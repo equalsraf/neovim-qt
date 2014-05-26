@@ -41,9 +41,6 @@ Afterwards just follow the build instructions above.
 
 A crapload of them
 
-* I must've been sleeping when I wrote the readyRead handler,
-  it works assuming the buffer does not need to grow ...
-  otherwise it is just broken
 * Error checking (start with the QIODevice related errros)
 * Function call errors are not being handled ATM
 * Deep check QVariants before starting to serialized them

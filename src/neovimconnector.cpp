@@ -3,8 +3,6 @@
 
 namespace NeoVimQt {
 
-#define BUFFER_ALLOC_STEP 8196
-
 NeoVimConnector::NeoVimConnector(QIODevice *s)
 :QObject(), m_socket(s), m_error(NoError), reqid(0), m_neovimobj(NULL)
 {
@@ -562,22 +560,27 @@ void NeoVimConnector::error(const msgpack_object& req, const QString& msg)
  */
 void NeoVimConnector::dataAvailable()
 {
-	if ( msgpack_unpacker_buffer_capacity(&m_uk) < BUFFER_ALLOC_STEP ) {
-		if ( !msgpack_unpacker_reserve_buffer(&m_uk, BUFFER_ALLOC_STEP ) ) {
-			qWarning() << "Could not allocate memory in unpack buffer";
-			return;
+	qint64 read = 1;
+	while (read > 0) {
+		if ( msgpack_unpacker_buffer_capacity(&m_uk) == 0 ) {
+			if ( !msgpack_unpacker_reserve_buffer(&m_uk, 8192 ) ) {
+				// FIXME: error out
+				qWarning() << "Could not allocate memory in unpack buffer";
+				return;
+			}
+		}
+
+		read = m_socket->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
+		qDebug() << __func__ << read << msgpack_unpacker_buffer_capacity(&m_uk);
+		if ( read > 0 ) {
+			msgpack_unpacker_buffer_consumed(&m_uk, read);
+			msgpack_unpacked result;
+			msgpack_unpacked_init(&result);
+			while(msgpack_unpacker_next(&m_uk, &result)) {
+				dispatch(result.data);
+			}
 		}
 	}
-
-	qint64 read = m_socket->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
-	msgpack_unpacker_buffer_consumed(&m_uk, read);
-	msgpack_unpacked result;
-	msgpack_unpacked_init(&result);
-	while(msgpack_unpacker_next(&m_uk, &result)) {
-		dispatch(result.data);
-	}
-	// FIXME: this MAY fail if we don't grow the buffer
-	// if msg was parsed grow the buffer and read more
 }
 
 /**
