@@ -13,7 +13,7 @@ The NeoVimConnector class is used to setup the connection to NeoVim. It also
 provides you with some VERY low level methods to call RPC functions - but in general
 you should be using the QObject returned by NeoVimConnector::neovimObject()
 
-1. To call a function just call the corresponding slot in - slots 
+1. To call a function just call the corresponding slot - slots 
    have the same names as the original neovim functions - 
    these are async (return void)
 2. To get the result of the call catch the corresponding signals,
@@ -34,7 +34,8 @@ From the project root
 
     lua scripts/code-gen.lua ../neovim/src/nvim/api/*.h src/auto/
 
-and then just follow the build instructions above
+The first path, points to the API headers in the neovim source code.
+Afterwards just follow the build instructions above.
 
 ## TODO
 
