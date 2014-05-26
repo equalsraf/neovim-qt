@@ -510,15 +510,18 @@ void NeoVim::window_is_valid(int64_t window)
 
 }
 
-void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error, const msgpack_object& res)
+void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool failed, const msgpack_object& res)
 {
+	bool convfail=true;
+	if ( failed ) {
+		emit error(m_c->to_QString(res));
+		return;
+	}
 	switch(fun) {
 	case Function::NEOVIM_FN_BUFFER_GET_LENGTH:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_length";
 			} else {
 				qDebug() << __func__ << data;
@@ -527,11 +530,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_LINE:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QString data = m_c->to_QString(res, &failed);
-			if (failed) {
+		{
+			QString data = m_c->to_QString(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_line";
 			} else {
 				qDebug() << __func__ << data;
@@ -540,25 +541,21 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_LINE:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_buffer_set_line";
 			emit on_buffer_set_line();
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_DEL_LINE:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_buffer_del_line";
 			emit on_buffer_del_line();
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_SLICE:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QStringList data = m_c->to_QStringList(res, &failed);
-			if (failed) {
+		{
+			QStringList data = m_c->to_QStringList(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_slice";
 			} else {
 				qDebug() << __func__ << data;
@@ -567,18 +564,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_SLICE:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_buffer_set_slice";
 			emit on_buffer_set_slice();
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_VAR:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_var";
 			} else {
 				qDebug() << __func__ << data;
@@ -587,11 +581,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_VAR:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_set_var";
 			} else {
 				qDebug() << __func__ << data;
@@ -600,11 +592,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_OPTION:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_option";
 			} else {
 				qDebug() << __func__ << data;
@@ -613,18 +603,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_OPTION:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_buffer_set_option";
 			emit on_buffer_set_option();
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_NAME:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QString data = m_c->to_QString(res, &failed);
-			if (failed) {
+		{
+			QString data = m_c->to_QString(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_name";
 			} else {
 				qDebug() << __func__ << data;
@@ -633,18 +620,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_NAME:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_buffer_set_name";
 			emit on_buffer_set_name();
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_IS_VALID:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			bool data = m_c->to_bool(res, &failed);
-			if (failed) {
+		{
+			bool data = m_c->to_bool(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_is_valid";
 			} else {
 				qDebug() << __func__ << data;
@@ -653,18 +637,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_INSERT:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_buffer_insert";
 			emit on_buffer_insert();
 		}
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_MARK:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QPoint data = m_c->to_QPoint(res, &failed);
-			if (failed) {
+		{
+			QPoint data = m_c->to_QPoint(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_mark";
 			} else {
 				qDebug() << __func__ << data;
@@ -673,11 +654,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW_COUNT:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal tabpage_get_window_count";
 			} else {
 				qDebug() << __func__ << data;
@@ -686,11 +665,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_TABPAGE_GET_VAR:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal tabpage_get_var";
 			} else {
 				qDebug() << __func__ << data;
@@ -699,11 +676,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_TABPAGE_SET_VAR:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal tabpage_set_var";
 			} else {
 				qDebug() << __func__ << data;
@@ -712,11 +687,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal tabpage_get_window";
 			} else {
 				qDebug() << __func__ << data;
@@ -725,11 +698,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_TABPAGE_IS_VALID:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			bool data = m_c->to_bool(res, &failed);
-			if (failed) {
+		{
+			bool data = m_c->to_bool(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal tabpage_is_valid";
 			} else {
 				qDebug() << __func__ << data;
@@ -738,25 +709,21 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_PUSH_KEYS:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_push_keys";
 			emit on_vim_push_keys();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_COMMAND:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_command";
 			emit on_vim_command();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_EVAL:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_eval";
 			} else {
 				qDebug() << __func__ << data;
@@ -765,11 +732,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_STRWIDTH:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_strwidth";
 			} else {
 				qDebug() << __func__ << data;
@@ -778,11 +743,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_LIST_RUNTIME_PATHS:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QStringList data = m_c->to_QStringList(res, &failed);
-			if (failed) {
+		{
+			QStringList data = m_c->to_QStringList(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_list_runtime_paths";
 			} else {
 				qDebug() << __func__ << data;
@@ -791,18 +754,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_CHANGE_DIRECTORY:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_change_directory";
 			emit on_vim_change_directory();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_CURRENT_LINE:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QString data = m_c->to_QString(res, &failed);
-			if (failed) {
+		{
+			QString data = m_c->to_QString(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_current_line";
 			} else {
 				qDebug() << __func__ << data;
@@ -811,25 +771,21 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_DEL_CURRENT_LINE:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_del_current_line";
 			emit on_vim_del_current_line();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_SET_CURRENT_LINE:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_set_current_line";
 			emit on_vim_set_current_line();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_VAR:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_var";
 			} else {
 				qDebug() << __func__ << data;
@@ -838,11 +794,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_SET_VAR:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_set_var";
 			} else {
 				qDebug() << __func__ << data;
@@ -851,11 +805,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_VVAR:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_vvar";
 			} else {
 				qDebug() << __func__ << data;
@@ -864,11 +816,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_OPTION:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_option";
 			} else {
 				qDebug() << __func__ << data;
@@ -877,32 +827,27 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_SET_OPTION:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_set_option";
 			emit on_vim_set_option();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_OUT_WRITE:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_out_write";
 			emit on_vim_out_write();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_ERR_WRITE:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_err_write";
 			emit on_vim_err_write();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_BUFFER_COUNT:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_buffer_count";
 			} else {
 				qDebug() << __func__ << data;
@@ -911,11 +856,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_CURRENT_BUFFER:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_current_buffer";
 			} else {
 				qDebug() << __func__ << data;
@@ -924,18 +867,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_SET_CURRENT_BUFFER:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_set_current_buffer";
 			emit on_vim_set_current_buffer();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_WINDOW_COUNT:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_window_count";
 			} else {
 				qDebug() << __func__ << data;
@@ -944,11 +884,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_CURRENT_WINDOW:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_current_window";
 			} else {
 				qDebug() << __func__ << data;
@@ -957,18 +895,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_SET_CURRENT_WINDOW:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_set_current_window";
 			emit on_vim_set_current_window();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_TABPAGE_COUNT:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_tabpage_count";
 			} else {
 				qDebug() << __func__ << data;
@@ -977,11 +912,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_CURRENT_TABPAGE:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_current_tabpage";
 			} else {
 				qDebug() << __func__ << data;
@@ -990,18 +923,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_SET_CURRENT_TABPAGE:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_vim_set_current_tabpage";
 			emit on_vim_set_current_tabpage();
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_BUFFER:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_buffer";
 			} else {
 				qDebug() << __func__ << data;
@@ -1010,11 +940,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_CURSOR:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QPoint data = m_c->to_QPoint(res, &failed);
-			if (failed) {
+		{
+			QPoint data = m_c->to_QPoint(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_cursor";
 			} else {
 				qDebug() << __func__ << data;
@@ -1023,18 +951,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_CURSOR:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_window_set_cursor";
 			emit on_window_set_cursor();
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_HEIGHT:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_height";
 			} else {
 				qDebug() << __func__ << data;
@@ -1043,18 +968,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_HEIGHT:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_window_set_height";
 			emit on_window_set_height();
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_WIDTH:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_width";
 			} else {
 				qDebug() << __func__ << data;
@@ -1063,18 +985,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_WIDTH:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_window_set_width";
 			emit on_window_set_width();
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_VAR:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_var";
 			} else {
 				qDebug() << __func__ << data;
@@ -1083,11 +1002,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_VAR:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_set_var";
 			} else {
 				qDebug() << __func__ << data;
@@ -1096,11 +1013,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_OPTION:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QVariant data = m_c->to_QVariant(res, &failed);
-			if (failed) {
+		{
+			QVariant data = m_c->to_QVariant(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_option";
 			} else {
 				qDebug() << __func__ << data;
@@ -1109,18 +1024,15 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_OPTION:
-		if ( error ) {
-		} else {
+		{
 			qDebug() << "on_window_set_option";
 			emit on_window_set_option();
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_POSITION:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			QPoint data = m_c->to_QPoint(res, &failed);
-			if (failed) {
+		{
+			QPoint data = m_c->to_QPoint(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_position";
 			} else {
 				qDebug() << __func__ << data;
@@ -1129,11 +1041,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_TABPAGE:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			int64_t data = m_c->to_int64_t(res, &failed);
-			if (failed) {
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_tabpage";
 			} else {
 				qDebug() << __func__ << data;
@@ -1142,11 +1052,9 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error
 		}
 		break;
 	case Function::NEOVIM_FN_WINDOW_IS_VALID:
-		if ( error ) {
-		} else {
-			bool failed=true;
-			bool data = m_c->to_bool(res, &failed);
-			if (failed) {
+		{
+			bool data = m_c->to_bool(res, &convfail);
+			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_is_valid";
 			} else {
 				qDebug() << __func__ << data;

@@ -185,6 +185,8 @@ public:
 	NeoVim(NeoVimConnector *);
 protected slots:
 	void handleResponse(uint32_t id, Function::FunctionId fun, bool error, const msgpack_object&);
+signals:
+	void error(const QString& errmsg);
 private:
 	NeoVimConnector *m_c;
 ]])
@@ -280,21 +282,23 @@ end
 
 -- and finally the response handler
 
-neovim_cpp:write('void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool error, const msgpack_object& res)\n{\n')
+neovim_cpp:write('void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool failed, const msgpack_object& res)\n{\n')
+neovim_cpp:write('\tbool convfail=true;\n')
+
+neovim_cpp:write('\tif ( failed ) {\n')
+neovim_cpp:write('\t\temit error(m_c->to_QString(res));\n')
+neovim_cpp:write('\t\treturn;\n')
+neovim_cpp:write('\t}\n\n')
 
 neovim_cpp:write('\tswitch(fun) {\n')
 for i = 1, #api.functions do
   local fn = api.functions[i]
   local return_type = (typedefs[fn.return_type] or fn.return_type)
   neovim_cpp:write('\tcase Function::'..fname_to_enum(fn.name)..':\n')
-  neovim_cpp:write('\t\tif ( error ) {\n')
-  -- FIXME: what do we do on error
-  neovim_cpp:write('\t\t} else {\n')
+  neovim_cpp:write('\t\t{\n') -- context
   if fn.return_type ~= 'void' then
-    neovim_cpp:write('\t\t\tbool failed=true;\n')
-    neovim_cpp:write('\t\t\t'..return_type..' data = m_c->to_'..return_type..'(res, &failed);\n')
-
-    neovim_cpp:write('\t\t\tif (failed) {\n')
+    neovim_cpp:write('\t\t\t'..return_type..' data = m_c->to_'..return_type..'(res, &convfail);\n')
+    neovim_cpp:write('\t\t\tif (convfail) {\n')
     neovim_cpp:write('\t\t\t\tqWarning() << "Error unpacking data for signal '..fn.name..'";\n')
     neovim_cpp:write('\t\t\t} else {\n')
     neovim_cpp:write('\t\t\t\tqDebug() << __func__ << data;\n')
@@ -307,7 +311,8 @@ for i = 1, #api.functions do
   end
 
 
-  neovim_cpp:write('\t\t}\n')
+--  neovim_cpp:write('\t\t}\n')
+  neovim_cpp:write('\t\t}\n') -- context
   neovim_cpp:write('\t\tbreak;\n')
 end
 

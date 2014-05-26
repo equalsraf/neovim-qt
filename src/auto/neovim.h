@@ -15,6 +15,8 @@ public:
 	NeoVim(NeoVimConnector *);
 protected slots:
 	void handleResponse(uint32_t id, Function::FunctionId fun, bool error, const msgpack_object&);
+signals:
+	void error(const QString& errmsg);
 private:
 	NeoVimConnector *m_c;
 public slots:
