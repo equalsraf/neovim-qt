@@ -216,7 +216,7 @@ end
 neovim_h:write([[
 
 };
-}; // Namespace
+} // Namespace
 #endif
 
 ]])
@@ -312,7 +312,7 @@ neovim_cpp:write('\t}\n') -- switch case
 neovim_cpp:write('\n}\n')
 
 neovim_cpp:write([[
-}; // Namespace
+} // Namespace
 ]])
 
 

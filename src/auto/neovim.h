@@ -143,6 +143,6 @@ signals:
 	void on_window_is_valid(Boolean);
 
 };
-}; // Namespace
+} // Namespace
 #endif
 

@@ -48,6 +48,6 @@ public:
 	const static QList<Function> knownFunctions;
 };
 
-};
+}
 
 #endif // NEOVIM_QT_FUNCTIONS

@@ -1087,4 +1087,4 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 	}
 
 }
-}; // Namespace
+} // Namespace

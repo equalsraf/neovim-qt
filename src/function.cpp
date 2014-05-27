@@ -42,5 +42,5 @@ bool Function::operator==(const Function& other)
 	return true;
 }
 
-}; // Namespace
+} // Namespace
 

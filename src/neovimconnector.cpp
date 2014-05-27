@@ -4,7 +4,7 @@
 namespace NeoVimQt {
 
 NeoVimConnector::NeoVimConnector(QIODevice *s)
-:QObject(), m_socket(s), m_error(NoError), reqid(0), m_neovimobj(NULL), m_channel(0)
+:QObject(), reqid(0), m_socket(s), m_error(NoError), m_neovimobj(NULL), m_channel(0)
 {
 	msgpack_packer_init(&m_pk, this, NeoVimConnector::msgpack_write_cb);
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
@@ -783,7 +783,7 @@ void NeoVimRequest::setFunction(Function::FunctionId f)
 	m_function = f;
 }
 
-}; // namespace NeoVimQt
+} // namespace NeoVimQt
 
 
 #include "moc_neovimconnector.cpp"

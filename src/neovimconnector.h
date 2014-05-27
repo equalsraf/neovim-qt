@@ -130,6 +130,6 @@ private:
 	uint64_t m_channel;
 };
 
-}; // namespace NeoVimQt
+} // namespace NeoVimQt
 
 #endif
