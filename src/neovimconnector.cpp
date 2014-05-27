@@ -49,7 +49,6 @@ int NeoVimConnector::msgpack_write_cb(void* data, const char* buf, unsigned int 
  */
 NeoVimRequest* NeoVimConnector::startRequestUnchecked(uint32_t method, uint32_t argcount)
 {
-	qDebug() << __func__ << method << argcount;
 	uint32_t msgid = this->reqid++;
 	// [type(0), msgid, method, args]
 	msgpack_pack_array(&m_pk, 4);

@@ -290,7 +290,7 @@ for i = 1, #api.functions do
     neovim_cpp:write('\t\t\tif (convfail) {\n')
     neovim_cpp:write('\t\t\t\tqWarning() << "Error unpacking data for signal '..fn.name..'";\n')
     neovim_cpp:write('\t\t\t} else {\n')
-    neovim_cpp:write('\t\t\t\tqDebug() << __func__ << data;\n')
+    neovim_cpp:write('\t\t\t\tqDebug() << "'..fn.name..' ->" << data;\n')
     neovim_cpp:write('\t\t\t\temit on_'..fn.name..'(data);\n')
     neovim_cpp:write('\t\t\t}\n')
 
