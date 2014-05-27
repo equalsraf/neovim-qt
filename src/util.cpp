@@ -1,5 +1,26 @@
 #include "util.h"
 
+namespace NeoVimQt {
+
+/**
+ * Some NeoVim functions take arguments of type **Object** which works an
+ * abstract container for various data types - In this lib we use QVariant
+ * for this purpose
+ *
+ * The problem being that QVariant can encapsulate some data types that cannot
+ * be serialised at as msgpack data, or just would not make sense for NeoVim to
+ * handle.
+ *
+ * Ideally we would detect such errors early on and avoid sending those objects
+ * entirely - this function checks if QVariant objects are admissible
+ */
+bool checkVariant(const QVariant& )
+{
+	// FIXME: implement my please :D
+	return true;
+}
+} // namespace
+
 /**
  * Overload to use msgpack_object with qDebug()
  *

@@ -190,7 +190,6 @@ void NeoVimConnector::send(const QVariant& var)
 		msgpack_pack_int64(&m_pk, var.toPoint().y());
 		msgpack_pack_int64(&m_pk, var.toPoint().x());
 	default:
-		// FIXME: This should not be possible - write checkVariant() was used
 		msgpack_pack_nil(&m_pk);
 		qWarning() << "Trying to pack unsupported variant type" << var.type() << "packing Nil instead";
 	}
