@@ -352,6 +352,46 @@ int64_t NeoVimConnector::to_int64_t(const msgpack_object& obj, bool *failed)
 	return obj.via.i64;
 }
 
+QList<int64_t> NeoVimConnector::to_IntegerArray(const msgpack_object& obj, bool *failed)
+{
+	if ( failed ) {
+		*failed = true;
+	}
+	if ( obj.type != MSGPACK_OBJECT_ARRAY) {
+		setError(UnexpectedMsg,
+				tr("Found unexpected data type when unpacking a QList<int64_t>"));
+		return QList<int64_t>();
+	}
+
+	QList<int64_t> ret;
+	for (uint32_t i=0; i<obj.via.array.size; i++) {
+		if ( obj.via.array.ptr[i].type != MSGPACK_OBJECT_RAW ) {
+			setError(UnexpectedMsg,
+				tr("Found non-raw element type when unpacking a QStringList"));
+			return QList<int64_t>();
+		}
+		ret.append(to_int64_t(obj));
+	}
+
+	if ( failed ) {
+		*failed = false;
+	}
+	return ret;
+}
+
+QList<int64_t> NeoVimConnector::to_WindowArray(const msgpack_object& obj, bool *failed)
+{
+	return to_IntegerArray(obj, failed);
+}
+QList<int64_t> NeoVimConnector::to_BufferArray(const msgpack_object& obj, bool *failed)
+{
+	return to_IntegerArray(obj, failed);
+}
+QList<int64_t> NeoVimConnector::to_TabpageArray(const msgpack_object& obj, bool *failed)
+{
+	return to_IntegerArray(obj, failed);
+}
+
 QList<QByteArray> NeoVimConnector::parseParameters(const msgpack_object& obj)
 {
 	QList<QByteArray> fail;

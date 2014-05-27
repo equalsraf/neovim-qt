@@ -11,6 +11,10 @@
 
 namespace NeoVimQt {
 
+typedef QList<int64_t> BufferArray;
+typedef QList<int64_t> WindowArray;
+typedef QList<int64_t> TabpageArray;
+
 /**
  * A function signature used to identify NeoVim RPC functions 
  *

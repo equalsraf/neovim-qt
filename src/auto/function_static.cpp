@@ -58,6 +58,10 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 		<< QByteArray("String")
 		<< QByteArray("Object")
 	, true)
+<< Function( "Integer", "buffer_get_number",
+	QList<QByteArray>()
+		<< QByteArray("Buffer")
+	, true)
 << Function( "String", "buffer_get_name",
 	QList<QByteArray>()
 		<< QByteArray("Buffer")
@@ -82,7 +86,7 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 		<< QByteArray("Buffer")
 		<< QByteArray("String")
 	, true)
-<< Function( "Integer", "tabpage_get_window_count",
+<< Function( "WindowArray", "tabpage_get_windows",
 	QList<QByteArray>()
 		<< QByteArray("Tabpage")
 	, true)
@@ -168,7 +172,7 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 	QList<QByteArray>()
 		<< QByteArray("String")
 	, false)
-<< Function( "Integer", "vim_get_buffer_count",
+<< Function( "BufferArray", "vim_get_buffers",
 	QList<QByteArray>()
 	, false)
 << Function( "Buffer", "vim_get_current_buffer",
@@ -178,7 +182,7 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 	QList<QByteArray>()
 		<< QByteArray("Buffer")
 	, true)
-<< Function( "Integer", "vim_get_window_count",
+<< Function( "WindowArray", "vim_get_windows",
 	QList<QByteArray>()
 	, false)
 << Function( "Window", "vim_get_current_window",
@@ -188,7 +192,7 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 	QList<QByteArray>()
 		<< QByteArray("Window")
 	, true)
-<< Function( "Integer", "vim_get_tabpage_count",
+<< Function( "TabpageArray", "vim_get_tabpages",
 	QList<QByteArray>()
 	, false)
 << Function( "Tabpage", "vim_get_current_tabpage",

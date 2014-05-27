@@ -109,6 +109,14 @@ void NeoVim::buffer_set_option(int64_t buffer, QString name, QVariant value)
 
 }
 
+void NeoVim::buffer_get_number(int64_t buffer)
+{
+	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_GET_NUMBER, 1);
+	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
+	m_c->send(buffer);
+
+}
+
 void NeoVim::buffer_get_name(int64_t buffer)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_GET_NAME, 1);
@@ -153,9 +161,9 @@ void NeoVim::buffer_get_mark(int64_t buffer, QString name)
 
 }
 
-void NeoVim::tabpage_get_window_count(int64_t tabpage)
+void NeoVim::tabpage_get_windows(int64_t tabpage)
 {
-	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_TABPAGE_GET_WINDOW_COUNT, 1);
+	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_TABPAGE_GET_WINDOWS, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
 	m_c->send(tabpage);
 
@@ -323,9 +331,9 @@ void NeoVim::vim_err_write(QString str)
 
 }
 
-void NeoVim::vim_get_buffer_count()
+void NeoVim::vim_get_buffers()
 {
-	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_GET_BUFFER_COUNT, 0);
+	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_GET_BUFFERS, 0);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
 
 }
@@ -345,9 +353,9 @@ void NeoVim::vim_set_current_buffer(int64_t buffer)
 
 }
 
-void NeoVim::vim_get_window_count()
+void NeoVim::vim_get_windows()
 {
-	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_GET_WINDOW_COUNT, 0);
+	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_GET_WINDOWS, 0);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
 
 }
@@ -367,9 +375,9 @@ void NeoVim::vim_set_current_window(int64_t window)
 
 }
 
-void NeoVim::vim_get_tabpage_count()
+void NeoVim::vim_get_tabpages()
 {
-	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_GET_TABPAGE_COUNT, 0);
+	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_GET_TABPAGES, 0);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
 
 }
@@ -517,6 +525,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		emit error(m_c->to_QString(res));
 		return;
 	}
+
 	switch(fun) {
 	case Function::NEOVIM_FN_BUFFER_GET_LENGTH:
 		{
@@ -608,6 +617,17 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 			emit on_buffer_set_option();
 		}
 		break;
+	case Function::NEOVIM_FN_BUFFER_GET_NUMBER:
+		{
+			int64_t data = m_c->to_int64_t(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal buffer_get_number";
+			} else {
+				qDebug() << __func__ << data;
+				emit on_buffer_get_number(data);
+			}
+		}
+		break;
 	case Function::NEOVIM_FN_BUFFER_GET_NAME:
 		{
 			QString data = m_c->to_QString(res, &convfail);
@@ -653,14 +673,14 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 			}
 		}
 		break;
-	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW_COUNT:
+	case Function::NEOVIM_FN_TABPAGE_GET_WINDOWS:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			WindowArray data = m_c->to_WindowArray(res, &convfail);
 			if (convfail) {
-				qWarning() << "Error unpacking data for signal tabpage_get_window_count";
+				qWarning() << "Error unpacking data for signal tabpage_get_windows";
 			} else {
 				qDebug() << __func__ << data;
-				emit on_tabpage_get_window_count(data);
+				emit on_tabpage_get_windows(data);
 			}
 		}
 		break;
@@ -844,14 +864,14 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 			emit on_vim_err_write();
 		}
 		break;
-	case Function::NEOVIM_FN_VIM_GET_BUFFER_COUNT:
+	case Function::NEOVIM_FN_VIM_GET_BUFFERS:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			BufferArray data = m_c->to_BufferArray(res, &convfail);
 			if (convfail) {
-				qWarning() << "Error unpacking data for signal vim_get_buffer_count";
+				qWarning() << "Error unpacking data for signal vim_get_buffers";
 			} else {
 				qDebug() << __func__ << data;
-				emit on_vim_get_buffer_count(data);
+				emit on_vim_get_buffers(data);
 			}
 		}
 		break;
@@ -872,14 +892,14 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 			emit on_vim_set_current_buffer();
 		}
 		break;
-	case Function::NEOVIM_FN_VIM_GET_WINDOW_COUNT:
+	case Function::NEOVIM_FN_VIM_GET_WINDOWS:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			WindowArray data = m_c->to_WindowArray(res, &convfail);
 			if (convfail) {
-				qWarning() << "Error unpacking data for signal vim_get_window_count";
+				qWarning() << "Error unpacking data for signal vim_get_windows";
 			} else {
 				qDebug() << __func__ << data;
-				emit on_vim_get_window_count(data);
+				emit on_vim_get_windows(data);
 			}
 		}
 		break;
@@ -900,14 +920,14 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 			emit on_vim_set_current_window();
 		}
 		break;
-	case Function::NEOVIM_FN_VIM_GET_TABPAGE_COUNT:
+	case Function::NEOVIM_FN_VIM_GET_TABPAGES:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			TabpageArray data = m_c->to_TabpageArray(res, &convfail);
 			if (convfail) {
-				qWarning() << "Error unpacking data for signal vim_get_tabpage_count";
+				qWarning() << "Error unpacking data for signal vim_get_tabpages";
 			} else {
 				qDebug() << __func__ << data;
-				emit on_vim_get_tabpage_count(data);
+				emit on_vim_get_tabpages(data);
 			}
 		}
 		break;

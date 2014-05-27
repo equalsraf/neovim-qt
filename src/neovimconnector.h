@@ -71,6 +71,10 @@ public:
 	QStringList to_QStringList(const msgpack_object&, bool *failed=NULL);
 	QPoint to_QPoint(const msgpack_object&, bool *failed=NULL);
 	QVariant to_QVariant(const msgpack_object& msg, bool *failed=NULL);
+	QList<int64_t> to_IntegerArray(const msgpack_object& msg, bool *failed=NULL);
+	QList<int64_t> to_WindowArray(const msgpack_object& msg, bool *failed=NULL);
+	QList<int64_t> to_BufferArray(const msgpack_object& msg, bool *failed=NULL);
+	QList<int64_t> to_TabpageArray(const msgpack_object& msg, bool *failed=NULL);
 
 	//static QVariant toVariant(const msgpack_object&);
 
