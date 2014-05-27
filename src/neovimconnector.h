@@ -31,6 +31,8 @@ class NeoVimConnector: public QObject
 
 public:
 	enum NeoVimError {
+		DeviceNotOpen,
+		InvalidDevice,
 		NoError,
 		NoMetadata,
 		MetadataDescriptorError,

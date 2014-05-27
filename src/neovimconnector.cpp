@@ -11,7 +11,17 @@ NeoVimConnector::NeoVimConnector(QIODevice *s)
 
 	connect(m_socket, &QAbstractSocket::readyRead,
 			this, &NeoVimConnector::dataAvailable);
-	// FIXME: IO errors
+
+	if ( !s->isOpen() ) {
+		setError(DeviceNotOpen, tr("IO device is not open"));
+		return;
+	}
+
+	if ( !s->isSequential() ) {
+		setError(InvalidDevice, tr("IO device needs to be sequential"));
+		return;
+	}
+
 	discoverMetadata();
 }
 
@@ -27,6 +37,16 @@ void NeoVimConnector::setError(NeoVimError err, const QString& msg)
 	m_errorString = msg;
 	qWarning() << m_errorString;
 	emit error(m_error);
+}
+
+NeoVimConnector::NeoVimError NeoVimConnector::error()
+{
+	return m_error;
+}
+
+QString NeoVimConnector::errorString()
+{
+	return m_errorString;
 }
 
 /**
