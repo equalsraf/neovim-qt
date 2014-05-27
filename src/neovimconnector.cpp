@@ -6,6 +6,8 @@ namespace NeoVimQt {
 NeoVimConnector::NeoVimConnector(QIODevice *s)
 :QObject(), reqid(0), m_socket(s), m_error(NoError), m_neovimobj(NULL), m_channel(0)
 {
+	qRegisterMetaType<NeoVimError>("NeoVimError");
+
 	msgpack_packer_init(&m_pk, this, NeoVimConnector::msgpack_write_cb);
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
 

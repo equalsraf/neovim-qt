@@ -28,7 +28,7 @@ private:
 class NeoVimConnector: public QObject
 {
 	Q_OBJECT
-
+	Q_ENUMS(NeoVimError)
 public:
 	enum NeoVimError {
 		DeviceNotOpen,
@@ -96,7 +96,6 @@ signals:
 	void error(NeoVimError);
 
 protected:
-	void discoverMetadata();
 
 	void dispatch(msgpack_object& obj);
 	void dispatchRequest(msgpack_object& obj);
@@ -111,6 +110,7 @@ protected:
 	void setError(NeoVimError err, const QString& msg);
 
 protected slots:
+	void discoverMetadata();
 	void dataAvailable();
 	void handleMetadata(uint32_t, Function::FunctionId, bool error, const msgpack_object& result);
 
@@ -131,7 +131,7 @@ private:
 	NeoVim *m_neovimobj;
 	uint64_t m_channel;
 };
-
 } // namespace NeoVimQt
+Q_DECLARE_METATYPE(NeoVimQt::NeoVimConnector::NeoVimError)
 
 #endif
