@@ -407,9 +407,8 @@ void NeoVimConnector::addFunctions(const msgpack_object& ftable)
 
 	Q_ASSERT(m_functionToId.size() == m_idToFunction.size());
 	if ( Function::knownFunctions.size() != m_functionToId.size() ) {
-		qDebug() << "API mismatch";
 		setError( APIMisMatch,
-				tr("Cannot connect to this instance of NeoVim, its version is likely too old"));
+				tr("Cannot connect to this instance of NeoVim, its version is likely too old, or the API has changed"));
 		return;
 	}
 	emit ready();
@@ -509,10 +508,24 @@ void NeoVimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool 
 		return;
 	}
 
+	if ( result.type != MSGPACK_OBJECT_ARRAY || 
+			result.via.array.size != 2 ||
+			result.via.array.ptr[0].type != MSGPACK_OBJECT_POSITIVE_INTEGER ||
+			result.via.array.ptr[1].type != MSGPACK_OBJECT_RAW ) {
+		setError(UnexpectedMsg,
+				tr("Unable to unpack metadata response description, unexpected data type"));
+		return;
+	}
+
+	// FIXME: store the channel id, we need to implement API notifications
+
+	const msgpack_object& metadataraw = result.via.array.ptr[1];
 	// The metadata bytearray is actually a serialized msgpack 
 	msgpack_unpacked msg;
 	msgpack_unpacked_init(&msg);
-	bool ok = msgpack_unpack_next(&msg, result.via.raw.ptr, result.via.raw.size, NULL);
+	bool ok = msgpack_unpack_next(&msg, 
+			metadataraw.via.raw.ptr,
+			metadataraw.via.raw.size, NULL);
 	if ( !ok ) {
 		setError(UnexpectedMsg,
 				tr("Unable to unpack metadata description"));
