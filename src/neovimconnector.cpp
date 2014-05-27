@@ -258,7 +258,7 @@ QString NeoVimConnector::to_String(const msgpack_object& obj, bool *failed)
 	}
 	if ( obj.type != MSGPACK_OBJECT_RAW ) {
 		setError(UnexpectedMsg,
-				tr("Found unexpected data type when unpacking a string"));
+				tr("Found unexpected data type when unpacking a String"));
 		return QString();
 	} else if ( failed ) {
 		*failed = false;
@@ -327,7 +327,7 @@ StringArray NeoVimConnector::to_StringArray(const msgpack_object& obj, bool *fai
 				tr("Found non-raw element type when unpacking a QStringList"));
 			return QStringList();
 		}
-		ret.append(to_String(obj));
+		ret.append(to_String(obj.via.array.ptr[i]));
 	}
 
 	if ( failed ) {
@@ -378,12 +378,12 @@ QList<int64_t> NeoVimConnector::to_IntegerArray(const msgpack_object& obj, bool 
 
 	QList<int64_t> ret;
 	for (uint32_t i=0; i<obj.via.array.size; i++) {
-		if ( obj.via.array.ptr[i].type != MSGPACK_OBJECT_RAW ) {
+		if ( obj.via.array.ptr[i].type != MSGPACK_OBJECT_POSITIVE_INTEGER ) {
 			setError(UnexpectedMsg,
-				tr("Found non-raw element type when unpacking a QStringList"));
+				tr("Found non-raw element type when unpacking an IntegerArray"));
 			return QList<int64_t>();
 		}
-		ret.append(to_Integer(obj));
+		ret.append(to_Integer(obj.via.array.ptr[i]));
 	}
 
 	if ( failed ) {
