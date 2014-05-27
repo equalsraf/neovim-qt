@@ -701,7 +701,6 @@ NeoVim* NeoVimConnector::neovimObject()
 NeoVimRequest::NeoVimRequest(uint32_t id, QObject *parent)
 :QObject(parent), m_id(id), m_function(Function::NEOVIM_FN_NULL)
 {
-	m_function = Function::NEOVIM_FN_NULL;
 }
 
 void NeoVimRequest::processResponse(const msgpack_object& res, bool error)
