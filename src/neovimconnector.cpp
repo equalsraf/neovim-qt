@@ -571,7 +571,6 @@ void NeoVimConnector::dataAvailable()
 		}
 
 		read = m_socket->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
-		qDebug() << __func__ << read << msgpack_unpacker_buffer_capacity(&m_uk);
 		if ( read > 0 ) {
 			msgpack_unpacker_buffer_consumed(&m_uk, read);
 			msgpack_unpacked result;
