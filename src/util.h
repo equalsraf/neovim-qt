@@ -6,10 +6,10 @@
 #include "function.h"
 
 QDebug operator<<(QDebug dbg, const msgpack_object&);
-QDebug operator<<(QDebug dbg, const NeoVimQt::Function& f);
+QDebug operator<<(QDebug dbg, const NeovimQt::Function& f);
 
-namespace NeoVimQt {
+namespace NeovimQt {
 bool checkVariant(const QVariant&);
-};
+}
 
 #endif

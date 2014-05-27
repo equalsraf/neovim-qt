@@ -9,16 +9,16 @@
 #include "function.h"
 #include "auto/neovim.h"
 
-namespace NeoVimQt {
+namespace NeovimQt {
 
 /**
- * NeoVimRequest objects track RPC calls
+ * NeovimRequest objects track RPC calls
  * to Neovim
  */
-class NeoVimRequest: public QObject {
+class NeovimRequest: public QObject {
 	Q_OBJECT
 public:
-	NeoVimRequest(uint32_t id, QObject *parent=0);
+	NeovimRequest(uint32_t id, QObject *parent=0);
 	void processResponse(const msgpack_object& res, bool error=false);
 	void setFunction(Function::FunctionId);
 	Function::FunctionId function();
@@ -29,12 +29,12 @@ private:
 	Function::FunctionId m_function;
 };
 
-class NeoVimConnector: public QObject
+class NeovimConnector: public QObject
 {
 	Q_OBJECT
-	Q_ENUMS(NeoVimError)
+	Q_ENUMS(NeovimError)
 public:
-	enum NeoVimError {
+	enum NeovimError {
 		DeviceNotOpen,
 		InvalidDevice,
 		NoError,
@@ -45,17 +45,17 @@ public:
 		NoSuchMethod,
 	};
 
-	NeoVimConnector(QIODevice* s);
-	~NeoVimConnector();
+	NeovimConnector(QIODevice* s);
+	~NeovimConnector();
 
-	NeoVimError error();
+	NeovimError error();
 	QString errorString();
 
-	NeoVimRequest* startRequestUnchecked(uint32_t method, uint32_t argcount);
+	NeovimRequest* startRequestUnchecked(uint32_t method, uint32_t argcount);
 	// FIXME: add argcount verification, e.g.
 	// - remove the argcount from this method
 	// - count calls to send() and match agains argcount - fail hard on mismatch
-	NeoVimRequest* startRequest(Function::FunctionId method, uint32_t argcount);
+	NeovimRequest* startRequest(Function::FunctionId method, uint32_t argcount);
 
 	// Methods to pack datatypes as message pack
 	// This is what you can use for arguments after startRequest
@@ -89,14 +89,14 @@ public:
 	BufferArray to_BufferArray(const msgpack_object& msg, bool *failed=NULL);
 	TabpageArray to_TabpageArray(const msgpack_object& msg, bool *failed=NULL);
 
-	NeoVim* neovimObject();
+	Neovim* neovimObject();
 
 signals:
 	void ready();
-	void error(NeoVimError);
+	void error(NeovimError);
 
 protected:
-	void setError(NeoVimError err, const QString& msg);
+	void setError(NeovimError err, const QString& msg);
 
 	// Message handlers
 	void dispatch(msgpack_object& obj);
@@ -124,16 +124,16 @@ private:
 	msgpack_packer m_pk;
 	msgpack_unpacker m_uk;
 
-	QHash<uint32_t, NeoVimRequest*> m_requests;
+	QHash<uint32_t, NeovimRequest*> m_requests;
 	QString m_errorString;
-	NeoVimError m_error;
+	NeovimError m_error;
 
 	QHash<Function::FunctionId, uint64_t> m_functionToId;
 	QHash<uint64_t, Function::FunctionId> m_idToFunction;
-	NeoVim *m_neovimobj;
+	Neovim *m_neovimobj;
 	uint64_t m_channel;
 };
-} // namespace NeoVimQt
-Q_DECLARE_METATYPE(NeoVimQt::NeoVimConnector::NeoVimError)
+} // namespace NeovimQt
+Q_DECLARE_METATYPE(NeovimQt::NeovimConnector::NeovimError)
 
 #endif

@@ -9,7 +9,7 @@
 #include <QStringList>
 #include <QPoint>
 
-namespace NeoVimQt {
+namespace NeovimQt {
 
 typedef int64_t Integer;
 typedef QPoint Position;
@@ -25,7 +25,7 @@ typedef QList<int64_t> TabpageArray;
 typedef QStringList StringArray;
 
 /**
- * A function signature used to identify NeoVim RPC functions 
+ * A function signature used to identify Neovim RPC functions 
  *
  * The static list **knowFunctions** holds a list of all the supported
  * signature.

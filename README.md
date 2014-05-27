@@ -9,18 +9,18 @@ A library to talk with neovim in Qt
 
 ## Design
 
-The NeoVimConnector class is used to setup the connection to NeoVim. It also
+The NeovimConnector class is used to setup the connection to Neovim. It also
 provides you with some VERY low level methods to call RPC functions - but in general
-you should be using the QObject returned by NeoVimConnector::neovimObject()
+you should be using the QObject returned by NeovimConnector::neovimObject()
 
 1. To call a function just call the corresponding slot - slots 
    have the same names as the original neovim functions - 
    these are async (return void)
 2. To get the result of the call catch the corresponding signals,
    by convention these signals are named 'on\_' + slot\_name
-3. The NeoVim() class is automagically generated using a lua script
+3. The Neovim() class is automagically generated using a lua script
    (based on the dispatch generator from neovim)
-5. For NeoVim functions that take the **Object** type we use **QVariant**,
+5. For Neovim functions that take the **Object** type we use **QVariant**,
    this seems to be the natural equivalent in Qt
 
 ## Requirements
@@ -50,6 +50,6 @@ A crapload of them
   QEventLoop
 * Start considering testing ...
 * Make it pretty, i.e. hide msgpack internals, PIMPL the
-  NeoVimConnector/Function class, etc
+  NeovimConnector/Function class, etc
 * Add some cmake rules to call the lua generator
 

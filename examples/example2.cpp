@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 	s.connectToServer(QLatin1String("/tmp/neovim"));
 	qDebug() << s.waitForConnected();
 
-	NeoVimQt::NeoVimConnector c(&s);
+	NeovimQt::NeovimConnector c(&s);
 	QLineEdit line;
 	line.setEnabled(false);
 	line.show();
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 	
 	// You must wait for the ready signal before trying to use the neovim object
 	// otherwise funky things will happen, like all your calls being dropped
-	QObject::connect(&c, &NeoVimQt::NeoVimConnector::ready,
+	QObject::connect(&c, &NeovimQt::NeovimConnector::ready,
 			[&c, &line]() {
 			line.setEnabled(true);
 			});

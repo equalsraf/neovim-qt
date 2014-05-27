@@ -3,7 +3,7 @@
 #include <QStringList>
 #include "util.h"
 
-namespace NeoVimQt {
+namespace NeovimQt {
 
 #include "auto/function_static.cpp"
 

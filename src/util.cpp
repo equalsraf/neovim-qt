@@ -1,14 +1,14 @@
 #include "util.h"
 
-namespace NeoVimQt {
+namespace NeovimQt {
 
 /**
- * Some NeoVim functions take arguments of type **Object** which works an
+ * Some Neovim functions take arguments of type **Object** which works an
  * abstract container for various data types - In this lib we use QVariant
  * for this purpose
  *
  * The problem being that QVariant can encapsulate some data types that cannot
- * be serialised at as msgpack data, or just would not make sense for NeoVim to
+ * be serialised at as msgpack data, or just would not make sense for Neovim to
  * handle.
  *
  * Ideally we would detect such errors early on and avoid sending those objects
@@ -71,7 +71,7 @@ QDebug operator<<(QDebug dbg, const msgpack_object& obj)
 }
 
 
-QDebug operator<<(QDebug dbg, const NeoVimQt::Function& f)
+QDebug operator<<(QDebug dbg, const NeovimQt::Function& f)
 {
 	dbg.space() << f.return_type << f.name << "(";
 	foreach(QByteArray p, f.parameterTypes) {

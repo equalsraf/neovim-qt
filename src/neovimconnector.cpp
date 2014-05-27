@@ -1,18 +1,18 @@
 #include "neovimconnector.h"
 #include <QtGlobal>
 
-namespace NeoVimQt {
+namespace NeovimQt {
 
-NeoVimConnector::NeoVimConnector(QIODevice *s)
+NeovimConnector::NeovimConnector(QIODevice *s)
 :QObject(), reqid(0), m_socket(s), m_error(NoError), m_neovimobj(NULL), m_channel(0)
 {
-	qRegisterMetaType<NeoVimError>("NeoVimError");
+	qRegisterMetaType<NeovimError>("NeovimError");
 
-	msgpack_packer_init(&m_pk, this, NeoVimConnector::msgpack_write_cb);
+	msgpack_packer_init(&m_pk, this, NeovimConnector::msgpack_write_cb);
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
 
 	connect(m_socket, &QAbstractSocket::readyRead,
-			this, &NeoVimConnector::dataAvailable);
+			this, &NeovimConnector::dataAvailable);
 
 	if ( !s->isOpen() ) {
 		setError(DeviceNotOpen, tr("IO device is not open"));
@@ -27,13 +27,13 @@ NeoVimConnector::NeoVimConnector(QIODevice *s)
 	discoverMetadata();
 }
 
-NeoVimConnector::~NeoVimConnector()
+NeovimConnector::~NeovimConnector()
 {
 	//msgpack_packer_destroy(&m_pk);
 	msgpack_unpacker_destroy(&m_uk);
 }
 
-void NeoVimConnector::setError(NeoVimError err, const QString& msg)
+void NeovimConnector::setError(NeovimError err, const QString& msg)
 {
 	m_error = err;
 	m_errorString = msg;
@@ -41,12 +41,12 @@ void NeoVimConnector::setError(NeoVimError err, const QString& msg)
 	emit error(m_error);
 }
 
-NeoVimConnector::NeoVimError NeoVimConnector::error()
+NeovimConnector::NeovimError NeovimConnector::error()
 {
 	return m_error;
 }
 
-QString NeoVimConnector::errorString()
+QString NeovimConnector::errorString()
 {
 	return m_errorString;
 }
@@ -54,9 +54,9 @@ QString NeoVimConnector::errorString()
 /**
  * Called when the msgpack packer has data to write
  */
-int NeoVimConnector::msgpack_write_cb(void* data, const char* buf, unsigned int len)
+int NeovimConnector::msgpack_write_cb(void* data, const char* buf, unsigned int len)
 {
-	NeoVimConnector *c = static_cast<NeoVimConnector*>(data);
+	NeovimConnector *c = static_cast<NeovimConnector*>(data);
 	return c->m_socket->write(buf, len);
 }
 
@@ -66,10 +66,10 @@ int NeoVimConnector::msgpack_write_cb(void* data, const char* buf, unsigned int 
  * It is up to the caller to call msgpack_pack* to
  * pack each individual argument
  *
- * Returns a NeoVimRequest object. You can connect to
+ * Returns a NeovimRequest object. You can connect to
  * its finished() SIGNAL to handle the response
  */
-NeoVimRequest* NeoVimConnector::startRequestUnchecked(uint32_t method, uint32_t argcount)
+NeovimRequest* NeovimConnector::startRequestUnchecked(uint32_t method, uint32_t argcount)
 {
 	uint32_t msgid = this->reqid++;
 	// [type(0), msgid, method, args]
@@ -79,12 +79,12 @@ NeoVimRequest* NeoVimConnector::startRequestUnchecked(uint32_t method, uint32_t 
 	msgpack_pack_int(&m_pk, method);
 	msgpack_pack_array(&m_pk, argcount);
 
-	NeoVimRequest *r = new NeoVimRequest( msgid, this);
+	NeovimRequest *r = new NeovimRequest( msgid, this);
 	m_requests.insert(msgid, r);
 	return r;
 }
 
-NeoVimRequest* NeoVimConnector::startRequest(Function::FunctionId method, uint32_t argcount)
+NeovimRequest* NeovimConnector::startRequest(Function::FunctionId method, uint32_t argcount)
 {
 	if ( !m_functionToId.contains(method) ) {
 		QString err = tr("Attempting to call method that is not supported by the remote server! Did you wait for the ready signal?");
@@ -92,18 +92,18 @@ NeoVimRequest* NeoVimConnector::startRequest(Function::FunctionId method, uint32
 		setError(NoSuchMethod, err);
 		return NULL;
 	}
-	NeoVimRequest *r = startRequestUnchecked(m_functionToId.value(method), argcount);
+	NeovimRequest *r = startRequestUnchecked(m_functionToId.value(method), argcount);
 	r->setFunction(method);
 	return r;
 }
 
-void NeoVimConnector::send(int64_t i)
+void NeovimConnector::send(int64_t i)
 {
 	qDebug() << __func__ << i;
 	msgpack_pack_int64(&m_pk, i);
 }
 
-void NeoVimConnector::send(const QString& str)
+void NeovimConnector::send(const QString& str)
 {
 	qDebug() << __func__ << str;
 	QByteArray utf8 = str.toUtf8();
@@ -111,7 +111,7 @@ void NeoVimConnector::send(const QString& str)
 	msgpack_pack_raw_body(&m_pk, utf8.constData(), utf8.size());
 }
 
-void NeoVimConnector::send(const QStringList& strlist)
+void NeovimConnector::send(const QStringList& strlist)
 {
 	qDebug() << __func__ << strlist;
 	msgpack_pack_array(&m_pk, strlist.size());
@@ -120,14 +120,14 @@ void NeoVimConnector::send(const QStringList& strlist)
 	}
 }
 
-void NeoVimConnector::send(const QByteArray& raw)
+void NeovimConnector::send(const QByteArray& raw)
 {
 	qDebug() << __func__ << raw;
 	msgpack_pack_raw(&m_pk, raw.size());
 	msgpack_pack_raw_body(&m_pk, raw.constData(), raw.size());
 }
 
-void NeoVimConnector::send(bool b)
+void NeovimConnector::send(bool b)
 {
 	qDebug() << __func__ << b;
 	if ( b ) {
@@ -141,7 +141,7 @@ void NeoVimConnector::send(bool b)
  * We use QVariants for RPC functions that use the *Object* type do not use
  * this in any other conditions
  */
-void NeoVimConnector::send(const QVariant& var)
+void NeovimConnector::send(const QVariant& var)
 {
 	qDebug() << __func__ << var;
 	switch((QMetaType::Type)var.type()) {
@@ -200,7 +200,7 @@ void NeoVimConnector::send(const QVariant& var)
  * We use QVariants for RPC functions use the *Object* type do not use this in any other conditions
  *
  */
-Object NeoVimConnector::to_Object(const msgpack_object& obj, bool *failed)
+Object NeovimConnector::to_Object(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = false;
@@ -265,16 +265,16 @@ Object NeoVimConnector::to_Object(const msgpack_object& obj, bool *failed)
 }
 
 /**
- * Call function 0 to request metadata from NeoVim
+ * Call function 0 to request metadata from Neovim
  */
-void NeoVimConnector::discoverMetadata()
+void NeovimConnector::discoverMetadata()
 {
-	NeoVimRequest *r = startRequestUnchecked(0, 0);
-	connect(r, &NeoVimRequest::finished,
-			this, &NeoVimConnector::handleMetadata);
+	NeovimRequest *r = startRequestUnchecked(0, 0);
+	connect(r, &NeovimRequest::finished,
+			this, &NeovimConnector::handleMetadata);
 }
 
-QString NeoVimConnector::to_String(const msgpack_object& obj, bool *failed)
+QString NeovimConnector::to_String(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -289,7 +289,7 @@ QString NeoVimConnector::to_String(const msgpack_object& obj, bool *failed)
 	return QString::fromUtf8(obj.via.raw.ptr, obj.via.raw.size);
 }
 
-QByteArray NeoVimConnector::to_QByteArray(const msgpack_object& obj, bool *failed)
+QByteArray NeovimConnector::to_QByteArray(const msgpack_object& obj, bool *failed)
 {
 	if ( obj.type != MSGPACK_OBJECT_RAW ) {
 		setError( UnexpectedMsg,
@@ -301,7 +301,7 @@ QByteArray NeoVimConnector::to_QByteArray(const msgpack_object& obj, bool *faile
 	return QByteArray(obj.via.raw.ptr, obj.via.raw.size);
 }
 
-Position NeoVimConnector::to_Position(const msgpack_object& obj, bool *failed)
+Position NeovimConnector::to_Position(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -317,7 +317,7 @@ Position NeoVimConnector::to_Position(const msgpack_object& obj, bool *failed)
 	return QPoint(to_Integer(obj.via.array.ptr[1]), to_Integer(obj.via.array.ptr[0]));
 }
 
-Boolean NeoVimConnector::to_Boolean(const msgpack_object& obj, bool *failed)
+Boolean NeovimConnector::to_Boolean(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -332,7 +332,7 @@ Boolean NeoVimConnector::to_Boolean(const msgpack_object& obj, bool *failed)
 	return obj.via.boolean;
 }
 
-StringArray NeoVimConnector::to_StringArray(const msgpack_object& obj, bool *failed)
+StringArray NeovimConnector::to_StringArray(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -359,7 +359,7 @@ StringArray NeoVimConnector::to_StringArray(const msgpack_object& obj, bool *fai
 	return ret;
 }
 
-Integer NeoVimConnector::to_Integer(const msgpack_object& obj, bool *failed)
+Integer NeovimConnector::to_Integer(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -375,20 +375,20 @@ Integer NeoVimConnector::to_Integer(const msgpack_object& obj, bool *failed)
 	return obj.via.i64;
 }
 
-Buffer NeoVimConnector::to_Buffer(const msgpack_object& obj, bool *failed)
+Buffer NeovimConnector::to_Buffer(const msgpack_object& obj, bool *failed)
 {
 	return to_Integer(obj, failed);
 }
-Window NeoVimConnector::to_Window(const msgpack_object& obj, bool *failed)
+Window NeovimConnector::to_Window(const msgpack_object& obj, bool *failed)
 {
 	return to_Integer(obj, failed);
 }
-Tabpage NeoVimConnector::to_Tabpage(const msgpack_object& obj, bool *failed)
+Tabpage NeovimConnector::to_Tabpage(const msgpack_object& obj, bool *failed)
 {
 	return to_Integer(obj, failed);
 }
 
-QList<int64_t> NeoVimConnector::to_IntegerArray(const msgpack_object& obj, bool *failed)
+QList<int64_t> NeovimConnector::to_IntegerArray(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -415,15 +415,15 @@ QList<int64_t> NeoVimConnector::to_IntegerArray(const msgpack_object& obj, bool 
 	return ret;
 }
 
-QList<int64_t> NeoVimConnector::to_WindowArray(const msgpack_object& obj, bool *failed)
+QList<int64_t> NeovimConnector::to_WindowArray(const msgpack_object& obj, bool *failed)
 {
 	return to_IntegerArray(obj, failed);
 }
-QList<int64_t> NeoVimConnector::to_BufferArray(const msgpack_object& obj, bool *failed)
+QList<int64_t> NeovimConnector::to_BufferArray(const msgpack_object& obj, bool *failed)
 {
 	return to_IntegerArray(obj, failed);
 }
-QList<int64_t> NeoVimConnector::to_TabpageArray(const msgpack_object& obj, bool *failed)
+QList<int64_t> NeovimConnector::to_TabpageArray(const msgpack_object& obj, bool *failed)
 {
 	return to_IntegerArray(obj, failed);
 }
@@ -434,7 +434,7 @@ QList<int64_t> NeoVimConnector::to_TabpageArray(const msgpack_object& obj, bool 
  * i.e. [Type0 name0 Type1 name1 ... ] -> [Type0 Type1 ...]
  *
  */
-QList<QByteArray> NeoVimConnector::parseParameterTypes(const msgpack_object& obj)
+QList<QByteArray> NeovimConnector::parseParameterTypes(const msgpack_object& obj)
 {
 	QList<QByteArray> fail;
 	if ( obj.type != MSGPACK_OBJECT_ARRAY ) {
@@ -476,7 +476,7 @@ QList<QByteArray> NeoVimConnector::parseParameterTypes(const msgpack_object& obj
  *
  * The ftable MUST be an array
  */
-void NeoVimConnector::addFunctions(const msgpack_object& ftable)
+void NeovimConnector::addFunctions(const msgpack_object& ftable)
 {
 	if ( ftable.type != MSGPACK_OBJECT_ARRAY ) {
 		setError( UnexpectedMsg,
@@ -490,7 +490,7 @@ void NeoVimConnector::addFunctions(const msgpack_object& ftable)
 	Q_ASSERT(m_functionToId.size() == m_idToFunction.size());
 	if ( Function::knownFunctions.size() != m_functionToId.size() ) {
 		setError( APIMisMatch,
-				tr("Cannot connect to this instance of NeoVim, its version is likely too old, or the API has changed"));
+				tr("Cannot connect to this instance of Neovim, its version is likely too old, or the API has changed"));
 		return;
 	}
 }
@@ -499,7 +499,7 @@ void NeoVimConnector::addFunctions(const msgpack_object& ftable)
  * Add a function
  *
  */
-void NeoVimConnector::addFunction(const msgpack_object& fun)
+void NeovimConnector::addFunction(const msgpack_object& fun)
 {
 	if ( fun.type != MSGPACK_OBJECT_MAP ) {
 		setError( UnexpectedMsg,
@@ -564,7 +564,7 @@ void NeoVimConnector::addFunction(const msgpack_object& fun)
 	}
 }
 
-void NeoVimConnector::addClasses(const msgpack_object& ctable)
+void NeovimConnector::addClasses(const msgpack_object& ctable)
 {
 	if ( ctable.type != MSGPACK_OBJECT_ARRAY ) {
 		setError( UnexpectedMsg,
@@ -582,16 +582,16 @@ void NeoVimConnector::addClasses(const msgpack_object& ctable)
 }
 
 /**
- * Process metadata object returned by NeoVim
+ * Process metadata object returned by Neovim
  *
  * - Set channel_id
  * - Check if all functions we need are available
  */
-void NeoVimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool failed, const msgpack_object& result)
+void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool failed, const msgpack_object& result)
 {
 	if ( failed ) {
 		setError( NoMetadata,
-			tr("Unable to get NeoVim information"));
+			tr("Unable to get Neovim information"));
 		return;
 	}
 
@@ -642,7 +642,7 @@ void NeoVimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool 
 /**
  * Send error response for the given request message
  */
-void NeoVimConnector::sendError(const msgpack_object& req, const QString& msg)
+void NeovimConnector::sendError(const msgpack_object& req, const QString& msg)
 {
 	if ( req.via.array.ptr[0].via.u64 != 0 ) {
 		qFatal("Errors can only be send as replies to Requests(type=0)");
@@ -662,7 +662,7 @@ void NeoVimConnector::sendError(const msgpack_object& req, const QString& msg)
  * Called when new data is available to be parsed
  *
  */
-void NeoVimConnector::dataAvailable()
+void NeovimConnector::dataAvailable()
 {
 	qint64 read = 1;
 	while (read > 0) {
@@ -689,7 +689,7 @@ void NeoVimConnector::dataAvailable()
 /**
  * Do some sanity checks and forward message to the proper handler
  */
-void NeoVimConnector::dispatch(msgpack_object& req)
+void NeovimConnector::dispatch(msgpack_object& req)
 {
 	//
 	// neovim msgpack rpc calls are
@@ -754,7 +754,7 @@ void NeoVimConnector::dispatch(msgpack_object& req)
 /*
  * [type(0), msgid(uint), method(int), args([...])]
  */
-void NeoVimConnector::dispatchRequest(msgpack_object& req)
+void NeovimConnector::dispatchRequest(msgpack_object& req)
 {
 	qWarning() << "We do not support requests (yet)";
 }
@@ -764,7 +764,7 @@ void NeoVimConnector::dispatchRequest(msgpack_object& req)
  *
  * [type(1), msgid(uint), error(str?), result(...)]
  */
-void NeoVimConnector::dispatchResponse(msgpack_object& resp)
+void NeovimConnector::dispatchResponse(msgpack_object& resp)
 {
 	// [type(1), msgid, error, result]
 	uint64_t msgid = resp.via.array.ptr[1].via.u64;
@@ -774,7 +774,7 @@ void NeoVimConnector::dispatchResponse(msgpack_object& resp)
 		return;
 	}
 
-	NeoVimRequest *req = m_requests.take(msgid);
+	NeovimRequest *req = m_requests.take(msgid);
 	if ( resp.via.array.ptr[2].type != MSGPACK_OBJECT_NIL ) {
 		// Error response
 		req->processResponse(resp.via.array.ptr[2], true);
@@ -784,15 +784,15 @@ void NeoVimConnector::dispatchResponse(msgpack_object& resp)
 	req->deleteLater();
 }
 
-void NeoVimConnector::dispatchNotification(msgpack_object& req)
+void NeovimConnector::dispatchNotification(msgpack_object& req)
 {
 	qWarning() << "We do not support notifications (yet)";
 }
 
-NeoVim* NeoVimConnector::neovimObject()
+Neovim* NeovimConnector::neovimObject()
 {
 	if ( !m_neovimobj ) {
-		m_neovimobj = new NeoVim(this);
+		m_neovimobj = new Neovim(this);
 	}
 	return m_neovimobj;
 }
@@ -800,27 +800,27 @@ NeoVim* NeoVimConnector::neovimObject()
 // Request obj
 //
 
-NeoVimRequest::NeoVimRequest(uint32_t id, QObject *parent)
+NeovimRequest::NeovimRequest(uint32_t id, QObject *parent)
 :QObject(parent), m_id(id), m_function(Function::NEOVIM_FN_NULL)
 {
 }
 
-void NeoVimRequest::processResponse(const msgpack_object& res, bool error)
+void NeovimRequest::processResponse(const msgpack_object& res, bool error)
 {
 	emit finished(this->m_id, m_function, error, res);
 }
 
-Function::FunctionId NeoVimRequest::function()
+Function::FunctionId NeovimRequest::function()
 {
 	return m_function;
 }
 
-void NeoVimRequest::setFunction(Function::FunctionId f)
+void NeovimRequest::setFunction(Function::FunctionId f)
 {
 	m_function = f;
 }
 
-} // namespace NeoVimQt
+} // namespace NeovimQt
 
 
 #include "moc_neovimconnector.cpp"
