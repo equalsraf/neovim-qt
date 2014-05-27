@@ -491,7 +491,6 @@ void NeoVimConnector::addFunctions(const msgpack_object& ftable)
 				tr("Cannot connect to this instance of NeoVim, its version is likely too old, or the API has changed"));
 		return;
 	}
-	emit ready();
 }
 
 /**
@@ -580,9 +579,15 @@ void NeoVimConnector::addClasses(const msgpack_object& ctable)
 	}
 }
 
-void NeoVimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool error, const msgpack_object& result)
+/**
+ * Process metadata object returned by NeoVim
+ *
+ * - Set channel_id
+ * - Check if all functions we need are available
+ */
+void NeoVimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool failed, const msgpack_object& result)
 {
-	if ( error ) {
+	if ( failed ) {
 		setError( NoMetadata,
 			tr("Unable to get NeoVim information"));
 		return;
@@ -625,6 +630,10 @@ void NeoVimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool 
 		} else if ( key == "classes" ) {
 			addClasses(msg.data.via.map.ptr[i].val);
 		}
+	}
+
+	if (error() == NoError) {
+		emit ready();
 	}
 }
 
