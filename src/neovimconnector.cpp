@@ -638,9 +638,9 @@ void NeoVimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool 
 }
 
 /**
- * Send error response
+ * Send error response for the given request message
  */
-void NeoVimConnector::error(const msgpack_object& req, const QString& msg)
+void NeoVimConnector::sendError(const msgpack_object& req, const QString& msg)
 {
 	if ( req.via.array.ptr[0].via.u64 != 0 ) {
 		qFatal("Errors can only be send as replies to Requests(type=0)");
@@ -713,7 +713,7 @@ void NeoVimConnector::dispatch(msgpack_object& req)
 	if (req.via.array.ptr[1].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
 		qDebug() << "Received Invalid msgpack: msg id MUST be a positive integer";
 		if ( type == 0 ) {
-			error(req, tr("Msg Id must be a positive integer"));
+			sendError(req, tr("Msg Id must be a positive integer"));
 		}
 		return;
 	}
@@ -721,7 +721,7 @@ void NeoVimConnector::dispatch(msgpack_object& req)
 	if (type == 0 && req.via.array.ptr[2].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
 		qDebug() << "Received Invalid msgpack: method MUST be a positive integer" << req.via.array.ptr[2].type;
 		if ( type == 0 ) {
-			error(req, tr("Method id must be a positive integer"));
+			sendError(req, tr("Method id must be a positive integer"));
 		}
 		return;
 	}
@@ -729,7 +729,7 @@ void NeoVimConnector::dispatch(msgpack_object& req)
 	if (type == 0 && req.via.array.ptr[3].type != MSGPACK_OBJECT_ARRAY) {
 		qDebug() << "Invalid msgpack: arguments MUST be an array";
 		if ( type == 0 ) {
-			error(req, tr("Paremeters must be an array"));
+			sendError(req, tr("Paremeters must be an array"));
 		}
 		return;
 	}
@@ -745,7 +745,7 @@ void NeoVimConnector::dispatch(msgpack_object& req)
 		dispatchNotification(req);
 		break;
 	default:
-		error(req, tr("Message type is unknown"));
+		sendError(req, tr("Message type is unknown"));
 	}
 }
 

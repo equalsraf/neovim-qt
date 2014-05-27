@@ -101,7 +101,7 @@ protected:
 	void dispatchRequest(msgpack_object& obj);
 	void dispatchResponse(msgpack_object& obj);
 	void dispatchNotification(msgpack_object& obj);
-	void error(const msgpack_object& req, const QString& msg);
+	void sendError(const msgpack_object& req, const QString& msg);
 
 	void addFunction(const msgpack_object& ftable);
 	void addFunctions(const msgpack_object& ftable);
