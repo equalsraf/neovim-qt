@@ -206,12 +206,6 @@ for i = 1, #api.functions do
   neovim_h:write('on_'..fn.name..'(')
   neovim_h:write(fn.return_type)
   neovim_h:write(');\n')
-
--- FIXME generate error handlers
---  if fn.can_fail then
---    functions_static:write('\t, true)\n')
---  end
-
 end
 neovim_h:write([[
 
