@@ -42,8 +42,6 @@ public:
 	NeoVimConnector(QIODevice* s);
 	~NeoVimConnector();
 
-	void discoverMetadata();
-
 	QList<QByteArray> parseParameters(const msgpack_object&);
 
 	NeoVimError error();
@@ -83,6 +81,7 @@ signals:
 	void error(NeoVimError);
 
 protected:
+	void discoverMetadata();
 
 	void dispatch(msgpack_object& obj);
 	void dispatchRequest(msgpack_object& obj);

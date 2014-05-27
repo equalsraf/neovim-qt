@@ -11,7 +11,6 @@ int main(int argc, char **argv)
 	qDebug() << s.waitForConnected();
 
 	NeoVimQt::NeoVimConnector c(&s);
-	c.discoverMetadata();
 
 	NeoVimQt::NeoVimRequest *r = c.startRequestUnchecked(54, 0);
 	QObject::connect(r, &NeoVimQt::NeoVimRequest::finished,
