@@ -25,7 +25,7 @@ void NeoVimConnector::setError(NeoVimError err, const QString& msg)
 {
 	m_error = err;
 	m_errorString = msg;
-	qWarning() << m_error;
+	qWarning() << m_errorString;
 	emit error(m_error);
 }
 
