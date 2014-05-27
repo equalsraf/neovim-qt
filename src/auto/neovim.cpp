@@ -10,7 +10,7 @@ NeoVim::NeoVim(NeoVimConnector *c)
 {
 }
 
-void NeoVim::buffer_get_length(int64_t buffer)
+void NeoVim::buffer_get_length(Buffer buffer)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_GET_LENGTH, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -18,7 +18,7 @@ void NeoVim::buffer_get_length(int64_t buffer)
 
 }
 
-void NeoVim::buffer_get_line(int64_t buffer, int64_t index)
+void NeoVim::buffer_get_line(Buffer buffer, Integer index)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_GET_LINE, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -27,7 +27,7 @@ void NeoVim::buffer_get_line(int64_t buffer, int64_t index)
 
 }
 
-void NeoVim::buffer_set_line(int64_t buffer, int64_t index, QString line)
+void NeoVim::buffer_set_line(Buffer buffer, Integer index, String line)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_SET_LINE, 3);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -37,7 +37,7 @@ void NeoVim::buffer_set_line(int64_t buffer, int64_t index, QString line)
 
 }
 
-void NeoVim::buffer_del_line(int64_t buffer, int64_t index)
+void NeoVim::buffer_del_line(Buffer buffer, Integer index)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_DEL_LINE, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -46,7 +46,7 @@ void NeoVim::buffer_del_line(int64_t buffer, int64_t index)
 
 }
 
-void NeoVim::buffer_get_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end)
+void NeoVim::buffer_get_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_GET_SLICE, 5);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -58,7 +58,7 @@ void NeoVim::buffer_get_slice(int64_t buffer, int64_t start, int64_t end, bool i
 
 }
 
-void NeoVim::buffer_set_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end, QStringList replacement)
+void NeoVim::buffer_set_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end, StringArray replacement)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_SET_SLICE, 6);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -71,7 +71,7 @@ void NeoVim::buffer_set_slice(int64_t buffer, int64_t start, int64_t end, bool i
 
 }
 
-void NeoVim::buffer_get_var(int64_t buffer, QString name)
+void NeoVim::buffer_get_var(Buffer buffer, String name)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_GET_VAR, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -80,7 +80,7 @@ void NeoVim::buffer_get_var(int64_t buffer, QString name)
 
 }
 
-void NeoVim::buffer_set_var(int64_t buffer, QString name, QVariant value)
+void NeoVim::buffer_set_var(Buffer buffer, String name, Object value)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_SET_VAR, 3);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -90,7 +90,7 @@ void NeoVim::buffer_set_var(int64_t buffer, QString name, QVariant value)
 
 }
 
-void NeoVim::buffer_get_option(int64_t buffer, QString name)
+void NeoVim::buffer_get_option(Buffer buffer, String name)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_GET_OPTION, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -99,7 +99,7 @@ void NeoVim::buffer_get_option(int64_t buffer, QString name)
 
 }
 
-void NeoVim::buffer_set_option(int64_t buffer, QString name, QVariant value)
+void NeoVim::buffer_set_option(Buffer buffer, String name, Object value)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_SET_OPTION, 3);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -109,7 +109,7 @@ void NeoVim::buffer_set_option(int64_t buffer, QString name, QVariant value)
 
 }
 
-void NeoVim::buffer_get_number(int64_t buffer)
+void NeoVim::buffer_get_number(Buffer buffer)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_GET_NUMBER, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -117,7 +117,7 @@ void NeoVim::buffer_get_number(int64_t buffer)
 
 }
 
-void NeoVim::buffer_get_name(int64_t buffer)
+void NeoVim::buffer_get_name(Buffer buffer)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_GET_NAME, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -125,7 +125,7 @@ void NeoVim::buffer_get_name(int64_t buffer)
 
 }
 
-void NeoVim::buffer_set_name(int64_t buffer, QString name)
+void NeoVim::buffer_set_name(Buffer buffer, String name)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_SET_NAME, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -134,7 +134,7 @@ void NeoVim::buffer_set_name(int64_t buffer, QString name)
 
 }
 
-void NeoVim::buffer_is_valid(int64_t buffer)
+void NeoVim::buffer_is_valid(Buffer buffer)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_IS_VALID, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -142,7 +142,7 @@ void NeoVim::buffer_is_valid(int64_t buffer)
 
 }
 
-void NeoVim::buffer_insert(int64_t buffer, int64_t lnum, QStringList lines)
+void NeoVim::buffer_insert(Buffer buffer, Integer lnum, StringArray lines)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_INSERT, 3);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -152,7 +152,7 @@ void NeoVim::buffer_insert(int64_t buffer, int64_t lnum, QStringList lines)
 
 }
 
-void NeoVim::buffer_get_mark(int64_t buffer, QString name)
+void NeoVim::buffer_get_mark(Buffer buffer, String name)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_BUFFER_GET_MARK, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -161,7 +161,7 @@ void NeoVim::buffer_get_mark(int64_t buffer, QString name)
 
 }
 
-void NeoVim::tabpage_get_windows(int64_t tabpage)
+void NeoVim::tabpage_get_windows(Tabpage tabpage)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_TABPAGE_GET_WINDOWS, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -169,7 +169,7 @@ void NeoVim::tabpage_get_windows(int64_t tabpage)
 
 }
 
-void NeoVim::tabpage_get_var(int64_t tabpage, QString name)
+void NeoVim::tabpage_get_var(Tabpage tabpage, String name)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_TABPAGE_GET_VAR, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -178,7 +178,7 @@ void NeoVim::tabpage_get_var(int64_t tabpage, QString name)
 
 }
 
-void NeoVim::tabpage_set_var(int64_t tabpage, QString name, QVariant value)
+void NeoVim::tabpage_set_var(Tabpage tabpage, String name, Object value)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_TABPAGE_SET_VAR, 3);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -188,7 +188,7 @@ void NeoVim::tabpage_set_var(int64_t tabpage, QString name, QVariant value)
 
 }
 
-void NeoVim::tabpage_get_window(int64_t tabpage)
+void NeoVim::tabpage_get_window(Tabpage tabpage)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_TABPAGE_GET_WINDOW, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -196,7 +196,7 @@ void NeoVim::tabpage_get_window(int64_t tabpage)
 
 }
 
-void NeoVim::tabpage_is_valid(int64_t tabpage)
+void NeoVim::tabpage_is_valid(Tabpage tabpage)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_TABPAGE_IS_VALID, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -204,7 +204,7 @@ void NeoVim::tabpage_is_valid(int64_t tabpage)
 
 }
 
-void NeoVim::vim_push_keys(QString str)
+void NeoVim::vim_push_keys(String str)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_PUSH_KEYS, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -212,7 +212,7 @@ void NeoVim::vim_push_keys(QString str)
 
 }
 
-void NeoVim::vim_command(QString str)
+void NeoVim::vim_command(String str)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_COMMAND, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -220,7 +220,7 @@ void NeoVim::vim_command(QString str)
 
 }
 
-void NeoVim::vim_eval(QString str)
+void NeoVim::vim_eval(String str)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_EVAL, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -228,7 +228,7 @@ void NeoVim::vim_eval(QString str)
 
 }
 
-void NeoVim::vim_strwidth(QString str)
+void NeoVim::vim_strwidth(String str)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_STRWIDTH, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -243,7 +243,7 @@ void NeoVim::vim_list_runtime_paths()
 
 }
 
-void NeoVim::vim_change_directory(QString dir)
+void NeoVim::vim_change_directory(String dir)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_CHANGE_DIRECTORY, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -265,7 +265,7 @@ void NeoVim::vim_del_current_line()
 
 }
 
-void NeoVim::vim_set_current_line(QString line)
+void NeoVim::vim_set_current_line(String line)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_SET_CURRENT_LINE, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -273,7 +273,7 @@ void NeoVim::vim_set_current_line(QString line)
 
 }
 
-void NeoVim::vim_get_var(QString name)
+void NeoVim::vim_get_var(String name)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_GET_VAR, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -281,7 +281,7 @@ void NeoVim::vim_get_var(QString name)
 
 }
 
-void NeoVim::vim_set_var(QString name, QVariant value)
+void NeoVim::vim_set_var(String name, Object value)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_SET_VAR, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -290,7 +290,7 @@ void NeoVim::vim_set_var(QString name, QVariant value)
 
 }
 
-void NeoVim::vim_get_vvar(QString name)
+void NeoVim::vim_get_vvar(String name)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_GET_VVAR, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -298,7 +298,7 @@ void NeoVim::vim_get_vvar(QString name)
 
 }
 
-void NeoVim::vim_get_option(QString name)
+void NeoVim::vim_get_option(String name)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_GET_OPTION, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -306,7 +306,7 @@ void NeoVim::vim_get_option(QString name)
 
 }
 
-void NeoVim::vim_set_option(QString name, QVariant value)
+void NeoVim::vim_set_option(String name, Object value)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_SET_OPTION, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -315,7 +315,7 @@ void NeoVim::vim_set_option(QString name, QVariant value)
 
 }
 
-void NeoVim::vim_out_write(QString str)
+void NeoVim::vim_out_write(String str)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_OUT_WRITE, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -323,7 +323,7 @@ void NeoVim::vim_out_write(QString str)
 
 }
 
-void NeoVim::vim_err_write(QString str)
+void NeoVim::vim_err_write(String str)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_ERR_WRITE, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -345,7 +345,7 @@ void NeoVim::vim_get_current_buffer()
 
 }
 
-void NeoVim::vim_set_current_buffer(int64_t buffer)
+void NeoVim::vim_set_current_buffer(Buffer buffer)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_SET_CURRENT_BUFFER, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -367,7 +367,7 @@ void NeoVim::vim_get_current_window()
 
 }
 
-void NeoVim::vim_set_current_window(int64_t window)
+void NeoVim::vim_set_current_window(Window window)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_SET_CURRENT_WINDOW, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -389,7 +389,7 @@ void NeoVim::vim_get_current_tabpage()
 
 }
 
-void NeoVim::vim_set_current_tabpage(int64_t tabpage)
+void NeoVim::vim_set_current_tabpage(Tabpage tabpage)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_VIM_SET_CURRENT_TABPAGE, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -397,7 +397,7 @@ void NeoVim::vim_set_current_tabpage(int64_t tabpage)
 
 }
 
-void NeoVim::window_get_buffer(int64_t window)
+void NeoVim::window_get_buffer(Window window)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_GET_BUFFER, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -405,7 +405,7 @@ void NeoVim::window_get_buffer(int64_t window)
 
 }
 
-void NeoVim::window_get_cursor(int64_t window)
+void NeoVim::window_get_cursor(Window window)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_GET_CURSOR, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -413,7 +413,7 @@ void NeoVim::window_get_cursor(int64_t window)
 
 }
 
-void NeoVim::window_set_cursor(int64_t window, QPoint pos)
+void NeoVim::window_set_cursor(Window window, Position pos)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_SET_CURSOR, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -422,7 +422,7 @@ void NeoVim::window_set_cursor(int64_t window, QPoint pos)
 
 }
 
-void NeoVim::window_get_height(int64_t window)
+void NeoVim::window_get_height(Window window)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_GET_HEIGHT, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -430,7 +430,7 @@ void NeoVim::window_get_height(int64_t window)
 
 }
 
-void NeoVim::window_set_height(int64_t window, int64_t height)
+void NeoVim::window_set_height(Window window, Integer height)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_SET_HEIGHT, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -439,7 +439,7 @@ void NeoVim::window_set_height(int64_t window, int64_t height)
 
 }
 
-void NeoVim::window_get_width(int64_t window)
+void NeoVim::window_get_width(Window window)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_GET_WIDTH, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -447,7 +447,7 @@ void NeoVim::window_get_width(int64_t window)
 
 }
 
-void NeoVim::window_set_width(int64_t window, int64_t width)
+void NeoVim::window_set_width(Window window, Integer width)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_SET_WIDTH, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -456,7 +456,7 @@ void NeoVim::window_set_width(int64_t window, int64_t width)
 
 }
 
-void NeoVim::window_get_var(int64_t window, QString name)
+void NeoVim::window_get_var(Window window, String name)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_GET_VAR, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -465,7 +465,7 @@ void NeoVim::window_get_var(int64_t window, QString name)
 
 }
 
-void NeoVim::window_set_var(int64_t window, QString name, QVariant value)
+void NeoVim::window_set_var(Window window, String name, Object value)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_SET_VAR, 3);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -475,7 +475,7 @@ void NeoVim::window_set_var(int64_t window, QString name, QVariant value)
 
 }
 
-void NeoVim::window_get_option(int64_t window, QString name)
+void NeoVim::window_get_option(Window window, String name)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_GET_OPTION, 2);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -484,7 +484,7 @@ void NeoVim::window_get_option(int64_t window, QString name)
 
 }
 
-void NeoVim::window_set_option(int64_t window, QString name, QVariant value)
+void NeoVim::window_set_option(Window window, String name, Object value)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_SET_OPTION, 3);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -494,7 +494,7 @@ void NeoVim::window_set_option(int64_t window, QString name, QVariant value)
 
 }
 
-void NeoVim::window_get_position(int64_t window)
+void NeoVim::window_get_position(Window window)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_GET_POSITION, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -502,7 +502,7 @@ void NeoVim::window_get_position(int64_t window)
 
 }
 
-void NeoVim::window_get_tabpage(int64_t window)
+void NeoVim::window_get_tabpage(Window window)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_GET_TABPAGE, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -510,7 +510,7 @@ void NeoVim::window_get_tabpage(int64_t window)
 
 }
 
-void NeoVim::window_is_valid(int64_t window)
+void NeoVim::window_is_valid(Window window)
 {
 	NeoVimRequest *r = m_c->startRequest(Function::NEOVIM_FN_WINDOW_IS_VALID, 1);
 	connect(r, &NeoVimRequest::finished, this, &NeoVim::handleResponse);
@@ -522,14 +522,14 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 {
 	bool convfail=true;
 	if ( failed ) {
-		emit error(m_c->to_QString(res));
+		emit error(m_c->to_String(res));
 		return;
 	}
 
 	switch(fun) {
 	case Function::NEOVIM_FN_BUFFER_GET_LENGTH:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Integer data = m_c->to_Integer(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_length";
 			} else {
@@ -540,7 +540,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_LINE:
 		{
-			QString data = m_c->to_QString(res, &convfail);
+			String data = m_c->to_String(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_line";
 			} else {
@@ -563,7 +563,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_SLICE:
 		{
-			QStringList data = m_c->to_QStringList(res, &convfail);
+			StringArray data = m_c->to_StringArray(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_slice";
 			} else {
@@ -580,7 +580,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_VAR:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_var";
 			} else {
@@ -591,7 +591,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_VAR:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_set_var";
 			} else {
@@ -602,7 +602,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_OPTION:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_option";
 			} else {
@@ -619,7 +619,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_NUMBER:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Integer data = m_c->to_Integer(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_number";
 			} else {
@@ -630,7 +630,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_NAME:
 		{
-			QString data = m_c->to_QString(res, &convfail);
+			String data = m_c->to_String(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_name";
 			} else {
@@ -647,7 +647,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_BUFFER_IS_VALID:
 		{
-			bool data = m_c->to_bool(res, &convfail);
+			Boolean data = m_c->to_Boolean(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_is_valid";
 			} else {
@@ -664,7 +664,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_MARK:
 		{
-			QPoint data = m_c->to_QPoint(res, &convfail);
+			Position data = m_c->to_Position(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal buffer_get_mark";
 			} else {
@@ -686,7 +686,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_TABPAGE_GET_VAR:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal tabpage_get_var";
 			} else {
@@ -697,7 +697,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_TABPAGE_SET_VAR:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal tabpage_set_var";
 			} else {
@@ -708,7 +708,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Window data = m_c->to_Window(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal tabpage_get_window";
 			} else {
@@ -719,7 +719,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_TABPAGE_IS_VALID:
 		{
-			bool data = m_c->to_bool(res, &convfail);
+			Boolean data = m_c->to_Boolean(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal tabpage_is_valid";
 			} else {
@@ -742,7 +742,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_EVAL:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_eval";
 			} else {
@@ -753,7 +753,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_STRWIDTH:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Integer data = m_c->to_Integer(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_strwidth";
 			} else {
@@ -764,7 +764,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_LIST_RUNTIME_PATHS:
 		{
-			QStringList data = m_c->to_QStringList(res, &convfail);
+			StringArray data = m_c->to_StringArray(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_list_runtime_paths";
 			} else {
@@ -781,7 +781,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_GET_CURRENT_LINE:
 		{
-			QString data = m_c->to_QString(res, &convfail);
+			String data = m_c->to_String(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_current_line";
 			} else {
@@ -804,7 +804,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_GET_VAR:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_var";
 			} else {
@@ -815,7 +815,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_SET_VAR:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_set_var";
 			} else {
@@ -826,7 +826,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_GET_VVAR:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_vvar";
 			} else {
@@ -837,7 +837,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_GET_OPTION:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_option";
 			} else {
@@ -877,7 +877,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_GET_CURRENT_BUFFER:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Buffer data = m_c->to_Buffer(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_current_buffer";
 			} else {
@@ -905,7 +905,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_GET_CURRENT_WINDOW:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Window data = m_c->to_Window(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_current_window";
 			} else {
@@ -933,7 +933,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_VIM_GET_CURRENT_TABPAGE:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Tabpage data = m_c->to_Tabpage(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal vim_get_current_tabpage";
 			} else {
@@ -950,7 +950,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_BUFFER:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Buffer data = m_c->to_Buffer(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_buffer";
 			} else {
@@ -961,7 +961,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_CURSOR:
 		{
-			QPoint data = m_c->to_QPoint(res, &convfail);
+			Position data = m_c->to_Position(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_cursor";
 			} else {
@@ -978,7 +978,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_HEIGHT:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Integer data = m_c->to_Integer(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_height";
 			} else {
@@ -995,7 +995,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_WIDTH:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Integer data = m_c->to_Integer(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_width";
 			} else {
@@ -1012,7 +1012,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_VAR:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_var";
 			} else {
@@ -1023,7 +1023,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_VAR:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_set_var";
 			} else {
@@ -1034,7 +1034,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_OPTION:
 		{
-			QVariant data = m_c->to_QVariant(res, &convfail);
+			Object data = m_c->to_Object(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_option";
 			} else {
@@ -1051,7 +1051,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_POSITION:
 		{
-			QPoint data = m_c->to_QPoint(res, &convfail);
+			Position data = m_c->to_Position(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_position";
 			} else {
@@ -1062,7 +1062,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_TABPAGE:
 		{
-			int64_t data = m_c->to_int64_t(res, &convfail);
+			Tabpage data = m_c->to_Tabpage(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_get_tabpage";
 			} else {
@@ -1073,7 +1073,7 @@ void NeoVim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		break;
 	case Function::NEOVIM_FN_WINDOW_IS_VALID:
 		{
-			bool data = m_c->to_bool(res, &convfail);
+			Boolean data = m_c->to_Boolean(res, &convfail);
 			if (convfail) {
 				qWarning() << "Error unpacking data for signal window_is_valid";
 			} else {

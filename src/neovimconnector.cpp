@@ -180,7 +180,7 @@ void NeoVimConnector::send(const QVariant& var)
  * We use QVariants for RPC functions use the *Object* type do not use this in any other conditions
  *
  */
-QVariant NeoVimConnector::to_QVariant(const msgpack_object& obj, bool *failed)
+Object NeoVimConnector::to_Object(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = false;
@@ -204,14 +204,14 @@ QVariant NeoVimConnector::to_QVariant(const msgpack_object& obj, bool *failed)
 		res = obj.via.dec;
 		break;
 	case MSGPACK_OBJECT_RAW:
-		res = to_QString(obj, failed);
+		res = to_String(obj, failed);
 		break;
 	case MSGPACK_OBJECT_ARRAY:
 		// Either a QVariantList or a QStringList
 		{
 		QVariantList ls;
 		for (uint64_t i=0; i<obj.via.array.size; i++) {
-			QVariant v = to_QVariant(obj.via.array.ptr[i], failed);
+			QVariant v = to_Object(obj.via.array.ptr[i], failed);
 			if ( v.isNull() ) {
 				setError(UnexpectedMsg,
 					tr("Found unexpected data type when unpacking Map as QVariantList"));
@@ -233,8 +233,8 @@ QVariant NeoVimConnector::to_QVariant(const msgpack_object& obj, bool *failed)
 				return QVariant();
 			}
 			m.insert(
-				to_QString(obj.via.map.ptr[i].key), 
-				to_QVariant(obj.via.map.ptr[i].val, failed));
+				to_String(obj.via.map.ptr[i].key), 
+				to_Object(obj.via.map.ptr[i].val, failed));
 		}
 		res = m;
 		}
@@ -251,7 +251,7 @@ void NeoVimConnector::discoverMetadata()
 			this, &NeoVimConnector::handleMetadata);
 }
 
-QString NeoVimConnector::to_QString(const msgpack_object& obj, bool *failed)
+QString NeoVimConnector::to_String(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -278,7 +278,7 @@ QByteArray NeoVimConnector::to_QByteArray(const msgpack_object& obj, bool *faile
 	return QByteArray(obj.via.raw.ptr, obj.via.raw.size);
 }
 
-QPoint NeoVimConnector::to_QPoint(const msgpack_object& obj, bool *failed)
+Position NeoVimConnector::to_Position(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -291,10 +291,10 @@ QPoint NeoVimConnector::to_QPoint(const msgpack_object& obj, bool *failed)
 		*failed = false;
 	}
 	// QPoint is (x,y)  neovim Position is (row, col)
-	return QPoint(to_int64_t(obj.via.array.ptr[1]), to_int64_t(obj.via.array.ptr[0]));
+	return QPoint(to_Integer(obj.via.array.ptr[1]), to_Integer(obj.via.array.ptr[0]));
 }
 
-bool NeoVimConnector::to_bool(const msgpack_object& obj, bool *failed)
+Boolean NeoVimConnector::to_Boolean(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -309,7 +309,7 @@ bool NeoVimConnector::to_bool(const msgpack_object& obj, bool *failed)
 	return obj.via.boolean;
 }
 
-QStringList NeoVimConnector::to_QStringList(const msgpack_object& obj, bool *failed)
+StringArray NeoVimConnector::to_StringArray(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -327,7 +327,7 @@ QStringList NeoVimConnector::to_QStringList(const msgpack_object& obj, bool *fai
 				tr("Found non-raw element type when unpacking a QStringList"));
 			return QStringList();
 		}
-		ret.append(to_QString(obj));
+		ret.append(to_String(obj));
 	}
 
 	if ( failed ) {
@@ -336,7 +336,7 @@ QStringList NeoVimConnector::to_QStringList(const msgpack_object& obj, bool *fai
 	return ret;
 }
 
-int64_t NeoVimConnector::to_int64_t(const msgpack_object& obj, bool *failed)
+Integer NeoVimConnector::to_Integer(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -350,6 +350,19 @@ int64_t NeoVimConnector::to_int64_t(const msgpack_object& obj, bool *failed)
 		*failed = false;
 	}
 	return obj.via.i64;
+}
+
+Buffer NeoVimConnector::to_Buffer(const msgpack_object& obj, bool *failed)
+{
+	return to_Integer(obj, failed);
+}
+Window NeoVimConnector::to_Window(const msgpack_object& obj, bool *failed)
+{
+	return to_Integer(obj, failed);
+}
+Tabpage NeoVimConnector::to_Tabpage(const msgpack_object& obj, bool *failed)
+{
+	return to_Integer(obj, failed);
 }
 
 QList<int64_t> NeoVimConnector::to_IntegerArray(const msgpack_object& obj, bool *failed)
@@ -370,7 +383,7 @@ QList<int64_t> NeoVimConnector::to_IntegerArray(const msgpack_object& obj, bool 
 				tr("Found non-raw element type when unpacking a QStringList"));
 			return QList<int64_t>();
 		}
-		ret.append(to_int64_t(obj));
+		ret.append(to_Integer(obj));
 	}
 
 	if ( failed ) {
@@ -685,7 +698,6 @@ void NeoVimConnector::dispatch(msgpack_object& req)
 		return;
 	}
 
-	qDebug() << req;
 	switch(req.via.array.ptr[0].via.u64) {
 	case 0:
 		dispatchRequest(req);

@@ -55,7 +55,7 @@ public:
 
 	// Methods to pack datatypes as message pack
 	// This is what you can use for arguments after startRequest
-	void send(int64_t);
+	void send(Integer);
 	void send(const QString&);
 	void send(const QLatin1String& s) { send(QString(s));}
 	void send(const QStringList&);
@@ -63,18 +63,27 @@ public:
 	void send(const QByteArray&);
 	void send(bool);
 
+	// 
 	// Methods to unpack msgpack responses
+	//
 	QByteArray to_QByteArray(const msgpack_object&, bool *failed=NULL);
-	QString to_QString(const msgpack_object&, bool *failed=NULL);
-	bool to_bool(const msgpack_object&, bool *failed=NULL);
-	int64_t to_int64_t(const msgpack_object&, bool *failed=NULL);
-	QStringList to_QStringList(const msgpack_object&, bool *failed=NULL);
-	QPoint to_QPoint(const msgpack_object&, bool *failed=NULL);
-	QVariant to_QVariant(const msgpack_object& msg, bool *failed=NULL);
+	String to_String(const msgpack_object&, bool *failed=NULL);
+	Boolean to_Boolean(const msgpack_object&, bool *failed=NULL);
+	StringArray to_StringArray(const msgpack_object&, bool *failed=NULL);
+	Position to_Position(const msgpack_object&, bool *failed=NULL);
+	Object to_Object(const msgpack_object& msg, bool *failed=NULL);
+
+	// These are all to_Integer
+	Integer to_Integer(const msgpack_object&, bool *failed=NULL);
+	Buffer to_Buffer(const msgpack_object&, bool *failed=NULL);
+	Window to_Window(const msgpack_object&, bool *failed=NULL);
+	Tabpage to_Tabpage(const msgpack_object&, bool *failed=NULL);
+
+	// These are all basically the same as to_IntegerArray
 	QList<int64_t> to_IntegerArray(const msgpack_object& msg, bool *failed=NULL);
-	QList<int64_t> to_WindowArray(const msgpack_object& msg, bool *failed=NULL);
-	QList<int64_t> to_BufferArray(const msgpack_object& msg, bool *failed=NULL);
-	QList<int64_t> to_TabpageArray(const msgpack_object& msg, bool *failed=NULL);
+	WindowArray to_WindowArray(const msgpack_object& msg, bool *failed=NULL);
+	BufferArray to_BufferArray(const msgpack_object& msg, bool *failed=NULL);
+	TabpageArray to_TabpageArray(const msgpack_object& msg, bool *failed=NULL);
 
 	//static QVariant toVariant(const msgpack_object&);
 
