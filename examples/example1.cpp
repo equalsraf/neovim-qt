@@ -12,11 +12,13 @@ int main(int argc, char **argv)
 
 	NeoVimQt::NeoVimConnector c(&s);
 
+	// These two requests might fail because I've hardcoded the function Id
 	NeoVimQt::NeoVimRequest *r = c.startRequestUnchecked(54, 0);
 	QObject::connect(r, &NeoVimQt::NeoVimRequest::finished,
 		[](uint32_t id, NeoVimQt::Function::FunctionId, bool error, const msgpack_object& obj){
 			qDebug() << obj;
 		});
+
 	NeoVimQt::NeoVimRequest *r2 = c.startRequestUnchecked(43, 1);
 	c.send(QLatin1String("WAT THE HELL"));
 	QObject::connect(r2, &NeoVimQt::NeoVimRequest::finished,
