@@ -265,6 +265,9 @@ Object NeoVimConnector::to_Object(const msgpack_object& obj, bool *failed)
 	return res;
 }
 
+/**
+ * Call function 0 to request metadata from NeoVim
+ */
 void NeoVimConnector::discoverMetadata()
 {
 	NeoVimRequest *r = startRequestUnchecked(0, 0);
@@ -789,7 +792,6 @@ void NeoVimConnector::dispatchNotification(msgpack_object& req)
 
 NeoVim* NeoVimConnector::neovimObject()
 {
-	// FIXME: return NULL if we have not check the metadata
 	if ( !m_neovimobj ) {
 		m_neovimobj = new NeoVim(this);
 	}

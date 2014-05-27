@@ -11,6 +11,10 @@
 
 namespace NeoVimQt {
 
+/**
+ * NeoVimRequest objects track RPC calls
+ * to Neovim
+ */
 class NeoVimRequest: public QObject {
 	Q_OBJECT
 public:
@@ -44,8 +48,6 @@ public:
 	NeoVimConnector(QIODevice* s);
 	~NeoVimConnector();
 
-	QList<QByteArray> parseParameterTypes(const msgpack_object&);
-
 	NeoVimError error();
 	QString errorString();
 
@@ -75,7 +77,7 @@ public:
 	Position to_Position(const msgpack_object&, bool *failed=NULL);
 	Object to_Object(const msgpack_object& msg, bool *failed=NULL);
 
-	// These are all to_Integer
+	// These are all the same as to_Integer
 	Integer to_Integer(const msgpack_object&, bool *failed=NULL);
 	Buffer to_Buffer(const msgpack_object&, bool *failed=NULL);
 	Window to_Window(const msgpack_object&, bool *failed=NULL);
@@ -87,8 +89,6 @@ public:
 	BufferArray to_BufferArray(const msgpack_object& msg, bool *failed=NULL);
 	TabpageArray to_TabpageArray(const msgpack_object& msg, bool *failed=NULL);
 
-	//static QVariant toVariant(const msgpack_object&);
-
 	NeoVim* neovimObject();
 
 signals:
@@ -96,18 +96,20 @@ signals:
 	void error(NeoVimError);
 
 protected:
+	void setError(NeoVimError err, const QString& msg);
 
+	// Message handlers
 	void dispatch(msgpack_object& obj);
 	void dispatchRequest(msgpack_object& obj);
 	void dispatchResponse(msgpack_object& obj);
 	void dispatchNotification(msgpack_object& obj);
 	void sendError(const msgpack_object& req, const QString& msg);
 
+	// Function table
 	void addFunction(const msgpack_object& ftable);
 	void addFunctions(const msgpack_object& ftable);
 	void addClasses(const msgpack_object& ftable);
-
-	void setError(NeoVimError err, const QString& msg);
+	QList<QByteArray> parseParameterTypes(const msgpack_object&);
 
 protected slots:
 	void discoverMetadata();
