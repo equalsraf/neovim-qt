@@ -10,6 +10,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
+find_package(Qt5Test REQUIRED)
 
 # msgpack
 find_package(Msgpack REQUIRED)
@@ -21,3 +22,4 @@ endif()
 
 add_subdirectory(src)
 add_subdirectory(examples)
+add_subdirectory(test)
