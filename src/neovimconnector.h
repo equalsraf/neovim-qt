@@ -127,6 +127,7 @@ private:
 	QHash<Function::FunctionId, uint64_t> m_functionToId;
 	QHash<uint64_t, Function::FunctionId> m_idToFunction;
 	NeoVim *m_neovimobj;
+	uint64_t m_channel;
 };
 
 }; // namespace NeoVimQt

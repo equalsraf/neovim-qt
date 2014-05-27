@@ -4,7 +4,7 @@
 namespace NeoVimQt {
 
 NeoVimConnector::NeoVimConnector(QIODevice *s)
-:QObject(), m_socket(s), m_error(NoError), reqid(0), m_neovimobj(NULL)
+:QObject(), m_socket(s), m_error(NoError), reqid(0), m_neovimobj(NULL), m_channel(0)
 {
 	msgpack_packer_init(&m_pk, this, NeoVimConnector::msgpack_write_cb);
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
@@ -570,7 +570,7 @@ void NeoVimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool 
 		return;
 	}
 
-	// FIXME: store the channel id, we need to implement API notifications
+	m_channel = result.via.array.ptr[0].via.u64;
 
 	const msgpack_object& metadataraw = result.via.array.ptr[1];
 	// The metadata bytearray is actually a serialized msgpack 
