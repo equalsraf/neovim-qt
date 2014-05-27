@@ -426,7 +426,13 @@ QList<int64_t> NeoVimConnector::to_TabpageArray(const msgpack_object& obj, bool 
 	return to_IntegerArray(obj, failed);
 }
 
-QList<QByteArray> NeoVimConnector::parseParameters(const msgpack_object& obj)
+/**
+ * Retrieve parameter types from a list of function parameters in the metadata
+ * object. Basically retrieves the even numbered elements of the array (types)
+ * i.e. [Type0 name0 Type1 name1 ... ] -> [Type0 Type1 ...]
+ *
+ */
+QList<QByteArray> NeoVimConnector::parseParameterTypes(const msgpack_object& obj)
 {
 	QList<QByteArray> fail;
 	if ( obj.type != MSGPACK_OBJECT_ARRAY ) {
@@ -545,7 +551,7 @@ void NeoVimConnector::addFunction(const msgpack_object& fun)
 					tr("Found unexpected data type for function parameters"));
 				return;
 			}
-			f.parameterTypes = parseParameters(val);
+			f.parameterTypes = parseParameterTypes(val);
 		} else {
 			qWarning() << "Unsupported function attribute"<< key << val.type;
 		}

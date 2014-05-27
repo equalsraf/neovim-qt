@@ -44,7 +44,7 @@ public:
 	NeoVimConnector(QIODevice* s);
 	~NeoVimConnector();
 
-	QList<QByteArray> parseParameters(const msgpack_object&);
+	QList<QByteArray> parseParameterTypes(const msgpack_object&);
 
 	NeoVimError error();
 	QString errorString();
