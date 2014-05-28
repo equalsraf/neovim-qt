@@ -1,10 +1,12 @@
 #include "neovimconnector.h"
 #include <QtGlobal>
+#include <QMetaMethod>
 
 namespace NeovimQt {
 
 NeovimConnector::NeovimConnector(QIODevice *s)
-:QObject(), reqid(0), m_socket(s), m_error(NoError), m_neovimobj(NULL), m_channel(0)
+:QObject(), reqid(0), m_socket(s), m_error(NoError), m_neovimobj(NULL), 
+	m_eventHandler(NULL), m_channel(0)
 {
 	qRegisterMetaType<NeovimError>("NeovimError");
 
@@ -787,10 +789,70 @@ void NeovimConnector::dispatchResponse(msgpack_object& resp)
 	req->deleteLater();
 }
 
-void NeovimConnector::dispatchNotification(msgpack_object& req)
+/**
+ * [type(2), method, params]
+ *
+ */
+void NeovimConnector::dispatchNotification(msgpack_object& nt)
 {
-	// TODO: call notification handler ...
-	qWarning() << "We do not support notifications (yet)" << req;
+	QByteArray methodName = to_QByteArray(nt.via.array.ptr[1]);
+	bool convfail;
+	QVariant args = to_Object(nt.via.array.ptr[2], &convfail);
+	if ( convfail ) {
+		qDebug() << "Unable to unpack notification parameter list";
+		return;
+	}
+	emit notification(methodName, args);
+
+	if ( !m_eventHandler ) {
+		return;
+	}
+
+	const QMetaObject *meta = m_eventHandler->metaObject();
+	for (int i=0; i<meta->methodCount(); i++) {
+		QMetaMethod meth = meta->method(i);
+		if ( meth.access() != QMetaMethod::Public ||
+				meth.methodType() != QMetaMethod::Slot) {
+			// Only call public slots
+			continue;
+		}
+
+		if ( meth.name() != methodName ) {
+			continue;
+		}
+		
+		bool match=true;
+		QList<QGenericArgument> slotArgs;
+		for ( int argidx=0; argidx < args.toList().size(); argidx++ ) {
+			const QVariant& v = args.toList().at(argidx);
+			// This cast should be safe (See docs for QVariant::type)
+			if ( meth.parameterType(argidx) != (QMetaType::Type)v.type() ) {
+				match=false;
+				break;
+			}
+			slotArgs << QGenericArgument(QMetaType::typeName(v.type()), const_cast<void*>(v.constData()));
+		}
+		if ( !match ) {
+			continue;
+		}
+
+		// 10 arguments is our limit
+		bool ok = meth.invoke(m_eventHandler,
+				slotArgs.value(0),
+				slotArgs.value(1),
+				slotArgs.value(2),
+				slotArgs.value(3),
+				slotArgs.value(4),
+				slotArgs.value(5),
+				slotArgs.value(6),
+				slotArgs.value(7),
+				slotArgs.value(8),
+				slotArgs.value(9)
+				);
+		if ( ok ) {
+			return;
+		}
+	}
 }
 
 Neovim* NeovimConnector::neovimObject()
