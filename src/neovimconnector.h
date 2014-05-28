@@ -90,6 +90,7 @@ public:
 	TabpageArray to_TabpageArray(const msgpack_object& msg, bool *failed=NULL);
 
 	Neovim* neovimObject();
+	uint64_t channel() {return m_channel;}
 
 signals:
 	void ready();

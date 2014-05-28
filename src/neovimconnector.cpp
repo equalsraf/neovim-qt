@@ -701,8 +701,8 @@ void NeovimConnector::dispatch(msgpack_object& req)
 		return;
 	}
 
-	if (req.via.array.size != 4) {
-		qDebug() << "Received Invalid msgpack: message len MUST be 4";
+	if (req.via.array.size < 3 || req.via.array.size > 4) {
+		qDebug() << "Received Invalid msgpack: message len MUST be 3 or 4";
 		return;
 	}
 
@@ -710,44 +710,47 @@ void NeovimConnector::dispatch(msgpack_object& req)
 		qDebug() << "Received Invalid msgpack: msg type MUST be an integer";
 		return;
 	}
-
 	uint64_t type = req.via.array.ptr[0].via.u64;
-	if (req.via.array.ptr[1].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
-		qDebug() << "Received Invalid msgpack: msg id MUST be a positive integer";
-		if ( type == 0 ) {
-			sendError(req, tr("Msg Id must be a positive integer"));
-		}
-		return;
-	}
 
-	if (type == 0 && req.via.array.ptr[2].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
-		qDebug() << "Received Invalid msgpack: method MUST be a positive integer" << req.via.array.ptr[2].type;
-		if ( type == 0 ) {
-			sendError(req, tr("Method id must be a positive integer"));
-		}
-		return;
-	}
-
-	if (type == 0 && req.via.array.ptr[3].type != MSGPACK_OBJECT_ARRAY) {
-		qDebug() << "Invalid msgpack: arguments MUST be an array";
-		if ( type == 0 ) {
-			sendError(req, tr("Paremeters must be an array"));
-		}
-		return;
-	}
-
-	switch(req.via.array.ptr[0].via.u64) {
+	switch(type) {
 	case 0:
+		if (req.via.array.ptr[1].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
+			qDebug() << "Received Invalid request: msg id MUST be a positive integer";
+			sendError(req, tr("Msg Id must be a positive integer"));
+			return;
+		}
+		if (req.via.array.ptr[2].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
+			qDebug() << "Received Invalid request: method MUST be a positive integer" << req.via.array.ptr[2].type;
+			sendError(req, tr("Method id must be a positive integer"));
+			return;
+		}
+		if (req.via.array.ptr[3].type != MSGPACK_OBJECT_ARRAY) {
+			qDebug() << "Invalid request: arguments MUST be an array";
+			sendError(req, tr("Paremeters must be an array"));
+			return;
+		}
 		dispatchRequest(req);
 		break;
 	case 1:
+		if (req.via.array.ptr[1].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
+			qDebug() << "Received Invalid response: msg id MUST be a positive integer";
+			return;
+		}
 		dispatchResponse(req);
 		break;
 	case 2:
+		if (req.via.array.ptr[1].type != MSGPACK_OBJECT_RAW) {
+			qDebug() << "Received Invalid notification: event MUST be a String";
+			return;
+		}
+		if (req.via.array.ptr[2].type != MSGPACK_OBJECT_ARRAY) {
+			qDebug() << "Invalid notification: arguments MUST be an array";
+			return;
+		}
 		dispatchNotification(req);
 		break;
 	default:
-		sendError(req, tr("Message type is unknown"));
+		qDebug() << "Unsupported msg type" << type;
 	}
 }
 
@@ -786,7 +789,8 @@ void NeovimConnector::dispatchResponse(msgpack_object& resp)
 
 void NeovimConnector::dispatchNotification(msgpack_object& req)
 {
-	qWarning() << "We do not support notifications (yet)";
+	// TODO: call notification handler ...
+	qWarning() << "We do not support notifications (yet)" << req;
 }
 
 Neovim* NeovimConnector::neovimObject()
