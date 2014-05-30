@@ -509,60 +509,16 @@ void NeovimConnector::addFunction(const msgpack_object& fun)
 		return;
 	}	
 
-	Function f;
-	uint64_t msgpack_id;
-	for (uint32_t i=0; i<fun.via.map.size; i++) {
-		if ( fun.via.map.ptr[i].key.type != MSGPACK_OBJECT_RAW ) {
-			setError( UnexpectedMsg,
-					tr("Found unexpected data type when unpacking function item"));
-			return;
-		}
-
-		QByteArray key = to_QByteArray(fun.via.map.ptr[i].key);
-		msgpack_object& val = fun.via.map.ptr[i].val;
-		if ( key == "id" ) {
-			if ( val.type != MSGPACK_OBJECT_POSITIVE_INTEGER ) {
-				setError( UnexpectedMsg,
-					tr("Found unexpected data type for function id"));
-				return;
-			}
-			msgpack_id = val.via.u64;
-		} else if ( key == "return_type" ) {
-			if ( val.type != MSGPACK_OBJECT_RAW ) {
-				setError( UnexpectedMsg,
-					tr("Found unexpected data type for function return type"));
-				return;
-			}
-			f.return_type = to_QByteArray(val);
-		} else if ( key == "name" ) {
-			if ( val.type != MSGPACK_OBJECT_RAW ) {
-				setError( UnexpectedMsg,
-					tr("Found unexpected data type for function name"));
-				return;
-			}
-			f.name = to_QByteArray(val);
-		} else if ( key == "can_fail" ) {
-			if ( val.type != MSGPACK_OBJECT_BOOLEAN ) {
-				setError( UnexpectedMsg,
-					tr("Found unexpected data type for function can_fail"));
-				return;
-			}
-			f.can_fail = val.via.boolean;
-		} else if ( key == "parameters" ) {
-			if ( val.type != MSGPACK_OBJECT_ARRAY ) {
-				setError( UnexpectedMsg,
-					tr("Found unexpected data type for function parameters"));
-				return;
-			}
-			f.parameterTypes = parseParameterTypes(val);
-		} else {
-			qWarning() << "Unsupported function attribute"<< key << val.type;
-		}
+	Function f = Function::fromMsgpack(fun);
+	if ( f.isValid() ) {
+		setError( UnexpectedMsg,
+			tr("Error parsing function metadata"));
+		return;
 	}
 	int index = Function::knownFunctions.indexOf(f);
 	if ( index != -1 ) {
-		m_functionToId.insert(Function::FunctionId(index), msgpack_id);
-		m_idToFunction.insert(msgpack_id, Function::FunctionId(index));
+		m_functionToId.insert(Function::FunctionId(index), f.id);
+		m_idToFunction.insert(f.id, Function::FunctionId(index));
 	}
 }
 

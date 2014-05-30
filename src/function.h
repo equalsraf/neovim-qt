@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QStringList>
 #include <QPoint>
+#include <msgpack.h>
 
 namespace NeovimQt {
 
@@ -34,18 +35,27 @@ class Function {
 	Q_ENUMS(FunctionId)
 public:
 
+#ifndef NEOVIMQT_NO_AUTO
 // Bring in auto-generated enum
 #include "auto/function_enum.h"
+#endif
 
 	Function();
-	Function(const QByteArray& ret, const QByteArray& name, QList<QByteArray> params, bool can_fail);
+	Function(const QString& ret, const QString& name, QList<QPair<QString,QString> > params, bool can_fail);
+	Function(const QString& ret, const QString& name, QList<QString> paramTypes, bool can_fail);
+	bool isValid();
 	bool operator==(const Function& other);
+	static Function fromMsgpack(const msgpack_object&);
+	static QList<QPair<QString,QString> > parseParameters(const msgpack_object& obj);
 
+	uint64_t id;
 	bool can_fail;
-	QByteArray return_type;
-	QByteArray name;
-	QList<QByteArray> parameterTypes;
+	QString return_type;
+	QString name;
+	QList<QPair<QString,QString> > parameters;
 	const static QList<Function> knownFunctions;
+private:
+	bool m_valid;
 };
 
 }

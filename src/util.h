@@ -10,6 +10,7 @@ QDebug operator<<(QDebug dbg, const NeovimQt::Function& f);
 
 namespace NeovimQt {
 bool checkVariant(const QVariant&);
+QByteArray toByteArray(const msgpack_object&);
 }
 
 #endif

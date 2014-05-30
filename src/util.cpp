@@ -19,6 +19,18 @@ bool checkVariant(const QVariant& )
 	// FIXME: implement my please :D
 	return true;
 }
+
+/**
+ * Convert msgpack object into QByteArray
+ */
+QByteArray toByteArray(const msgpack_object& obj)
+{
+	if ( obj.type != MSGPACK_OBJECT_RAW ) {
+		return QByteArray();
+	}
+	return QByteArray(obj.via.raw.ptr, obj.via.raw.size);
+}
+
 } // namespace
 
 /**
@@ -70,12 +82,12 @@ QDebug operator<<(QDebug dbg, const msgpack_object& obj)
 	return dbg.maybeSpace();
 }
 
-
+typedef QPair<QString,QString> Param;
 QDebug operator<<(QDebug dbg, const NeovimQt::Function& f)
 {
 	dbg.space() << f.return_type << f.name << "(";
-	foreach(QByteArray p, f.parameterTypes) {
-		dbg.space() << p << ",";
+	foreach(Param p, f.parameters) {
+		dbg.space() << p.first << ",";
 	}
 	dbg.space() << ")" << "fails:" << f.can_fail;
 	return dbg.maybeSpace();

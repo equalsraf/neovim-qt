@@ -27,15 +27,17 @@ you should be using the QObject returned by NeovimConnector::neovimObject()
 
 * Qt5
 * libmsgpack
+* Neovim
 
 ## To update the RPC bindings
 
-From the project root
+To regenerate the neovim API bindings run
 
-    lua scripts/code-gen.lua ../neovim/src/nvim/api/*.h src/auto/
+    make neovim_auto
 
-The first path, points to the API headers in the neovim source code.
-Afterwards just follow the build instructions above.
+If your Neovim version is not in your path, pass the path to cmake as
+
+    cmake -DNEOVIM_EXEC=/usr/bin/nvim ..
 
 ## TODO
 

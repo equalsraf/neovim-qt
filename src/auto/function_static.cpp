@@ -1,270 +1,279 @@
+// Auto generated Fri May 30 17:18:13 2014
 const QList<Function> Function::knownFunctions = QList<Function>()
-<< Function( "Integer", "buffer_get_length",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-	, true)
-<< Function( "String", "buffer_get_line",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("Integer")
-	, true)
-<< Function( "void", "buffer_set_line",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("Integer")
-		<< QByteArray("String")
-	, true)
-<< Function( "void", "buffer_del_line",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("Integer")
-	, true)
-<< Function( "StringArray", "buffer_get_slice",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("Integer")
-		<< QByteArray("Integer")
-		<< QByteArray("Boolean")
-		<< QByteArray("Boolean")
-	, true)
-<< Function( "void", "buffer_set_slice",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("Integer")
-		<< QByteArray("Integer")
-		<< QByteArray("Boolean")
-		<< QByteArray("Boolean")
-		<< QByteArray("StringArray")
-	, true)
-<< Function( "Object", "buffer_get_var",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("String")
-	, true)
-<< Function( "Object", "buffer_set_var",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("String")
-		<< QByteArray("Object")
-	, true)
-<< Function( "Object", "buffer_get_option",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("String")
-	, true)
-<< Function( "void", "buffer_set_option",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("String")
-		<< QByteArray("Object")
-	, true)
-<< Function( "Integer", "buffer_get_number",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-	, true)
-<< Function( "String", "buffer_get_name",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-	, true)
-<< Function( "void", "buffer_set_name",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("String")
-	, true)
-<< Function( "Boolean", "buffer_is_valid",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-	, false)
-<< Function( "void", "buffer_insert",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("Integer")
-		<< QByteArray("StringArray")
-	, true)
-<< Function( "Position", "buffer_get_mark",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-		<< QByteArray("String")
-	, true)
-<< Function( "WindowArray", "tabpage_get_windows",
-	QList<QByteArray>()
-		<< QByteArray("Tabpage")
-	, true)
-<< Function( "Object", "tabpage_get_var",
-	QList<QByteArray>()
-		<< QByteArray("Tabpage")
-		<< QByteArray("String")
-	, true)
-<< Function( "Object", "tabpage_set_var",
-	QList<QByteArray>()
-		<< QByteArray("Tabpage")
-		<< QByteArray("String")
-		<< QByteArray("Object")
-	, true)
-<< Function( "Window", "tabpage_get_window",
-	QList<QByteArray>()
-		<< QByteArray("Tabpage")
-	, true)
-<< Function( "Boolean", "tabpage_is_valid",
-	QList<QByteArray>()
-		<< QByteArray("Tabpage")
-	, false)
-<< Function( "void", "vim_push_keys",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, false)
-<< Function( "void", "vim_command",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, true)
-<< Function( "Object", "vim_eval",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, true)
-<< Function( "Integer", "vim_strwidth",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, true)
-<< Function( "StringArray", "vim_list_runtime_paths",
-	QList<QByteArray>()
-	, false)
-<< Function( "void", "vim_change_directory",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, true)
-<< Function( "String", "vim_get_current_line",
-	QList<QByteArray>()
-	, true)
-<< Function( "void", "vim_del_current_line",
-	QList<QByteArray>()
-	, true)
-<< Function( "void", "vim_set_current_line",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, true)
-<< Function( "Object", "vim_get_var",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, true)
-<< Function( "Object", "vim_set_var",
-	QList<QByteArray>()
-		<< QByteArray("String")
-		<< QByteArray("Object")
-	, true)
-<< Function( "Object", "vim_get_vvar",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, true)
-<< Function( "Object", "vim_get_option",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, true)
-<< Function( "void", "vim_set_option",
-	QList<QByteArray>()
-		<< QByteArray("String")
-		<< QByteArray("Object")
-	, true)
-<< Function( "void", "vim_out_write",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, false)
-<< Function( "void", "vim_err_write",
-	QList<QByteArray>()
-		<< QByteArray("String")
-	, false)
-<< Function( "BufferArray", "vim_get_buffers",
-	QList<QByteArray>()
-	, false)
-<< Function( "Buffer", "vim_get_current_buffer",
-	QList<QByteArray>()
-	, false)
-<< Function( "void", "vim_set_current_buffer",
-	QList<QByteArray>()
-		<< QByteArray("Buffer")
-	, true)
-<< Function( "WindowArray", "vim_get_windows",
-	QList<QByteArray>()
-	, false)
-<< Function( "Window", "vim_get_current_window",
-	QList<QByteArray>()
-	, false)
-<< Function( "void", "vim_set_current_window",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-	, true)
-<< Function( "TabpageArray", "vim_get_tabpages",
-	QList<QByteArray>()
-	, false)
-<< Function( "Tabpage", "vim_get_current_tabpage",
-	QList<QByteArray>()
-	, false)
-<< Function( "void", "vim_set_current_tabpage",
-	QList<QByteArray>()
-		<< QByteArray("Tabpage")
-	, true)
-<< Function( "Buffer", "window_get_buffer",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-	, true)
-<< Function( "Position", "window_get_cursor",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-	, true)
-<< Function( "void", "window_set_cursor",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-		<< QByteArray("Position")
-	, true)
-<< Function( "Integer", "window_get_height",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-	, true)
-<< Function( "void", "window_set_height",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-		<< QByteArray("Integer")
-	, true)
-<< Function( "Integer", "window_get_width",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-	, true)
-<< Function( "void", "window_set_width",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-		<< QByteArray("Integer")
-	, true)
-<< Function( "Object", "window_get_var",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-		<< QByteArray("String")
-	, true)
-<< Function( "Object", "window_set_var",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-		<< QByteArray("String")
-		<< QByteArray("Object")
-	, true)
-<< Function( "Object", "window_get_option",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-		<< QByteArray("String")
-	, true)
-<< Function( "void", "window_set_option",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-		<< QByteArray("String")
-		<< QByteArray("Object")
-	, true)
-<< Function( "Position", "window_get_position",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-	, true)
-<< Function( "Tabpage", "window_get_tabpage",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-	, true)
-<< Function( "Boolean", "window_is_valid",
-	QList<QByteArray>()
-		<< QByteArray("Window")
-	, false)
+<< Function("WindowArray", "tabpage_get_windows",
+	QList<QString>()
+		<< QString("Tabpage")
+	, 1)
+<< Function("Object", "tabpage_get_var",
+	QList<QString>()
+		<< QString("Tabpage")
+		<< QString("String")
+	, 1)
+<< Function("Object", "tabpage_set_var",
+	QList<QString>()
+		<< QString("Tabpage")
+		<< QString("String")
+		<< QString("Object")
+	, 1)
+<< Function("Window", "tabpage_get_window",
+	QList<QString>()
+		<< QString("Tabpage")
+	, 1)
+<< Function("Boolean", "tabpage_is_valid",
+	QList<QString>()
+		<< QString("Tabpage")
+	, 0)
+<< Function("Integer", "buffer_get_length",
+	QList<QString>()
+		<< QString("Buffer")
+	, 1)
+<< Function("String", "buffer_get_line",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("Integer")
+	, 1)
+<< Function("void", "buffer_set_line",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("Integer")
+		<< QString("String")
+	, 1)
+<< Function("void", "buffer_del_line",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("Integer")
+	, 1)
+<< Function("StringArray", "buffer_get_slice",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("Integer")
+		<< QString("Integer")
+		<< QString("Boolean")
+		<< QString("Boolean")
+	, 1)
+<< Function("void", "buffer_set_slice",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("Integer")
+		<< QString("Integer")
+		<< QString("Boolean")
+		<< QString("Boolean")
+		<< QString("StringArray")
+	, 1)
+<< Function("Object", "buffer_get_var",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("String")
+	, 1)
+<< Function("Object", "buffer_set_var",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("String")
+		<< QString("Object")
+	, 1)
+<< Function("Object", "buffer_get_option",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("String")
+	, 1)
+<< Function("void", "buffer_set_option",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("String")
+		<< QString("Object")
+	, 1)
+<< Function("Integer", "buffer_get_number",
+	QList<QString>()
+		<< QString("Buffer")
+	, 1)
+<< Function("String", "buffer_get_name",
+	QList<QString>()
+		<< QString("Buffer")
+	, 1)
+<< Function("void", "buffer_set_name",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("String")
+	, 1)
+<< Function("Boolean", "buffer_is_valid",
+	QList<QString>()
+		<< QString("Buffer")
+	, 0)
+<< Function("void", "buffer_insert",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("Integer")
+		<< QString("StringArray")
+	, 1)
+<< Function("Position", "buffer_get_mark",
+	QList<QString>()
+		<< QString("Buffer")
+		<< QString("String")
+	, 1)
+<< Function("Buffer", "window_get_buffer",
+	QList<QString>()
+		<< QString("Window")
+	, 1)
+<< Function("Position", "window_get_cursor",
+	QList<QString>()
+		<< QString("Window")
+	, 1)
+<< Function("void", "window_set_cursor",
+	QList<QString>()
+		<< QString("Window")
+		<< QString("Position")
+	, 1)
+<< Function("Integer", "window_get_height",
+	QList<QString>()
+		<< QString("Window")
+	, 1)
+<< Function("void", "window_set_height",
+	QList<QString>()
+		<< QString("Window")
+		<< QString("Integer")
+	, 1)
+<< Function("Integer", "window_get_width",
+	QList<QString>()
+		<< QString("Window")
+	, 1)
+<< Function("void", "window_set_width",
+	QList<QString>()
+		<< QString("Window")
+		<< QString("Integer")
+	, 1)
+<< Function("Object", "window_get_var",
+	QList<QString>()
+		<< QString("Window")
+		<< QString("String")
+	, 1)
+<< Function("Object", "window_set_var",
+	QList<QString>()
+		<< QString("Window")
+		<< QString("String")
+		<< QString("Object")
+	, 1)
+<< Function("Object", "window_get_option",
+	QList<QString>()
+		<< QString("Window")
+		<< QString("String")
+	, 1)
+<< Function("void", "window_set_option",
+	QList<QString>()
+		<< QString("Window")
+		<< QString("String")
+		<< QString("Object")
+	, 1)
+<< Function("Position", "window_get_position",
+	QList<QString>()
+		<< QString("Window")
+	, 1)
+<< Function("Tabpage", "window_get_tabpage",
+	QList<QString>()
+		<< QString("Window")
+	, 1)
+<< Function("Boolean", "window_is_valid",
+	QList<QString>()
+		<< QString("Window")
+	, 0)
+<< Function("void", "vim_push_keys",
+	QList<QString>()
+		<< QString("String")
+	, 0)
+<< Function("void", "vim_command",
+	QList<QString>()
+		<< QString("String")
+	, 1)
+<< Function("Object", "vim_eval",
+	QList<QString>()
+		<< QString("String")
+	, 1)
+<< Function("Integer", "vim_strwidth",
+	QList<QString>()
+		<< QString("String")
+	, 1)
+<< Function("StringArray", "vim_list_runtime_paths",
+	QList<QString>()
+	, 0)
+<< Function("void", "vim_change_directory",
+	QList<QString>()
+		<< QString("String")
+	, 1)
+<< Function("String", "vim_get_current_line",
+	QList<QString>()
+	, 1)
+<< Function("void", "vim_del_current_line",
+	QList<QString>()
+	, 1)
+<< Function("void", "vim_set_current_line",
+	QList<QString>()
+		<< QString("String")
+	, 1)
+<< Function("Object", "vim_get_var",
+	QList<QString>()
+		<< QString("String")
+	, 1)
+<< Function("Object", "vim_set_var",
+	QList<QString>()
+		<< QString("String")
+		<< QString("Object")
+	, 1)
+<< Function("Object", "vim_get_vvar",
+	QList<QString>()
+		<< QString("String")
+	, 1)
+<< Function("Object", "vim_get_option",
+	QList<QString>()
+		<< QString("String")
+	, 1)
+<< Function("void", "vim_set_option",
+	QList<QString>()
+		<< QString("String")
+		<< QString("Object")
+	, 1)
+<< Function("void", "vim_out_write",
+	QList<QString>()
+		<< QString("String")
+	, 0)
+<< Function("void", "vim_err_write",
+	QList<QString>()
+		<< QString("String")
+	, 0)
+<< Function("BufferArray", "vim_get_buffers",
+	QList<QString>()
+	, 0)
+<< Function("Buffer", "vim_get_current_buffer",
+	QList<QString>()
+	, 0)
+<< Function("void", "vim_set_current_buffer",
+	QList<QString>()
+		<< QString("Buffer")
+	, 1)
+<< Function("WindowArray", "vim_get_windows",
+	QList<QString>()
+	, 0)
+<< Function("Window", "vim_get_current_window",
+	QList<QString>()
+	, 0)
+<< Function("void", "vim_set_current_window",
+	QList<QString>()
+		<< QString("Window")
+	, 1)
+<< Function("TabpageArray", "vim_get_tabpages",
+	QList<QString>()
+	, 0)
+<< Function("Tabpage", "vim_get_current_tabpage",
+	QList<QString>()
+	, 0)
+<< Function("void", "vim_set_current_tabpage",
+	QList<QString>()
+		<< QString("Tabpage")
+	, 1)
+<< Function("void", "vim_subscribe",
+	QList<QString>()
+		<< QString("String")
+	, 0)
+<< Function("void", "vim_unsubscribe",
+	QList<QString>()
+		<< QString("String")
+	, 0)
 	;
