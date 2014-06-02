@@ -510,7 +510,7 @@ void NeovimConnector::addFunction(const msgpack_object& fun)
 	}	
 
 	Function f = Function::fromMsgpack(fun);
-	if ( f.isValid() ) {
+	if ( !f.isValid() ) {
 		setError( UnexpectedMsg,
 			tr("Error parsing function metadata"));
 		return;
