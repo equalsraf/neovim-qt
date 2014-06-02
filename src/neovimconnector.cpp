@@ -697,14 +697,6 @@ void NeovimConnector::dispatch(msgpack_object& req)
 		dispatchResponse(req);
 		break;
 	case 2:
-		if (req.via.array.ptr[1].type != MSGPACK_OBJECT_RAW) {
-			qDebug() << "Received Invalid notification: event MUST be a String";
-			return;
-		}
-		if (req.via.array.ptr[2].type != MSGPACK_OBJECT_ARRAY) {
-			qDebug() << "Invalid notification: arguments MUST be an array";
-			return;
-		}
 		dispatchNotification(req);
 		break;
 	default:
@@ -751,14 +743,19 @@ void NeovimConnector::dispatchResponse(msgpack_object& resp)
  */
 void NeovimConnector::dispatchNotification(msgpack_object& nt)
 {
-	QByteArray methodName = to_QByteArray(nt.via.array.ptr[1]);
-	bool convfail;
-	QVariant args = to_Object(nt.via.array.ptr[2], &convfail);
-	if ( convfail ) {
-		qDebug() << "Unable to unpack notification parameter list";
+	if (nt.via.array.ptr[1].type != MSGPACK_OBJECT_RAW) {
+		qDebug() << "Received Invalid notification: event MUST be a String";
 		return;
 	}
-	emit notification(methodName, args);
+	QByteArray methodName = to_QByteArray(nt.via.array.ptr[1]);
+
+	bool convfail;
+	QVariant val = to_Object(nt.via.array.ptr[2], &convfail);
+	if ( convfail ) {
+		qDebug() << "Unable to unpack notification parameter";
+		return;
+	}
+	emit notification(methodName, val);
 
 	if ( !m_eventHandler ) {
 		return;
@@ -777,34 +774,19 @@ void NeovimConnector::dispatchNotification(msgpack_object& nt)
 			continue;
 		}
 		
-		bool match=true;
-		QList<QGenericArgument> slotArgs;
-		for ( int argidx=0; argidx < args.toList().size(); argidx++ ) {
-			const QVariant& v = args.toList().at(argidx);
-			// This cast should be safe (See docs for QVariant::type)
-			if ( meth.parameterType(argidx) != (QMetaType::Type)v.type() ) {
-				match=false;
-				break;
-			}
-			slotArgs << QGenericArgument(QMetaType::typeName(v.type()), const_cast<void*>(v.constData()));
-		}
-		if ( !match ) {
+		// FIXME: nil i.e. no arguments
+		if ( meth.parameterTypes().size() != 1 ) {
 			continue;
 		}
 
-		// 10 arguments is our limit
+		if ( meth.parameterType(0) != QMetaType::QVariant ) {
+			continue;
+		}
+
 		bool ok = meth.invoke(m_eventHandler,
-				slotArgs.value(0),
-				slotArgs.value(1),
-				slotArgs.value(2),
-				slotArgs.value(3),
-				slotArgs.value(4),
-				slotArgs.value(5),
-				slotArgs.value(6),
-				slotArgs.value(7),
-				slotArgs.value(8),
-				slotArgs.value(9)
+			QGenericArgument(QMetaType::typeName(val.type()), const_cast<void*>(val.constData()))
 				);
+
 		if ( ok ) {
 			return;
 		}
