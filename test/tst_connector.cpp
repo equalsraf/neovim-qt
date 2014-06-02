@@ -9,7 +9,7 @@ class TestConnector: public QObject
 private slots:
 	void initTestCase();
 	void invalidSocket();
-	void ctor();
+
 private:
 	NeovimQt::NeovimConnector *m_c;
 
@@ -29,11 +29,6 @@ void TestConnector::invalidSocket()
 	QLocalSocket s;
 	NeovimQt::NeovimConnector *c = new NeovimQt::NeovimConnector(&s);
 	Q_ASSERT(c->error() != NeovimQt::NeovimConnector::NoError);
-}
-
-void TestConnector::ctor()
-{
-
 }
 
 QTEST_MAIN(TestConnector)
