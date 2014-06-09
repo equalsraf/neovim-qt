@@ -6,7 +6,7 @@ namespace NeovimQt {
 
 NeovimConnector::NeovimConnector(QIODevice *s)
 :QObject(), reqid(0), m_socket(s), m_error(NoError), m_neovimobj(NULL), 
-	m_eventHandler(NULL), m_channel(0)
+	m_channel(0)
 {
 	qRegisterMetaType<NeovimError>("NeovimError");
 
@@ -756,41 +756,6 @@ void NeovimConnector::dispatchNotification(msgpack_object& nt)
 		return;
 	}
 	emit notification(methodName, val);
-
-	if ( !m_eventHandler ) {
-		return;
-	}
-
-	const QMetaObject *meta = m_eventHandler->metaObject();
-	for (int i=0; i<meta->methodCount(); i++) {
-		QMetaMethod meth = meta->method(i);
-		if ( meth.access() != QMetaMethod::Public ||
-				meth.methodType() != QMetaMethod::Slot) {
-			// Only call public slots
-			continue;
-		}
-
-		if ( meth.name() != methodName ) {
-			continue;
-		}
-		
-		// FIXME: nil i.e. no arguments
-		if ( meth.parameterTypes().size() != 1 ) {
-			continue;
-		}
-
-		if ( meth.parameterType(0) != QMetaType::QVariant ) {
-			continue;
-		}
-
-		bool ok = meth.invoke(m_eventHandler,
-			QGenericArgument(QMetaType::typeName(val.type()), const_cast<void*>(val.constData()))
-				);
-
-		if ( ok ) {
-			return;
-		}
-	}
 }
 
 Neovim* NeovimConnector::neovimObject()

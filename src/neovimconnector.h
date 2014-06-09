@@ -91,7 +91,6 @@ public:
 
 	Neovim* neovimObject();
 	uint64_t channel() {return m_channel;}
-	void setNeovimEventHandler(QObject* h) { m_eventHandler = h; }
 
 signals:
 	void ready();
@@ -134,7 +133,6 @@ private:
 	QHash<Function::FunctionId, uint64_t> m_functionToId;
 	QHash<uint64_t, Function::FunctionId> m_idToFunction;
 	Neovim *m_neovimobj;
-	QObject *m_eventHandler;
 	uint64_t m_channel;
 };
 } // namespace NeovimQt
