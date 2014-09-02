@@ -7,8 +7,7 @@ class TestNeovimObject: public QObject
 {
 	Q_OBJECT
 public slots:
-	void notification(const QByteArray& name, const QVariant& v);
-	void test_event(const QVariant&);
+	void test_event(const QByteArray& name, const QVariantList&);
 
 protected slots:
 	void delayedSetup();
@@ -23,38 +22,36 @@ private:
 	bool m_test_event_stringlist;
 };
 
-void TestNeovimObject::notification(const QByteArray& name, const QVariant& val)
-{
-	qDebug() << name << val;
-}
-
 void TestNeovimObject::delayedSetup()
 {
-	m_c->setNeovimEventHandler(this);
 	NeovimQt::Neovim *n = m_c->neovimObject();
 
 	m_test_event_string = false;
 	m_test_event_uint = false;
 	m_test_event_stringlist = false;
+	connect(m_c, &NeovimQt::NeovimConnector::notification,
+			this, &TestNeovimObject::test_event);
+
 	n->vim_command(QString("call send_event(%1, \"test_event\", \"WAT\")").arg(m_c->channel()));
 	n->vim_command(QString("call send_event(%1, \"test_event\", 42)").arg(m_c->channel()));
 	n->vim_command(QString("call send_event(%1, \"test_event\", [\"one\", \"two\", \"\"])").arg(m_c->channel()));
 }
 
-void TestNeovimObject::test_event(const QVariant& v)
+void TestNeovimObject::test_event(const QByteArray& name, const QVariantList& params)
 {
-	if ( (QMetaType::Type)v.type() == QMetaType::QString ) {
-		Q_ASSERT(v.toString() == "WAT");
+	QVariant arg0 = params.at(0);
+	if ( (QMetaType::Type)arg0.type() == QMetaType::QString ) {
+		Q_ASSERT(arg0.toString() == "WAT");
 		m_test_event_string = true;
 	}
 
-	if ( (QMetaType::Type)v.type() == QMetaType::ULongLong ) {
-		Q_ASSERT(v.toInt() == 42);
+	if ( (QMetaType::Type)arg0.type() == QMetaType::ULongLong ) {
+		Q_ASSERT(arg0.toInt() == 42);
 		m_test_event_uint = true;
 	}
 
-	if (v.canConvert(QMetaType::QStringList)) {
-		QStringList l = v.toStringList();
+	if (arg0.canConvert(QMetaType::QStringList)) {
+		QStringList l = arg0.toStringList();
 		m_test_event_stringlist = true;
 	}
 }
@@ -79,8 +76,6 @@ void TestNeovimObject::initTestCase()
 
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 			this, &TestNeovimObject::delayedSetup);
-	connect(m_c, &NeovimQt::NeovimConnector::notification,
-			this, &TestNeovimObject::notification);
 	QTest::qWait(500);
 }
 
