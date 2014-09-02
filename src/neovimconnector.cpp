@@ -63,10 +63,9 @@ int NeovimConnector::msgpack_write_cb(void* data, const char* buf, unsigned long
 }
 
 /**
- * Send a request msg
+ * Start an RPC request
  *
- * It is up to the caller to call msgpack_pack* to
- * pack each individual argument
+ * Use send() to pass on each of the call parameters
  *
  * Returns a NeovimRequest object. You can connect to
  * its finished() SIGNAL to handle the response
@@ -85,14 +84,6 @@ NeovimRequest* NeovimConnector::startRequestUnchecked(const QString& method, uin
 
 	NeovimRequest *r = new NeovimRequest( msgid, this);
 	m_requests.insert(msgid, r);
-	return r;
-}
-
-NeovimRequest* NeovimConnector::startRequest(Function::FunctionId method, uint32_t argcount)
-{
-	NeovimRequest *r = startRequestUnchecked(Function::knownFunctions.at(method).name, argcount);
-
-	r->setFunction(method);
 	return r;
 }
 

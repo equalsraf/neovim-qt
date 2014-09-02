@@ -1,4 +1,4 @@
-// Auto generated Tue Sep 2 09:42:05 2014
+// Auto generated Tue Sep 2 10:55:22 2014
 enum FunctionId {
 	NEOVIM_FN_WINDOW_GET_BUFFER,
 	NEOVIM_FN_WINDOW_GET_CURSOR,

@@ -1,4 +1,4 @@
-// Auto generated Tue Sep 2 09:42:05 2014
+// Auto generated Tue Sep 2 10:55:22 2014
 const QList<Function> Function::knownFunctions = QList<Function>()
 << Function("Buffer", "window_get_buffer",
 	QList<QString>()

@@ -52,10 +52,6 @@ public:
 	QString errorString();
 
 	NeovimRequest* startRequestUnchecked(const QString& method, uint32_t argcount);
-	// FIXME: add argcount verification, e.g.
-	// - remove the argcount from this method
-	// - count calls to send() and match agains argcount - fail hard on mismatch
-	NeovimRequest* startRequest(Function::FunctionId method, uint32_t argcount);
 
 	// Methods to pack datatypes as message pack
 	// This is what you can use for arguments after startRequest

@@ -134,7 +134,8 @@ bool generate_neovim_cpp(const QList<NeovimQt::Function> &ftable, QDir& dst)
 			out << QString("%1 %2").arg(f.parameters.at(i).first, f.parameters.at(i).second);
 		}
 		out << ")\n{\n";
-		out << QString("\tNeovimRequest *r = m_c->startRequest(Function::NEOVIM_FN_%1, %2);\n").arg(f.name.toUpper()).arg(f.parameters.size());
+		out << QString("\tNeovimRequest *r = m_c->startRequestUnchecked(\"%1\", %2);\n").arg(f.name).arg(f.parameters.size());
+		out << QString("\tr->setFunction(Function::NEOVIM_FN_%1);\n").arg(f.name.toUpper());
 		out << "\tconnect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);\n";
 		foreach(Param p, f.parameters) {
 			out << QString("\tm_c->send(%1);\n").arg(p.second);
