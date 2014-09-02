@@ -95,7 +95,7 @@ public:
 signals:
 	void ready();
 	void error(NeovimError);
-	void notification(const QByteArray &name, const QVariantList& args);
+	void neovimEvent(const QByteArray &name, const QVariantList& args);
 
 protected:
 	void setError(NeovimError err, const QString& msg);

@@ -29,7 +29,7 @@ void TestNeovimObject::delayedSetup()
 	m_test_event_string = false;
 	m_test_event_uint = false;
 	m_test_event_stringlist = false;
-	connect(m_c, &NeovimQt::NeovimConnector::notification,
+	connect(m_c, &NeovimQt::NeovimConnector::neovimEvent,
 			this, &TestNeovimObject::test_event);
 
 	n->vim_command(QString("call send_event(%1, \"test_event\", \"WAT\")").arg(m_c->channel()));

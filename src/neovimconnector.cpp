@@ -776,7 +776,7 @@ void NeovimConnector::dispatchNotification(msgpack_object& nt)
 		qDebug() << "Unable to unpack notification parameters";
 		return;
 	}
-	emit notification(methodName, val.toList());
+	emit neovimEvent(methodName, val.toList());
 }
 
 Neovim* NeovimConnector::neovimObject()
