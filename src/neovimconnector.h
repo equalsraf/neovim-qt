@@ -51,7 +51,7 @@ public:
 	NeovimError error();
 	QString errorString();
 
-	NeovimRequest* startRequestUnchecked(uint32_t method, uint32_t argcount);
+	NeovimRequest* startRequestUnchecked(const QString& method, uint32_t argcount);
 	// FIXME: add argcount verification, e.g.
 	// - remove the argcount from this method
 	// - count calls to send() and match agains argcount - fail hard on mismatch
@@ -95,7 +95,7 @@ public:
 signals:
 	void ready();
 	void error(NeovimError);
-	void notification(const QByteArray &name, const QVariant& args);
+	void notification(const QByteArray &name, const QVariantList& args);
 
 protected:
 	void setError(NeovimError err, const QString& msg);
@@ -108,10 +108,11 @@ protected:
 	void sendError(const msgpack_object& req, const QString& msg);
 
 	// Function table
-	void addFunction(const msgpack_object& ftable);
+	Function::FunctionId addFunction(const msgpack_object& ftable);
 	void addFunctions(const msgpack_object& ftable);
 	void addClasses(const msgpack_object& ftable);
 	QList<QByteArray> parseParameterTypes(const msgpack_object&);
+	uint32_t msgId();
 
 protected slots:
 	void discoverMetadata();
@@ -119,7 +120,7 @@ protected slots:
 	void handleMetadata(uint32_t, Function::FunctionId, bool error, const msgpack_object& result);
 
 private:
-	static int msgpack_write_cb(void* data, const char* buf, unsigned int len);
+	static int msgpack_write_cb(void* data, const char* buf, unsigned long int len);
 
 	uint32_t reqid;
 	QIODevice *m_socket;
@@ -130,8 +131,6 @@ private:
 	QString m_errorString;
 	NeovimError m_error;
 
-	QHash<Function::FunctionId, uint64_t> m_functionToId;
-	QHash<uint64_t, Function::FunctionId> m_idToFunction;
 	Neovim *m_neovimobj;
 	uint64_t m_channel;
 };

@@ -80,12 +80,7 @@ Function Function::fromMsgpack(const msgpack_object& fun)
 
 		QString key = toByteArray(fun.via.map.ptr[i].key);
 		msgpack_object& val = fun.via.map.ptr[i].val;
-		if ( key == "id" ) {
-			if ( val.type != MSGPACK_OBJECT_POSITIVE_INTEGER ) {
-				return f;
-			}
-			f.id = val.via.u64;
-		} else if ( key == "return_type" ) {
+		if ( key == "return_type" ) {
 			if ( val.type != MSGPACK_OBJECT_RAW ) {
 				return f;
 			}
@@ -105,6 +100,10 @@ Function Function::fromMsgpack(const msgpack_object& fun)
 				return f;
 			}
 			f.parameters = parseParameters(val);
+		} else if ( key == "id" ) {
+			// Deprecated
+		} else if ( key == "receives_channel_id" ) {
+			// Internal
 		} else {
 			qWarning() << "Unsupported function attribute"<< key << val.type;
 		}

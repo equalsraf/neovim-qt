@@ -56,7 +56,7 @@ QString NeovimConnector::errorString()
 /**
  * Called when the msgpack packer has data to write
  */
-int NeovimConnector::msgpack_write_cb(void* data, const char* buf, unsigned int len)
+int NeovimConnector::msgpack_write_cb(void* data, const char* buf, unsigned long int len)
 {
 	NeovimConnector *c = static_cast<NeovimConnector*>(data);
 	return c->m_socket->write(buf, len);
@@ -71,14 +71,16 @@ int NeovimConnector::msgpack_write_cb(void* data, const char* buf, unsigned int 
  * Returns a NeovimRequest object. You can connect to
  * its finished() SIGNAL to handle the response
  */
-NeovimRequest* NeovimConnector::startRequestUnchecked(uint32_t method, uint32_t argcount)
+NeovimRequest* NeovimConnector::startRequestUnchecked(const QString& method, uint32_t argcount)
 {
-	uint32_t msgid = this->reqid++;
+	uint32_t msgid = msgId();
 	// [type(0), msgid, method, args]
 	msgpack_pack_array(&m_pk, 4);
 	msgpack_pack_int(&m_pk, 0);
 	msgpack_pack_int(&m_pk, msgid);
-	msgpack_pack_int(&m_pk, method);
+	const QByteArray& utf8 = method.toUtf8();
+	msgpack_pack_raw(&m_pk, utf8.size());
+	msgpack_pack_raw_body(&m_pk, utf8.constData(), utf8.size());
 	msgpack_pack_array(&m_pk, argcount);
 
 	NeovimRequest *r = new NeovimRequest( msgid, this);
@@ -88,13 +90,8 @@ NeovimRequest* NeovimConnector::startRequestUnchecked(uint32_t method, uint32_t 
 
 NeovimRequest* NeovimConnector::startRequest(Function::FunctionId method, uint32_t argcount)
 {
-	if ( !m_functionToId.contains(method) ) {
-		QString err = tr("Attempting to call method that is not supported by the remote server! Did you wait for the ready signal?");
-		qWarning() << err;
-		setError(NoSuchMethod, err);
-		return NULL;
-	}
-	NeovimRequest *r = startRequestUnchecked(m_functionToId.value(method), argcount);
+	NeovimRequest *r = startRequestUnchecked(Function::knownFunctions.at(method).name, argcount);
+
 	r->setFunction(method);
 	return r;
 }
@@ -266,12 +263,31 @@ Object NeovimConnector::to_Object(const msgpack_object& obj, bool *failed)
 	return res;
 }
 
+uint32_t NeovimConnector::msgId()
+{
+	return this->reqid++;
+}
+
 /**
  * Call function 0 to request metadata from Neovim
  */
 void NeovimConnector::discoverMetadata()
 {
-	NeovimRequest *r = startRequestUnchecked(0, 0);
+	// With the use of msgpack-rpc, this now the only method
+	// that DOES NOT comply with the spec, because it uses
+	// int(0) as method id
+
+	uint32_t msgid = msgId();
+	// [type(0), msgid, method, args]
+	msgpack_pack_array(&m_pk, 4);
+	msgpack_pack_int(&m_pk, 0);
+	msgpack_pack_int(&m_pk, msgid);
+	msgpack_pack_int(&m_pk, 0);
+	msgpack_pack_array(&m_pk, 0);
+
+	NeovimRequest *r = new NeovimRequest( msgid, this);
+	m_requests.insert(msgid, r);
+
 	connect(r, &NeovimRequest::finished,
 			this, &NeovimConnector::handleMetadata);
 }
@@ -485,12 +501,16 @@ void NeovimConnector::addFunctions(const msgpack_object& ftable)
 				tr("Found unexpected data type when unpacking function table"));
 		return;
 	}
+
+	QList<Function::FunctionId> m_supported;
 	for (uint32_t i=0; i<ftable.via.array.size; i++) {
-		addFunction(ftable.via.array.ptr[i]);
+		Function::FunctionId fid = addFunction(ftable.via.array.ptr[i]);
+		if (fid != Function::NEOVIM_FN_NULL) {
+			m_supported.append(fid);
+		}
 	}
 
-	Q_ASSERT(m_functionToId.size() == m_idToFunction.size());
-	if ( Function::knownFunctions.size() != m_functionToId.size() ) {
+	if ( Function::knownFunctions.size() != m_supported.size() ) {
 		setError( APIMisMatch,
 				tr("Cannot connect to this instance of Neovim, its version is likely too old, or the API has changed"));
 		return;
@@ -498,28 +518,28 @@ void NeovimConnector::addFunctions(const msgpack_object& ftable)
 }
 
 /**
- * Add a function
- *
+ * Add a function, return the FunctionId or NEOVIM_FN_NULL if the
+ * funciton is uknown
  */
-void NeovimConnector::addFunction(const msgpack_object& fun)
+Function::FunctionId NeovimConnector::addFunction(const msgpack_object& fun)
 {
 	if ( fun.type != MSGPACK_OBJECT_MAP ) {
 		setError( UnexpectedMsg,
 			tr("Found unexpected data type when unpacking function"));
-		return;
+		return Function::NEOVIM_FN_NULL;
 	}	
 
 	Function f = Function::fromMsgpack(fun);
 	if ( !f.isValid() ) {
 		setError( UnexpectedMsg,
 			tr("Error parsing function metadata"));
-		return;
+		return Function::NEOVIM_FN_NULL;
 	}
 	int index = Function::knownFunctions.indexOf(f);
 	if ( index != -1 ) {
-		m_functionToId.insert(Function::FunctionId(index), f.id);
-		m_idToFunction.insert(f.id, Function::FunctionId(index));
+		return Function::FunctionId(index);
 	}
+	return Function::NEOVIM_FN_NULL;
 }
 
 void NeovimConnector::addClasses(const msgpack_object& ctable)
@@ -722,8 +742,8 @@ void NeovimConnector::dispatchResponse(msgpack_object& resp)
 	// [type(1), msgid, error, result]
 	uint64_t msgid = resp.via.array.ptr[1].via.u64;
 
-	if ( !m_requests.contains(resp.via.array.ptr[1].via.u64) ) {
-		qWarning() << "Received response for unknown message";
+	if ( !m_requests.contains(msgid) ) {
+		qWarning() << "Received response for unknown message" << msgid;
 		return;
 	}
 
@@ -751,11 +771,12 @@ void NeovimConnector::dispatchNotification(msgpack_object& nt)
 
 	bool convfail;
 	QVariant val = to_Object(nt.via.array.ptr[2], &convfail);
-	if ( convfail ) {
-		qDebug() << "Unable to unpack notification parameter";
+	if ( convfail || 
+			(QMetaType::Type)val.type() != QMetaType::QVariantList  ) {
+		qDebug() << "Unable to unpack notification parameters";
 		return;
 	}
-	emit notification(methodName, val);
+	emit notification(methodName, val.toList());
 }
 
 Neovim* NeovimConnector::neovimObject()

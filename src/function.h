@@ -48,7 +48,6 @@ public:
 	static Function fromMsgpack(const msgpack_object&);
 	static QList<QPair<QString,QString> > parseParameters(const msgpack_object& obj);
 
-	uint64_t id;
 	bool can_fail;
 	QString return_type;
 	QString name;
