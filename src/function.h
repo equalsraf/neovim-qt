@@ -25,12 +25,6 @@ typedef QList<int64_t> WindowArray;
 typedef QList<int64_t> TabpageArray;
 typedef QStringList StringArray;
 
-/**
- * A function signature used to identify Neovim RPC functions 
- *
- * The static list **knowFunctions** holds a list of all the supported
- * signature.
- */
 class Function {
 	Q_ENUMS(FunctionId)
 public:
@@ -48,10 +42,19 @@ public:
 	static Function fromMsgpack(const msgpack_object&);
 	static QList<QPair<QString,QString> > parseParameters(const msgpack_object& obj);
 
+	/** Whether this function call fail without returning*/
 	bool can_fail;
+	/** Function return type */
 	QString return_type;
+	/** Function name */
 	QString name;
+	/** Function parameter types and name */
 	QList<QPair<QString,QString> > parameters;
+
+	/**
+	 * The static list **knowFunctions** holds a list of all the supported
+	 * signature. The list is populated at compile time from a code generator.
+	 */
 	const static QList<Function> knownFunctions;
 private:
 	bool m_valid;

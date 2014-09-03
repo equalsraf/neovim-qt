@@ -5,17 +5,34 @@
 
 namespace NeovimQt {
 
+/**
+ * \class NeovimQt::Function
+ *
+ * \brief Representation of a Neovim API function signature
+ */
+
+/**
+ * \enum Function::FunctionId
+ *
+ * Neovim API function identifiers, the list NeovimQt::Function::knownFunctions
+ * is indexed with this enum.
+ */
+
 #ifndef NEOVIMQT_NO_AUTO
 #include "auto/function_static.cpp"
 #endif
 
-
+/**
+ * Construct invalid function
+ */
 Function::Function()
 :can_fail(false), m_valid(false)
 {
-
 }
 
+/**
+ * Construct new function with the given return type, name, parameters and error
+ */
 Function::Function(const QString& ret, const QString& name, QList<QPair<QString,QString> > params, bool can_fail)
 :m_valid(true)
 {
@@ -25,6 +42,9 @@ Function::Function(const QString& ret, const QString& name, QList<QPair<QString,
 	this->can_fail = can_fail;
 }
 
+/**
+ * Construct new function with the given return type, name, parameters and error
+ */
 Function::Function(const QString& ret, const QString& name, QList<QString> paramTypes, bool can_fail)
 :m_valid(true)
 {
@@ -36,11 +56,18 @@ Function::Function(const QString& ret, const QString& name, QList<QString> param
 	this->can_fail = can_fail;
 }
 
+/**
+ * Returns true if this function has all the necessary attributes
+ */
 bool Function::isValid()
 {
 	return m_valid;
 }
 
+/**
+ * Two functions are considered identical if their names
+ * argument and return types, and error status are identical
+ */
 bool Function::operator==(const Function& other)
 {
 	if ( this->name != other.name ) {
@@ -66,6 +93,9 @@ bool Function::operator==(const Function& other)
 	return true;
 }
 
+/**
+ * Deserialise a msgpack function description
+ */
 Function Function::fromMsgpack(const msgpack_object& fun)
 {
 	Function f;

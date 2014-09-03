@@ -13,10 +13,6 @@
 
 namespace NeovimQt {
 
-/**
- * NeovimRequest objects track RPC calls
- * to Neovim
- */
 class NeovimRequest: public QObject {
 	Q_OBJECT
 public:
@@ -89,7 +85,7 @@ public:
 	TabpageArray to_TabpageArray(const msgpack_object& msg, bool *failed=NULL);
 
 	Neovim* neovimObject();
-	uint64_t channel() {return m_channel;}
+	uint64_t channel();
 	QString decode(const QByteArray&);
 	QByteArray encode(const QString&);
 

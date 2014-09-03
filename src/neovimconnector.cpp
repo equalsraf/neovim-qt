@@ -4,8 +4,18 @@
 
 namespace NeovimQt {
 
-NeovimConnector::NeovimConnector(QIODevice *s)
-:QObject(), reqid(0), m_socket(s), m_error(NoError), m_neovimobj(NULL), 
+/**
+ * \class NeovimQt::NeovimConnector
+ * 
+ * \brief A Connection to a Neovim instance
+ *
+ */
+
+/**
+ * Create a new Neovim API connection from an open IO device
+ */
+NeovimConnector::NeovimConnector(QIODevice *dev)
+:QObject(), reqid(0), m_socket(dev), m_error(NoError), m_neovimobj(NULL), 
 	m_channel(0), m_encoding(0)
 {
 	qRegisterMetaType<NeovimError>("NeovimError");
@@ -35,6 +45,9 @@ NeovimConnector::~NeovimConnector()
 	msgpack_unpacker_destroy(&m_uk);
 }
 
+/**
+ * Sets latest error code and message for this connector
+ */
 void NeovimConnector::setError(NeovimError err, const QString& msg)
 {
 	m_error = err;
@@ -43,11 +56,17 @@ void NeovimConnector::setError(NeovimError err, const QString& msg)
 	emit error(m_error);
 }
 
+/**
+ * Called when an error takes place
+ */ 
 NeovimConnector::NeovimError NeovimConnector::error()
 {
 	return m_error;
 }
 
+/**
+ * An human readable error message for the last error
+ */
 QString NeovimConnector::errorString()
 {
 	return m_errorString;
@@ -87,12 +106,18 @@ NeovimRequest* NeovimConnector::startRequestUnchecked(const QString& method, uin
 	return r;
 }
 
+/**
+ * Serialise a valud into the msgpack stream
+ */
 void NeovimConnector::send(int64_t i)
 {
 	qDebug() << __func__ << i;
 	msgpack_pack_int64(&m_pk, i);
 }
 
+/**
+ * Serialise a valud into the msgpack stream
+ */
 void NeovimConnector::send(const QByteArray& raw)
 {
 	qDebug() << __func__ << raw;
@@ -100,6 +125,9 @@ void NeovimConnector::send(const QByteArray& raw)
 	msgpack_pack_raw_body(&m_pk, raw.constData(), raw.size());
 }
 
+/**
+ * Serialise a valud into the msgpack stream
+ */
 void NeovimConnector::send(bool b)
 {
 	qDebug() << __func__ << b;
@@ -111,7 +139,9 @@ void NeovimConnector::send(bool b)
 }
 
 /**
- * We use QVariants for RPC functions that use the *Object* type do not use
+ * Serialise a valud into the msgpack stream
+ *
+ * We use QVariants for RPC functions that use the *Object* type. Do not use
  * this in any other conditions
  */
 void NeovimConnector::send(const QVariant& var)
@@ -237,9 +267,20 @@ Object NeovimConnector::to_Object(const msgpack_object& obj, bool *failed)
 	return res;
 }
 
+/**
+ * Returns a new msgid that can be used for a msg
+ */
 uint32_t NeovimConnector::msgId()
 {
 	return this->reqid++;
+}
+
+/**
+ * Returns the channel id used by Neovim to identify this connection
+ */
+uint64_t NeovimConnector::channel()
+{
+	return m_channel;
 }
 
 /**
@@ -464,9 +505,7 @@ QList<QByteArray> NeovimConnector::parseParameterTypes(const msgpack_object& obj
 }
 
 /**
- * Processes msgpack with API function declarations
- *
- * The ftable MUST be an array
+ * Handle the *functions* attribute in the metadata
  */
 void NeovimConnector::addFunctions(const msgpack_object& ftable)
 {
@@ -516,6 +555,9 @@ Function::FunctionId NeovimConnector::addFunction(const msgpack_object& fun)
 	return Function::NEOVIM_FN_NULL;
 }
 
+/**
+ * Handle the *classes* attribute in the metadata
+ */
 void NeovimConnector::addClasses(const msgpack_object& ctable)
 {
 	if ( ctable.type != MSGPACK_OBJECT_ARRAY ) {
@@ -594,6 +636,9 @@ void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool 
 	}
 }
 
+/**
+ * Called after metadata discovery, to get the &encoding
+ */
 void NeovimConnector::encodingChanged(Object obj)
 {
 	disconnect(neovimObject(), &Neovim::on_vim_get_option,
@@ -610,7 +655,8 @@ void NeovimConnector::encodingChanged(Object obj)
 
 /**
  * Decode byte array as string, from Neovim's encoding
- * @warn This method MUST not be called before @ready()
+ *
+ * \warning This method MUST not be called before NeovimConnector::ready
  */
 QString NeovimConnector::decode(const QByteArray& data)
 {
@@ -620,7 +666,7 @@ QString NeovimConnector::decode(const QByteArray& data)
 
 /**
  * Convert string to encoding expected by Neovim
- * @warn This method MUST not be called before @ready()
+ * \warning This method MUST not be called before NeovimConnector::ready
  */
 QByteArray NeovimConnector::encode(const QString& str)
 {
@@ -649,7 +695,6 @@ void NeovimConnector::sendError(const msgpack_object& req, const QString& msg)
 
 /**
  * Called when new data is available to be parsed
- *
  */
 void NeovimConnector::dataAvailable()
 {
@@ -735,7 +780,11 @@ void NeovimConnector::dispatch(msgpack_object& req)
 	}
 }
 
-/*
+/**
+ * Handle request message
+ *
+ * \todo Respond with error
+ *
  * [type(0), msgid(uint), method(int), args([...])]
  */
 void NeovimConnector::dispatchRequest(msgpack_object& req)
@@ -790,6 +839,11 @@ void NeovimConnector::dispatchNotification(msgpack_object& nt)
 	emit neovimEvent(methodName, val.toList());
 }
 
+/**
+ * Get main NeovimObject
+ *
+ * \warning Do not call this before NeovimConnector::ready as been signaled
+ */
 Neovim* NeovimConnector::neovimObject()
 {
 	if ( !m_neovimobj ) {
@@ -798,6 +852,9 @@ Neovim* NeovimConnector::neovimObject()
 	return m_neovimobj;
 }
 
+/**
+ * Launch an embedded Neovim process
+ */
 NeovimConnector* NeovimConnector::launch()
 {
 	QProcess *p = new QProcess();
@@ -816,6 +873,10 @@ NeovimConnector* NeovimConnector::launch()
 	return c;
 }
 
+/**
+ * Called when running embedded Neovim to report an error
+ * with the Neovim process
+ */
 void NeovimConnector::processError(QProcess::ProcessError err)
 {
 	switch(err) {
@@ -832,24 +893,75 @@ void NeovimConnector::processError(QProcess::ProcessError err)
 	}
 }
 
-// Request obj
-//
+/**
+ * \fn NeovimQt::NeovimConnector::ready()
+ *
+ * This signal is emitted when the connector has beem able to successfuly setup
+ * a connection with Neovim. Some methods SHOULD NOT be called before the signal
+ * is emitted, otherwise you get an invalid object or NULL pointer.
+ */
 
+/**
+ * \fn NeovimQt::NeovimConnector::error(NeovimError)
+ *
+ * This signal is emitted when an error occurs. Use NeovimConnector::errorString
+ * to get an error message.
+ */
+
+/**
+ * \fn NeovimQt::NeovimConnector::neovimEvent(const QByteArray &name, const QVariantList& args)
+ *
+ * Signal emitted when Neovim sends a notification withen given name and args
+ */
+
+/**
+ * \class NeovimQt::NeovimRequest
+ *
+ * \brief A NeovimRequest represents an ongoing API call
+ */
+
+/**
+ * \fn NeovimQt::NeovimRequest::finished
+ *
+ * \brief The request has finished
+ */
+
+/**
+ * Creates a new NeovimRequest, identified by id
+ *
+ * \see NeovimQt::NeovimConnector::msgId
+ */
 NeovimRequest::NeovimRequest(uint32_t id, QObject *parent)
 :QObject(parent), m_id(id), m_function(Function::NEOVIM_FN_NULL)
 {
 }
 
+/**
+ * Process the response message for this call
+ *
+ * \see NeovimQt::NeovimRequest::finished
+ */
 void NeovimRequest::processResponse(const msgpack_object& res, bool error)
 {
 	emit finished(this->m_id, m_function, error, res);
 }
 
+/**
+ * The function id for the function signature associated with this call.
+ * The value NEOVIM_FN_NULL indicates this call will not go through the
+ * the generated function handlers.
+ */
 Function::FunctionId NeovimRequest::function()
 {
 	return m_function;
 }
 
+/**
+ * Associate a function id with this request
+ *
+ * NeovimQt has auto-generated call handlers (in NeovimQt::NeovimConnector::neovimObject)
+ * that will be used to process the response
+ */
 void NeovimRequest::setFunction(Function::FunctionId f)
 {
 	m_function = f;
@@ -857,6 +969,5 @@ void NeovimRequest::setFunction(Function::FunctionId f)
 
 
 } // namespace NeovimQt
-
 
 #include "moc_neovimconnector.cpp"
