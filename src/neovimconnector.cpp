@@ -6,7 +6,7 @@ namespace NeovimQt {
 
 NeovimConnector::NeovimConnector(QIODevice *s)
 :QObject(), reqid(0), m_socket(s), m_error(NoError), m_neovimobj(NULL), 
-	m_channel(0)
+	m_channel(0), m_encoding(0)
 {
 	qRegisterMetaType<NeovimError>("NeovimError");
 
@@ -93,23 +93,6 @@ void NeovimConnector::send(int64_t i)
 	msgpack_pack_int64(&m_pk, i);
 }
 
-void NeovimConnector::send(const QString& str)
-{
-	qDebug() << __func__ << str;
-	QByteArray utf8 = str.toUtf8();
-	msgpack_pack_raw(&m_pk, utf8.size());
-	msgpack_pack_raw_body(&m_pk, utf8.constData(), utf8.size());
-}
-
-void NeovimConnector::send(const QStringList& strlist)
-{
-	qDebug() << __func__ << strlist;
-	msgpack_pack_array(&m_pk, strlist.size());
-	foreach(const QString& str, strlist) {
-		send(str);
-	}
-}
-
 void NeovimConnector::send(const QByteArray& raw)
 {
 	qDebug() << __func__ << raw;
@@ -149,15 +132,15 @@ void NeovimConnector::send(const QVariant& var)
 	case QMetaType::Float:
 		msgpack_pack_float(&m_pk, var.toFloat());
 		break;
-	case QMetaType::QString:
-		send(var.toString());
-		break;
+//	case QMetaType::QString:
+//		send(var.toString());
+//		break;
 	case QMetaType::Double:
 		msgpack_pack_double(&m_pk, var.toDouble());
 		break;
-//	case QMetaType::QByteArray:
-//		send(var.toByteArray());
-//		break;
+	case QMetaType::QByteArray:
+		send(var.toByteArray());
+		break;
 	case QMetaType::QVariantList:
 		msgpack_pack_array(&m_pk, var.toList().size());
 		foreach(const QVariant& elem, var.toList()) {
@@ -283,7 +266,7 @@ void NeovimConnector::discoverMetadata()
 			this, &NeovimConnector::handleMetadata);
 }
 
-QString NeovimConnector::to_String(const msgpack_object& obj, bool *failed)
+QByteArray NeovimConnector::to_String(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
@@ -291,11 +274,11 @@ QString NeovimConnector::to_String(const msgpack_object& obj, bool *failed)
 	if ( obj.type != MSGPACK_OBJECT_RAW ) {
 		setError(UnexpectedMsg,
 				tr("Found unexpected data type when unpacking a String"));
-		return QString();
+		return QByteArray();
 	} else if ( failed ) {
 		*failed = false;
 	}
-	return QString::fromUtf8(obj.via.raw.ptr, obj.via.raw.size);
+	return QByteArray(obj.via.raw.ptr, obj.via.raw.size);
 }
 
 QByteArray NeovimConnector::to_QByteArray(const msgpack_object& obj, bool *failed)
@@ -604,8 +587,45 @@ void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool 
 	}
 
 	if (error() == NoError) {
-		emit ready();
+		// Get &encoding before we signal readyness
+		neovimObject()->vim_get_option("encoding");
+		connect(neovimObject(), &Neovim::on_vim_get_option,
+				this, &NeovimConnector::encodingChanged);
 	}
+}
+
+void NeovimConnector::encodingChanged(Object obj)
+{
+	disconnect(neovimObject(), &Neovim::on_vim_get_option,
+			this, &NeovimConnector::encodingChanged);
+	const QByteArray enc_name = obj.toByteArray();
+	m_encoding = QTextCodec::codecForName(enc_name);
+	if (m_encoding) {
+		qDebug() << "Neovim &encoding is " << m_encoding->name();
+		emit ready();
+	} else {
+		setError(UnsupportedEncoding, QString("Unsupported &encoding (%1)").arg(QString::fromLatin1(enc_name)));
+	}
+}
+
+/**
+ * Decode byte array as string, from Neovim's encoding
+ * @warn This method MUST not be called before @ready()
+ */
+QString NeovimConnector::decode(const QByteArray& data)
+{
+	Q_ASSERT(m_encoding);
+	return m_encoding->toUnicode(data);
+}
+
+/**
+ * Convert string to encoding expected by Neovim
+ * @warn This method MUST not be called before @ready()
+ */
+QByteArray NeovimConnector::encode(const QString& str)
+{
+	Q_ASSERT(m_encoding);
+	return m_encoding->fromUnicode(str);
 }
 
 /**

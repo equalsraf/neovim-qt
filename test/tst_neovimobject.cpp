@@ -32,15 +32,15 @@ void TestNeovimObject::delayedSetup()
 	connect(m_c, &NeovimQt::NeovimConnector::neovimEvent,
 			this, &TestNeovimObject::test_event);
 
-	n->vim_command(QString("call send_event(%1, \"test_event\", \"WAT\")").arg(m_c->channel()));
-	n->vim_command(QString("call send_event(%1, \"test_event\", 42)").arg(m_c->channel()));
-	n->vim_command(QString("call send_event(%1, \"test_event\", [\"one\", \"two\", \"\"])").arg(m_c->channel()));
+	n->vim_command(QString("call send_event(%1, \"test_event\", \"WAT\")").arg(m_c->channel()).toUtf8());
+	n->vim_command(QString("call send_event(%1, \"test_event\", 42)").arg(m_c->channel()).toUtf8());
+	n->vim_command(QString("call send_event(%1, \"test_event\", [\"one\", \"two\", \"\"])").arg(m_c->channel()).toUtf8());
 }
 
 void TestNeovimObject::test_event(const QByteArray& name, const QVariantList& params)
 {
 	QVariant arg0 = params.at(0);
-	if ( (QMetaType::Type)arg0.type() == QMetaType::QString ) {
+	if ( (QMetaType::Type)arg0.type() == QMetaType::QByteArray ) {
 		Q_ASSERT(arg0.toString() == "WAT");
 		m_test_event_string = true;
 	}

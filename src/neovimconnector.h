@@ -5,6 +5,7 @@
 #include <QAbstractSocket>
 #include <QHash>
 #include <QProcess>
+#include <QTextCodec>
 #include <msgpack.h>
 #include "util.h"
 #include "function.h"
@@ -45,7 +46,8 @@ public:
 		APIMisMatch,
 		NoSuchMethod,
 		FailedToStart,
-		Crashed
+		Crashed,
+		UnsupportedEncoding
 	};
 
 	NeovimConnector(QIODevice* s);
@@ -60,9 +62,6 @@ public:
 	// Methods to pack datatypes as message pack
 	// This is what you can use for arguments after startRequest
 	void send(Integer);
-	void send(const QString&);
-	void send(const QLatin1String& s) { send(QString(s));}
-	void send(const QStringList&);
 	void send(const QVariant&);
 	void send(const QByteArray&);
 	void send(bool);
@@ -91,6 +90,8 @@ public:
 
 	Neovim* neovimObject();
 	uint64_t channel() {return m_channel;}
+	QString decode(const QByteArray&);
+	QByteArray encode(const QString&);
 
 signals:
 	void ready();
@@ -119,6 +120,7 @@ protected slots:
 	void dataAvailable();
 	void handleMetadata(uint32_t, Function::FunctionId, bool error, const msgpack_object& result);
 	void processError(QProcess::ProcessError);
+	void encodingChanged(Object);
 
 private:
 	static int msgpack_write_cb(void* data, const char* buf, unsigned long int len);
@@ -134,6 +136,7 @@ private:
 
 	Neovim *m_neovimobj;
 	uint64_t m_channel;
+	QTextCodec *m_encoding;
 };
 } // namespace NeovimQt
 Q_DECLARE_METATYPE(NeovimQt::NeovimConnector::NeovimError)

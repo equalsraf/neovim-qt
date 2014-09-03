@@ -15,7 +15,7 @@ namespace NeovimQt {
 typedef int64_t Integer;
 typedef QPoint Position;
 typedef bool Boolean;
-typedef QString String;
+typedef QByteArray String;
 typedef QVariant Object;
 typedef int64_t Buffer;
 typedef int64_t Window;
