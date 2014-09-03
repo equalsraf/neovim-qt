@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QAbstractSocket>
 #include <QHash>
+#include <QProcess>
 #include <msgpack.h>
 #include "util.h"
 #include "function.h"
@@ -43,10 +44,13 @@ public:
 		UnexpectedMsg,
 		APIMisMatch,
 		NoSuchMethod,
+		FailedToStart,
+		Crashed
 	};
 
 	NeovimConnector(QIODevice* s);
 	~NeovimConnector();
+	static NeovimConnector* launch();
 
 	NeovimError error();
 	QString errorString();
@@ -114,6 +118,7 @@ protected slots:
 	void discoverMetadata();
 	void dataAvailable();
 	void handleMetadata(uint32_t, Function::FunctionId, bool error, const msgpack_object& result);
+	void processError(QProcess::ProcessError);
 
 private:
 	static int msgpack_write_cb(void* data, const char* buf, unsigned long int len);

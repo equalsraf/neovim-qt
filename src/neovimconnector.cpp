@@ -778,6 +778,40 @@ Neovim* NeovimConnector::neovimObject()
 	return m_neovimobj;
 }
 
+NeovimConnector* NeovimConnector::launch()
+{
+	QProcess *p = new QProcess();
+	QStringList args;
+	args << "--embedded-mode";
+	p->start("nvim", args);
+
+	NeovimConnector *c = new NeovimConnector(p);
+	connect(p, SIGNAL(error(QProcess::ProcessError)),
+			c, SLOT(processError(QProcess::ProcessError)));
+	connect(p, &QProcess::started,
+			c, &NeovimConnector::discoverMetadata);
+	// The connector raised and error because the IO device is
+	// closed - reset error state
+	c->setError(NoError, "");
+	return c;
+}
+
+void NeovimConnector::processError(QProcess::ProcessError err)
+{
+	switch(err) {
+	case QProcess::FailedToStart:
+		setError(FailedToStart, "Unable to start the Neovim process");
+		break;
+	case QProcess::Crashed:
+		setError(Crashed, "The Neovim process has crashed");
+		break;
+	default:
+		// In practice we should be able to catch other types of
+		// errors from the QIODevice
+		qDebug() << "Neovim process error " << m_socket->errorString();
+	}
+}
+
 // Request obj
 //
 
@@ -800,6 +834,7 @@ void NeovimRequest::setFunction(Function::FunctionId f)
 {
 	m_function = f;
 }
+
 
 } // namespace NeovimQt
 
