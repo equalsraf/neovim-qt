@@ -68,10 +68,7 @@ void TestNeovimObject::eventTypes()
 
 void TestNeovimObject::initTestCase()
 {
-	QLocalSocket *s = new QLocalSocket();
-	s->connectToServer(QLatin1String("/tmp/neovim"));
-	Q_ASSERT(s->waitForConnected());
-	m_c = new NeovimQt::NeovimConnector(s);
+	m_c = NeovimQt::NeovimConnector::spawn();
 	Q_ASSERT(m_c->neovimObject());
 
 	connect(m_c, &NeovimQt::NeovimConnector::ready,

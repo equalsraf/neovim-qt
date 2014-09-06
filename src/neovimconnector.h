@@ -48,7 +48,7 @@ public:
 
 	NeovimConnector(QIODevice* s);
 	~NeovimConnector();
-	static NeovimConnector* launch();
+	static NeovimConnector* spawn();
 
 	NeovimError error();
 	QString errorString();

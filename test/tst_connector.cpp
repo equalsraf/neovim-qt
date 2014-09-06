@@ -9,7 +9,7 @@ class TestConnector: public QObject
 private slots:
 	void initTestCase();
 	void invalidSocket();
-	void launch();
+	void spawn();
 
 private:
 	NeovimQt::NeovimConnector *m_c;
@@ -32,10 +32,10 @@ void TestConnector::invalidSocket()
 	Q_ASSERT(c->error() != NeovimQt::NeovimConnector::NoError);
 }
 
-void TestConnector::launch()
+void TestConnector::spawn()
 {
 	bool ready = false;
-	NeovimQt::NeovimConnector *c = NeovimQt::NeovimConnector::launch();
+	NeovimQt::NeovimConnector *c = NeovimQt::NeovimConnector::spawn();
 	Q_ASSERT(c->error() == NeovimQt::NeovimConnector::NoError);
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 		[&ready](){

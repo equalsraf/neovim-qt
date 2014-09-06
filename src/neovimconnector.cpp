@@ -855,7 +855,7 @@ Neovim* NeovimConnector::neovimObject()
 /**
  * Launch an embedded Neovim process
  */
-NeovimConnector* NeovimConnector::launch()
+NeovimConnector* NeovimConnector::spawn()
 {
 	QProcess *p = new QProcess();
 	QStringList args;

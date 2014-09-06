@@ -22,6 +22,7 @@ protected slots:
 
 private slots:
 	void initTestCase();
+	void connectionError(NeovimQt::NeovimConnector::NeovimError);
 	void error(const QString& errmsg);
 
 private:
@@ -32,11 +33,8 @@ private:
 void TestCallAllMethods::initTestCase()
 {
 	m_errors = false;
-	QLocalSocket *s = new QLocalSocket();
-	s->connectToServer(QLatin1String("/tmp/neovim"));
-	Q_ASSERT(s->waitForConnected());
-	m_c = new NeovimQt::NeovimConnector(s);
-	Q_ASSERT(m_c->neovimObject());
+
+	m_c = NeovimQt::NeovimConnector::spawn();
 
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 			this, &TestCallAllMethods::callAll);
@@ -52,6 +50,8 @@ void TestCallAllMethods::error(const QString& errmsg)
 
 void TestCallAllMethods::callAll()
 {
+	Q_ASSERT(m_c->neovimObject());
+
 	NeovimQt::Neovim *obj = m_c->neovimObject();
 	connect(m_c->neovimObject(), &NeovimQt::Neovim::error,
 			this, &TestCallAllMethods::error);
@@ -75,6 +75,12 @@ void TestCallAllMethods::callAll()
 		}
 	}
 
+}
+
+void TestCallAllMethods::connectionError(NeovimQt::NeovimConnector::NeovimError err)
+{
+	qDebug() << m_c->errorString();
+	Q_ASSERT(false);
 }
 
 QTEST_MAIN(TestCallAllMethods)
