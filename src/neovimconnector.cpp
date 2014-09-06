@@ -15,7 +15,7 @@ namespace NeovimQt {
  * Create a new Neovim API connection from an open IO device
  */
 NeovimConnector::NeovimConnector(QIODevice *dev)
-:QObject(), reqid(0), m_socket(dev), m_error(NoError), m_neovimobj(NULL), 
+:QObject(), reqid(0), m_dev(dev), m_error(NoError), m_neovimobj(NULL), 
 	m_channel(0), m_encoding(0)
 {
 	qRegisterMetaType<NeovimError>("NeovimError");
@@ -23,15 +23,15 @@ NeovimConnector::NeovimConnector(QIODevice *dev)
 	msgpack_packer_init(&m_pk, this, NeovimConnector::msgpack_write_cb);
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
 
-	connect(m_socket, &QAbstractSocket::readyRead,
+	connect(m_dev, &QAbstractSocket::readyRead,
 			this, &NeovimConnector::dataAvailable);
 
-	if ( !s->isOpen() ) {
+	if ( !m_dev->isOpen() ) {
 		setError(DeviceNotOpen, tr("IO device is not open"));
 		return;
 	}
 
-	if ( !s->isSequential() ) {
+	if ( !m_dev->isSequential() ) {
 		setError(InvalidDevice, tr("IO device needs to be sequential"));
 		return;
 	}
@@ -78,7 +78,7 @@ QString NeovimConnector::errorString()
 int NeovimConnector::msgpack_write_cb(void* data, const char* buf, unsigned long int len)
 {
 	NeovimConnector *c = static_cast<NeovimConnector*>(data);
-	return c->m_socket->write(buf, len);
+	return c->m_dev->write(buf, len);
 }
 
 /**
@@ -708,7 +708,7 @@ void NeovimConnector::dataAvailable()
 			}
 		}
 
-		read = m_socket->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
+		read = m_dev->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
 		if ( read > 0 ) {
 			msgpack_unpacker_buffer_consumed(&m_uk, read);
 			msgpack_unpacked result;
@@ -889,7 +889,7 @@ void NeovimConnector::processError(QProcess::ProcessError err)
 	default:
 		// In practice we should be able to catch other types of
 		// errors from the QIODevice
-		qDebug() << "Neovim process error " << m_socket->errorString();
+		qDebug() << "Neovim process error " << m_dev->errorString();
 	}
 }
 

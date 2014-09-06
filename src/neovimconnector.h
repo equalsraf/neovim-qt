@@ -122,7 +122,7 @@ private:
 	static int msgpack_write_cb(void* data, const char* buf, unsigned long int len);
 
 	uint32_t reqid;
-	QIODevice *m_socket;
+	QIODevice *m_dev;
 	msgpack_packer m_pk;
 	msgpack_unpacker m_uk;
 
