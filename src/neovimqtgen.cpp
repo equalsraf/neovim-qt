@@ -245,8 +245,12 @@ int main(int argc, char **argv)
 	for (uint32_t i=0; i< msg.data.via.map.size; i++) {
 		const msgpack_object& key = msg.data.via.map.ptr[i].key;
 		const msgpack_object& val = msg.data.via.map.ptr[i].val;
-		if ( key.type != MSGPACK_OBJECT_RAW || val.type != MSGPACK_OBJECT_ARRAY ) {
-			printf("Found unexpected data type for metadata description\n");
+		if ( key.type != MSGPACK_OBJECT_RAW ) {
+			printf("Found unexpected data type for metadata key(%d)\n", key.type);
+			return -1;
+		}
+		if ( val.type != MSGPACK_OBJECT_ARRAY ) {
+			printf("Found unexpected data type for metadata val(%d)\n", val.type);
 			return -1;
 		}
 
