@@ -180,7 +180,7 @@ bool generate_neovim_cpp(const QList<NeovimQt::Function> &ftable, QDir& dst)
 
 void usage()
 {
-	printf("Usage: nvim --api-metadata | neovimqtgen <output dir>");
+	printf("Usage: nvim --api-info | neovimqtgen <output dir>");
 }
 
 int main(int argc, char **argv)
