@@ -5,6 +5,8 @@
 
 namespace NeovimQt {
 
+typedef QPair<QString,QString> StringPair;
+
 /**
  * \class NeovimQt::Function
  *
@@ -179,6 +181,20 @@ QList<QPair<QString,QString> > Function::parseParameters(const msgpack_object& o
 		}
 	}
 	return res;
+}
+
+QString Function::signature() const
+{
+	QStringList sigparams;
+	foreach(const StringPair p, parameters) {
+		sigparams.append(QString("%1 %2").arg(p.first).arg(p.second));
+	}
+
+	QString notes;
+	if (can_fail) {
+		notes += " !fail";
+	}
+	return  QString("%1 %2(%3)%4").arg(return_type).arg(name).arg(sigparams.join(", ")).arg(notes);
 }
 
 } // Namespace

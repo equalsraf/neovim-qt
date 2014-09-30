@@ -51,6 +51,7 @@ public:
 	/** Function parameter types and name */
 	QList<QPair<QString,QString> > parameters;
 
+	QString signature() const;
 	/**
 	 * The static list **knowFunctions** holds a list of all the supported
 	 * signature. The list is populated at compile time from a code generator.

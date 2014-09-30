@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QtGlobal>
 #include <QFile>
 #include <QDebug>
 #include <QDir>
@@ -183,14 +184,38 @@ void usage()
 	printf("Usage: nvim --api-info | neovimqtgen <output dir>");
 }
 
+int generate_bindings(const QString& path, const QList<NeovimQt::Function> &ftable)
+{
+	if (!QDir().mkpath(path)) {
+		qFatal("Error creating output folder");
+		return -1;
+	}
+	QDir dst(path);
+	if ( !generate_function_enum(ftable, dst) ) {
+		return -1;
+	}
+	if ( !generate_function_static(ftable, dst) ) {
+		return -1;
+	}
+	if ( !generate_neovim_h(ftable, dst) ) {
+		return -1;
+	}
+	if ( !generate_neovim_cpp(ftable, dst) ) {
+		return -1;
+	}
+
+	printf("Generated Qt bindings for %d functions\n", ftable.size());
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	QCoreApplication app(argc, argv);
-	if ( app.arguments().size() != 2 ) {
+	if ( app.arguments().size() > 2 ) {
 		usage();
 		return -1;
 	}
-	QDir().mkpath(app.arguments().at(1));
+	bool bindings = app.arguments().size() == 2;
 
 	QFile in;;
 	in.open(stdin, QIODevice::ReadOnly);
@@ -238,21 +263,14 @@ int main(int argc, char **argv)
 		}
 	}
 
-	QDir dst(app.arguments().at(1));
-	if ( !generate_function_enum(ftable, dst) ) {
-		return -1;
+	if (bindings) {
+		return generate_bindings(app.arguments().at(1), ftable);
+	} else {
+		printf("API info");
+		foreach(const NeovimQt::Function f, ftable) {
+			QTextStream(stdout) << "  " << f.signature() << "\n";
+		}
 	}
-	if ( !generate_function_static(ftable, dst) ) {
-		return -1;
-	}
-	if ( !generate_neovim_h(ftable, dst) ) {
-		return -1;
-	}
-	if ( !generate_neovim_cpp(ftable, dst) ) {
-		return -1;
-	}
-
-	printf("Generated Qt bindings for %d functions\n", ftable.size());
 
 	return 0;
 }
