@@ -859,7 +859,7 @@ NeovimConnector* NeovimConnector::spawn()
 {
 	QProcess *p = new QProcess();
 	QStringList args;
-	args << "--embedded-mode";
+	args << "--embed";
 	p->start("nvim", args);
 
 	NeovimConnector *c = new NeovimConnector(p);
