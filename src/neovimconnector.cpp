@@ -291,16 +291,26 @@ void NeovimConnector::discoverMetadata()
 	NeovimRequest *r = startRequestUnchecked("vim_get_api_info", 0);
 	connect(r, &NeovimRequest::finished,
 			this, &NeovimConnector::handleMetadata);
+	connect(r, &NeovimRequest::error,
+			this, &NeovimConnector::handleMetadataError);
 }
 
 QByteArray NeovimConnector::to_String(const msgpack_object& obj, bool *failed)
+{
+	QByteArray out = decodeString(obj, failed);
+	if (*failed) {
+		setError(UnexpectedMsg,
+				tr("Unable to unpack String object from msgpack"));
+	}
+	return out;
+}
+
+QByteArray NeovimConnector::decodeString(const msgpack_object& obj, bool *failed)
 {
 	if ( failed ) {
 		*failed = true;
 	}
 	if ( obj.type != MSGPACK_OBJECT_RAW ) {
-		setError(UnexpectedMsg,
-				tr("Found unexpected data type when unpacking a String"));
 		return QByteArray();
 	} else if ( failed ) {
 		*failed = false;
@@ -562,21 +572,23 @@ void NeovimConnector::addClasses(const msgpack_object& ctable)
 	}
 }
 
+void NeovimConnector::handleMetadataError(uint32_t msgid, Function::FunctionId,
+		const QString& msg, const msgpack_object& errobj)
+{
+	setError( NoMetadata,
+		tr("Unable to get Neovim api information"));
+	// TODO: better error message (from result?)
+	return;
+}
+
 /**
  * Process metadata object returned by Neovim
  *
  * - Set channel_id
  * - Check if all functions we need are available
  */
-void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool failed, const msgpack_object& result)
+void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, const msgpack_object& result)
 {
-	if ( failed ) {
-		setError( NoMetadata,
-			tr("Unable to get Neovim information"));
-		// TODO: better error message (from result?)
-		return;
-	}
-
 	if ( result.type != MSGPACK_OBJECT_ARRAY || 
 			result.via.array.size != 2 ||
 			result.via.array.ptr[0].type != MSGPACK_OBJECT_POSITIVE_INTEGER ||
@@ -917,9 +929,27 @@ NeovimRequest::NeovimRequest(uint32_t id, QObject *parent)
  *
  * \see NeovimQt::NeovimRequest::finished
  */
-void NeovimRequest::processResponse(const msgpack_object& res, bool error)
+void NeovimRequest::processResponse(const msgpack_object& res, bool failed)
 {
-	emit finished(this->m_id, m_function, error, res);
+	if (!failed) {
+		emit finished(this->m_id, m_function, res);
+		return;
+	}
+
+	// TODO: support Neovim error types Exception/Validation/etc
+	// This will require chaing the error() signature to hold a type
+	// parameter - and update the generator to get error types from the api
+	// info
+	if (res.type == MSGPACK_OBJECT_ARRAY &&
+			res.via.array.size >= 2 ) {
+		bool decode_error;
+		QString msg = NeovimConnector::decodeString(res.via.array.ptr[1], &decode_error);
+		if (!decode_error) {
+			emit error(this->m_id, m_function, msg, res);
+			return;
+		}
+	}
+	emit error(this->m_id, m_function, tr("Received unsupported error type"), res);
 }
 
 /**

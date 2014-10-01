@@ -17,11 +17,12 @@ class NeovimRequest: public QObject {
 	Q_OBJECT
 public:
 	NeovimRequest(uint32_t id, QObject *parent=0);
-	void processResponse(const msgpack_object& res, bool error=false);
+	void processResponse(const msgpack_object& res, bool failed=false);
 	void setFunction(Function::FunctionId);
 	Function::FunctionId function();
 signals:
-	void finished(uint32_t msgid, Function::FunctionId fun, bool error, const msgpack_object&);
+	void finished(uint32_t msgid, Function::FunctionId fun, const msgpack_object&);
+	void error(uint32_t msgid, Function::FunctionId fun, const QString& msg, const msgpack_object&);
 private:
 	uint32_t m_id;
 	Function::FunctionId m_function;
@@ -67,6 +68,7 @@ public:
 	//
 	QByteArray to_QByteArray(const msgpack_object&, bool *failed=NULL);
 	String to_String(const msgpack_object&, bool *failed=NULL);
+	static String decodeString(const msgpack_object&, bool *failed=NULL);
 	Boolean to_Boolean(const msgpack_object&, bool *failed=NULL);
 	StringArray to_StringArray(const msgpack_object&, bool *failed=NULL);
 	Position to_Position(const msgpack_object&, bool *failed=NULL);
@@ -114,7 +116,9 @@ protected:
 protected slots:
 	void discoverMetadata();
 	void dataAvailable();
-	void handleMetadata(uint32_t, Function::FunctionId, bool error, const msgpack_object& result);
+	void handleMetadata(uint32_t, Function::FunctionId, const msgpack_object& result);
+	void handleMetadataError(uint32_t msgid, Function::FunctionId,
+		const QString& msg, const msgpack_object& errobj);
 	void processError(QProcess::ProcessError);
 	void encodingChanged(Object);
 

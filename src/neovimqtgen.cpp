@@ -111,7 +111,8 @@ bool generate_neovim_h(const QList<NeovimQt::Function> &ftable, QDir& dst)
 	out << "public:\n";
 	out << "\tNeovim(NeovimConnector *);\n";
 	out << "protected slots:\n";
-	out << "\tvoid handleResponse(uint32_t id, Function::FunctionId fun, bool error, const msgpack_object&);\n";
+	out << "\tvoid handleResponse(uint32_t id, Function::FunctionId fun, const msgpack_object&);\n";
+	out << "\tvoid handleResponseError(uint32_t id, Function::FunctionId fun, const QString& msg, const msgpack_object&);\n";
 	out << "signals:\n";
 	out << "\tvoid error(const QString& errmsg);\n";
 	out << "private:\n";
@@ -168,6 +169,7 @@ bool generate_neovim_cpp(const QList<NeovimQt::Function> &ftable, QDir& dst)
 		out << QString("\tNeovimRequest *r = m_c->startRequestUnchecked(\"%1\", %2);\n").arg(f.name).arg(f.parameters.size());
 		out << QString("\tr->setFunction(Function::NEOVIM_FN_%1);\n").arg(f.name.toUpper());
 		out << "\tconnect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);\n";
+		out << "\tconnect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);\n";
 		foreach(Param p, f.parameters) {
 			out << QString("\tm_c->send(%1);\n").arg(p.second);
 		}
@@ -175,12 +177,13 @@ bool generate_neovim_cpp(const QList<NeovimQt::Function> &ftable, QDir& dst)
 	}
 
 	// dispatcher
-	out << "void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool failed, const msgpack_object& res)\n{\n";
+	out << "void Neovim::handleResponseError(uint32_t msgid, Function::FunctionId fun, const QString& msg, const msgpack_object& res)\n{\n";
+	out << "\temit error(msg);\n";
+	out << "\tqDebug() << msg;\n";
+	out << "\t}\n";
+
+	out << "void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, const msgpack_object& res)\n{\n";
 	out << "\tbool convfail=true;\n";
-	out << "\tif (failed) {\n";
-	out << "\t\temit error(m_c->to_String(res));\n";
-	out << "\t\treturn;\n";
-	out << "\t}\n\n";
 	out << "\tswitch(fun) {\n";
 	foreach(NeovimQt::Function f, ftable) {
 		out << "\tcase Function::NEOVIM_FN_" << f.name.toUpper() << ":\n";
