@@ -538,6 +538,7 @@ Function::FunctionId NeovimConnector::addFunction(const msgpack_object& fun)
 	if ( index != -1 ) {
 		return Function::FunctionId(index);
 	}
+	qDebug() << "Found unknown function in metadata" << f.signature();
 	return Function::NEOVIM_FN_NULL;
 }
 
