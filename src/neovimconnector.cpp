@@ -288,21 +288,7 @@ uint64_t NeovimConnector::channel()
  */
 void NeovimConnector::discoverMetadata()
 {
-	// With the use of msgpack-rpc, this now the only method
-	// that DOES NOT comply with the spec, because it uses
-	// int(0) as method id
-
-	uint32_t msgid = msgId();
-	// [type(0), msgid, method, args]
-	msgpack_pack_array(&m_pk, 4);
-	msgpack_pack_int(&m_pk, 0);
-	msgpack_pack_int(&m_pk, msgid);
-	msgpack_pack_int(&m_pk, 0);
-	msgpack_pack_array(&m_pk, 0);
-
-	NeovimRequest *r = new NeovimRequest( msgid, this);
-	m_requests.insert(msgid, r);
-
+	NeovimRequest *r = startRequestUnchecked("vim_get_api_info", 0);
 	connect(r, &NeovimRequest::finished,
 			this, &NeovimConnector::handleMetadata);
 }
@@ -586,6 +572,7 @@ void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, bool 
 	if ( failed ) {
 		setError( NoMetadata,
 			tr("Unable to get Neovim information"));
+		// TODO: better error message (from result?)
 		return;
 	}
 
