@@ -249,13 +249,14 @@ int main(int argc, char **argv)
 			printf("Found unexpected data type for metadata key(%d)\n", key.type);
 			return -1;
 		}
-		if ( val.type != MSGPACK_OBJECT_ARRAY ) {
-			printf("Found unexpected data type for metadata val(%d)\n", val.type);
-			return -1;
-		}
-
 		QByteArray key_b = QByteArray(key.via.raw.ptr, key.via.raw.size);
+
 		if ( key_b == "functions" ) {
+			if ( val.type != MSGPACK_OBJECT_ARRAY ) {
+				printf("Found unexpected data type for metadata function table");
+				return -1;
+			}
+
 			for(uint32_t j=0; j<val.via.array.size; j++) {
 				NeovimQt::Function f = NeovimQt::Function::fromMsgpack(val.via.array.ptr[j]);
 				if ( !f.isValid() ) {
