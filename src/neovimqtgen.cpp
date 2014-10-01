@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QDateTime>
+#include <QRegExp>
 #include <msgpack.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -15,6 +16,35 @@
 #define COMMA ", "
 #define SEMICOLON ";"
 #define QUOT "\""
+
+/**
+ * Convert data type names from Neovim API types into
+ * our own types. For simple types this is done using
+ * the typedefs in function.h - this function handles
+ * ArrayOf(...) constructs - all other types are left
+ * unchanged
+ */
+QString Type(QString type)
+{
+	type = type.trimmed();
+
+	// ArrayOf(String)
+	QRegExp array_template("ArrayOf\\(\\s*(\\w+)\\s*\\)");
+	// ArrayOf(Integer, 2)
+	QRegExp array_int2("ArrayOf\\(\\s*Integer,\\s*2\\s*\\)");
+
+	if (type.contains(array_template)) {
+		//return QString("QList<%1>").arg(array_template.cap(1));
+		return QString("%1Array").arg(array_template.cap(1));
+	} else if (type.contains(array_int2)){
+		// TODO: we could generalise this to fixed size any type arrays
+		// but this seems to be the only right now
+		return "Position";
+	} else if (type.contains('(')) {
+		qFatal(QString("Found unsupported data type %1").arg(type).toLocal8Bit());
+	}
+	return type;
+}
 
 bool generate_function_enum(const QList<NeovimQt::Function> &ftable, QDir& dst)
 {
@@ -94,13 +124,13 @@ bool generate_neovim_h(const QList<NeovimQt::Function> &ftable, QDir& dst)
 			if (i) {
 				out << COMMA;
 			}
-			out << QString("%1 %2").arg(f.parameters.at(i).first, f.parameters.at(i).second);
+			out << QString("%1 %2").arg(Type(f.parameters.at(i).first), f.parameters.at(i).second);
 		}
 		out << ");\n";
 	}
 	out << "\nsignals:\n";
 	foreach(NeovimQt::Function f, ftable) {
-		out << QString("\tvoid %1(%2);\n").arg("on_" + f.name, f.return_type);
+		out << QString("\tvoid %1(%2);\n").arg("on_" + f.name, Type(f.return_type));
 	}
 
 	out << "};\n";
@@ -132,7 +162,7 @@ bool generate_neovim_cpp(const QList<NeovimQt::Function> &ftable, QDir& dst)
 			if (i) {
 				out << COMMA;
 			}
-			out << QString("%1 %2").arg(f.parameters.at(i).first, f.parameters.at(i).second);
+			out << QString("%1 %2").arg(Type(f.parameters.at(i).first), f.parameters.at(i).second);
 		}
 		out << ")\n{\n";
 		out << QString("\tNeovimRequest *r = m_c->startRequestUnchecked(\"%1\", %2);\n").arg(f.name).arg(f.parameters.size());
@@ -156,7 +186,7 @@ bool generate_neovim_cpp(const QList<NeovimQt::Function> &ftable, QDir& dst)
 		out << "\tcase Function::NEOVIM_FN_" << f.name.toUpper() << ":\n";
 		out << "\t\t{\n"; // ctx
 		if ( f.return_type != "void" ) {
-			out << QString("\t\t\t%1 data = m_c->to_%1(res, &convfail);\n").arg(f.return_type);
+			out << QString("\t\t\t%1 data = m_c->to_%1(res, &convfail);\n").arg(Type(f.return_type));
 			out << "\t\t\tif (convfail) {\n";
 			out << QString("\t\t\t\tqWarning() << \"Error unpacking data for signal %1\";\n").arg(f.name);
 			out << "\t\t\t} else {\n";
@@ -262,6 +292,11 @@ int main(int argc, char **argv)
 				if ( !f.isValid() ) {
 					printf("Unable to parse metadata function\n");
 					return -1;
+				}
+				if (f.name == "vim_get_api_info") {
+					// TODO: For now we skip this function, add later
+					// after adding proper type decoding
+					continue;
 				}
 				ftable.append(f);
 			}
