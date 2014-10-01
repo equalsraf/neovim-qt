@@ -501,15 +501,15 @@ void NeovimConnector::addFunctions(const msgpack_object& ftable)
 		return;
 	}
 
-	QList<Function::FunctionId> m_supported;
+	QList<Function::FunctionId> supported;
 	for (uint32_t i=0; i<ftable.via.array.size; i++) {
 		Function::FunctionId fid = addFunction(ftable.via.array.ptr[i]);
 		if (fid != Function::NEOVIM_FN_NULL) {
-			m_supported.append(fid);
+			supported.append(fid);
 		}
 	}
 
-	if ( Function::knownFunctions.size() != m_supported.size() ) {
+	if ( Function::knownFunctions.size() != supported.size() ) {
 		setError( APIMisMatch,
 				tr("API methods mismatch: Cannot connect to this instance of Neovim, its version is likely too old, or the API has changed"));
 		return;
