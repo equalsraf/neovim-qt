@@ -1,131 +1,10 @@
-// Auto generated Tue Sep 2 10:55:22 2014
+// Auto generated Wed Oct 1 11:05:20 2014
 #include "neovim.h"
 #include "neovimconnector.h"
 namespace NeovimQt {
 Neovim::Neovim(NeovimConnector *c)
 :m_c(c)
 {
-}
-
-void Neovim::window_get_buffer(Window window)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_get_buffer", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_BUFFER);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-}
-
-void Neovim::window_get_cursor(Window window)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_get_cursor", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_CURSOR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-}
-
-void Neovim::window_set_cursor(Window window, Position pos)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_set_cursor", 2);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_CURSOR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-	m_c->send(pos);
-}
-
-void Neovim::window_get_height(Window window)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_get_height", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_HEIGHT);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-}
-
-void Neovim::window_set_height(Window window, Integer height)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_set_height", 2);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_HEIGHT);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-	m_c->send(height);
-}
-
-void Neovim::window_get_width(Window window)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_get_width", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_WIDTH);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-}
-
-void Neovim::window_set_width(Window window, Integer width)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_set_width", 2);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_WIDTH);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-	m_c->send(width);
-}
-
-void Neovim::window_get_var(Window window, String name)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_get_var", 2);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_VAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-	m_c->send(name);
-}
-
-void Neovim::window_set_var(Window window, String name, Object value)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_set_var", 3);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_VAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-	m_c->send(name);
-	m_c->send(value);
-}
-
-void Neovim::window_get_option(Window window, String name)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_get_option", 2);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_OPTION);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-	m_c->send(name);
-}
-
-void Neovim::window_set_option(Window window, String name, Object value)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_set_option", 3);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_OPTION);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-	m_c->send(name);
-	m_c->send(value);
-}
-
-void Neovim::window_get_position(Window window)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_get_position", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_POSITION);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-}
-
-void Neovim::window_get_tabpage(Window window)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_get_tabpage", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_TABPAGE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
-}
-
-void Neovim::window_is_valid(Window window)
-{
-	NeovimRequest *r = m_c->startRequestUnchecked("window_is_valid", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_IS_VALID);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(window);
 }
 
 void Neovim::tabpage_get_windows(Tabpage tabpage)
@@ -318,6 +197,14 @@ void Neovim::vim_err_write(String str)
 	m_c->send(str);
 }
 
+void Neovim::vim_report_error(String str)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("vim_report_error", 1);
+	r->setFunction(Function::NEOVIM_FN_VIM_REPORT_ERROR);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(str);
+}
+
 void Neovim::vim_get_buffers()
 {
 	NeovimRequest *r = m_c->startRequestUnchecked("vim_get_buffers", 0);
@@ -400,12 +287,12 @@ void Neovim::vim_unsubscribe(String event)
 	m_c->send(event);
 }
 
-void Neovim::vim_register_provider(String method)
+void Neovim::vim_register_provider(String feature)
 {
 	NeovimRequest *r = m_c->startRequestUnchecked("vim_register_provider", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_REGISTER_PROVIDER);
 	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	m_c->send(method);
+	m_c->send(feature);
 }
 
 void Neovim::buffer_get_length(Buffer buffer)
@@ -559,6 +446,127 @@ void Neovim::buffer_get_mark(Buffer buffer, String name)
 	m_c->send(name);
 }
 
+void Neovim::window_get_buffer(Window window)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_get_buffer", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_BUFFER);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+}
+
+void Neovim::window_get_cursor(Window window)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_get_cursor", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_CURSOR);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+}
+
+void Neovim::window_set_cursor(Window window, Position pos)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_set_cursor", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_CURSOR);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+	m_c->send(pos);
+}
+
+void Neovim::window_get_height(Window window)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_get_height", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_HEIGHT);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+}
+
+void Neovim::window_set_height(Window window, Integer height)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_set_height", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_HEIGHT);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+	m_c->send(height);
+}
+
+void Neovim::window_get_width(Window window)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_get_width", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_WIDTH);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+}
+
+void Neovim::window_set_width(Window window, Integer width)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_set_width", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_WIDTH);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+	m_c->send(width);
+}
+
+void Neovim::window_get_var(Window window, String name)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_get_var", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_VAR);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+	m_c->send(name);
+}
+
+void Neovim::window_set_var(Window window, String name, Object value)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_set_var", 3);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_VAR);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+	m_c->send(name);
+	m_c->send(value);
+}
+
+void Neovim::window_get_option(Window window, String name)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_get_option", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_OPTION);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+	m_c->send(name);
+}
+
+void Neovim::window_set_option(Window window, String name, Object value)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_set_option", 3);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_OPTION);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+	m_c->send(name);
+	m_c->send(value);
+}
+
+void Neovim::window_get_position(Window window)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_get_position", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_POSITION);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+}
+
+void Neovim::window_get_tabpage(Window window)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_get_tabpage", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_TABPAGE);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+}
+
+void Neovim::window_is_valid(Window window)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("window_is_valid", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_IS_VALID);
+	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
+	m_c->send(window);
+}
+
 void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool failed, const msgpack_object& res)
 {
 	bool convfail=true;
@@ -568,140 +576,6 @@ void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 	}
 
 	switch(fun) {
-	case Function::NEOVIM_FN_WINDOW_GET_BUFFER:
-		{
-			Buffer data = m_c->to_Buffer(res, &convfail);
-			if (convfail) {
-				qWarning() << "Error unpacking data for signal window_get_buffer";
-			} else {
-				qDebug() << "window_get_buffer ->" << data;
-				emit on_window_get_buffer(data);
-			}
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_CURSOR:
-		{
-			Position data = m_c->to_Position(res, &convfail);
-			if (convfail) {
-				qWarning() << "Error unpacking data for signal window_get_cursor";
-			} else {
-				qDebug() << "window_get_cursor ->" << data;
-				emit on_window_get_cursor(data);
-			}
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_SET_CURSOR:
-		{
-			qDebug() << "on_window_set_cursor";
-			emit on_window_set_cursor();
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_HEIGHT:
-		{
-			Integer data = m_c->to_Integer(res, &convfail);
-			if (convfail) {
-				qWarning() << "Error unpacking data for signal window_get_height";
-			} else {
-				qDebug() << "window_get_height ->" << data;
-				emit on_window_get_height(data);
-			}
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_SET_HEIGHT:
-		{
-			qDebug() << "on_window_set_height";
-			emit on_window_set_height();
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_WIDTH:
-		{
-			Integer data = m_c->to_Integer(res, &convfail);
-			if (convfail) {
-				qWarning() << "Error unpacking data for signal window_get_width";
-			} else {
-				qDebug() << "window_get_width ->" << data;
-				emit on_window_get_width(data);
-			}
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_SET_WIDTH:
-		{
-			qDebug() << "on_window_set_width";
-			emit on_window_set_width();
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_VAR:
-		{
-			Object data = m_c->to_Object(res, &convfail);
-			if (convfail) {
-				qWarning() << "Error unpacking data for signal window_get_var";
-			} else {
-				qDebug() << "window_get_var ->" << data;
-				emit on_window_get_var(data);
-			}
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_SET_VAR:
-		{
-			Object data = m_c->to_Object(res, &convfail);
-			if (convfail) {
-				qWarning() << "Error unpacking data for signal window_set_var";
-			} else {
-				qDebug() << "window_set_var ->" << data;
-				emit on_window_set_var(data);
-			}
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_OPTION:
-		{
-			Object data = m_c->to_Object(res, &convfail);
-			if (convfail) {
-				qWarning() << "Error unpacking data for signal window_get_option";
-			} else {
-				qDebug() << "window_get_option ->" << data;
-				emit on_window_get_option(data);
-			}
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_SET_OPTION:
-		{
-			qDebug() << "on_window_set_option";
-			emit on_window_set_option();
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_POSITION:
-		{
-			Position data = m_c->to_Position(res, &convfail);
-			if (convfail) {
-				qWarning() << "Error unpacking data for signal window_get_position";
-			} else {
-				qDebug() << "window_get_position ->" << data;
-				emit on_window_get_position(data);
-			}
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_TABPAGE:
-		{
-			Tabpage data = m_c->to_Tabpage(res, &convfail);
-			if (convfail) {
-				qWarning() << "Error unpacking data for signal window_get_tabpage";
-			} else {
-				qDebug() << "window_get_tabpage ->" << data;
-				emit on_window_get_tabpage(data);
-			}
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_IS_VALID:
-		{
-			Boolean data = m_c->to_Boolean(res, &convfail);
-			if (convfail) {
-				qWarning() << "Error unpacking data for signal window_is_valid";
-			} else {
-				qDebug() << "window_is_valid ->" << data;
-				emit on_window_is_valid(data);
-			}
-		}
-		break;
 	case Function::NEOVIM_FN_TABPAGE_GET_WINDOWS:
 		{
 			WindowArray data = m_c->to_WindowArray(res, &convfail);
@@ -908,6 +782,12 @@ void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 		{
 			qDebug() << "on_vim_err_write";
 			emit on_vim_err_write();
+		}
+		break;
+	case Function::NEOVIM_FN_VIM_REPORT_ERROR:
+		{
+			qDebug() << "on_vim_report_error";
+			emit on_vim_report_error();
 		}
 		break;
 	case Function::NEOVIM_FN_VIM_GET_BUFFERS:
@@ -1155,6 +1035,140 @@ void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, bool faile
 			} else {
 				qDebug() << "buffer_get_mark ->" << data;
 				emit on_buffer_get_mark(data);
+			}
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_BUFFER:
+		{
+			Buffer data = m_c->to_Buffer(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal window_get_buffer";
+			} else {
+				qDebug() << "window_get_buffer ->" << data;
+				emit on_window_get_buffer(data);
+			}
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_CURSOR:
+		{
+			Position data = m_c->to_Position(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal window_get_cursor";
+			} else {
+				qDebug() << "window_get_cursor ->" << data;
+				emit on_window_get_cursor(data);
+			}
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_CURSOR:
+		{
+			qDebug() << "on_window_set_cursor";
+			emit on_window_set_cursor();
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_HEIGHT:
+		{
+			Integer data = m_c->to_Integer(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal window_get_height";
+			} else {
+				qDebug() << "window_get_height ->" << data;
+				emit on_window_get_height(data);
+			}
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_HEIGHT:
+		{
+			qDebug() << "on_window_set_height";
+			emit on_window_set_height();
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_WIDTH:
+		{
+			Integer data = m_c->to_Integer(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal window_get_width";
+			} else {
+				qDebug() << "window_get_width ->" << data;
+				emit on_window_get_width(data);
+			}
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_WIDTH:
+		{
+			qDebug() << "on_window_set_width";
+			emit on_window_set_width();
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_VAR:
+		{
+			Object data = m_c->to_Object(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal window_get_var";
+			} else {
+				qDebug() << "window_get_var ->" << data;
+				emit on_window_get_var(data);
+			}
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_VAR:
+		{
+			Object data = m_c->to_Object(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal window_set_var";
+			} else {
+				qDebug() << "window_set_var ->" << data;
+				emit on_window_set_var(data);
+			}
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_OPTION:
+		{
+			Object data = m_c->to_Object(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal window_get_option";
+			} else {
+				qDebug() << "window_get_option ->" << data;
+				emit on_window_get_option(data);
+			}
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_OPTION:
+		{
+			qDebug() << "on_window_set_option";
+			emit on_window_set_option();
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_POSITION:
+		{
+			Position data = m_c->to_Position(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal window_get_position";
+			} else {
+				qDebug() << "window_get_position ->" << data;
+				emit on_window_get_position(data);
+			}
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_TABPAGE:
+		{
+			Tabpage data = m_c->to_Tabpage(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal window_get_tabpage";
+			} else {
+				qDebug() << "window_get_tabpage ->" << data;
+				emit on_window_get_tabpage(data);
+			}
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_IS_VALID:
+		{
+			Boolean data = m_c->to_Boolean(res, &convfail);
+			if (convfail) {
+				qWarning() << "Error unpacking data for signal window_is_valid";
+			} else {
+				qDebug() << "window_is_valid ->" << data;
+				emit on_window_is_valid(data);
 			}
 		}
 		break;
