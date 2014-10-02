@@ -1,4 +1,4 @@
-// Auto generated 2014-10-02 15:38:02.047087
+// Auto generated 2014-10-02 17:02:59.031088
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
@@ -16,6 +16,7 @@ protected slots:
 	void handleResponseError(uint32_t id, Function::FunctionId fun, const QString& msg, const msgpack_object&);
 signals:
 	void error(const QString& errmsg, const QVariant& errObj);
+	void neovimEvent(const QByteArray &name, const QVariantList& args);
 private:
 	NeovimConnector *m_c;
 public slots:

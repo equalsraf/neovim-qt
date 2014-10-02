@@ -612,7 +612,9 @@ void NeovimConnector::dispatchNotification(msgpack_object& nt)
 		qDebug() << "Unable to unpack notification parameters";
 		return;
 	}
-	emit neovimEvent(methodName, val.toList());
+	if (m_neovimobj) {
+		emit m_neovimobj->neovimEvent(methodName, val.toList());
+	}
 }
 
 /**
@@ -685,11 +687,10 @@ void NeovimConnector::processError(QProcess::ProcessError err)
  */
 
 /**
- * \fn NeovimQt::NeovimConnector::neovimEvent(const QByteArray &name, const QVariantList& args)
+ * \fn NeovimQt::Neovim::neovimEvent(const QByteArray &name, const QVariantList& args)
  *
  * Signal emitted when Neovim sends a notification withen given name and args
  */
-
 
 
 } // namespace NeovimQt

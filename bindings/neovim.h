@@ -16,6 +16,7 @@ protected slots:
 	void handleResponseError(uint32_t id, Function::FunctionId fun, const QString& msg, const msgpack_object&);
 signals:
 	void error(const QString& errmsg, const QVariant& errObj);
+	void neovimEvent(const QByteArray &name, const QVariantList& args);
 private:
 	NeovimConnector *m_c;
 public slots:

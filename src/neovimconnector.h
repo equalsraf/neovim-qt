@@ -58,7 +58,6 @@ public:
 signals:
 	void ready();
 	void error(NeovimError);
-	void neovimEvent(const QByteArray &name, const QVariantList& args);
 
 protected:
 	void setError(NeovimError err, const QString& msg);
