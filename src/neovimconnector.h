@@ -59,7 +59,7 @@ public:
 
 	// Methods to pack datatypes as message pack
 	// This is what you can use for arguments after startRequest
-	void send(Integer);
+	void send(int64_t);
 	void send(const QVariant&);
 	void send(const QByteArray&);
 	void send(bool);
@@ -99,7 +99,7 @@ protected slots:
 	void handleMetadataError(uint32_t msgid, Function::FunctionId,
 		const QString& msg, const msgpack_object& errobj);
 	void processError(QProcess::ProcessError);
-	void encodingChanged(Object);
+	void encodingChanged(const QVariant&);
 
 private:
 	static int msgpack_write_cb(void* data, const char* buf, unsigned long int len);

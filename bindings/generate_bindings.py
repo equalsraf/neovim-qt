@@ -28,6 +28,15 @@ def generate_file(name, outpath, **kw):
         fp.write(template.render(kw))
 
 ARRAY_OF = re.compile('ArrayOf\(\s*(\w+)\s*\)')
+TYPES = {
+        'Integer': 'int64_t',
+        'Boolean': 'bool',
+        'String': 'QByteArray',
+        'Object': 'QVariant',
+        'Buffer': 'int64_t',
+        'Window': 'int64_t',
+        'Tabpage': 'int64_t',
+    }
 def qt_typefor(typename):
     """
     Some Neovim data types are non trivial e.g. ArrayOf(String)
@@ -35,17 +44,22 @@ def qt_typefor(typename):
     a simple typedef is enough (see function.h) but for these cases
     the generator needs to know in advance.
     """
+    if typename == 'void':
+        return typename
+    if typename in TYPES:
+        # Basic types
+        return TYPES[typename]
+
     m = ARRAY_OF.match(typename)
     if m:
-        return 'QList<%s>' % m.groups()[0]
+        return 'QList<%s>' % qt_typefor(m.groups()[0])
     elif typename == 'ArrayOf(Integer, 2)':
         # We don't actually implement fixed size array types
         # We only support this one for positions
-        return 'Position'
-    elif ',' in typename or '(' in typename:
-        print('Unsupported type: %s' % typename)
-        sys.exit(-1)
-    return typename
+        return 'QPoint'
+
+    print('Unsupported type: %s' % typename)
+    sys.exit(-1)
 
 class Function:
     """

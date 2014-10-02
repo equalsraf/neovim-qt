@@ -12,19 +12,6 @@
 
 namespace NeovimQt {
 
-typedef int64_t Integer;
-typedef QPoint Position;
-typedef bool Boolean;
-typedef QByteArray String;
-typedef QVariant Object;
-typedef int64_t Buffer;
-typedef int64_t Window;
-typedef int64_t Tabpage;
-typedef QList<int64_t> BufferArray;
-typedef QList<int64_t> WindowArray;
-typedef QList<int64_t> TabpageArray;
-typedef QStringList StringArray;
-
 class Function {
 	Q_ENUMS(FunctionId)
 public:

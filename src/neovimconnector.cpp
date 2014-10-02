@@ -412,7 +412,7 @@ void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, const
 /**
  * Called after metadata discovery, to get the &encoding
  */
-void NeovimConnector::encodingChanged(Object obj)
+void NeovimConnector::encodingChanged(const QVariant&  obj)
 {
 	disconnect(neovimObject(), &Neovim::on_vim_get_option,
 			this, &NeovimConnector::encodingChanged);
