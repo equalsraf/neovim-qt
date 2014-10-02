@@ -59,7 +59,7 @@ void NeovimConnector::setError(NeovimError err, const QString& msg)
 /**
  * Called when an error takes place
  */ 
-NeovimConnector::NeovimError NeovimConnector::error()
+NeovimConnector::NeovimError NeovimConnector::errorCause()
 {
 	return m_error;
 }
@@ -401,7 +401,7 @@ void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, const
 		}
 	}
 
-	if (error() == NoError) {
+	if (errorCause() == NoError) {
 		// Get &encoding before we signal readyness
 		neovimObject()->vim_get_option("encoding");
 		connect(neovimObject(), &Neovim::on_vim_get_option,

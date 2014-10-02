@@ -26,6 +26,10 @@ public slots:
 signals:
 {% for f in functions %}
 	void on_{{f.name}}({{f.real_return_type}});
+{% if f.can_fail %}
+	void err_{{f.name}}(const QString&, const msgpack_object&);
+{% endif%}
+
 {% endfor %}
 };
 } // namespace

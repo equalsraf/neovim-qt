@@ -27,7 +27,17 @@ void Neovim::{{f.name}}({{f.argstring}})
 void Neovim::handleResponseError(uint32_t msgid, Function::FunctionId fun, const QString& msg, const msgpack_object& res)
 {
 	emit error(msg);
-	qDebug() << msg;
+	switch(fun) {
+{% for f in functions %}
+{% if f.can_fail %}
+	case Function::NEOVIM_FN_{{f.name.upper()}}:
+		emit err_{{f.name}}(msg, res);
+		break;
+{% endif %}
+{% endfor %}
+	default:
+		qWarning() << "Received error for function call that should not fail" << fun << msg;
+	}
 }
 
 void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, const msgpack_object& res)

@@ -1,4 +1,4 @@
-// Auto generated 2014-10-02 13:43:11.429845
+// Auto generated 2014-10-02 15:05:02.656707
 #include "neovim.h"
 #include "neovimconnector.h"
 namespace NeovimQt {
@@ -575,7 +575,154 @@ void Neovim::window_is_valid(int64_t window)
 void Neovim::handleResponseError(uint32_t msgid, Function::FunctionId fun, const QString& msg, const msgpack_object& res)
 {
 	emit error(msg);
-	qDebug() << msg;
+	switch(fun) {
+	case Function::NEOVIM_FN_TABPAGE_GET_WINDOWS:
+		emit err_tabpage_get_windows(msg, res);
+		break;
+	case Function::NEOVIM_FN_TABPAGE_GET_VAR:
+		emit err_tabpage_get_var(msg, res);
+		break;
+	case Function::NEOVIM_FN_TABPAGE_SET_VAR:
+		emit err_tabpage_set_var(msg, res);
+		break;
+	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW:
+		emit err_tabpage_get_window(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_COMMAND:
+		emit err_vim_command(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_EVAL:
+		emit err_vim_eval(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_STRWIDTH:
+		emit err_vim_strwidth(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_CHANGE_DIRECTORY:
+		emit err_vim_change_directory(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_GET_CURRENT_LINE:
+		emit err_vim_get_current_line(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_CURRENT_LINE:
+		emit err_vim_set_current_line(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_DEL_CURRENT_LINE:
+		emit err_vim_del_current_line(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_GET_VAR:
+		emit err_vim_get_var(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_VAR:
+		emit err_vim_set_var(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_GET_VVAR:
+		emit err_vim_get_vvar(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_GET_OPTION:
+		emit err_vim_get_option(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_OPTION:
+		emit err_vim_set_option(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_CURRENT_BUFFER:
+		emit err_vim_set_current_buffer(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_CURRENT_WINDOW:
+		emit err_vim_set_current_window(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_CURRENT_TABPAGE:
+		emit err_vim_set_current_tabpage(msg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_REGISTER_PROVIDER:
+		emit err_vim_register_provider(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_GET_LENGTH:
+		emit err_buffer_get_length(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_GET_LINE:
+		emit err_buffer_get_line(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_SET_LINE:
+		emit err_buffer_set_line(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_DEL_LINE:
+		emit err_buffer_del_line(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_GET_SLICE:
+		emit err_buffer_get_slice(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_SET_SLICE:
+		emit err_buffer_set_slice(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_GET_VAR:
+		emit err_buffer_get_var(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_SET_VAR:
+		emit err_buffer_set_var(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_GET_OPTION:
+		emit err_buffer_get_option(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_SET_OPTION:
+		emit err_buffer_set_option(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_GET_NUMBER:
+		emit err_buffer_get_number(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_GET_NAME:
+		emit err_buffer_get_name(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_SET_NAME:
+		emit err_buffer_set_name(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_INSERT:
+		emit err_buffer_insert(msg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_GET_MARK:
+		emit err_buffer_get_mark(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_BUFFER:
+		emit err_window_get_buffer(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_CURSOR:
+		emit err_window_get_cursor(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_CURSOR:
+		emit err_window_set_cursor(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_HEIGHT:
+		emit err_window_get_height(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_HEIGHT:
+		emit err_window_set_height(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_WIDTH:
+		emit err_window_get_width(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_WIDTH:
+		emit err_window_set_width(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_VAR:
+		emit err_window_get_var(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_VAR:
+		emit err_window_set_var(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_OPTION:
+		emit err_window_get_option(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_OPTION:
+		emit err_window_set_option(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_POSITION:
+		emit err_window_get_position(msg, res);
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_TABPAGE:
+		emit err_window_get_tabpage(msg, res);
+		break;
+	default:
+		qWarning() << "Received error for function call that should not fail" << fun << msg;
+	}
 }
 
 void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, const msgpack_object& res)

@@ -52,7 +52,7 @@ public:
 	~NeovimConnector();
 	static NeovimConnector* spawn();
 
-	NeovimError error();
+	NeovimError errorCause();
 	QString errorString();
 
 	NeovimRequest* startRequestUnchecked(const QString& method, uint32_t argcount);
