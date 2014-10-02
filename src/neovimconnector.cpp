@@ -157,6 +157,13 @@ void NeovimConnector::send(const QList<QByteArray>& list)
 void NeovimConnector::send(const QVariant& var)
 {
 	qDebug() << __func__ << var;
+
+	if (!checkVariant(var)) {
+		msgpack_pack_nil(&m_pk);
+		qWarning() << "Trying to pack unsupported variant type" << var.type() << "packing Nil instead";
+		return;
+	}
+
 	switch((QMetaType::Type)var.type()) {
 	case QMetaType::Void:
 		msgpack_pack_nil(&m_pk);
@@ -207,7 +214,7 @@ void NeovimConnector::send(const QVariant& var)
 		break;
 	default:
 		msgpack_pack_nil(&m_pk);
-		qWarning() << "Trying to pack unsupported variant type" << var.type() << "packing Nil instead";
+		qWarning() << "There is a BUG in the QVariant serializer" << var.type();
 	}
 }
 
@@ -228,7 +235,7 @@ uint64_t NeovimConnector::channel()
 }
 
 /**
- * Call function 0 to request metadata from Neovim
+ * Request API information from Neovim
  */
 void NeovimConnector::discoverMetadata()
 {

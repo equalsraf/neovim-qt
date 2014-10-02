@@ -14,9 +14,52 @@ namespace NeovimQt {
  * Ideally we would detect such errors early on and avoid sending those objects
  * entirely - this function checks if QVariant objects are admissible
  */
-bool checkVariant(const QVariant& )
+bool checkVariant(const QVariant& var)
 {
-	// FIXME: implement my please :D
+	switch((QMetaType::Type)var.type()) {
+	case QMetaType::UnknownType:
+		break;
+	case QMetaType::Bool:
+		break;
+	case QMetaType::Int:
+		break;
+	case QMetaType::UInt:
+		break;
+	case QMetaType::Float:
+		break;
+	case QMetaType::QString:
+		break;
+	case QMetaType::Double:
+		break;
+	case QMetaType::QByteArray:
+		break;
+	case QMetaType::QVariantList:
+		foreach(const QVariant& elem, var.toList()) {
+			if (!checkVariant(elem)) {
+				return false;
+			}
+		}
+		break;
+	case QMetaType::QVariantMap:
+		{
+		const QVariantMap& m = var.toMap();
+		QMapIterator<QString,QVariant> it(m);
+		while(it.hasNext()) {
+			it.next();
+			if (!checkVariant(it.key())) {
+				return false;
+			}
+			if (!checkVariant(it.value())) {
+				return false;
+			}
+		}
+		}
+		break;
+	case QMetaType::QPoint:
+		break;
+	default:
+		return false;
+	}
 	return true;
 }
 
@@ -134,7 +177,7 @@ bool decodeMsgpack(const msgpack_object& in, QVariant& out)
 {
 	switch (in.type) {
 	case MSGPACK_OBJECT_NIL:
-		out = QVariant(QMetaType::Void, NULL);
+		out = QVariant();
 		break;
 	case MSGPACK_OBJECT_BOOLEAN:
 		out = in.via.boolean;

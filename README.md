@@ -60,7 +60,6 @@ found.
 A crapload of them
 
 * Error checking (start with the QIODevice related errros)
-* Deep check QVariants before starting to serialized them
 * We can be more pedantic about argcount in startRequest
 * I currently do not implement synchronous calls, I suppose it
   would be possible to generate more code to do it using
