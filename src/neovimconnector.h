@@ -16,7 +16,7 @@ namespace NeovimQt {
 class NeovimRequest: public QObject {
 	Q_OBJECT
 public:
-	NeovimRequest(uint32_t id, QObject *parent=0);
+	NeovimRequest(uint32_t id, NeovimConnector *c, QObject *parent=0);
 	void processResponse(const msgpack_object& res, bool failed=false);
 	void setFunction(Function::FunctionId);
 	Function::FunctionId function();
@@ -25,6 +25,7 @@ signals:
 	void error(uint32_t msgid, Function::FunctionId fun, const QString& msg, const msgpack_object&);
 private:
 	uint32_t m_id;
+	NeovimConnector *m_c;
 	Function::FunctionId m_function;
 };
 
@@ -62,29 +63,7 @@ public:
 	void send(const QVariant&);
 	void send(const QByteArray&);
 	void send(bool);
-
-	// 
-	// Methods to unpack msgpack responses
-	//
-	QByteArray to_QByteArray(const msgpack_object&, bool *failed=NULL);
-	String to_String(const msgpack_object&, bool *failed=NULL);
-	static String decodeString(const msgpack_object&, bool *failed=NULL);
-	Boolean to_Boolean(const msgpack_object&, bool *failed=NULL);
-	StringArray to_StringArray(const msgpack_object&, bool *failed=NULL);
-	Position to_Position(const msgpack_object&, bool *failed=NULL);
-	Object to_Object(const msgpack_object& msg, bool *failed=NULL);
-
-	// These are all the same as to_Integer
-	Integer to_Integer(const msgpack_object&, bool *failed=NULL);
-	Buffer to_Buffer(const msgpack_object&, bool *failed=NULL);
-	Window to_Window(const msgpack_object&, bool *failed=NULL);
-	Tabpage to_Tabpage(const msgpack_object&, bool *failed=NULL);
-
-	// These are all basically the same as to_IntegerArray
-	QList<int64_t> to_IntegerArray(const msgpack_object& msg, bool *failed=NULL);
-	WindowArray to_WindowArray(const msgpack_object& msg, bool *failed=NULL);
-	BufferArray to_BufferArray(const msgpack_object& msg, bool *failed=NULL);
-	TabpageArray to_TabpageArray(const msgpack_object& msg, bool *failed=NULL);
+	void send(const QList<QByteArray>& list);
 
 	Neovim* neovimObject();
 	uint64_t channel();

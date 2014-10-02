@@ -1,4 +1,4 @@
-// Auto generated Wed Oct 1 13:47:33 2014
+// Auto generated 2014-10-02 12:40:22.234175
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
@@ -60,7 +60,7 @@ public slots:
 	void buffer_set_line(Buffer buffer, Integer index, String line);
 	void buffer_del_line(Buffer buffer, Integer index);
 	void buffer_get_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end);
-	void buffer_set_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end, StringArray replacement);
+	void buffer_set_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end, QList<String> replacement);
 	void buffer_get_var(Buffer buffer, String name);
 	void buffer_set_var(Buffer buffer, String name, Object value);
 	void buffer_get_option(Buffer buffer, String name);
@@ -69,7 +69,7 @@ public slots:
 	void buffer_get_name(Buffer buffer);
 	void buffer_set_name(Buffer buffer, String name);
 	void buffer_is_valid(Buffer buffer);
-	void buffer_insert(Buffer buffer, Integer lnum, StringArray lines);
+	void buffer_insert(Buffer buffer, Integer lnum, QList<String> lines);
 	void buffer_get_mark(Buffer buffer, String name);
 	void window_get_buffer(Window window);
 	void window_get_cursor(Window window);
@@ -87,7 +87,7 @@ public slots:
 	void window_is_valid(Window window);
 
 signals:
-	void on_tabpage_get_windows(WindowArray);
+	void on_tabpage_get_windows(QList<Window>);
 	void on_tabpage_get_var(Object);
 	void on_tabpage_set_var(Object);
 	void on_tabpage_get_window(Window);
@@ -98,7 +98,7 @@ signals:
 	void on_vim_replace_termcodes(String);
 	void on_vim_eval(Object);
 	void on_vim_strwidth(Integer);
-	void on_vim_list_runtime_paths(StringArray);
+	void on_vim_list_runtime_paths(QList<String>);
 	void on_vim_change_directory(void);
 	void on_vim_get_current_line(String);
 	void on_vim_set_current_line(void);
@@ -111,13 +111,13 @@ signals:
 	void on_vim_out_write(void);
 	void on_vim_err_write(void);
 	void on_vim_report_error(void);
-	void on_vim_get_buffers(BufferArray);
+	void on_vim_get_buffers(QList<Buffer>);
 	void on_vim_get_current_buffer(Buffer);
 	void on_vim_set_current_buffer(void);
-	void on_vim_get_windows(WindowArray);
+	void on_vim_get_windows(QList<Window>);
 	void on_vim_get_current_window(Window);
 	void on_vim_set_current_window(void);
-	void on_vim_get_tabpages(TabpageArray);
+	void on_vim_get_tabpages(QList<Tabpage>);
 	void on_vim_get_current_tabpage(Tabpage);
 	void on_vim_set_current_tabpage(void);
 	void on_vim_subscribe(void);
@@ -127,7 +127,7 @@ signals:
 	void on_buffer_get_line(String);
 	void on_buffer_set_line(void);
 	void on_buffer_del_line(void);
-	void on_buffer_get_slice(StringArray);
+	void on_buffer_get_slice(QList<String>);
 	void on_buffer_set_slice(void);
 	void on_buffer_get_var(Object);
 	void on_buffer_set_var(Object);

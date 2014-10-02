@@ -116,7 +116,7 @@ void NeovimConnector::send(int64_t i)
 }
 
 /**
- * Serialise a valud into the msgpack stream
+ * Serialise a value into the msgpack stream
  */
 void NeovimConnector::send(const QByteArray& raw)
 {
@@ -135,6 +135,15 @@ void NeovimConnector::send(bool b)
 		msgpack_pack_true(&m_pk);
 	} else {
 		msgpack_pack_false(&m_pk);
+	}
+}
+
+void NeovimConnector::send(const QList<QByteArray>& list)
+{
+	qDebug() << __func__ << list;
+	msgpack_pack_array(&m_pk, list.size());
+	foreach(const QByteArray& elem, list) {
+		send(elem);
 	}
 }
 
@@ -198,75 +207,6 @@ void NeovimConnector::send(const QVariant& var)
 	}
 }
 
-// FIXME: this should match send(QVariant) -> enforce it
-/**
- * We use QVariants for RPC functions use the *Object* type do not use this in any other conditions
- *
- */
-Object NeovimConnector::to_Object(const msgpack_object& obj, bool *failed)
-{
-	if ( failed ) {
-		*failed = false;
-	}
-
-	QVariant res;
-	switch (obj.type) {
-	case MSGPACK_OBJECT_NIL:
-		res =  QVariant(QMetaType::Void, NULL);
-		break;
-	case MSGPACK_OBJECT_BOOLEAN:
-		res = obj.via.boolean;
-		break;
-	case MSGPACK_OBJECT_NEGATIVE_INTEGER:
-		res = QVariant((qint64)obj.via.i64);
-		break;
-	case MSGPACK_OBJECT_POSITIVE_INTEGER:
-		res = QVariant((quint64)obj.via.u64);
-		break;
-	case MSGPACK_OBJECT_DOUBLE:
-		res = obj.via.dec;
-		break;
-	case MSGPACK_OBJECT_RAW:
-		res = to_String(obj, failed);
-		break;
-	case MSGPACK_OBJECT_ARRAY:
-		// Either a QVariantList or a QStringList
-		{
-		QVariantList ls;
-		for (uint64_t i=0; i<obj.via.array.size; i++) {
-			QVariant v = to_Object(obj.via.array.ptr[i], failed);
-			if ( v.isNull() ) {
-				setError(UnexpectedMsg,
-					tr("Found unexpected data type when unpacking Map as QVariantList"));
-				res = QVariant();
-				break;
-			}
-			ls.append(v);
-		}
-		res = ls;
-		}
-		break;
-	case MSGPACK_OBJECT_MAP:
-		{
-		QVariantMap m;
-		for (uint64_t i=0; i<obj.via.map.size; i++) {
-			if (obj.via.map.ptr[i].key.type != MSGPACK_OBJECT_RAW) {
-				setError(UnexpectedMsg,
-					tr("Found unexpected data type when unpacking Map as QVariant"));
-				return QVariant();
-			}
-			m.insert(
-				to_String(obj.via.map.ptr[i].key), 
-				to_Object(obj.via.map.ptr[i].val, failed));
-		}
-		res = m;
-		}
-		break;
-	
-	}
-	return res;
-}
-
 /**
  * Returns a new msgid that can be used for a msg
  */
@@ -293,168 +233,6 @@ void NeovimConnector::discoverMetadata()
 			this, &NeovimConnector::handleMetadata);
 	connect(r, &NeovimRequest::error,
 			this, &NeovimConnector::handleMetadataError);
-}
-
-QByteArray NeovimConnector::to_String(const msgpack_object& obj, bool *failed)
-{
-	QByteArray out = decodeString(obj, failed);
-	if (*failed) {
-		setError(UnexpectedMsg,
-				tr("Unable to unpack String object from msgpack"));
-	}
-	return out;
-}
-
-QByteArray NeovimConnector::decodeString(const msgpack_object& obj, bool *failed)
-{
-	if ( failed ) {
-		*failed = true;
-	}
-	if ( obj.type != MSGPACK_OBJECT_RAW ) {
-		return QByteArray();
-	} else if ( failed ) {
-		*failed = false;
-	}
-	return QByteArray(obj.via.raw.ptr, obj.via.raw.size);
-}
-
-QByteArray NeovimConnector::to_QByteArray(const msgpack_object& obj, bool *failed)
-{
-	if ( obj.type != MSGPACK_OBJECT_RAW ) {
-		setError( UnexpectedMsg,
-				tr("Found unexpected data type when unpacking a byte array"));
-		return QByteArray();
-	} if ( failed ) {
-		*failed = false;
-	}
-	return QByteArray(obj.via.raw.ptr, obj.via.raw.size);
-}
-
-Position NeovimConnector::to_Position(const msgpack_object& obj, bool *failed)
-{
-	if ( failed ) {
-		*failed = true;
-	}
-	if ( obj.type != MSGPACK_OBJECT_ARRAY || obj.via.array.size != 2 ) {
-		setError(UnexpectedMsg,
-				tr("Found unexpected data type when unpacking a Point"));
-		return QPoint();
-	} else if ( failed ) {
-		*failed = false;
-	}
-	// QPoint is (x,y)  neovim Position is (row, col)
-	return QPoint(to_Integer(obj.via.array.ptr[1]), to_Integer(obj.via.array.ptr[0]));
-}
-
-Boolean NeovimConnector::to_Boolean(const msgpack_object& obj, bool *failed)
-{
-	if ( failed ) {
-		*failed = true;
-	}
-	if ( obj.type != MSGPACK_OBJECT_BOOLEAN) {
-		setError(UnexpectedMsg,
-				tr("Found unexpected data type when unpacking a bool"));
-		return false;
-	} if ( failed ) {
-		*failed = false;
-	}
-	return obj.via.boolean;
-}
-
-StringArray NeovimConnector::to_StringArray(const msgpack_object& obj, bool *failed)
-{
-	if ( failed ) {
-		*failed = true;
-	}
-	if ( obj.type != MSGPACK_OBJECT_ARRAY) {
-		setError(UnexpectedMsg,
-				tr("Found unexpected data type when unpacking a QStringList"));
-		return QStringList();
-	} 
-
-	QStringList ret;
-	for (uint32_t i=0; i<obj.via.array.size; i++) {
-		if ( obj.via.array.ptr[i].type != MSGPACK_OBJECT_RAW ) {
-			setError(UnexpectedMsg,
-				tr("Found non-raw element type when unpacking a QStringList"));
-			return QStringList();
-		}
-		ret.append(to_String(obj.via.array.ptr[i]));
-	}
-
-	if ( failed ) {
-		*failed = false;
-	}
-	return ret;
-}
-
-Integer NeovimConnector::to_Integer(const msgpack_object& obj, bool *failed)
-{
-	if ( failed ) {
-		*failed = true;
-	}
-	if ( obj.type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
-		setError(UnexpectedMsg,
-				tr("Found unexpected data type when unpacking int64_t"));
-		return false;
-	}
-	if ( failed ) {
-		*failed = false;
-	}
-	return obj.via.i64;
-}
-
-Buffer NeovimConnector::to_Buffer(const msgpack_object& obj, bool *failed)
-{
-	return to_Integer(obj, failed);
-}
-Window NeovimConnector::to_Window(const msgpack_object& obj, bool *failed)
-{
-	return to_Integer(obj, failed);
-}
-Tabpage NeovimConnector::to_Tabpage(const msgpack_object& obj, bool *failed)
-{
-	return to_Integer(obj, failed);
-}
-
-QList<int64_t> NeovimConnector::to_IntegerArray(const msgpack_object& obj, bool *failed)
-{
-	if ( failed ) {
-		*failed = true;
-	}
-	if ( obj.type != MSGPACK_OBJECT_ARRAY) {
-		setError(UnexpectedMsg,
-				tr("Found unexpected data type when unpacking a QList<int64_t>"));
-		return QList<int64_t>();
-	}
-
-	QList<int64_t> ret;
-	for (uint32_t i=0; i<obj.via.array.size; i++) {
-		if ( obj.via.array.ptr[i].type != MSGPACK_OBJECT_POSITIVE_INTEGER ) {
-			setError(UnexpectedMsg,
-				tr("Found non-raw element type when unpacking an IntegerArray"));
-			return QList<int64_t>();
-		}
-		ret.append(to_Integer(obj.via.array.ptr[i]));
-	}
-
-	if ( failed ) {
-		*failed = false;
-	}
-	return ret;
-}
-
-QList<int64_t> NeovimConnector::to_WindowArray(const msgpack_object& obj, bool *failed)
-{
-	return to_IntegerArray(obj, failed);
-}
-QList<int64_t> NeovimConnector::to_BufferArray(const msgpack_object& obj, bool *failed)
-{
-	return to_IntegerArray(obj, failed);
-}
-QList<int64_t> NeovimConnector::to_TabpageArray(const msgpack_object& obj, bool *failed)
-{
-	return to_IntegerArray(obj, failed);
 }
 
 /**
@@ -488,13 +266,16 @@ QList<QByteArray> NeovimConnector::parseParameterTypes(const msgpack_object& obj
 		}
 
 		for (uint32_t j=0; j<param.via.array.size; j+=2) {
-			if ( param.via.array.ptr[j].type != MSGPACK_OBJECT_RAW ||
-					param.via.array.ptr[j+1].type != MSGPACK_OBJECT_RAW ) {
+			// For full correctness we could check the parameter names
+			// type as well but we don't actually need it
+			QByteArray p;
+			bool convfail = decodeMsgpack(param.via.array.ptr[j], p);
+			if (convfail) {
 				setError( UnexpectedMsg,
-						tr("Found unexpected data when unpacking parameter value"));
+						tr("Decoding error when unpacking parameter value"));
 				return fail;
 			}
-			res.append(to_QByteArray(param.via.array.ptr[j]));
+			res.append(p);
 		}
 	}
 	return res;
@@ -568,7 +349,6 @@ void NeovimConnector::addClasses(const msgpack_object& ctable)
 					tr("Found unexpected data type for class name"));
 			return;
 		}
-		qDebug() << to_QByteArray(ctable.via.array.ptr[i]);
 	}
 }
 
@@ -608,7 +388,12 @@ void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, const
 	}
 
 	for (uint32_t i=0; i< metadata.via.map.size; i++) {
-		QByteArray key = to_QByteArray(metadata.via.map.ptr[i].key);
+		QByteArray key;
+		if (decodeMsgpack(metadata.via.map.ptr[i].key, key)) {
+			setError(MetadataDescriptorError,
+				tr("Found unexpected data type for metadata key"));
+			continue;
+		}
 		if ( key == "functions" ) {
 			addFunctions(metadata.via.map.ptr[i].val);
 		} else if ( key == "classes" ) {
@@ -648,8 +433,11 @@ void NeovimConnector::encodingChanged(Object obj)
  */
 QString NeovimConnector::decode(const QByteArray& data)
 {
-	Q_ASSERT(m_encoding);
-	return m_encoding->toUnicode(data);
+	if (m_encoding) {
+		return m_encoding->toUnicode(data);
+	} else {
+		return QString::fromUtf8(data);
+	}
 }
 
 /**
@@ -811,15 +599,14 @@ void NeovimConnector::dispatchResponse(msgpack_object& resp)
  */
 void NeovimConnector::dispatchNotification(msgpack_object& nt)
 {
-	if (nt.via.array.ptr[1].type != MSGPACK_OBJECT_RAW) {
+	QByteArray methodName;
+	if (decodeMsgpack(nt.via.array.ptr[1], methodName)) {
 		qDebug() << "Received Invalid notification: event MUST be a String";
 		return;
 	}
-	QByteArray methodName = to_QByteArray(nt.via.array.ptr[1]);
 
-	bool convfail;
-	QVariant val = to_Object(nt.via.array.ptr[2], &convfail);
-	if ( convfail || 
+	QVariant val; 
+	if (decodeMsgpack(nt.via.array.ptr[2], val) ||
 			(QMetaType::Type)val.type() != QMetaType::QVariantList  ) {
 		qDebug() << "Unable to unpack notification parameters";
 		return;
@@ -919,8 +706,8 @@ void NeovimConnector::processError(QProcess::ProcessError err)
  *
  * \see NeovimQt::NeovimConnector::msgId
  */
-NeovimRequest::NeovimRequest(uint32_t id, QObject *parent)
-:QObject(parent), m_id(id), m_function(Function::NEOVIM_FN_NULL)
+NeovimRequest::NeovimRequest(uint32_t id, NeovimConnector *c, QObject *parent)
+:QObject(parent), m_id(id), m_c(c), m_function(Function::NEOVIM_FN_NULL)
 {
 }
 
@@ -942,10 +729,9 @@ void NeovimRequest::processResponse(const msgpack_object& res, bool failed)
 	// info
 	if (res.type == MSGPACK_OBJECT_ARRAY &&
 			res.via.array.size >= 2 ) {
-		bool decode_error;
-		QString msg = NeovimConnector::decodeString(res.via.array.ptr[1], &decode_error);
-		if (!decode_error) {
-			emit error(this->m_id, m_function, msg, res);
+		QByteArray val;
+		if (!decodeMsgpack(res.via.array.ptr[1], val)) {
+			emit error(this->m_id, m_function, m_c->decode(val), res);
 			return;
 		}
 	}
