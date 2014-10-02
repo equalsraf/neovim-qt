@@ -1,4 +1,4 @@
-// Auto generated 2014-10-02 15:05:02.737293
+// Auto generated 2014-10-02 15:38:02.047087
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
@@ -15,7 +15,7 @@ protected slots:
 	void handleResponse(uint32_t id, Function::FunctionId fun, const msgpack_object&);
 	void handleResponseError(uint32_t id, Function::FunctionId fun, const QString& msg, const msgpack_object&);
 signals:
-	void error(const QString& errmsg);
+	void error(const QString& errmsg, const QVariant& errObj);
 private:
 	NeovimConnector *m_c;
 public slots:
@@ -88,62 +88,62 @@ public slots:
 
 signals:
 	void on_tabpage_get_windows(QList<int64_t>);
-	void err_tabpage_get_windows(const QString&, const msgpack_object&);
+	void err_tabpage_get_windows(const QString&, const QVariant&);
 
 	void on_tabpage_get_var(QVariant);
-	void err_tabpage_get_var(const QString&, const msgpack_object&);
+	void err_tabpage_get_var(const QString&, const QVariant&);
 
 	void on_tabpage_set_var(QVariant);
-	void err_tabpage_set_var(const QString&, const msgpack_object&);
+	void err_tabpage_set_var(const QString&, const QVariant&);
 
 	void on_tabpage_get_window(int64_t);
-	void err_tabpage_get_window(const QString&, const msgpack_object&);
+	void err_tabpage_get_window(const QString&, const QVariant&);
 
 	void on_tabpage_is_valid(bool);
 
 	void on_vim_push_keys(void);
 
 	void on_vim_command(void);
-	void err_vim_command(const QString&, const msgpack_object&);
+	void err_vim_command(const QString&, const QVariant&);
 
 	void on_vim_feedkeys(void);
 
 	void on_vim_replace_termcodes(QByteArray);
 
 	void on_vim_eval(QVariant);
-	void err_vim_eval(const QString&, const msgpack_object&);
+	void err_vim_eval(const QString&, const QVariant&);
 
 	void on_vim_strwidth(int64_t);
-	void err_vim_strwidth(const QString&, const msgpack_object&);
+	void err_vim_strwidth(const QString&, const QVariant&);
 
 	void on_vim_list_runtime_paths(QList<QByteArray>);
 
 	void on_vim_change_directory(void);
-	void err_vim_change_directory(const QString&, const msgpack_object&);
+	void err_vim_change_directory(const QString&, const QVariant&);
 
 	void on_vim_get_current_line(QByteArray);
-	void err_vim_get_current_line(const QString&, const msgpack_object&);
+	void err_vim_get_current_line(const QString&, const QVariant&);
 
 	void on_vim_set_current_line(void);
-	void err_vim_set_current_line(const QString&, const msgpack_object&);
+	void err_vim_set_current_line(const QString&, const QVariant&);
 
 	void on_vim_del_current_line(void);
-	void err_vim_del_current_line(const QString&, const msgpack_object&);
+	void err_vim_del_current_line(const QString&, const QVariant&);
 
 	void on_vim_get_var(QVariant);
-	void err_vim_get_var(const QString&, const msgpack_object&);
+	void err_vim_get_var(const QString&, const QVariant&);
 
 	void on_vim_set_var(QVariant);
-	void err_vim_set_var(const QString&, const msgpack_object&);
+	void err_vim_set_var(const QString&, const QVariant&);
 
 	void on_vim_get_vvar(QVariant);
-	void err_vim_get_vvar(const QString&, const msgpack_object&);
+	void err_vim_get_vvar(const QString&, const QVariant&);
 
 	void on_vim_get_option(QVariant);
-	void err_vim_get_option(const QString&, const msgpack_object&);
+	void err_vim_get_option(const QString&, const QVariant&);
 
 	void on_vim_set_option(void);
-	void err_vim_set_option(const QString&, const msgpack_object&);
+	void err_vim_set_option(const QString&, const QVariant&);
 
 	void on_vim_out_write(void);
 
@@ -156,114 +156,114 @@ signals:
 	void on_vim_get_current_buffer(int64_t);
 
 	void on_vim_set_current_buffer(void);
-	void err_vim_set_current_buffer(const QString&, const msgpack_object&);
+	void err_vim_set_current_buffer(const QString&, const QVariant&);
 
 	void on_vim_get_windows(QList<int64_t>);
 
 	void on_vim_get_current_window(int64_t);
 
 	void on_vim_set_current_window(void);
-	void err_vim_set_current_window(const QString&, const msgpack_object&);
+	void err_vim_set_current_window(const QString&, const QVariant&);
 
 	void on_vim_get_tabpages(QList<int64_t>);
 
 	void on_vim_get_current_tabpage(int64_t);
 
 	void on_vim_set_current_tabpage(void);
-	void err_vim_set_current_tabpage(const QString&, const msgpack_object&);
+	void err_vim_set_current_tabpage(const QString&, const QVariant&);
 
 	void on_vim_subscribe(void);
 
 	void on_vim_unsubscribe(void);
 
 	void on_vim_register_provider(void);
-	void err_vim_register_provider(const QString&, const msgpack_object&);
+	void err_vim_register_provider(const QString&, const QVariant&);
 
 	void on_buffer_get_length(int64_t);
-	void err_buffer_get_length(const QString&, const msgpack_object&);
+	void err_buffer_get_length(const QString&, const QVariant&);
 
 	void on_buffer_get_line(QByteArray);
-	void err_buffer_get_line(const QString&, const msgpack_object&);
+	void err_buffer_get_line(const QString&, const QVariant&);
 
 	void on_buffer_set_line(void);
-	void err_buffer_set_line(const QString&, const msgpack_object&);
+	void err_buffer_set_line(const QString&, const QVariant&);
 
 	void on_buffer_del_line(void);
-	void err_buffer_del_line(const QString&, const msgpack_object&);
+	void err_buffer_del_line(const QString&, const QVariant&);
 
 	void on_buffer_get_slice(QList<QByteArray>);
-	void err_buffer_get_slice(const QString&, const msgpack_object&);
+	void err_buffer_get_slice(const QString&, const QVariant&);
 
 	void on_buffer_set_slice(void);
-	void err_buffer_set_slice(const QString&, const msgpack_object&);
+	void err_buffer_set_slice(const QString&, const QVariant&);
 
 	void on_buffer_get_var(QVariant);
-	void err_buffer_get_var(const QString&, const msgpack_object&);
+	void err_buffer_get_var(const QString&, const QVariant&);
 
 	void on_buffer_set_var(QVariant);
-	void err_buffer_set_var(const QString&, const msgpack_object&);
+	void err_buffer_set_var(const QString&, const QVariant&);
 
 	void on_buffer_get_option(QVariant);
-	void err_buffer_get_option(const QString&, const msgpack_object&);
+	void err_buffer_get_option(const QString&, const QVariant&);
 
 	void on_buffer_set_option(void);
-	void err_buffer_set_option(const QString&, const msgpack_object&);
+	void err_buffer_set_option(const QString&, const QVariant&);
 
 	void on_buffer_get_number(int64_t);
-	void err_buffer_get_number(const QString&, const msgpack_object&);
+	void err_buffer_get_number(const QString&, const QVariant&);
 
 	void on_buffer_get_name(QByteArray);
-	void err_buffer_get_name(const QString&, const msgpack_object&);
+	void err_buffer_get_name(const QString&, const QVariant&);
 
 	void on_buffer_set_name(void);
-	void err_buffer_set_name(const QString&, const msgpack_object&);
+	void err_buffer_set_name(const QString&, const QVariant&);
 
 	void on_buffer_is_valid(bool);
 
 	void on_buffer_insert(void);
-	void err_buffer_insert(const QString&, const msgpack_object&);
+	void err_buffer_insert(const QString&, const QVariant&);
 
 	void on_buffer_get_mark(QPoint);
-	void err_buffer_get_mark(const QString&, const msgpack_object&);
+	void err_buffer_get_mark(const QString&, const QVariant&);
 
 	void on_window_get_buffer(int64_t);
-	void err_window_get_buffer(const QString&, const msgpack_object&);
+	void err_window_get_buffer(const QString&, const QVariant&);
 
 	void on_window_get_cursor(QPoint);
-	void err_window_get_cursor(const QString&, const msgpack_object&);
+	void err_window_get_cursor(const QString&, const QVariant&);
 
 	void on_window_set_cursor(void);
-	void err_window_set_cursor(const QString&, const msgpack_object&);
+	void err_window_set_cursor(const QString&, const QVariant&);
 
 	void on_window_get_height(int64_t);
-	void err_window_get_height(const QString&, const msgpack_object&);
+	void err_window_get_height(const QString&, const QVariant&);
 
 	void on_window_set_height(void);
-	void err_window_set_height(const QString&, const msgpack_object&);
+	void err_window_set_height(const QString&, const QVariant&);
 
 	void on_window_get_width(int64_t);
-	void err_window_get_width(const QString&, const msgpack_object&);
+	void err_window_get_width(const QString&, const QVariant&);
 
 	void on_window_set_width(void);
-	void err_window_set_width(const QString&, const msgpack_object&);
+	void err_window_set_width(const QString&, const QVariant&);
 
 	void on_window_get_var(QVariant);
-	void err_window_get_var(const QString&, const msgpack_object&);
+	void err_window_get_var(const QString&, const QVariant&);
 
 	void on_window_set_var(QVariant);
-	void err_window_set_var(const QString&, const msgpack_object&);
+	void err_window_set_var(const QString&, const QVariant&);
 
 	void on_window_get_option(QVariant);
-	void err_window_get_option(const QString&, const msgpack_object&);
+	void err_window_get_option(const QString&, const QVariant&);
 
 	void on_window_set_option(void);
-	void err_window_set_option(const QString&, const msgpack_object&);
+	void err_window_set_option(const QString&, const QVariant&);
 
 	void on_window_get_position(QPoint);
-	void err_window_get_position(const QString&, const msgpack_object&);
+	void err_window_get_position(const QString&, const QVariant&);
 
 	void on_window_get_tabpage(int64_t);
-	void err_window_get_tabpage(const QString&, const msgpack_object&);
+	void err_window_get_tabpage(const QString&, const QVariant&);
 
 	void on_window_is_valid(bool);
 

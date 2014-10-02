@@ -15,7 +15,7 @@ protected slots:
 	void handleResponse(uint32_t id, Function::FunctionId fun, const msgpack_object&);
 	void handleResponseError(uint32_t id, Function::FunctionId fun, const QString& msg, const msgpack_object&);
 signals:
-	void error(const QString& errmsg);
+	void error(const QString& errmsg, const QVariant& errObj);
 private:
 	NeovimConnector *m_c;
 public slots:
@@ -27,7 +27,7 @@ signals:
 {% for f in functions %}
 	void on_{{f.name}}({{f.real_return_type}});
 {% if f.can_fail %}
-	void err_{{f.name}}(const QString&, const msgpack_object&);
+	void err_{{f.name}}(const QString&, const QVariant&);
 {% endif%}
 
 {% endfor %}

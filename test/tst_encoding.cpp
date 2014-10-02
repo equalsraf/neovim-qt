@@ -25,7 +25,7 @@ void TestEncoding::encodeString()
 	m_c->neovimObject()->vim_set_var("testing-neovim-qt", QString("value"));
 	m_c->neovimObject()->vim_get_var("testing-neovim-qt");
 	connect(m_c->neovimObject(), &NeovimQt::Neovim::err_vim_get_var,
-			[&failed_to_set](const QString &msg, const msgpack_object& ) {
+			[&failed_to_set](const QString &msg, const QVariant& ) {
 				failed_to_set = true;
 			});
 	QTest::qWait(500);
