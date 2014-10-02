@@ -172,9 +172,9 @@ void NeovimConnector::send(const QVariant& var)
 	case QMetaType::Float:
 		msgpack_pack_float(&m_pk, var.toFloat());
 		break;
-//	case QMetaType::QString:
-//		send(var.toString());
-//		break;
+	case QMetaType::QString:
+		send(encode(var.toString()));
+		break;
 	case QMetaType::Double:
 		msgpack_pack_double(&m_pk, var.toDouble());
 		break;
@@ -189,7 +189,9 @@ void NeovimConnector::send(const QVariant& var)
 		break;
 	case QMetaType::QVariantMap:
 		{
-		QMapIterator<QString,QVariant> it(var.toMap());
+		const QVariantMap& m = var.toMap();
+		msgpack_pack_map(&m_pk, m.size());
+		QMapIterator<QString,QVariant> it(m);
 		while(it.hasNext()) {
 			it.next();
 			send(it.key());
