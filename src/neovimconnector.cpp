@@ -197,11 +197,12 @@ void NeovimConnector::send(const QVariant& var)
 		}
 		}
 		break;
-	case QMetaType::QVariant:
+	case QMetaType::QPoint:
 		// As an array [row, col]
 		msgpack_pack_array(&m_pk, 2);
 		msgpack_pack_int64(&m_pk, var.toPoint().y());
 		msgpack_pack_int64(&m_pk, var.toPoint().x());
+		break;
 	default:
 		msgpack_pack_nil(&m_pk);
 		qWarning() << "Trying to pack unsupported variant type" << var.type() << "packing Nil instead";
