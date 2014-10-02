@@ -1,6 +1,8 @@
 // Auto generated {{date}}
 #include "neovim.h"
 #include "neovimconnector.h"
+#include "neovimrequest.h"
+
 namespace NeovimQt {
 
 Neovim::Neovim(NeovimConnector *c)

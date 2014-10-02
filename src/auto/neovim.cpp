@@ -1,6 +1,8 @@
 // Auto generated 2014-10-02 15:05:02.656707
 #include "neovim.h"
 #include "neovimconnector.h"
+#include "neovimrequest.h"
+
 namespace NeovimQt {
 
 Neovim::Neovim(NeovimConnector *c)
