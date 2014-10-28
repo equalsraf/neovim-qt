@@ -12,13 +12,26 @@ import datetime
 
 INPUT = 'bindings'
 
+def decutf8(inp):
+    """
+    Recursively decode bytes as utf8 into unicode
+    """
+    if isinstance(inp, bytes):
+        return inp.decode('utf8')
+    elif isinstance(inp, list):
+        return [decutf8(x) for x in inp]
+    elif isinstance(inp, dict):
+        return {decutf8(key):decutf8(val) for key,val in inp.items()}
+    else:
+        return inp
+
 def get_api_info(nvim):
     """
     Call the neovim binary to get the api info
     """
     args = [nvim, '--api-info']
     info = subprocess.check_output(args)
-    return msgpack.unpackb(info)
+    return decutf8(msgpack.unpackb(info))
 
 def generate_file(name, outpath, **kw):
     from jinja2 import Environment, FileSystemLoader
