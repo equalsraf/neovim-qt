@@ -1,5 +1,92 @@
-// Auto generated 2014-10-02 17:02:59.015810
+// Auto generated 2014-10-28 10:51:01.258424
 const QList<Function> Function::knownFunctions = QList<Function>()
+<< Function("Integer", "buffer_line_count",
+	QList<QString>()
+			<< QString("Buffer")
+		, true)
+<< Function("String", "buffer_get_line",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("Integer")
+		, true)
+<< Function("void", "buffer_set_line",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("Integer")
+			<< QString("String")
+		, true)
+<< Function("void", "buffer_del_line",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("Integer")
+		, true)
+<< Function("ArrayOf(String)", "buffer_get_line_slice",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("Integer")
+			<< QString("Integer")
+			<< QString("Boolean")
+			<< QString("Boolean")
+		, true)
+<< Function("void", "buffer_set_line_slice",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("Integer")
+			<< QString("Integer")
+			<< QString("Boolean")
+			<< QString("Boolean")
+			<< QString("ArrayOf(String)")
+		, true)
+<< Function("Object", "buffer_get_var",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("String")
+		, true)
+<< Function("Object", "buffer_set_var",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("String")
+			<< QString("Object")
+		, true)
+<< Function("Object", "buffer_get_option",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("String")
+		, true)
+<< Function("void", "buffer_set_option",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("String")
+			<< QString("Object")
+		, true)
+<< Function("Integer", "buffer_get_number",
+	QList<QString>()
+			<< QString("Buffer")
+		, true)
+<< Function("String", "buffer_get_name",
+	QList<QString>()
+			<< QString("Buffer")
+		, true)
+<< Function("void", "buffer_set_name",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("String")
+		, true)
+<< Function("Boolean", "buffer_is_valid",
+	QList<QString>()
+			<< QString("Buffer")
+		, false)
+<< Function("void", "buffer_insert",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("Integer")
+			<< QString("ArrayOf(String)")
+		, true)
+<< Function("ArrayOf(Integer, 2)", "buffer_get_mark",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("String")
+		, true)
 << Function("ArrayOf(Window)", "tabpage_get_windows",
 	QList<QString>()
 			<< QString("Tabpage")
@@ -22,10 +109,6 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 << Function("Boolean", "tabpage_is_valid",
 	QList<QString>()
 			<< QString("Tabpage")
-		, false)
-<< Function("void", "vim_push_keys",
-	QList<QString>()
-			<< QString("String")
 		, false)
 << Function("void", "vim_command",
 	QList<QString>()
@@ -142,93 +225,6 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 		, false)
 << Function("void", "vim_register_provider",
 	QList<QString>()
-			<< QString("String")
-		, true)
-<< Function("Integer", "buffer_get_length",
-	QList<QString>()
-			<< QString("Buffer")
-		, true)
-<< Function("String", "buffer_get_line",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("Integer")
-		, true)
-<< Function("void", "buffer_set_line",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("Integer")
-			<< QString("String")
-		, true)
-<< Function("void", "buffer_del_line",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("Integer")
-		, true)
-<< Function("ArrayOf(String)", "buffer_get_slice",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("Integer")
-			<< QString("Integer")
-			<< QString("Boolean")
-			<< QString("Boolean")
-		, true)
-<< Function("void", "buffer_set_slice",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("Integer")
-			<< QString("Integer")
-			<< QString("Boolean")
-			<< QString("Boolean")
-			<< QString("ArrayOf(String)")
-		, true)
-<< Function("Object", "buffer_get_var",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("String")
-		, true)
-<< Function("Object", "buffer_set_var",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("String")
-			<< QString("Object")
-		, true)
-<< Function("Object", "buffer_get_option",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("String")
-		, true)
-<< Function("void", "buffer_set_option",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("String")
-			<< QString("Object")
-		, true)
-<< Function("Integer", "buffer_get_number",
-	QList<QString>()
-			<< QString("Buffer")
-		, true)
-<< Function("String", "buffer_get_name",
-	QList<QString>()
-			<< QString("Buffer")
-		, true)
-<< Function("void", "buffer_set_name",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("String")
-		, true)
-<< Function("Boolean", "buffer_is_valid",
-	QList<QString>()
-			<< QString("Buffer")
-		, false)
-<< Function("void", "buffer_insert",
-	QList<QString>()
-			<< QString("Buffer")
-			<< QString("Integer")
-			<< QString("ArrayOf(String)")
-		, true)
-<< Function("ArrayOf(Integer, 2)", "buffer_get_mark",
-	QList<QString>()
-			<< QString("Buffer")
 			<< QString("String")
 		, true)
 << Function("Buffer", "window_get_buffer",
