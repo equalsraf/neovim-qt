@@ -48,12 +48,7 @@ To generate the bindings yourself you need
 - python-msgpack
 - jinja2
 
-From the root project dir call
-
-    python bindings/generate_bindings.py nvim src/auto
-
-If you omit the output path you can get some info on what the generator
-found.
+Just run `make bindings`.
 
 ## TODO
 

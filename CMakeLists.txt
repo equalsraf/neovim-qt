@@ -29,3 +29,14 @@ add_subdirectory(doc)
 enable_testing()
 add_subdirectory(test)
 
+# Bindings
+find_package(PythonInterp)
+if (PYTHONINTERP_FOUND)
+	add_custom_target(bindings
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/generate_bindings.py nvim ${CMAKE_SOURCE_DIR}/src/auto
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		COMMENT "Generating bindings"
+		)
+endif()
+
+
