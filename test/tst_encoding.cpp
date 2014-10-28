@@ -87,7 +87,7 @@ void TestEncoding::initTestCase()
 		[&ready](){
 			ready = true;
 		});
-	QTest::qWait(500);
+	QTest::qWait(1500);
 	Q_ASSERT(ready);
 }
 

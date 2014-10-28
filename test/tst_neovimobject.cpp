@@ -69,11 +69,11 @@ void TestNeovimObject::eventTypes()
 void TestNeovimObject::initTestCase()
 {
 	m_c = NeovimQt::NeovimConnector::spawn();
-	Q_ASSERT(m_c->neovimObject());
-
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 			this, &TestNeovimObject::delayedSetup);
-	QTest::qWait(500);
+	QTest::qWait(1500);
+	Q_ASSERT(m_c->errorCause() == NeovimQt::NeovimConnector::NoError);
+	Q_ASSERT(m_c->neovimObject());
 }
 
 QTEST_MAIN(TestNeovimObject)
