@@ -1,6 +1,7 @@
 #include "neovimconnector.h"
 #include <QtGlobal>
 #include <QMetaMethod>
+#include <QLocalSocket>
 #include "neovimrequest.h"
 
 namespace NeovimQt {
@@ -661,6 +662,31 @@ NeovimConnector* NeovimConnector::spawn()
 	return c;
 }
 
+NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
+{
+	QLocalSocket *s = new QLocalSocket();
+	s->connectToServer(path);
+
+	NeovimConnector *c = new NeovimConnector(s);
+	connect(s, SIGNAL(error(QLocalSocket::SocketError)),
+			c, SLOT(socketError()));
+	connect(s, &QLocalSocket::connected,
+			c, &NeovimConnector::discoverMetadata);
+	// The connector raised and error because the IO device is
+	// closed - reset error state
+	c->setError(NoError, "");
+	return c;
+}
+
+NeovimConnector* NeovimConnector::connectToNeovim()
+{
+	QByteArray env = qgetenv("NVIM_LISTEN_ADDRESS");
+	if (env.isEmpty()) {
+		return spawn();
+	}
+	return connectToSocket(env);
+}
+
 /**
  * Called when running embedded Neovim to report an error
  * with the Neovim process
@@ -679,6 +705,11 @@ void NeovimConnector::processError(QProcess::ProcessError err)
 		// errors from the QIODevice
 		qDebug() << "Neovim process error " << m_dev->errorString();
 	}
+}
+
+void NeovimConnector::socketError()
+{
+	setError(SocketError, m_dev->errorString());
 }
 
 /**

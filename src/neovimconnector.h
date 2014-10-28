@@ -20,9 +20,9 @@ class NeovimConnector: public QObject
 	Q_ENUMS(NeovimError)
 public:
 	enum NeovimError {
+		NoError=0,
 		DeviceNotOpen,
 		InvalidDevice,
-		NoError,
 		NoMetadata,
 		MetadataDescriptorError,
 		UnexpectedMsg,
@@ -30,12 +30,15 @@ public:
 		NoSuchMethod,
 		FailedToStart,
 		Crashed,
-		UnsupportedEncoding
+		UnsupportedEncoding,
+		SocketError,
 	};
 
 	NeovimConnector(QIODevice* s);
 	~NeovimConnector();
 	static NeovimConnector* spawn();
+	static NeovimConnector* connectToSocket(const QString&);
+	static NeovimConnector* connectToNeovim();
 
 	NeovimError errorCause();
 	QString errorString();
@@ -83,6 +86,7 @@ protected slots:
 	void handleMetadataError(uint32_t msgid, Function::FunctionId,
 		const QString& msg, const msgpack_object& errobj);
 	void processError(QProcess::ProcessError);
+	void socketError();
 	void encodingChanged(const QVariant&);
 
 private:
