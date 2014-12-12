@@ -5,7 +5,7 @@ if ( NOT EXISTS ${NEOVIM_EXEC} )
 	set(NEOVIM_EXEC nvim)
 endif ( NOT EXISTS ${NEOVIM_EXEC} )
 
-add_definitions(-Werror -Wall -Wextra -pedantic -Wno-unused-parameter -std=c++11 -Wfatal-errors)
+add_definitions(-Werror -Wno-unused-parameter -std=c++11 -Wfatal-errors)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

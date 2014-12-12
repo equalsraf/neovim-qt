@@ -29,7 +29,7 @@ you should be using the QObject returned by NeovimConnector::neovimObject()
 ## Requirements
 
 * Qt5
-* libmsgpack
+* libmsgpack (with support for BIN/STR)
 * Neovim
 
 ## Update the RPC bindings

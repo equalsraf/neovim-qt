@@ -99,8 +99,8 @@ NeovimRequest* NeovimConnector::startRequestUnchecked(const QString& method, uin
 	msgpack_pack_int(&m_pk, 0);
 	msgpack_pack_int(&m_pk, msgid);
 	const QByteArray& utf8 = method.toUtf8();
-	msgpack_pack_raw(&m_pk, utf8.size());
-	msgpack_pack_raw_body(&m_pk, utf8.constData(), utf8.size());
+	msgpack_pack_bin(&m_pk, utf8.size());
+	msgpack_pack_bin_body(&m_pk, utf8.constData(), utf8.size());
 	msgpack_pack_array(&m_pk, argcount);
 
 	NeovimRequest *r = new NeovimRequest( msgid, this);
@@ -120,11 +120,11 @@ void NeovimConnector::send(int64_t i)
 /**
  * Serialise a value into the msgpack stream
  */
-void NeovimConnector::send(const QByteArray& raw)
+void NeovimConnector::send(const QByteArray& bin)
 {
-	qDebug() << __func__ << raw;
-	msgpack_pack_raw(&m_pk, raw.size());
-	msgpack_pack_raw_body(&m_pk, raw.constData(), raw.size());
+	qDebug() << __func__ << bin;
+	msgpack_pack_bin(&m_pk, bin.size());
+	msgpack_pack_bin_body(&m_pk, bin.constData(), bin.size());
 }
 
 /**
@@ -356,7 +356,7 @@ void NeovimConnector::addClasses(const msgpack_object& ctable)
 		return;
 	}
 	for (uint32_t i=0; i<ctable.via.array.size; i++) {
-		if ( ctable.via.array.ptr[i].type != MSGPACK_OBJECT_RAW ) {
+		if ( ctable.via.array.ptr[i].type != MSGPACK_OBJECT_BIN ) {
 			setError( UnexpectedMsg,
 					tr("Found unexpected data type for class name"));
 			return;
@@ -476,8 +476,8 @@ void NeovimConnector::sendError(const msgpack_object& req, const QString& msg)
 	msgpack_pack_int(&m_pk, 1); // 1 = Response
 	msgpack_pack_int(&m_pk, req.via.array.ptr[1].via.u64);
 	QByteArray utf8 = msg.toUtf8();
-	msgpack_pack_raw(&m_pk, utf8.size());
-	msgpack_pack_raw_body(&m_pk, utf8.constData(), utf8.size());
+	msgpack_pack_bin(&m_pk, utf8.size());
+	msgpack_pack_bin_body(&m_pk, utf8.constData(), utf8.size());
 	msgpack_pack_nil(&m_pk);
 }
 

@@ -68,10 +68,10 @@ bool checkVariant(const QVariant& var)
  */
 QByteArray toByteArray(const msgpack_object& obj)
 {
-	if ( obj.type != MSGPACK_OBJECT_RAW ) {
+	if ( obj.type != MSGPACK_OBJECT_BIN ) {
 		return QByteArray();
 	}
-	return QByteArray(obj.via.raw.ptr, obj.via.raw.size);
+	return QByteArray(obj.via.bin.ptr, obj.via.bin.size);
 }
 
 bool decodeMsgpack(const msgpack_object& in, bool& out)
@@ -87,12 +87,12 @@ bool decodeMsgpack(const msgpack_object& in, bool& out)
 
 bool decodeMsgpack(const msgpack_object& in, QByteArray& out)
 {
-	if ( in.type != MSGPACK_OBJECT_RAW) {
+	if ( in.type != MSGPACK_OBJECT_BIN) {
 		qWarning() << "Attempting to decode as QByteArray when type is" << in.type << in;
 		out = QByteArray();
 		return true;
 	}
-	out = QByteArray(in.via.raw.ptr, in.via.raw.size);
+	out = QByteArray(in.via.bin.ptr, in.via.bin.size);
 	return false;
 }
 
@@ -191,7 +191,7 @@ bool decodeMsgpack(const msgpack_object& in, QVariant& out)
 	case MSGPACK_OBJECT_DOUBLE:
 		out = in.via.dec;
 		break;
-	case MSGPACK_OBJECT_RAW:
+	case MSGPACK_OBJECT_BIN:
 		{
 		QByteArray val;
 		if (decodeMsgpack(in, val)) {
@@ -273,8 +273,8 @@ QDebug operator<<(QDebug dbg, const msgpack_object& obj)
 	case MSGPACK_OBJECT_DOUBLE:
 		dbg.space() <<  obj.via.dec;
 		break;
-	case MSGPACK_OBJECT_RAW:
-		dbg.space() << QByteArray(obj.via.raw.ptr, obj.via.raw.size);
+	case MSGPACK_OBJECT_BIN:
+		dbg.space() << QByteArray(obj.via.bin.ptr, obj.via.bin.size);
 		break;
 	case MSGPACK_OBJECT_ARRAY:
 		dbg.nospace() << "[";

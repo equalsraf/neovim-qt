@@ -106,22 +106,22 @@ Function Function::fromMsgpack(const msgpack_object& fun)
 	}
 
 	for (uint32_t i=0; i<fun.via.map.size; i++) {
-		if ( fun.via.map.ptr[i].key.type != MSGPACK_OBJECT_RAW ) {
+		if ( fun.via.map.ptr[i].key.type != MSGPACK_OBJECT_BIN ) {
 			return f;
 		}
 
 		QString key = toByteArray(fun.via.map.ptr[i].key);
 		msgpack_object& val = fun.via.map.ptr[i].val;
 		if ( key == "return_type" ) {
-			if ( val.type != MSGPACK_OBJECT_RAW ) {
+			if ( val.type != MSGPACK_OBJECT_BIN ) {
 				return f;
 			}
-			f.return_type = QString::fromUtf8(val.via.raw.ptr, val.via.raw.size);
+			f.return_type = QString::fromUtf8(val.via.bin.ptr, val.via.bin.size);
 		} else if ( key == "name" ) {
-			if ( val.type != MSGPACK_OBJECT_RAW ) {
+			if ( val.type != MSGPACK_OBJECT_BIN ) {
 				return f;
 			}
-			f.name = QString::fromUtf8(val.via.raw.ptr, val.via.raw.size);
+			f.name = QString::fromUtf8(val.via.bin.ptr, val.via.bin.size);
 		} else if ( key == "can_fail" ) {
 			if ( val.type != MSGPACK_OBJECT_BOOLEAN ) {
 				return f;
@@ -169,8 +169,8 @@ QList<QPair<QString,QString> > Function::parseParameters(const msgpack_object& o
 		}
 
 		for (uint32_t j=0; j<param.via.array.size; j+=2) {
-			if ( param.via.array.ptr[j].type != MSGPACK_OBJECT_RAW ||
-					param.via.array.ptr[j+1].type != MSGPACK_OBJECT_RAW ) {
+			if ( param.via.array.ptr[j].type != MSGPACK_OBJECT_BIN ||
+					param.via.array.ptr[j+1].type != MSGPACK_OBJECT_BIN ) {
 				return fail;
 			}
 			QPair<QString,QString> arg(
