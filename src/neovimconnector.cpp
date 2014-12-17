@@ -669,7 +669,7 @@ NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 	s->connectToServer(path);
 
 	NeovimConnector *c = new NeovimConnector(s);
-	connect(s, SIGNAL(error(QLocalSocket::SocketError)),
+	connect(s, SIGNAL(error(QLocalSocket::LocalSocketError)),
 			c, SLOT(socketError()));
 	connect(s, &QLocalSocket::connected,
 			c, &NeovimConnector::discoverMetadata);
