@@ -36,7 +36,7 @@ public:
 
 	NeovimConnector(QIODevice* s);
 	~NeovimConnector();
-	static NeovimConnector* spawn();
+	static NeovimConnector* spawn(const QStringList& params=QStringList());
 	static NeovimConnector* connectToSocket(const QString&);
 	static NeovimConnector* connectToNeovim();
 

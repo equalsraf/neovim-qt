@@ -644,11 +644,12 @@ Neovim* NeovimConnector::neovimObject()
 /**
  * Launch an embedded Neovim process
  */
-NeovimConnector* NeovimConnector::spawn()
+NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 {
 	QProcess *p = new QProcess();
 	QStringList args;
 	args << "--embed";
+	args += params;
 	p->start("nvim", args);
 
 	NeovimConnector *c = new NeovimConnector(p);
