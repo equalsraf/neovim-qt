@@ -22,9 +22,8 @@ you should be using the QObject returned by NeovimConnector::neovimObject()
    metadata
 5. For Neovim functions that take the **Object** type we use **QVariant**,
    this seems to be the natural equivalent in Qt
-6. Neovim has recently started supporting event notifications, via
-   vim\_subscribe(), you can connect to the Neovim::neovimEvent
-   signal to catch them
+6. To catch Neovim Notifications  you can connect to the
+   Neovim::neovimNotification signal
 
 ## Requirements
 

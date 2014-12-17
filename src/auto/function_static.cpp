@@ -1,4 +1,4 @@
-// Auto generated 2014-12-12 14:41:02.456427
+// Auto generated 2014-12-17 13:40:01.722351
 const QList<Function> Function::knownFunctions = QList<Function>()
 << Function("void", "vim_command",
 	QList<QString>()

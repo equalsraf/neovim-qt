@@ -1,4 +1,4 @@
-// Auto generated 2014-12-12 14:41:02.429209
+// Auto generated 2014-12-17 13:40:01.695727
 enum FunctionId {
 	NEOVIM_FN_VIM_COMMAND,
 	NEOVIM_FN_VIM_FEEDKEYS,

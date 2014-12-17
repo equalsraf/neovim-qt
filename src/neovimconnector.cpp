@@ -624,7 +624,7 @@ void NeovimConnector::dispatchNotification(msgpack_object& nt)
 		return;
 	}
 	if (m_neovimobj) {
-		emit m_neovimobj->neovimEvent(methodName, val.toList());
+		emit m_neovimobj->neovimNotification(methodName, val.toList());
 	}
 }
 
@@ -729,9 +729,9 @@ void NeovimConnector::socketError()
  */
 
 /**
- * \fn NeovimQt::Neovim::neovimEvent(const QByteArray &name, const QVariantList& args)
+ * \fn NeovimQt::Neovim::neovimNotification(const QByteArray &name, const QVariantList& args)
  *
- * Signal emitted when Neovim sends a notification withen given name and args
+ * Signal emitted when Neovim sends a notification with given name and args
  */
 
 
