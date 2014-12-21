@@ -83,6 +83,28 @@ int NeovimConnector::msgpack_write_cb(void* data, const char* buf, unsigned long
 	return c->m_dev->write(buf, len);
 }
 
+void NeovimConnector::attachUi(int64_t width, int64_t height)
+{
+	// FIXME: this should be in class Neovim
+	startRequestUnchecked("ui_attach", 2);
+	send(width);
+	send(height);
+}
+
+void NeovimConnector::detachUi()
+{
+	// FIXME: this should be in class Neovim
+	startRequestUnchecked("ui_detach", 0);
+}
+
+void NeovimConnector::tryResizeUi(int64_t width, int64_t height)
+{
+	// FIXME: this should be in class Neovim
+	startRequestUnchecked("ui_try_resize", 2);
+	send(width);
+	send(height);
+}
+
 /**
  * Start an RPC request
  *

@@ -43,6 +43,11 @@ public:
 	NeovimError errorCause();
 	QString errorString();
 
+	// FIXME: remove this
+	void attachUi(int64_t width, int64_t height);
+	void detachUi();
+	void tryResizeUi(int64_t width, int64_t height);
+
 	NeovimRequest* startRequestUnchecked(const QString& method, uint32_t argcount);
 
 	// Methods to pack datatypes as message pack
