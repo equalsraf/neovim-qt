@@ -448,6 +448,7 @@ QString NeovimConnector::decode(const QByteArray& data)
 	if (m_encoding) {
 		return m_encoding->toUnicode(data);
 	} else {
+		qWarning() << "Calling ::decode on a closed connector";
 		return QString::fromUtf8(data);
 	}
 }
@@ -458,8 +459,12 @@ QString NeovimConnector::decode(const QByteArray& data)
  */
 QByteArray NeovimConnector::encode(const QString& str)
 {
-	Q_ASSERT(m_encoding);
-	return m_encoding->fromUnicode(str);
+	if (m_encoding) {
+		return m_encoding->fromUnicode(str);
+	} else {
+		qWarning() << "Calling ::encode on a closed connector";
+		return str.toUtf8();
+	}
 }
 
 /**
