@@ -686,6 +686,7 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 	QProcess *p = new QProcess();
 	QStringList args = params;
 	args << "--embed";
+	args << "-T" << "abstract_ui";
 	p->start("nvim", args);
 
 	NeovimConnector *c = new NeovimConnector(p);
