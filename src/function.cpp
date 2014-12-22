@@ -136,6 +136,8 @@ Function Function::fromMsgpack(const msgpack_object& fun)
 			// Deprecated
 		} else if ( key == "receives_channel_id" ) {
 			// Internal
+		} else if ( key == "deferred" ) {
+			// Internal
 		} else {
 			qWarning() << "Unsupported function attribute"<< key << val.type;
 		}
