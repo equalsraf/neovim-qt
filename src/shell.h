@@ -23,6 +23,7 @@ public slots:
 
 protected slots:
 	void neovimIsReady();
+	void neovimError(NeovimConnector::NeovimError);
 
 protected:
 	quint64 neovimWidth() const;
@@ -51,6 +52,7 @@ protected:
 	virtual void handleCursorOff(QPainter& painter);
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 private:
+	bool m_attached;
 	NeovimConnector *m_nvim;
 	uint64_t m_rows, m_cols;
 	QRect m_scroll_region;

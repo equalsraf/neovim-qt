@@ -10,7 +10,7 @@
 namespace NeovimQt {
 
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
-:QWidget(parent), m_nvim(nvim), m_cols(1), m_rows(1), m_fm(NULL),
+:QWidget(parent), m_attached(false), m_nvim(nvim), m_cols(1), m_rows(1), m_fm(NULL),
 	m_foreground(Qt::black), m_background(Qt::white), m_cursor_pos(0,0),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
 	m_cursor(false), m_cursor_color(Qt::white)
@@ -39,11 +39,15 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 
 	connect(m_nvim, &NeovimConnector::ready,
 			this, &Shell::neovimIsReady);
+	connect(m_nvim, &NeovimConnector::error,
+			this, &Shell::neovimError);
 }
 
 Shell::~Shell()
 {
-	m_nvim->detachUi();
+	if (m_nvim && m_attached) {
+		m_nvim->detachUi();
+	}
 }
 
 /** Neovim shell width in pixels (does not include extra margin) */
@@ -83,7 +87,11 @@ QSize Shell::sizeIncrement() const
 
 QSize Shell::sizeHint() const
 {
-	return neovimSize();
+	if (m_attached) {
+		return neovimSize();
+	} else {
+		return QWidget::sizeHint();
+	}
 }
 
 /** Pixel size of the Neovim shell */
@@ -100,9 +108,11 @@ QPoint Shell::neovimCursorTopLeft()
 
 void Shell::neovimIsReady()
 {
-	if (!m_nvim->neovimObject()) {
+	if (!m_nvim || !m_nvim->neovimObject()) {
 		return;
 	}
+	// FIXME: Don't set this here, wait for return from ui_attach instead
+	m_attached = true;
 
 	connect(m_nvim->neovimObject(), &Neovim::neovimNotification,
 			this, &Shell::handleNeovimNotification);
@@ -113,6 +123,14 @@ void Shell::neovimIsReady()
 	// FIXME: connect to neovimObject()->on_ui_try_resize
 
 	m_nvim->neovimObject()->vim_command("redraw!");
+}
+
+void Shell::neovimError(NeovimConnector::NeovimError err)
+{
+	if (m_attached) {
+		m_attached = false;
+		update();
+	}
 }
 
 /**
@@ -432,6 +450,11 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 void Shell::paintEvent(QPaintEvent *ev)
 {
 	QPainter painter(this);
+	if (!m_attached) {
+		painter.eraseRect(rect());
+		return;
+	}
+
 	QRegion imageReg(QRect(QPoint(0,0),neovimSize()));
 	QRegion intersection = imageReg.intersected(ev->region());
 	QRegion diff = ev->region().subtracted(imageReg);
@@ -456,6 +479,9 @@ void Shell::paintEvent(QPaintEvent *ev)
 
 void Shell::keyPressEvent(QKeyEvent *ev)
 {
+	if (!m_nvim || !m_attached) {
+		return;
+	}
 	// TODO: need to figure out how special keys and keyboard modifiers
 	// work for Neovim - for now simple keys only
 
@@ -474,7 +500,8 @@ void Shell::resizeEvent(QResizeEvent *ev)
 	// Call Neovim to resize
 	int64_t cols = ev->size().width()/neovimCellWidth();
 	int64_t rows = ev->size().height()/neovimRowHeight();
-	if (cols != m_cols || rows != m_rows) {
+	if (m_nvim && m_attached &&
+			(cols != m_cols || rows != m_rows) ) {
 		qDebug() << "Calling neovim to resize" << ev->size() << cols << rows << m_cols << m_rows;
 		// FIXME: Neovim will ignore simultaneous calls to resize - e.g. queue calls
 		m_nvim->tryResizeUi(cols, rows);
