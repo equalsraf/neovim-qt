@@ -521,4 +521,14 @@ void Shell::changeEvent( QEvent *ev)
 	QWidget::changeEvent(ev);
 }
 
+void Shell::closeEvent(QCloseEvent *ev)
+{
+	if (m_attached) {
+		ev->ignore();
+		m_nvim->neovimObject()->vim_command("qa");
+	} else {
+		QWidget::closeEvent(ev);
+	}
+}
+
 } // Namespace
