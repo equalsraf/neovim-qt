@@ -61,6 +61,7 @@ public:
 signals:
 	void ready();
 	void error(NeovimError);
+	void processExited(int exitCode);
 
 protected:
 	void setError(NeovimError err, const QString& msg);

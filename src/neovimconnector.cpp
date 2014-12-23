@@ -656,6 +656,8 @@ Neovim* NeovimConnector::neovimObject()
 
 /**
  * Launch an embedded Neovim process
+ *
+ * Use ::processExited to know when the process has exited
  */
 NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 {
@@ -667,6 +669,8 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 	NeovimConnector *c = new NeovimConnector(p);
 	connect(p, SIGNAL(error(QProcess::ProcessError)),
 			c, SLOT(processError(QProcess::ProcessError)));
+	connect(p, SIGNAL(finished(int, QProcess::ExitStatus)),
+			c, SIGNAL(processExited(int)));
 	connect(p, &QProcess::started,
 			c, &NeovimConnector::discoverMetadata);
 	// The connector raised and error because the IO device is
@@ -746,6 +750,12 @@ void NeovimConnector::socketError()
  * Signal emitted when Neovim sends a notification with given name and args
  */
 
+/**
+ * \fn NeovimQt::NeovimConnector::processExited(int exitStatus)
+ *
+ * If the Neovim process was started using NeovimQt::NeovimConnector::spawn this signal
+ * is emitted when the process exits.
+ */
 
 } // namespace NeovimQt
 
