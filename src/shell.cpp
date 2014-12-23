@@ -189,6 +189,9 @@ void Shell::handleHighlightSet(const QVariantMap& attrs, QPainter& painter)
 	painter.setFont(f);
 }
 
+/**
+ * Paint a character and advance the cursor by one
+ */
 void Shell::handlePut(const QVariantList& args, QPainter& painter)
 {
 	if (args.size() != 1 || (QMetaType::Type)args.at(0).type() != QMetaType::QByteArray) {
@@ -196,27 +199,29 @@ void Shell::handlePut(const QVariantList& args, QPainter& painter)
 		return;
 	}
 
-	painter.save();
 	QString text = m_nvim->decode(args.at(0).toByteArray());
-
 	QRect updateRect(neovimCursorTopLeft(),
-			QSize(text.size()*neovimCellWidth(), neovimRowHeight())
-		);
+			QSize(neovimCellWidth(), neovimRowHeight()));
 
-	// We don't trust fonts to fit inside the cell - clip them
-	painter.setClipRect(updateRect);
-	painter.eraseRect(updateRect);
+	if (!text.isEmpty()) {
+		painter.save();
+		// Clip the text - but still allow it to go into the next cell, it
+		// may be a fullwidth char
+		QRect clipRect(neovimCursorTopLeft(),
+				QSize(neovimCellWidth()*2, neovimRowHeight()));
+		painter.setClipRect(clipRect);
 
-	// Draw text at the baseline
-	QPoint pos(m_cursor_pos.x()*neovimCellWidth(), m_cursor_pos.y()*neovimRowHeight()+m_fm->ascent());
-	painter.drawText(pos, text);
+		// Draw text at the baseline
+		QPoint pos(m_cursor_pos.x()*neovimCellWidth(), m_cursor_pos.y()*neovimRowHeight()+m_fm->ascent());
+		painter.drawText(pos, text.at(0));
+
+		painter.restore();
+	}
+
 	update(updateRect);
-
 	// Move cursor ahead
-	m_cursor_pos.setX(m_cursor_pos.x() + text.size());
+	m_cursor_pos.setX(m_cursor_pos.x() + 1);
 	update(QRect(neovimCursorTopLeft(), neovimCharSize()));
-
-	painter.restore();
 }
 
 /**
@@ -428,14 +433,19 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		const QByteArray& name = redrawupdate.at(0).toByteArray();
 		const QVariantList& update_args = redrawupdate.mid(1);
 
-//		if (name == "put") {
-//			// TODO: merge put() calls into a single call if possible
-//			// continue - requires "proper" Monospace fonts
-//			QByteArray data;
-//			foreach (const QVariant& opargs_var, update_args) {
-//				data += opargs_var.toList().at(0).toByteArray();
-//			}
-//		}
+		if (name == "put") {
+			// A redraw:put does three things
+			// 1. Paints the cell background
+			// 2. Draws a char
+			// 3. Advance the cursor by one
+			//
+			// We draw the background here and leave 2/3 to handlePut
+			quint64 cells = update_args.size();
+			QRect bgRect(neovimCursorTopLeft(),
+					QSize(cells*neovimCellWidth(), neovimRowHeight())
+				);
+			painter.eraseRect(bgRect);
+		}
 
 		foreach (const QVariant& opargs_var, update_args) {
 			if ((QMetaType::Type)opargs_var.type() != QMetaType::QVariantList) {
