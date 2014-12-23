@@ -5,7 +5,10 @@ if ( NOT EXISTS ${NEOVIM_EXEC} )
 	set(NEOVIM_EXEC nvim)
 endif ( NOT EXISTS ${NEOVIM_EXEC} )
 
-add_definitions(-Werror -Wno-unused-parameter -std=c++11 -Wfatal-errors)
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR 
+		"${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	add_definitions(-Werror -Wall -Wextra -Wno-unused-parameter -std=c++11 -Wfatal-errors)
+endif()
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
