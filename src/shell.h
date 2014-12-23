@@ -24,6 +24,7 @@ public slots:
 protected slots:
 	void neovimIsReady();
 	void neovimError(NeovimConnector::NeovimError);
+	void neovimExited(int);
 
 protected:
 	quint64 neovimWidth() const;

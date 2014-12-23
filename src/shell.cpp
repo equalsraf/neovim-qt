@@ -41,6 +41,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 			this, &Shell::neovimIsReady);
 	connect(m_nvim, &NeovimConnector::error,
 			this, &Shell::neovimError);
+	connect(m_nvim, &NeovimConnector::processExited,
+			this, &Shell::neovimExited);
 }
 
 Shell::~Shell()
@@ -131,6 +133,13 @@ void Shell::neovimError(NeovimConnector::NeovimError err)
 		m_attached = false;
 		update();
 	}
+}
+
+/** The Neovim process has exited */
+void Shell::neovimExited(int status)
+{
+	m_attached = false;
+	close();
 }
 
 /**
