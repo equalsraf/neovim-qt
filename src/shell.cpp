@@ -10,10 +10,10 @@
 namespace NeovimQt {
 
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
-:QWidget(parent), m_attached(false), m_nvim(nvim), m_cols(1), m_rows(1), m_fm(NULL),
-	m_foreground(Qt::black), m_background(Qt::white), m_cursor_pos(0,0),
+:QWidget(parent), m_attached(false), m_nvim(nvim), m_rows(1), m_cols(1), m_fm(NULL),
+	m_foreground(Qt::black), m_background(Qt::white),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
-	m_cursor(false), m_cursor_color(Qt::white)
+	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_cursor(false)
 {
 	QFont f;
 	f.setStyleStrategy(QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics) );
@@ -507,8 +507,8 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 void Shell::resizeEvent(QResizeEvent *ev)
 {
 	// Call Neovim to resize
-	int64_t cols = ev->size().width()/neovimCellWidth();
-	int64_t rows = ev->size().height()/neovimRowHeight();
+	uint64_t cols = ev->size().width()/neovimCellWidth();
+	uint64_t rows = ev->size().height()/neovimRowHeight();
 	if (m_nvim && m_attached &&
 			(cols != m_cols || rows != m_rows) ) {
 		qDebug() << "Calling neovim to resize" << ev->size() << cols << rows << m_cols << m_rows;
