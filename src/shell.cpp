@@ -338,7 +338,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 		painter.fillRect(clearRect, m_background);
 		update(clearRect);
 	} else if (name == "cursor_goto"){
-		if (opargs.size() != 2 || !opargs.at(0).canConvert<quint64>(),
+		if (opargs.size() != 2 || !opargs.at(0).canConvert<quint64>() ||
 				!opargs.at(1).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
