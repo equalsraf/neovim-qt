@@ -546,8 +546,8 @@ void NeovimConnector::dispatch(msgpack_object& req)
 			sendError(req, tr("Msg Id must be a positive integer"));
 			return;
 		}
-		if (req.via.array.ptr[2].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
-			qDebug() << "Received Invalid request: method MUST be a positive integer" << req.via.array.ptr[2].type;
+		if (req.via.array.ptr[2].type != MSGPACK_OBJECT_BIN) {
+			qDebug() << "Received Invalid request: method MUST be a binary string" << req.via.array.ptr[2];
 			sendError(req, tr("Method id must be a positive integer"));
 			return;
 		}
@@ -576,13 +576,21 @@ void NeovimConnector::dispatch(msgpack_object& req)
 /**
  * Handle request message
  *
- * \todo Respond with error
- *
- * [type(0), msgid(uint), method(int), args([...])]
+ * [type(0), msgid(uint), method(bin), args([...])]
  */
 void NeovimConnector::dispatchRequest(msgpack_object& req)
 {
-	qWarning() << "We do not support requests (yet)";
+	qDebug() << "Received request for unknown method" << req.via.array.ptr[2];
+	uint64_t msgid = req.via.array.ptr[1].via.u64;
+
+	// Send error reply [type(1), msgid, error, NIL]
+	msgpack_pack_array(&m_pk, 4);
+	msgpack_pack_int(&m_pk, 1);
+	msgpack_pack_int(&m_pk, msgid);
+	QByteArray err = encode(tr("Unknown method"));
+	msgpack_pack_bin(&m_pk, err.size());
+	msgpack_pack_bin_body(&m_pk, err.constData(), err.size());
+	msgpack_pack_nil(&m_pk);
 }
 
 /**
