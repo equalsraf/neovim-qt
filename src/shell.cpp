@@ -6,6 +6,7 @@
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QKeyEvent>
+#include "input.h"
 
 namespace NeovimQt {
 
@@ -501,16 +502,14 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 	if (!m_nvim || !m_attached) {
 		return;
 	}
-	// TODO: need to figure out how special keys and keyboard modifiers
-	// work for Neovim - for now simple keys only
-
 	// FIXME mousehide - conceal mouse pointer when typing
-	// FIXME: handle special keys and modifiers
-	if (!ev->text().size()) {
+
+	QString inp = Input.convertKey(ev->text(), ev->key(), ev->modifiers());
+	if (inp.isEmpty()) {
 		return;
 	}
 
-	m_nvim->neovimObject()->vim_input(m_nvim->encode(ev->text()));
+	m_nvim->neovimObject()->vim_input(m_nvim->encode(inp));
 	// FIXME: bytes might not be written, and need to be buffered
 }
 

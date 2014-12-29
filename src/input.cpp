@@ -1,0 +1,107 @@
+
+#include "input.h"
+#include <QDebug>
+
+namespace NeovimQt {
+
+InputConv Input;
+
+InputConv::InputConv() {
+	// see :h key-notation
+
+	// special keys i.e. no textual representation
+	specialKeys.insert(Qt::Key_Up, "Up");
+	specialKeys.insert(Qt::Key_Down, "Down");
+	specialKeys.insert(Qt::Key_Left, "Left");
+	specialKeys.insert(Qt::Key_Right, "Right");
+
+	specialKeys.insert(Qt::Key_F1, "F1");
+	specialKeys.insert(Qt::Key_F2, "F2");
+	specialKeys.insert(Qt::Key_F3, "F3");
+	specialKeys.insert(Qt::Key_F4, "F4");
+	specialKeys.insert(Qt::Key_F5, "F5");
+	specialKeys.insert(Qt::Key_F6, "F6");
+	specialKeys.insert(Qt::Key_F7, "F7");
+	specialKeys.insert(Qt::Key_F8, "F8");
+	specialKeys.insert(Qt::Key_F9, "F9");
+	specialKeys.insert(Qt::Key_F10, "F10");
+	specialKeys.insert(Qt::Key_F11, "F11");
+	specialKeys.insert(Qt::Key_F12, "F12");
+
+	specialKeys.insert(Qt::Key_Backspace, "BS");
+	specialKeys.insert(Qt::Key_Delete, "Del");
+	specialKeys.insert(Qt::Key_Insert, "Insert");
+	specialKeys.insert(Qt::Key_Home, "Home");
+	specialKeys.insert(Qt::Key_End, "End");
+	specialKeys.insert(Qt::Key_PageUp, "PageUp");
+	specialKeys.insert(Qt::Key_PageDown, "PageDown");
+
+	specialKeys.insert(Qt::Key_Return, "Enter");
+	specialKeys.insert(Qt::Key_Enter, "Enter");
+	specialKeys.insert(Qt::Key_Tab, "Tab");
+	specialKeys.insert(Qt::Key_Backtab, "Tab");
+	specialKeys.insert(Qt::Key_Escape, "Esc");
+
+	specialKeys.insert(Qt::Key_Backslash, "Bslash");
+	specialKeys.insert(Qt::Key_Less, "lt");
+	specialKeys.insert(Qt::Key_Space, "Space");
+}
+
+/**
+ * Return keyboard modifier prefix 
+ *
+ * e.g. C-, A- or C-S-A-
+ */
+QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
+{
+	// FIXME: Mac and Meta check the Qt docs
+	QString modprefix;
+	if ( mod & Qt::ControlModifier ) {
+		modprefix += "C-";
+	}
+	if ( mod & Qt::ShiftModifier ) {
+		modprefix += "S-";
+	} 
+	if ( mod & Qt::AltModifier ) {
+		modprefix += "A-";
+	}
+	return modprefix;
+}
+
+/**
+ * Convert Qt key input into Neovim key-notation
+ *
+ * see QKeyEvent
+ */
+QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers mod)
+{
+	if (specialKeys.contains(k)) {
+		return QString("<%1%2>").arg(modPrefix(mod)).arg(specialKeys.value(k));
+	} else if (text.isEmpty()) {
+		// This is a special key we can't handle
+		return QString();
+	}
+
+	// Escape < and backslash
+	if (text == "<") {
+		return QString("<%1%2>").arg(modPrefix(mod)).arg("lt");
+	}
+	if (text == "\\") {
+		return QString("<%1%2>").arg(modPrefix(mod)).arg("Bslash");
+	}
+
+	QChar c = text.at(0);
+	// Remove SHIFT
+	if (c.unicode() < 0x100 && !c.isLetterOrNumber() && c.isPrint()) {
+		mod &= ~Qt::ShiftModifier;
+	}
+
+	// Remove CTRL
+	if (c.unicode() < 0x20) {
+		mod &= ~Qt::ControlModifier;
+	}
+
+	return text;
+}
+
+} // Namespace
