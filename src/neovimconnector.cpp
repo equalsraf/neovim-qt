@@ -671,8 +671,6 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 			c, SLOT(processError(QProcess::ProcessError)));
 	connect(p, SIGNAL(finished(int, QProcess::ExitStatus)),
 			c, SIGNAL(processExited(int)));
-	connect(p, &QProcess::started,
-			c, &NeovimConnector::discoverMetadata);
 	// The connector raised and error because the IO device is
 	// closed - reset error state
 	c->setError(NoError, "");
