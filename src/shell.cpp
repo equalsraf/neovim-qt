@@ -124,8 +124,6 @@ void Shell::neovimIsReady()
 	m_nvim->attachUi(screenRect.width()/neovimCellWidth(), screenRect.height()/neovimRowHeight());
 
 	// FIXME: connect to neovimObject()->on_ui_try_resize
-
-	m_nvim->neovimObject()->vim_command("redraw!");
 }
 
 void Shell::neovimError(NeovimConnector::NeovimError err)
