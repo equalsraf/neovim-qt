@@ -14,7 +14,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 :QWidget(parent), m_attached(false), m_nvim(nvim), m_rows(1), m_cols(1), m_fm(NULL),
 	m_foreground(Qt::black), m_background(Qt::white),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
-	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_cursor(false)
+	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_cursor(false), m_insertMode(false)
 {
 	QFont f;
 	f.setStyleStrategy(QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics) );
@@ -401,10 +401,12 @@ void Shell::setCursor(quint64 row, quint64 col)
 
 void Shell::handleNormalMode(QPainter& painter)
 {
+	m_insertMode = false;
 }
 
 void Shell::handleInsertMode(QPainter& painter)
 {
+	m_insertMode = true;
 }
 
 // FIXME: fix QVariant type conversions
@@ -490,6 +492,10 @@ void Shell::paintEvent(QPaintEvent *ev)
 	// just invert the shell colors by painting white with XoR
 	if (m_cursor && ev->region().contains(neovimCursorTopLeft())) {
 		QRect cursorRect(neovimCursorTopLeft(), neovimCharSize());
+
+		if (m_insertMode) {
+			cursorRect.setWidth(2);
+		}
 		painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
 		painter.fillRect(cursorRect, m_cursor_color);
 	}

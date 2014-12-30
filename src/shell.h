@@ -73,6 +73,7 @@ private:
 
 	QPoint m_cursor_pos;
 	bool m_cursor;
+	bool m_insertMode;
 };
 
 } // Namespace
