@@ -50,8 +50,6 @@ protected:
 	virtual void handleScroll(const QVariantList& args, QPainter& painter);
 	virtual void handleNormalMode(QPainter& painter);
 	virtual void handleInsertMode(QPainter& painter);
-	virtual void handleCursorOn(QPainter& painter);
-	virtual void handleCursorOff(QPainter& painter);
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 private:
 	bool m_attached;

@@ -14,7 +14,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 :QWidget(parent), m_attached(false), m_nvim(nvim), m_rows(1), m_cols(1), m_fm(NULL),
 	m_foreground(Qt::black), m_background(Qt::white),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
-	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_cursor(false), m_insertMode(false)
+	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false)
 {
 	QFont f;
 	f.setStyleStrategy(QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics) );
@@ -356,10 +356,6 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 		handleScroll(opargs, painter);
 	} else if (name == "set_scroll_region"){
 		handleSetScrollRegion(opargs);
-	} else if (name == "cursor_on"){
-		handleCursorOn(painter);
-	} else if (name == "cursor_off"){
-		handleCursorOff(painter);
 	} else if (name == "mouse_on"){
 		QApplication::restoreOverrideCursor();
 	} else if (name == "mouse_off"){
@@ -374,29 +370,11 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 
 }
 
-void Shell::handleCursorOn(QPainter& painter)
-{
-	// FIXME: what about wide chars?
-	m_cursor = true;
-	update(QRect(neovimCursorTopLeft(), neovimCharSize()));
-}
-
-void Shell::handleCursorOff(QPainter& painter)
-{
-	// FIXME: what about wide chars?
-	m_cursor = false;
-	update(QRect(neovimCursorTopLeft(), neovimCharSize()));
-}
-
 void Shell::setCursor(quint64 row, quint64 col)
 {
-	if (m_cursor) {
-		update(QRect(neovimCursorTopLeft(), neovimCharSize()));
-	}
+	update(QRect(neovimCursorTopLeft(), neovimCharSize()));
 	m_cursor_pos = QPoint(col, row);
-	if (m_cursor) {
-		update(QRect(neovimCursorTopLeft(), neovimCharSize()));
-	}
+	update(QRect(neovimCursorTopLeft(), neovimCharSize()));
 }
 
 void Shell::handleNormalMode(QPainter& painter)
@@ -490,7 +468,7 @@ void Shell::paintEvent(QPaintEvent *ev)
 
 	// paint cursor - we are not actually using Neovim colors yet,
 	// just invert the shell colors by painting white with XoR
-	if (m_cursor && ev->region().contains(neovimCursorTopLeft())) {
+	if (ev->region().contains(neovimCursorTopLeft())) {
 		QRect cursorRect(neovimCursorTopLeft(), neovimCharSize());
 
 		if (m_insertMode) {
