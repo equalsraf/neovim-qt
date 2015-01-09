@@ -77,7 +77,6 @@ bool Function::operator==(const Function& other)
 	}
 
 	if ( this->can_fail != other.can_fail ) {
-		qDebug() << __func__ << *this << other;
 		return false;
 	}
 

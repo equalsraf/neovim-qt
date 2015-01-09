@@ -132,7 +132,7 @@ NeovimRequest* NeovimConnector::startRequestUnchecked(const QString& method, uin
 }
 
 /**
- * Serialise a valud into the msgpack stream
+ * Serialise a value into the msgpack stream
  */
 void NeovimConnector::send(int64_t i)
 {
@@ -173,7 +173,7 @@ void NeovimConnector::send(const QList<QByteArray>& list)
 }
 
 /**
- * Serialise a valud into the msgpack stream
+ * Serialise a value into the msgpack stream
  *
  * We use QVariants for RPC functions that use the *Object* type. Do not use
  * this in any other conditions
@@ -454,7 +454,6 @@ void NeovimConnector::encodingChanged(const QVariant&  obj)
 	const QByteArray enc_name = obj.toByteArray();
 	m_encoding = QTextCodec::codecForName(enc_name);
 	if (m_encoding) {
-		qDebug() << "Neovim &encoding is " << m_encoding->name();
 		emit ready();
 	} else {
 		setError(UnsupportedEncoding, QString("Unsupported &encoding (%1)").arg(QString::fromLatin1(enc_name)));
