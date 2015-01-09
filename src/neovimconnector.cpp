@@ -86,9 +86,10 @@ int NeovimConnector::msgpack_write_cb(void* data, const char* buf, unsigned long
 void NeovimConnector::attachUi(int64_t width, int64_t height)
 {
 	// FIXME: this should be in class Neovim
-	startRequestUnchecked("ui_attach", 2);
+	startRequestUnchecked("ui_attach", 3);
 	send(width);
 	send(height);
+	send(true);
 }
 
 void NeovimConnector::detachUi()
