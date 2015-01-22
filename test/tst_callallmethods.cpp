@@ -39,7 +39,7 @@ void TestCallAllMethods::initTestCase()
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 			this, &TestCallAllMethods::callAll);
 	QTest::qWait(500);
-	Q_ASSERT(!m_errors);
+	QVERIFY(!m_errors);
 }
 
 void TestCallAllMethods::error(const QString& errmsg)
@@ -50,7 +50,7 @@ void TestCallAllMethods::error(const QString& errmsg)
 
 void TestCallAllMethods::callAll()
 {
-	Q_ASSERT(m_c->neovimObject());
+	QVERIFY(m_c->neovimObject());
 
 	NeovimQt::Neovim *obj = m_c->neovimObject();
 	connect(m_c->neovimObject(), &NeovimQt::Neovim::error,
@@ -80,7 +80,7 @@ void TestCallAllMethods::callAll()
 void TestCallAllMethods::connectionError(NeovimQt::NeovimConnector::NeovimError err)
 {
 	qDebug() << m_c->errorString();
-	Q_ASSERT(false);
+	QVERIFY(false);
 }
 
 QTEST_MAIN(TestCallAllMethods)

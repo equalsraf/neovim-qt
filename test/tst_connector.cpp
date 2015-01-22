@@ -20,7 +20,7 @@ void TestConnector::initTestCase()
 {
 	QLocalSocket *s = new QLocalSocket();
 	s->connectToServer(QLatin1String("/tmp/neovim"));
-	Q_ASSERT(s->waitForConnected());
+	QVERIFY(s->waitForConnected());
 	m_c = new NeovimQt::NeovimConnector(s);
 }
 
@@ -29,20 +29,20 @@ void TestConnector::invalidSocket()
 	// we expect the connector to complain
 	QLocalSocket s;
 	NeovimQt::NeovimConnector *c = new NeovimQt::NeovimConnector(&s);
-	Q_ASSERT(c->errorCause() != NeovimQt::NeovimConnector::NoError);
+	QVERIFY(c->errorCause() != NeovimQt::NeovimConnector::NoError);
 }
 
 void TestConnector::spawn()
 {
 	bool ready = false;
 	NeovimQt::NeovimConnector *c = NeovimQt::NeovimConnector::spawn();
-	Q_ASSERT(c->errorCause() == NeovimQt::NeovimConnector::NoError);
+	QVERIFY(c->errorCause() == NeovimQt::NeovimConnector::NoError);
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 		[&ready](){
 			ready = true;
 		});
 	QTest::qWait(500);
-	Q_ASSERT(ready);
+	QVERIFY(ready);
 }
 
 QTEST_MAIN(TestConnector)

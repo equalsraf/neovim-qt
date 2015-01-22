@@ -41,12 +41,12 @@ void TestNeovimObject::test_event(const QByteArray& name, const QVariantList& pa
 {
 	QVariant arg0 = params.at(0);
 	if ( (QMetaType::Type)arg0.type() == QMetaType::QByteArray ) {
-		Q_ASSERT(arg0.toString() == "WAT");
+		QVERIFY(arg0.toString() == "WAT");
 		m_test_event_string = true;
 	}
 
 	if ( (QMetaType::Type)arg0.type() == QMetaType::ULongLong ) {
-		Q_ASSERT(arg0.toInt() == 42);
+		QVERIFY(arg0.toInt() == 42);
 		m_test_event_uint = true;
 	}
 
@@ -61,9 +61,9 @@ void TestNeovimObject::test_event(const QByteArray& name, const QVariantList& pa
 //
 void TestNeovimObject::eventTypes()
 {
-	Q_ASSERT(m_test_event_string);
-	Q_ASSERT(m_test_event_uint);
-	Q_ASSERT(m_test_event_stringlist);
+	QVERIFY(m_test_event_string);
+	QVERIFY(m_test_event_uint);
+	QVERIFY(m_test_event_stringlist);
 }
 
 void TestNeovimObject::initTestCase()
@@ -72,8 +72,8 @@ void TestNeovimObject::initTestCase()
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 			this, &TestNeovimObject::delayedSetup);
 	QTest::qWait(1500);
-	Q_ASSERT(m_c->errorCause() == NeovimQt::NeovimConnector::NoError);
-	Q_ASSERT(m_c->neovimObject());
+	QVERIFY(m_c->errorCause() == NeovimQt::NeovimConnector::NoError);
+	QVERIFY(m_c->neovimObject());
 }
 
 QTEST_MAIN(TestNeovimObject)

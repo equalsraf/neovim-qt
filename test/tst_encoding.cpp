@@ -23,7 +23,7 @@ void TestEncoding::encodeString()
 	m_c->neovimObject()->vim_get_var("testing-neovim-qt");
 	conn = connect(m_c->neovimObject(), &NeovimQt::Neovim::on_vim_get_var,
 			[&failed_to_set](const QVariant& v) {
-				Q_ASSERT(v == QByteArray("value"));
+				QVERIFY(v == QByteArray("value"));
 			});
 	QTest::qWait(500);
 	disconnect(conn);
@@ -34,10 +34,10 @@ void TestEncoding::encodeString()
 	conn = connect(m_c->neovimObject(), &NeovimQt::Neovim::on_vim_get_var,
 			[&var_set](const QVariant& v) {
 				var_set = true;
-				Q_ASSERT(v == QVariant(QByteArray("value")));
+				QVERIFY(v == QVariant(QByteArray("value")));
 			});
 	QTest::qWait(500);
-	Q_ASSERT(var_set);
+	QVERIFY(var_set);
 	disconnect(conn);
 }
 
@@ -50,7 +50,7 @@ void TestEncoding::map()
 	m_c->neovimObject()->vim_get_var("test-map");
 	conn = connect(m_c->neovimObject(), &NeovimQt::Neovim::on_vim_get_var,
 			[map](const QVariant& v) {
-				Q_ASSERT(v == map);
+				QVERIFY(v == map);
 			});
 	QTest::qWait(500);
 	disconnect(conn);
@@ -64,31 +64,31 @@ void TestEncoding::map()
 void TestEncoding::checkVariant()
 {
 	// Some Unsupported types
-	Q_ASSERT(!NeovimQt::checkVariant(QRect()));
+	QVERIFY(!NeovimQt::checkVariant(QRect()));
 
 	// Supported types
-	Q_ASSERT(NeovimQt::checkVariant(QVariant()));
-	Q_ASSERT(NeovimQt::checkVariant(true));
-	Q_ASSERT(NeovimQt::checkVariant(42));
-	Q_ASSERT(NeovimQt::checkVariant(4.4));
-	Q_ASSERT(NeovimQt::checkVariant(QString("test")));
-	Q_ASSERT(NeovimQt::checkVariant(QByteArray()));
-	Q_ASSERT(NeovimQt::checkVariant(QVariantList() << "test"));
-	Q_ASSERT(NeovimQt::checkVariant(QVariantMap()));
-	Q_ASSERT(NeovimQt::checkVariant(QPoint(1,1)));
+	QVERIFY(NeovimQt::checkVariant(QVariant()));
+	QVERIFY(NeovimQt::checkVariant(true));
+	QVERIFY(NeovimQt::checkVariant(42));
+	QVERIFY(NeovimQt::checkVariant(4.4));
+	QVERIFY(NeovimQt::checkVariant(QString("test")));
+	QVERIFY(NeovimQt::checkVariant(QByteArray()));
+	QVERIFY(NeovimQt::checkVariant(QVariantList() << "test"));
+	QVERIFY(NeovimQt::checkVariant(QVariantMap()));
+	QVERIFY(NeovimQt::checkVariant(QPoint(1,1)));
 }
 
 void TestEncoding::initTestCase()
 {
 	bool ready = false;
 	m_c = NeovimQt::NeovimConnector::spawn();
-	Q_ASSERT(m_c->errorCause() == NeovimQt::NeovimConnector::NoError);
+	QVERIFY(m_c->errorCause() == NeovimQt::NeovimConnector::NoError);
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 		[&ready](){
 			ready = true;
 		});
 	QTest::qWait(1500);
-	Q_ASSERT(ready);
+	QVERIFY(ready);
 }
 
 QTEST_MAIN(TestEncoding)
