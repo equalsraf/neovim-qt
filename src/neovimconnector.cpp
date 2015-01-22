@@ -155,7 +155,6 @@ void NeovimConnector::send(const QByteArray& bin)
  */
 void NeovimConnector::send(bool b)
 {
-	qDebug() << __func__ << b;
 	if ( b ) {
 		msgpack_pack_true(&m_pk);
 	} else {
@@ -165,7 +164,6 @@ void NeovimConnector::send(bool b)
 
 void NeovimConnector::send(const QList<QByteArray>& list)
 {
-	qDebug() << __func__ << list;
 	msgpack_pack_array(&m_pk, list.size());
 	foreach(const QByteArray& elem, list) {
 		send(elem);
@@ -180,8 +178,6 @@ void NeovimConnector::send(const QList<QByteArray>& list)
  */
 void NeovimConnector::send(const QVariant& var)
 {
-	qDebug() << __func__ << var;
-
 	if (!checkVariant(var)) {
 		msgpack_pack_nil(&m_pk);
 		qWarning() << "Trying to pack unsupported variant type" << var.type() << "packing Nil instead";
