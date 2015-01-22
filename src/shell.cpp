@@ -173,6 +173,15 @@ void Shell::handleResize(uint64_t cols, uint64_t rows)
 
 void Shell::handleHighlightSet(const QVariantMap& attrs, QPainter& painter)
 {
+	// Empty highlight_set resets colors
+	if (attrs.isEmpty()) {
+		m_hg_foreground = m_foreground;
+		painter.setPen(m_foreground);
+		m_hg_background = m_background;
+		painter.setBackground(m_background);
+		return;
+	}
+
 	if (attrs.contains("foreground")) {
 		m_hg_foreground = QColor::fromRgb(QRgb(attrs.value("foreground").toULongLong()));
 		painter.setPen(m_hg_foreground);
