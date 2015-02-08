@@ -142,7 +142,6 @@ NeovimRequest* NeovimConnector::startRequestUnchecked(const QString& method, uin
  */
 void NeovimConnector::send(int64_t i)
 {
-	qDebug() << __func__ << i;
 	msgpack_pack_int64(&m_pk, i);
 }
 
@@ -151,7 +150,6 @@ void NeovimConnector::send(int64_t i)
  */
 void NeovimConnector::send(const QByteArray& bin)
 {
-	qDebug() << __func__ << bin;
 	msgpack_pack_bin(&m_pk, bin.size());
 	msgpack_pack_bin_body(&m_pk, bin.constData(), bin.size());
 }
