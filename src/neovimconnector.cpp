@@ -52,10 +52,16 @@ NeovimConnector::~NeovimConnector()
  */
 void NeovimConnector::setError(NeovimError err, const QString& msg)
 {
-	m_error = err;
-	m_errorString = msg;
-	qWarning() << m_errorString;
-	emit error(m_error);
+	if (m_error == NoError && err != NoError) {
+		m_error = err;
+		m_errorString = msg;
+		qWarning() << "Neovim fatal error" << m_errorString;
+		emit error(m_error);
+		m_dev->close();
+	} else {
+		// Only the first error is raised
+		qDebug() << "Neovim error" << msg;
+	}
 }
 
 /**
