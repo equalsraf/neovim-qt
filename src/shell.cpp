@@ -138,7 +138,9 @@ void Shell::neovimError(NeovimConnector::NeovimError err)
 void Shell::neovimExited(int status)
 {
 	m_attached = false;
-	close();
+	if (status == 0 && m_nvim->errorCause() == NeovimConnector::NoError) {
+		close();
+	}
 }
 
 /**
