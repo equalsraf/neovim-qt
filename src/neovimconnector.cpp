@@ -542,7 +542,7 @@ void NeovimConnector::dispatch(msgpack_object& req)
 	//
 
 	if (req.type != MSGPACK_OBJECT_ARRAY) {
-		qDebug() << "Invalid msgpack: not an array";
+		setError(InvalidMsgpack, "Received Invalid msgpack: not an array");
 		return;
 	}
 

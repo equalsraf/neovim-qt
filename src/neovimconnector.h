@@ -23,6 +23,7 @@ public:
 		NoError=0,
 		DeviceNotOpen,
 		InvalidDevice,
+		InvalidMsgpack,
 		NoMetadata,
 		MetadataDescriptorError,
 		UnexpectedMsg,
