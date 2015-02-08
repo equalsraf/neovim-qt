@@ -61,7 +61,7 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 	}
 	if ( mod & Qt::ShiftModifier ) {
 		modprefix += "S-";
-	} 
+	}
 	if ( mod & Qt::AltModifier ) {
 		modprefix += "A-";
 	}
