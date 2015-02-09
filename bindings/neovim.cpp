@@ -30,9 +30,9 @@ void Neovim::handleResponseError(uint32_t msgid, Function::FunctionId fun, const
 {
 	QVariant errObj;
 	if (decodeMsgpack(res, errObj)) {
-		qWarning() << "Error while decoding error object as" << fun << res;
+		m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking error object in function response");
+		return;
 	}
-	emit error(msg, errObj);
 	switch(fun) {
 {% for f in functions %}
 {% if f.can_fail %}
@@ -42,7 +42,7 @@ void Neovim::handleResponseError(uint32_t msgid, Function::FunctionId fun, const
 {% endif %}
 {% endfor %}
 	default:
-		qWarning() << "Received error for function call that should not fail" << fun << msg;
+		m_c->setError(NeovimConnector::RuntimeMsgpackError, QString("Received error for function that should not fail: %s").arg(fun));
 	}
 }
 
@@ -55,9 +55,9 @@ void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, const msgp
 {% if f.real_return_type != 'void' %}
 			{{f.real_return_type}} data;
 			if (decodeMsgpack(res, data)) {
-				qWarning() << "Error unpacking data for signal {{f.name}}";
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for {{f.name}}");
+				return;
 			} else {
-				qDebug() << "{{f.name}} ->" << data;
 				emit on_{{f.name}}(data);
 			}
 {% else %}

@@ -16,6 +16,7 @@ namespace NeovimQt {
 class NeovimRequest;
 class NeovimConnector: public QObject
 {
+	friend class Neovim;
 	Q_OBJECT
 	Q_ENUMS(NeovimError)
 public:
@@ -33,6 +34,7 @@ public:
 		Crashed,
 		UnsupportedEncoding,
 		SocketError,
+		RuntimeMsgpackError,
 	};
 
 	NeovimConnector(QIODevice* s);
