@@ -50,6 +50,7 @@ TYPES = {
         'Window': 'int64_t',
         'Tabpage': 'int64_t',
     }
+class UnsupportedType(Exception): pass
 def qt_typefor(typename):
     """
     Some Neovim data types are non trivial e.g. ArrayOf(String)
@@ -71,30 +72,35 @@ def qt_typefor(typename):
         # We only support this one for positions
         return 'QPoint'
 
-    print('Unsupported type: %s' % typename)
-    sys.exit(-1)
+    raise UnsupportedType(typename)
 
 class Function:
     """
     Representation for a Neovim API Function
     """
     def __init__(self, nvim_fun):
+        self.valid = False
         self.fun = nvim_fun
         self.argtypes = []
         self.realargtypes = []
         self.argnames = []
-        self.return_type = self.fun['return_type']
-        self.real_return_type = qt_typefor(self.return_type)
-        for typ,name in self.fun['parameters']:
-            self.argnames.append(name)
-            self.argtypes.append(typ)
-            self.realargtypes.append(qt_typefor(typ))
-        self.argcount = len(self.argtypes)
         self.name =  self.fun['name']
+        self.return_type = self.fun['return_type']
+        try:
+            self.real_return_type = qt_typefor(self.return_type)
+            for typ,name in self.fun['parameters']:
+                self.argnames.append(name)
+                self.argtypes.append(typ)
+                self.realargtypes.append(qt_typefor(typ))
+        except UnsupportedType as ex:
+            print('Found unsupported type(%s) when adding function %s(), skipping' % (ex,self.name))
+            return
+        self.argcount = len(self.argtypes)
         self.can_fail = self.fun.get('can_fail', False)
 
         # Build the argument string - makes it easier for the templates
         self.argstring = ', '.join(['%s %s' % tv for tv in zip(self.realargtypes, self.argnames)])
+        self.valid = True
 
     def real_signature(self):
         params = ''
@@ -173,7 +179,8 @@ if __name__ == '__main__':
                 continue
             env = {}
             env['date'] = datetime.datetime.now()
-            env['functions'] = [Function(f) for f in api['functions'] if f['name'] != 'vim_get_api_info']
+            functions = [Function(f) for f in api['functions'] if f['name'] != 'vim_get_api_info']
+            env['functions'] = [f for f in functions if f.valid]
             generate_file(name, outpath, **env)
 
     else:
