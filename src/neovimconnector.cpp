@@ -60,7 +60,7 @@ void NeovimConnector::setError(NeovimError err, const QString& msg)
 		m_dev->close();
 	} else {
 		// Only the first error is raised
-		qDebug() << "Neovim error" << msg;
+		qDebug() << "(Ignored) Neovim fatal error" << msg;
 	}
 }
 
