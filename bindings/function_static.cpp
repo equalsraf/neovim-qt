@@ -1,10 +1,10 @@
 // Auto generated {{date}}
 const QList<Function> Function::knownFunctions = QList<Function>()
 {% for f in functions %}
-<< Function("{{f.return_type}}", "{{f.name}}",
+<< Function("{{f.return_type.neovim_type}}", "{{f.name}}",
 	QList<QString>()
-	{% for ptype in f.argtypes %}
-		<< QString("{{ptype}}")
+	{% for param in f.parameters %}
+		<< QString("{{param.neovim_type}}")
 	{% endfor %}
 	, {% if f.can_fail%}true{%else%}false{%endif%})
 {% endfor %}

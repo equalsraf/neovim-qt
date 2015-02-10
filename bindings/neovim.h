@@ -21,12 +21,13 @@ private:
 	NeovimConnector *m_c;
 public slots:
 {% for f in functions %}
+	// {{f.signature}}
 	void {{f.name}}({{f.argstring}});
 {% endfor %}
 
 signals:
 {% for f in functions %}
-	void on_{{f.name}}({{f.real_return_type}});
+	void on_{{f.name}}({{f.return_type.native_type}});
 {% if f.can_fail %}
 	void err_{{f.name}}(const QString&, const QVariant&);
 {% endif%}

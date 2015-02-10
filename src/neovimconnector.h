@@ -61,6 +61,15 @@ public:
 	void send(bool);
 	void send(const QList<QByteArray>& list);
 
+	template <class T>
+	void sendArrayOf(const QList<T>& list) {
+		msgpack_pack_array(&m_pk, list.size());
+		foreach(const T& elem, list) {
+			send(elem);
+		}
+	};
+
+
 	Neovim* neovimObject();
 	uint64_t channel();
 	QString decode(const QByteArray&);

@@ -41,38 +41,68 @@ def generate_file(name, outpath, **kw):
         fp.write(template.render(kw))
 
 ARRAY_OF = re.compile('ArrayOf\(\s*(\w+)\s*\)')
-TYPES = {
-        'Integer': 'int64_t',
-        'Boolean': 'bool',
-        'String': 'QByteArray',
-        'Object': 'QVariant',
-        'Buffer': 'int64_t',
-        'Window': 'int64_t',
-        'Tabpage': 'int64_t',
-    }
 class UnsupportedType(Exception): pass
-def qt_typefor(typename):
+class NeovimTypeVal:
     """
-    Some Neovim data types are non trivial e.g. ArrayOf(String)
-    or fixed size arrays as ArrayOf(Integer, 2). For some cases
-    a simple typedef is enough (see function.h) but for these cases
-    the generator needs to know in advance.
+    Representation for Neovim Parameter/Return
     """
-    if typename == 'void':
-        return typename
-    if typename in TYPES:
-        # Basic types
-        return TYPES[typename]
+    # msgpack simple types types
+    SIMPLETYPES = {
+            'void': 'void',
+            'Integer': 'int64_t',
+            'Boolean': 'bool',
+            'String': 'QByteArray',
+            'Object': 'QVariant',
+        }
+    # msgpack extension types
+    EXTTYPES = {
+            'Window': 'int64_t',
+            'Buffer': 'int64_t',
+            'Tabpage': 'int64_t',
+        }
+    PAIRTYPE = 'ArrayOf(Integer, 2)'
+    # Unbound Array types
+    UNBOUND_ARRAY = re.compile('ArrayOf\(\s*(\w+)\s*\)')
 
-    m = ARRAY_OF.match(typename)
-    if m:
-        return 'QList<%s>' % qt_typefor(m.groups()[0])
-    elif typename == 'ArrayOf(Integer, 2)':
-        # We don't actually implement fixed size array types
-        # We only support this one for positions
-        return 'QPoint'
+    def __init__(self, typename, name=''):
+        self.name = name
+        self.neovim_type = typename
+        self.ext = False
+        self.native_type = NeovimTypeVal.nativeType(typename)
 
-    raise UnsupportedType(typename)
+        self.sendmethod = 'send'
+        self.decodemethod = 'decodeMsgpack'
+        if typename in self.SIMPLETYPES:
+            pass
+        elif typename in self.EXTTYPES:
+            self.ext = True
+            # FIXME
+            #self.sendmethod = 'send%s' % typename
+            #self.decodemethod = 'decodeMsgpackAs%s' % typename
+        elif self.UNBOUND_ARRAY.match(typename):
+            m = self.UNBOUND_ARRAY.match(typename)
+            elemtype = m.groups()[0]
+            self.sendmethod = 'sendArrayOf'
+        elif typename == self.PAIRTYPE:
+            self.native_type = 'QPoint'
+        else:
+            raise UnsupportedType(typename)
+
+    @classmethod
+    def nativeType(cls, typename):
+        """Return the native type for this Neovim type."""
+        if typename == 'void':
+            return typename
+        elif typename in cls.SIMPLETYPES:
+            return cls.SIMPLETYPES[typename]
+        elif typename in cls.EXTTYPES:
+            return cls.EXTTYPES[typename]
+        elif cls.UNBOUND_ARRAY.match(typename):
+            m = cls.UNBOUND_ARRAY.match(typename)
+            return 'QList<%s>' % cls.nativeType(m.groups()[0])
+        elif typename == cls.PAIRTYPE:
+            return 'QPoint'
+        raise UnsupportedType(typename)
 
 class Function:
     """
@@ -81,47 +111,40 @@ class Function:
     def __init__(self, nvim_fun):
         self.valid = False
         self.fun = nvim_fun
-        self.argtypes = []
-        self.realargtypes = []
-        self.argnames = []
+        self.parameters = []
         self.name =  self.fun['name']
-        self.return_type = self.fun['return_type']
         try:
-            self.real_return_type = qt_typefor(self.return_type)
-            for typ,name in self.fun['parameters']:
-                self.argnames.append(name)
-                self.argtypes.append(typ)
-                self.realargtypes.append(qt_typefor(typ))
+            self.return_type = NeovimTypeVal(self.fun['return_type'])
+            for param in self.fun['parameters']:
+                self.parameters.append(NeovimTypeVal(*param))
         except UnsupportedType as ex:
             print('Found unsupported type(%s) when adding function %s(), skipping' % (ex,self.name))
             return
-        self.argcount = len(self.argtypes)
+        self.argcount = len(self.parameters)
         self.can_fail = self.fun.get('can_fail', False)
 
         # Build the argument string - makes it easier for the templates
-        self.argstring = ', '.join(['%s %s' % tv for tv in zip(self.realargtypes, self.argnames)])
+        self.argstring = ', '.join(['%s %s' % (tv.native_type, tv.name) for tv in self.parameters])
         self.valid = True
 
     def real_signature(self):
         params = ''
-        for i in range(len(self.argtypes)):
-            params += '%s %s' % (qt_typefor(self.argtypes[i]), self.argnames[i])
-            if i != len(self.argtypes)-1:
-                params += ', '
+        for p in self.parameters:
+            params += '%s %s' % (p.native_type, p.name)
+            params += ', '
         notes = ''
         if self.can_fail:
             notes += '!fails'
-        return '%s %s(%s) %s' % (qt_typefor(self.fun['return_type']),self.fun['name'],params, notes)
+        return '%s %s(%s) %s' % (self.return_type.native_type,self.name,params, notes)
     def signature(self):
         params = ''
-        for i in range(len(self.argtypes)):
-            params += '%s %s' % (self.argtypes[i], self.argnames[i])
-            if i != len(self.argtypes)-1:
-                params += ', '
+        for p in self.parameters:
+            params += '%s %s' % (p.neovim_type, p.name)
+            params += ', '
         notes = ''
         if self.can_fail:
             notes += '!fails'
-        return '%s %s(%s) %s' % (self.fun['return_type'],self.fun['name'],params, notes)
+        return '%s %s(%s) %s' % (self.return_type.neovim_type,self.name,params, notes)
 
 
 def print_api(api):
@@ -131,6 +154,8 @@ def print_api(api):
             print('Functions')
             for f in api[key]:
                 fundef = Function(f)
+                if not fundef.valid:
+                    continue
                 sig = fundef.signature()
                 realsig = fundef.real_signature()
                 print('\t%s'% sig)

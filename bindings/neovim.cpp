@@ -18,8 +18,8 @@ void Neovim::{{f.name}}({{f.argstring}})
 	r->setFunction(Function::NEOVIM_FN_{{f.name.upper()}});
 	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
-{% for arg in f.argnames %}
-	m_c->send({{arg}});
+{% for param in f.parameters %}
+	m_c->{{param.sendmethod}}({{param.name}});
 {% endfor %}
 }
 {% endfor %}
@@ -52,8 +52,8 @@ void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, const msgp
 {% for f in functions %}
 	case Function::NEOVIM_FN_{{f.name.upper()}}:
 		{
-{% if f.real_return_type != 'void' %}
-			{{f.real_return_type}} data;
+{% if f.return_type.native_type != 'void' %}
+			{{f.return_type.native_type}} data;
 			if (decodeMsgpack(res, data)) {
 				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for {{f.name}}");
 				return;
