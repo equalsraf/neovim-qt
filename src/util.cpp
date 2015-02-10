@@ -188,8 +188,8 @@ bool decodeMsgpack(const msgpack_object& in, QVariant& out)
 	case MSGPACK_OBJECT_POSITIVE_INTEGER:
 		out = QVariant((quint64)in.via.u64);
 		break;
-	case MSGPACK_OBJECT_DOUBLE:
-		out = in.via.dec;
+	case MSGPACK_OBJECT_FLOAT:
+		out = in.via.f64;
 		break;
 	case MSGPACK_OBJECT_BIN:
 		{
@@ -270,8 +270,8 @@ QDebug operator<<(QDebug dbg, const msgpack_object& obj)
 	case MSGPACK_OBJECT_NEGATIVE_INTEGER:
 		dbg.space() <<  obj.via.i64;
 		break;
-	case MSGPACK_OBJECT_DOUBLE:
-		dbg.space() <<  obj.via.dec;
+	case MSGPACK_OBJECT_FLOAT:
+		dbg.space() <<  obj.via.f64;
 		break;
 	case MSGPACK_OBJECT_BIN:
 		dbg.space() << QByteArray(obj.via.bin.ptr, obj.via.bin.size);
