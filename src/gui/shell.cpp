@@ -175,23 +175,20 @@ void Shell::handleResize(uint64_t cols, uint64_t rows)
 
 void Shell::handleHighlightSet(const QVariantMap& attrs, QPainter& painter)
 {
-	// Empty highlight_set resets colors
-	if (attrs.isEmpty()) {
-		m_hg_foreground = m_foreground;
-		painter.setPen(m_foreground);
-		m_hg_background = m_background;
-		painter.setBackground(m_background);
-		return;
-	}
-
 	if (attrs.contains("foreground")) {
-		m_hg_foreground = QColor::fromRgb(QRgb(attrs.value("foreground").toULongLong()));
-		painter.setPen(m_hg_foreground);
+		// TODO: When does Neovim send -1
+		m_hg_foreground = color(attrs.value("foreground").toLongLong(), m_foreground);
+	} else {
+		m_hg_foreground = m_foreground;
 	}
+	painter.setPen(m_hg_foreground);
+
 	if (attrs.contains("background")) {
-		m_hg_background = QColor::fromRgb(QRgb(attrs.value("background").toULongLong()));
-		painter.setBackground(m_hg_background);
+		m_hg_background = color(attrs.value("background").toLongLong(), m_background);
+	} else {
+		m_hg_background = m_background;
 	}
+	painter.setBackground(m_hg_background);
 
 	QFont f = painter.font();
 	f.setBold(attrs.value("bold").toBool());
@@ -313,7 +310,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
-		m_foreground = QRgb(opargs.at(0).toULongLong());
+		m_foreground = color(opargs.at(0).toLongLong(), m_foreground);
 		m_hg_foreground = m_foreground;
 		painter.setPen(m_hg_foreground);
 	} else if (name == "update_bg") {
@@ -321,7 +318,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
-		m_background = QRgb(opargs.at(0).toULongLong());
+		m_background = color(opargs.at(0).toLongLong(), m_background);
 		m_hg_background = m_background;
 		painter.setBackground(m_hg_background);
 		update();
@@ -540,6 +537,14 @@ void Shell::closeEvent(QCloseEvent *ev)
 	} else {
 		QWidget::closeEvent(ev);
 	}
+}
+
+QColor Shell::color(qint64 color, const QColor& fallback)
+{
+	if (color == -1) {
+		return fallback;
+	}
+	return QRgb(color);
 }
 
 } // Namespace

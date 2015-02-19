@@ -17,6 +17,7 @@ public:
 	~Shell();
 	QSize sizeIncrement() const;
 	QSize sizeHint() const;
+	static QColor color(qint64 color, const QColor& fallback=QColor());
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
