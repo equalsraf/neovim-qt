@@ -702,8 +702,6 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 {
 	QLocalSocket *s = new QLocalSocket();
-	s->connectToServer(path);
-
 	NeovimConnector *c = new NeovimConnector(s);
 	connect(s, SIGNAL(error(QLocalSocket::LocalSocketError)),
 			c, SLOT(socketError()));
@@ -712,21 +710,20 @@ NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 	// The connector raised and error because the IO device is
 	// closed - reset error state
 	c->clearError();
+	s->connectToServer(path);
 	return c;
 }
 
 NeovimConnector* NeovimConnector::connectToHost(const QString& host, int port)
 {
 	QTcpSocket *s = new QTcpSocket();
-	s->connectToHost(host, port);
-
 	NeovimConnector *c = new NeovimConnector(s);
 	connect(s, SIGNAL(error(QAbstractSocket::SocketError)),
 			c, SLOT(socketError()));
 	connect(s, &QAbstractSocket::connected,
 			c, &NeovimConnector::discoverMetadata);
-
 	c->clearError();
+	s->connectToHost(host, port);
 	return c;
 }
 
