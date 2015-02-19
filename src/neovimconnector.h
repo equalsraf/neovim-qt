@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QProcess>
 #include <QTextCodec>
+#include <QTcpSocket>
 #include <msgpack.h>
 #include "util.h"
 #include "function.h"
@@ -41,7 +42,8 @@ public:
 	~NeovimConnector();
 	static NeovimConnector* spawn(const QStringList& params=QStringList());
 	static NeovimConnector* connectToSocket(const QString&);
-	static NeovimConnector* connectToNeovim();
+	static NeovimConnector* connectToHost(const QString& host, int port);
+	static NeovimConnector* connectToNeovim(const QString& server=QString());
 
 	NeovimError errorCause();
 	QString errorString();
@@ -82,6 +84,7 @@ signals:
 
 protected:
 	void setError(NeovimError err, const QString& msg);
+	void clearError();
 
 	// Message handlers
 	void dispatch(msgpack_object& obj);

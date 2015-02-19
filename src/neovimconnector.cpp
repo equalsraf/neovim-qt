@@ -64,6 +64,12 @@ void NeovimConnector::setError(NeovimError err, const QString& msg)
 	}
 }
 
+void NeovimConnector::clearError()
+{
+	m_error = NoError;
+	m_errorString = "";
+}
+
 /**
  * Called when an error takes place
  */ 
@@ -712,17 +718,45 @@ NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 			c, &NeovimConnector::discoverMetadata);
 	// The connector raised and error because the IO device is
 	// closed - reset error state
-	c->setError(NoError, "");
+	c->clearError();
 	return c;
 }
 
-NeovimConnector* NeovimConnector::connectToNeovim()
+NeovimConnector* NeovimConnector::connectToHost(const QString& host, int port)
 {
-	QByteArray env = qgetenv("NVIM_LISTEN_ADDRESS");
-	if (env.isEmpty()) {
+	QTcpSocket *s = new QTcpSocket();
+	s->connectToHost(host, port);
+
+	NeovimConnector *c = new NeovimConnector(s);
+	connect(s, SIGNAL(error(QAbstractSocket::SocketError)),
+			c, SLOT(socketError()));
+	connect(s, &QAbstractSocket::connected,
+			c, &NeovimConnector::discoverMetadata);
+
+	c->clearError();
+	return c;
+}
+
+NeovimConnector* NeovimConnector::connectToNeovim(const QString& server)
+{
+	QString addr = server;
+	if (addr.isEmpty()) {
+		 addr = QString::fromLocal8Bit(qgetenv("NVIM_LISTEN_ADDRESS"));
+	}
+	if (addr.isEmpty()) {
 		return spawn();
 	}
-	return connectToSocket(env);
+
+	int colon_pos = addr.lastIndexOf(':');
+	if (colon_pos != -1 && colon_pos != 0 && addr[colon_pos-1] != ':') {
+		bool ok;
+		int port = addr.mid(colon_pos+1).toInt(&ok);
+		if (ok) {
+			QString host = addr.mid(0, colon_pos);
+			return connectToHost(host, port);
+		}
+	}
+	return connectToSocket(addr);
 }
 
 /**

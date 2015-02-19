@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 
 	NeovimQt::NeovimConnector *c;
 	if (!server.isEmpty()) {
-		c = NeovimQt::NeovimConnector::connectToSocket(server);
+		c = NeovimQt::NeovimConnector::connectToNeovim(server);
 	} else {
 		c = NeovimQt::NeovimConnector::spawn(args);
 	}
