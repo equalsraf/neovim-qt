@@ -22,7 +22,8 @@ NeovimConnector::NeovimConnector(QIODevice *dev)
 {
 	qRegisterMetaType<NeovimError>("NeovimError");
 
-	msgpack_packer_init(&m_pk, this, NeovimConnector::msgpack_write_cb);
+	// MSVC: wont build without the (mspack_packer_write) cast
+	msgpack_packer_init(&m_pk, this, (msgpack_packer_write)NeovimConnector::msgpack_write_cb);
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
 
 	connect(m_dev, &QAbstractSocket::readyRead,
