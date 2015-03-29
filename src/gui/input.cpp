@@ -96,7 +96,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 		mod &= ~Qt::ShiftModifier;
 	}
 
-	// Remove CTRL
+	// Remove CTRL empty characters at the start of the ASCII range
 	if (c.unicode() < 0x20) {
 		mod &= ~Qt::ControlModifier;
 	}
