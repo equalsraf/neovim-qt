@@ -96,9 +96,15 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 		mod &= ~Qt::ShiftModifier;
 	}
 
-	// Remove CTRL
+	// Remove CTRL empty characters at the start of the ASCII range
 	if (c.unicode() < 0x20) {
 		mod &= ~Qt::ControlModifier;
+	}
+
+	// Format with prefix if necessary
+	QString prefix = modPrefix(mod);
+	if (!prefix.isEmpty()) {
+		return QString("<%1%2>").arg(prefix).arg(text);
 	}
 
 	return text;
