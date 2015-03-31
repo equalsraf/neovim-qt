@@ -19,9 +19,9 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	QFont f;
 	f.setStyleStrategy(QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics) );
 	f.setStyleHint(QFont::TypeWriter);
-	f.setFamily("Monospace");
+	f.setFamily("DejaVu Sans Mono");
 	f.setFixedPitch(true);
-	f.setPointSize(10);
+	f.setPointSize(11);
 	f.setKerning(false);
 	f.setFixedPitch(true);
 
