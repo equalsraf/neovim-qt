@@ -68,7 +68,9 @@ quint64 Shell::neovimHeight() const
 /** Height of a row (in pixels)*/
 quint64 Shell::neovimRowHeight() const
 {
-	return m_fm->lineSpacing();
+	// The leading may be negative making the linespacing
+	// smaller than height
+	return qMax(m_fm->lineSpacing(), m_fm->height());
 }
 
 /** Width of a char (in pixels)*/
