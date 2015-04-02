@@ -1,5 +1,28 @@
-// Auto generated 2015-02-19 10:53:08.921403
+// Auto generated 2015-04-02 14:51:10.915374
 const QList<Function> Function::knownFunctions = QList<Function>()
+<< Function("ArrayOf(Window)", "tabpage_get_windows",
+	QList<QString>()
+			<< QString("Tabpage")
+		, true)
+<< Function("Object", "tabpage_get_var",
+	QList<QString>()
+			<< QString("Tabpage")
+			<< QString("String")
+		, true)
+<< Function("Object", "tabpage_set_var",
+	QList<QString>()
+			<< QString("Tabpage")
+			<< QString("String")
+			<< QString("Object")
+		, true)
+<< Function("Window", "tabpage_get_window",
+	QList<QString>()
+			<< QString("Tabpage")
+		, true)
+<< Function("Boolean", "tabpage_is_valid",
+	QList<QString>()
+			<< QString("Tabpage")
+		, false)
 << Function("Integer", "buffer_line_count",
 	QList<QString>()
 			<< QString("Buffer")
@@ -87,29 +110,6 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 			<< QString("Buffer")
 			<< QString("String")
 		, true)
-<< Function("ArrayOf(Window)", "tabpage_get_windows",
-	QList<QString>()
-			<< QString("Tabpage")
-		, true)
-<< Function("Object", "tabpage_get_var",
-	QList<QString>()
-			<< QString("Tabpage")
-			<< QString("String")
-		, true)
-<< Function("Object", "tabpage_set_var",
-	QList<QString>()
-			<< QString("Tabpage")
-			<< QString("String")
-			<< QString("Object")
-		, true)
-<< Function("Window", "tabpage_get_window",
-	QList<QString>()
-			<< QString("Tabpage")
-		, true)
-<< Function("Boolean", "tabpage_is_valid",
-	QList<QString>()
-			<< QString("Tabpage")
-		, false)
 << Function("Buffer", "window_get_buffer",
 	QList<QString>()
 			<< QString("Window")

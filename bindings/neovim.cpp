@@ -10,6 +10,16 @@ Neovim::Neovim(NeovimConnector *c)
 {
 }
 
+
+void Neovim::ui_try_resize(int64_t width, int64_t height)
+{
+	NeovimRequest *r = m_c->startRequestUnchecked("ui_try_resize", 2);
+	m_c->send(width);
+	m_c->send(height);
+	connect(r, &NeovimRequest::finished, this, &Neovim::on_ui_try_resize);
+}
+
+
 // Slots
 {% for f in functions %}
 void Neovim::{{f.name}}({{f.argstring}})

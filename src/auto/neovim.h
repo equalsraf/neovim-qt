@@ -1,4 +1,4 @@
-// Auto generated 2015-02-19 10:53:09.027166
+// Auto generated 2015-04-02 14:51:10.959077
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
@@ -20,142 +20,160 @@ signals:
 private:
 	NeovimConnector *m_c;
 public slots:
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfd8560>>
-	void buffer_line_count(int64_t buffer);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfd8290>>
-	void buffer_get_line(int64_t buffer, int64_t index);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfd8950>>
-	void buffer_set_line(int64_t buffer, int64_t index, QByteArray line);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfda290>>
-	void buffer_del_line(int64_t buffer, int64_t index);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfd07e8>>
-	void buffer_get_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfdb440>>
-	void buffer_set_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end, QList<QByteArray> replacement);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfdb680>>
-	void buffer_get_var(int64_t buffer, QByteArray name);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfdb7a0>>
-	void buffer_set_var(int64_t buffer, QByteArray name, QVariant value);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfdb908>>
-	void buffer_get_option(int64_t buffer, QByteArray name);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfdba28>>
-	void buffer_set_option(int64_t buffer, QByteArray name, QVariant value);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfdbb90>>
-	void buffer_get_number(int64_t buffer);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfdbc68>>
-	void buffer_get_name(int64_t buffer);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfdbd40>>
-	void buffer_set_name(int64_t buffer, QByteArray name);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfdbe60>>
-	void buffer_is_valid(int64_t buffer);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bfdbf38>>
-	void buffer_insert(int64_t buffer, int64_t lnum, QList<QByteArray> lines);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf750e0>>
-	void buffer_get_mark(int64_t buffer, QByteArray name);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf75200>>
+	void ui_try_resize(int64_t width, int64_t height);
+
+	// ArrayOf(Window) tabpage_get_windows(Tabpage tabpage, ) !fails
 	void tabpage_get_windows(int64_t tabpage);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf752d8>>
+	// Object tabpage_get_var(Tabpage tabpage, String name, ) !fails
 	void tabpage_get_var(int64_t tabpage, QByteArray name);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf753f8>>
+	// Object tabpage_set_var(Tabpage tabpage, String name, Object value, ) !fails
 	void tabpage_set_var(int64_t tabpage, QByteArray name, QVariant value);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf75560>>
+	// Window tabpage_get_window(Tabpage tabpage, ) !fails
 	void tabpage_get_window(int64_t tabpage);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf75638>>
+	// Boolean tabpage_is_valid(Tabpage tabpage, ) 
 	void tabpage_is_valid(int64_t tabpage);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf75710>>
+	// Integer buffer_line_count(Buffer buffer, ) !fails
+	void buffer_line_count(int64_t buffer);
+	// String buffer_get_line(Buffer buffer, Integer index, ) !fails
+	void buffer_get_line(int64_t buffer, int64_t index);
+	// void buffer_set_line(Buffer buffer, Integer index, String line, ) !fails
+	void buffer_set_line(int64_t buffer, int64_t index, QByteArray line);
+	// void buffer_del_line(Buffer buffer, Integer index, ) !fails
+	void buffer_del_line(int64_t buffer, int64_t index);
+	// ArrayOf(String) buffer_get_line_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end, ) !fails
+	void buffer_get_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end);
+	// void buffer_set_line_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end, ArrayOf(String) replacement, ) !fails
+	void buffer_set_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end, QList<QByteArray> replacement);
+	// Object buffer_get_var(Buffer buffer, String name, ) !fails
+	void buffer_get_var(int64_t buffer, QByteArray name);
+	// Object buffer_set_var(Buffer buffer, String name, Object value, ) !fails
+	void buffer_set_var(int64_t buffer, QByteArray name, QVariant value);
+	// Object buffer_get_option(Buffer buffer, String name, ) !fails
+	void buffer_get_option(int64_t buffer, QByteArray name);
+	// void buffer_set_option(Buffer buffer, String name, Object value, ) !fails
+	void buffer_set_option(int64_t buffer, QByteArray name, QVariant value);
+	// Integer buffer_get_number(Buffer buffer, ) !fails
+	void buffer_get_number(int64_t buffer);
+	// String buffer_get_name(Buffer buffer, ) !fails
+	void buffer_get_name(int64_t buffer);
+	// void buffer_set_name(Buffer buffer, String name, ) !fails
+	void buffer_set_name(int64_t buffer, QByteArray name);
+	// Boolean buffer_is_valid(Buffer buffer, ) 
+	void buffer_is_valid(int64_t buffer);
+	// void buffer_insert(Buffer buffer, Integer lnum, ArrayOf(String) lines, ) !fails
+	void buffer_insert(int64_t buffer, int64_t lnum, QList<QByteArray> lines);
+	// ArrayOf(Integer, 2) buffer_get_mark(Buffer buffer, String name, ) !fails
+	void buffer_get_mark(int64_t buffer, QByteArray name);
+	// Buffer window_get_buffer(Window window, ) !fails
 	void window_get_buffer(int64_t window);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf757e8>>
+	// ArrayOf(Integer, 2) window_get_cursor(Window window, ) !fails
 	void window_get_cursor(int64_t window);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf758c0>>
+	// void window_set_cursor(Window window, ArrayOf(Integer, 2) pos, ) !fails
 	void window_set_cursor(int64_t window, QPoint pos);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf759e0>>
+	// Integer window_get_height(Window window, ) !fails
 	void window_get_height(int64_t window);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf75b00>>
+	// void window_set_height(Window window, Integer height, ) !fails
 	void window_set_height(int64_t window, int64_t height);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf75c68>>
+	// Integer window_get_width(Window window, ) !fails
 	void window_get_width(int64_t window);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf75d88>>
+	// void window_set_width(Window window, Integer width, ) !fails
 	void window_set_width(int64_t window, int64_t width);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf75f38>>
+	// Object window_get_var(Window window, String name, ) !fails
 	void window_get_var(int64_t window, QByteArray name);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf790e0>>
+	// Object window_set_var(Window window, String name, Object value, ) !fails
 	void window_set_var(int64_t window, QByteArray name, QVariant value);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf792d8>>
+	// Object window_get_option(Window window, String name, ) !fails
 	void window_get_option(int64_t window, QByteArray name);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf79440>>
+	// void window_set_option(Window window, String name, Object value, ) !fails
 	void window_set_option(int64_t window, QByteArray name, QVariant value);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf79638>>
+	// ArrayOf(Integer, 2) window_get_position(Window window, ) !fails
 	void window_get_position(int64_t window);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf79758>>
+	// Tabpage window_get_tabpage(Window window, ) !fails
 	void window_get_tabpage(int64_t window);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf79878>>
+	// Boolean window_is_valid(Window window, ) 
 	void window_is_valid(int64_t window);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf79998>>
+	// void vim_command(String str, ) !fails
 	void vim_command(QByteArray str);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf79ab8>>
+	// void vim_feedkeys(String keys, String mode, Boolean escape_csi, ) 
 	void vim_feedkeys(QByteArray keys, QByteArray mode, bool escape_csi);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf79cb0>>
+	// Integer vim_input(String keys, ) 
 	void vim_input(QByteArray keys);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf79dd0>>
+	// String vim_replace_termcodes(String str, Boolean from_part, Boolean do_lt, Boolean special, ) 
 	void vim_replace_termcodes(QByteArray str, bool from_part, bool do_lt, bool special);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf7d098>>
+	// String vim_command_output(String str, ) !fails
 	void vim_command_output(QByteArray str);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf7d1b8>>
+	// Object vim_eval(String str, ) !fails
 	void vim_eval(QByteArray str);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf7d2d8>>
+	// Integer vim_strwidth(String str, ) !fails
 	void vim_strwidth(QByteArray str);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf7d3f8>>
+	// ArrayOf(String) vim_list_runtime_paths() 
 	void vim_list_runtime_paths();
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf7d4d0>>
+	// void vim_change_directory(String dir, ) !fails
 	void vim_change_directory(QByteArray dir);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf7d5f0>>
+	// String vim_get_current_line() !fails
 	void vim_get_current_line();
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf7d710>>
+	// void vim_set_current_line(String line, ) !fails
 	void vim_set_current_line(QByteArray line);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf7d7a0>>
+	// void vim_del_current_line() !fails
 	void vim_del_current_line();
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf7d878>>
+	// Object vim_get_var(String name, ) !fails
 	void vim_get_var(QByteArray name);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf80a70>>
+	// Object vim_set_var(String name, Object value, ) !fails
 	void vim_set_var(QByteArray name, QVariant value);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf80c20>>
+	// Object vim_get_vvar(String name, ) !fails
 	void vim_get_vvar(QByteArray name);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf80cf8>>
+	// Object vim_get_option(String name, ) !fails
 	void vim_get_option(QByteArray name);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf80dd0>>
+	// void vim_set_option(String name, Object value, ) !fails
 	void vim_set_option(QByteArray name, QVariant value);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf80ef0>>
+	// void vim_out_write(String str, ) 
 	void vim_out_write(QByteArray str);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf80fc8>>
+	// void vim_err_write(String str, ) 
 	void vim_err_write(QByteArray str);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf860e0>>
+	// void vim_report_error(String str, ) 
 	void vim_report_error(QByteArray str);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf861b8>>
+	// ArrayOf(Buffer) vim_get_buffers() 
 	void vim_get_buffers();
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf86248>>
+	// Buffer vim_get_current_buffer() 
 	void vim_get_current_buffer();
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf862d8>>
+	// void vim_set_current_buffer(Buffer buffer, ) !fails
 	void vim_set_current_buffer(int64_t buffer);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf863b0>>
+	// ArrayOf(Window) vim_get_windows() 
 	void vim_get_windows();
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf86440>>
+	// Window vim_get_current_window() 
 	void vim_get_current_window();
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf864d0>>
+	// void vim_set_current_window(Window window, ) !fails
 	void vim_set_current_window(int64_t window);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf865a8>>
+	// ArrayOf(Tabpage) vim_get_tabpages() 
 	void vim_get_tabpages();
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf86638>>
+	// Tabpage vim_get_current_tabpage() 
 	void vim_get_current_tabpage();
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf866c8>>
+	// void vim_set_current_tabpage(Tabpage tabpage, ) !fails
 	void vim_set_current_tabpage(int64_t tabpage);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf867a0>>
+	// void vim_subscribe(String event, ) 
 	void vim_subscribe(QByteArray event);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf868c0>>
+	// void vim_unsubscribe(String event, ) 
 	void vim_unsubscribe(QByteArray event);
-	// <bound method Function.signature of <__main__.Function instance at 0x7f1c0bf869e0>>
+	// Integer vim_name_to_color(String name, ) 
 	void vim_name_to_color(QByteArray name);
 
 signals:
+	void on_ui_try_resize();
+
+	void on_tabpage_get_windows(QList<int64_t>);
+	void err_tabpage_get_windows(const QString&, const QVariant&);
+
+	void on_tabpage_get_var(QVariant);
+	void err_tabpage_get_var(const QString&, const QVariant&);
+
+	void on_tabpage_set_var(QVariant);
+	void err_tabpage_set_var(const QString&, const QVariant&);
+
+	void on_tabpage_get_window(int64_t);
+	void err_tabpage_get_window(const QString&, const QVariant&);
+
+	void on_tabpage_is_valid(bool);
+
 	void on_buffer_line_count(int64_t);
 	void err_buffer_line_count(const QString&, const QVariant&);
 
@@ -202,20 +220,6 @@ signals:
 
 	void on_buffer_get_mark(QPoint);
 	void err_buffer_get_mark(const QString&, const QVariant&);
-
-	void on_tabpage_get_windows(QList<int64_t>);
-	void err_tabpage_get_windows(const QString&, const QVariant&);
-
-	void on_tabpage_get_var(QVariant);
-	void err_tabpage_get_var(const QString&, const QVariant&);
-
-	void on_tabpage_set_var(QVariant);
-	void err_tabpage_set_var(const QString&, const QVariant&);
-
-	void on_tabpage_get_window(int64_t);
-	void err_tabpage_get_window(const QString&, const QVariant&);
-
-	void on_tabpage_is_valid(bool);
 
 	void on_window_get_buffer(int64_t);
 	void err_window_get_buffer(const QString&, const QVariant&);

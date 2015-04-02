@@ -110,14 +110,6 @@ void NeovimConnector::detachUi()
 	startRequestUnchecked("ui_detach", 0);
 }
 
-void NeovimConnector::tryResizeUi(int64_t width, int64_t height)
-{
-	// FIXME: this should be in class Neovim
-	startRequestUnchecked("ui_try_resize", 2);
-	send(width);
-	send(height);
-}
-
 /**
  * Start an RPC request
  *

@@ -26,6 +26,7 @@ protected slots:
 	void neovimIsReady();
 	void neovimError(NeovimConnector::NeovimError);
 	void neovimExited(int);
+	void neovimResizeFinished();
 
 protected:
 	quint64 neovimWidth() const;
@@ -73,6 +74,7 @@ private:
 	QPoint m_cursor_pos;
 	bool m_cursor;
 	bool m_insertMode;
+	bool m_resizing;
 };
 
 } // Namespace

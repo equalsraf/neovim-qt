@@ -51,7 +51,6 @@ public:
 	// FIXME: remove this
 	void attachUi(int64_t width, int64_t height);
 	void detachUi();
-	void tryResizeUi(int64_t width, int64_t height);
 
 	NeovimRequest* startRequestUnchecked(const QString& method, uint32_t argcount);
 

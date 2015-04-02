@@ -14,7 +14,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 :QWidget(parent), m_attached(false), m_nvim(nvim), m_rows(1), m_cols(1), m_fm(NULL),
 	m_foreground(Qt::black), m_background(Qt::white),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
-	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false)
+	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
+	m_resizing(false)
 {
 	QFont f;
 	f.setStyleStrategy(QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics) );
@@ -125,7 +126,8 @@ void Shell::neovimIsReady()
 	QRect screenRect = QApplication::desktop()->availableGeometry(this);
 	m_nvim->attachUi(screenRect.width()/neovimCellWidth(), screenRect.height()/neovimRowHeight());
 
-	// FIXME: connect to neovimObject()->on_ui_try_resize
+	connect(m_nvim->neovimObject(), &Neovim::on_ui_try_resize,
+			this, &Shell::neovimResizeFinished);
 }
 
 void Shell::neovimError(NeovimConnector::NeovimError err)
@@ -171,7 +173,11 @@ void Shell::handleResize(uint64_t cols, uint64_t rows)
 		}
 		m_image.swap(new_image);
 		updateGeometry();
-		adjustSize();
+		// If this is not the result of a resize event (i.e. Vim spontaneously 
+		// asked for a resize) then try to adjust the widget geometry
+		if (!m_resizing) {
+			adjustSize();
+		}
 	}
 }
 
@@ -374,6 +380,8 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 		handleNormalMode(painter);
 	} else if (name == "insert_mode"){
 		handleInsertMode(painter);
+	} else if (name == "cursor_on"){
+	} else if (name == "cursor_off"){
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
@@ -510,13 +518,22 @@ void Shell::resizeEvent(QResizeEvent *ev)
 	// Call Neovim to resize
 	uint64_t cols = ev->size().width()/neovimCellWidth();
 	uint64_t rows = ev->size().height()/neovimRowHeight();
-	if (m_nvim && m_attached &&
+
+	// Neovim will ignore simultaneous calls to ui_try_resize
+	if (!m_resizing && m_nvim && m_attached &&
 			(cols != m_cols || rows != m_rows) ) {
-		qDebug() << "Calling neovim to resize" << ev->size() << cols << rows << m_cols << m_rows;
-		// FIXME: Neovim will ignore simultaneous calls to resize - e.g. queue calls
-		m_nvim->tryResizeUi(cols, rows);
+		m_nvim->neovimObject()->ui_try_resize(cols, rows);
+		m_resizing = true;
 	}
 	QWidget::resizeEvent(ev);
+}
+
+/**
+ * Finished call to ui_try_resize
+ */
+void Shell::neovimResizeFinished()
+{
+	m_resizing = false;
 }
 
 void Shell::changeEvent( QEvent *ev)
