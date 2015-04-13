@@ -5,6 +5,7 @@
 #include <QVariantList>
 #include <QFont>
 #include <QBackingStore>
+#include <QLabel>
 #include "neovimconnector.h"
 
 namespace NeovimQt {
@@ -18,6 +19,7 @@ public:
 	QSize sizeIncrement() const;
 	QSize sizeHint() const;
 	static QColor color(qint64 color, const QColor& fallback=QColor());
+	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const;
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
@@ -29,12 +31,15 @@ protected slots:
 	void neovimResizeFinished();
 
 protected:
+	void tooltip(const QString& text);
+	virtual void inputMethodEvent(QInputMethodEvent *event);
+
 	quint64 neovimWidth() const;
 	quint64 neovimHeight() const;
 	quint64 neovimRowHeight() const;
 	quint64 neovimCellWidth() const;
 	QSize neovimSize() const;
-	QPoint neovimCursorTopLeft();
+	QPoint neovimCursorTopLeft() const;
 	QSize neovimCharSize() const;
 	void setCursor(quint64 col, quint64 row);
 	void setupPainter(QPainter&);
@@ -75,6 +80,7 @@ private:
 	bool m_cursor;
 	bool m_insertMode;
 	bool m_resizing;
+	QLabel *m_tooltip;
 };
 
 } // Namespace

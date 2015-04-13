@@ -31,8 +31,17 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 
 	m_image = QImage(neovimSize(), QImage::Format_ARGB32_Premultiplied);
 
+	setAttribute(Qt::WA_KeyCompression, false);
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setAttribute(Qt::WA_StaticContents, true);
+
+	// IM Tooltip
+	setAttribute(Qt::WA_InputMethodEnabled, true);
+	m_tooltip = new QLabel(this);
+	m_tooltip->setVisible(false);
+	m_tooltip->setTextFormat(Qt::PlainText);
+	m_tooltip->setTextInteractionFlags(Qt::NoTextInteraction);
+	m_tooltip->setAutoFillBackground(true);
 
 	if (m_nvim == NULL) {
 		qWarning() << "Received NULL as Neovim Connector";
@@ -107,7 +116,7 @@ QSize Shell::neovimSize() const
 }
 
 /** The top left corner position (pixel) for the cursor */
-QPoint Shell::neovimCursorTopLeft()
+QPoint Shell::neovimCursorTopLeft() const
 {
 	return QPoint(m_cursor_pos.x()*neovimCellWidth(), m_cursor_pos.y()*neovimRowHeight());
 }
@@ -564,6 +573,55 @@ QColor Shell::color(qint64 color, const QColor& fallback)
 		return fallback;
 	}
 	return QRgb(color);
+}
+
+/*
+ * Display a tooltip over the shell, covering underlying shell content.
+ * The tooltip is placed at the current shell cursor position.
+ *
+ * When the given string is empty the tooltip is concealed.
+ *
+ * FIXME: Colors could use improving
+ */
+void Shell::tooltip(const QString& text)
+{
+	m_tooltip->setText(text);
+	if ( text.isEmpty() ) {
+		m_tooltip->hide();
+		return;
+	}
+
+	if ( !m_tooltip->isVisible() ) {
+		m_tooltip->setMinimumHeight(neovimRowHeight());
+		m_tooltip->move(neovimCursorTopLeft() );
+		m_tooltip->show();
+	}
+
+	m_tooltip->setMinimumWidth( QFontMetrics(m_tooltip->font()).width(text) );
+	m_tooltip->setMaximumWidth( QFontMetrics(m_tooltip->font()).width(text) );
+	m_tooltip->update();
+}
+
+void Shell::inputMethodEvent(QInputMethodEvent *ev)
+{
+	if ( !ev->commitString().isEmpty() ) {
+		QByteArray s = m_nvim->encode(ev->commitString());
+		m_nvim->neovimObject()->vim_input(s);
+		tooltip("");
+	} else {
+		tooltip(ev->preeditString());
+	}
+}
+
+QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
+{
+	if ( query == Qt::ImFont) {
+		return font();
+	} else if ( query == Qt::ImMicroFocus ) {
+		return QRect(neovimCursorTopLeft(), QSize(0, neovimRowHeight()));
+	}
+
+	return QVariant();
 }
 
 } // Namespace
