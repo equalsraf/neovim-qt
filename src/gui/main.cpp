@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QFontDatabase>
 #include "neovimconnector.h"
-#include "shell.h"
+#include "mainwindow.h"
 
 /**
  * Neovim Qt GUI
@@ -49,7 +49,8 @@ int main(int argc, char **argv)
 		c = NeovimQt::NeovimConnector::spawn(args);
 	}
 
-	NeovimQt::Shell *shell = new NeovimQt::Shell(c);
-	shell->show();
+	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c);
+	win->show();
 	return app.exec();
 }
+
