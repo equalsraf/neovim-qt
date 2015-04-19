@@ -35,6 +35,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 	setAttribute(Qt::WA_StaticContents, true);
 
+	setFocusPolicy(Qt::StrongFocus);
+
 	// IM Tooltip
 	setAttribute(Qt::WA_InputMethodEnabled, true);
 	m_tooltip = new QLabel(this);
