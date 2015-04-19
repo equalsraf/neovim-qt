@@ -15,7 +15,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_foreground(Qt::black), m_background(Qt::white),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
-	m_resizing(false)
+	m_resizing(false), m_logo(QPixmap(":/neovim.png"))
 {
 	QFont f;
 	f.setStyleStrategy(QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics) );
@@ -33,7 +33,6 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 
 	setAttribute(Qt::WA_KeyCompression, false);
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
-	setAttribute(Qt::WA_StaticContents, true);
 
 	setFocusPolicy(Qt::StrongFocus);
 
@@ -63,6 +62,12 @@ Shell::~Shell()
 	if (m_nvim && m_attached) {
 		m_nvim->detachUi();
 	}
+}
+
+void Shell::setAttached(bool attached)
+{
+	setAttribute(Qt::WA_StaticContents, attached);
+	m_attached = attached;
 }
 
 /** Neovim shell width in pixels (does not include extra margin) */
@@ -129,7 +134,7 @@ void Shell::neovimIsReady()
 		return;
 	}
 	// FIXME: Don't set this here, wait for return from ui_attach instead
-	m_attached = true;
+	setAttached(true);
 
 	connect(m_nvim->neovimObject(), &Neovim::neovimNotification,
 			this, &Shell::handleNeovimNotification);
@@ -144,7 +149,7 @@ void Shell::neovimIsReady()
 void Shell::neovimError(NeovimConnector::NeovimError err)
 {
 	if (m_attached) {
-		m_attached = false;
+		setAttached(false);
 		update();
 	}
 }
@@ -152,7 +157,7 @@ void Shell::neovimError(NeovimConnector::NeovimError err)
 /** The Neovim process has exited */
 void Shell::neovimExited(int status)
 {
-	m_attached = false;
+	setAttached(false);
 	if (status == 0 && m_nvim->errorCause() == NeovimConnector::NoError) {
 		close();
 	}
@@ -474,11 +479,26 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 
 }
 
+/**
+ * Draws the Neovim logo at the center of the widget.
+ * If the is too small do nothing.
+ */
+void Shell::paintLogo(QPainter& p)
+{
+	if (size().width() > m_logo.width() &&
+		size().height() > m_logo.height() ) {
+		int x = size().width()/2 - m_logo.width()/2;
+		int y = size().height()/2 - m_logo.height()/2;
+		p.drawPixmap(QPoint(x,y), m_logo);
+	}
+}
+
 void Shell::paintEvent(QPaintEvent *ev)
 {
 	QPainter painter(this);
 	if (!m_attached) {
-		painter.eraseRect(rect());
+		painter.fillRect(rect(), Qt::white);
+		paintLogo(painter);
 		return;
 	}
 

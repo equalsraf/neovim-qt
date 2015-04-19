@@ -46,6 +46,7 @@ protected:
 
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
 	virtual void keyPressEvent(QKeyEvent *ev) Q_DECL_OVERRIDE;
+        void paintLogo(QPainter&);
 	virtual void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
 	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
@@ -60,6 +61,8 @@ protected:
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 private:
 	bool m_attached;
+        void setAttached(bool);
+
 	NeovimConnector *m_nvim;
 	uint64_t m_rows, m_cols;
 	QRect m_scroll_region;
@@ -81,6 +84,7 @@ private:
 	bool m_insertMode;
 	bool m_resizing;
 	QLabel *m_tooltip;
+        QPixmap m_logo;
 };
 
 } // Namespace
