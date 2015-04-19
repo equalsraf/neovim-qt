@@ -529,6 +529,10 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 
 void Shell::resizeEvent(QResizeEvent *ev)
 {
+	if (!m_attached) {
+		QWidget::resizeEvent(ev);
+		return;
+	}
 	// Call Neovim to resize
 	uint64_t cols = ev->size().width()/neovimCellWidth();
 	uint64_t rows = ev->size().height()/neovimRowHeight();
