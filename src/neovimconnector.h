@@ -38,12 +38,22 @@ public:
 		RuntimeMsgpackError,
 	};
 
+        enum NeovimConnectionType {
+		OtherConnection,
+		SpawnedConnection,
+		HostConnection,
+		SocketConnection,
+        };
+
 	NeovimConnector(QIODevice* s);
 	~NeovimConnector();
 	static NeovimConnector* spawn(const QStringList& params=QStringList());
 	static NeovimConnector* connectToSocket(const QString&);
 	static NeovimConnector* connectToHost(const QString& host, int port);
 	static NeovimConnector* connectToNeovim(const QString& server=QString());
+
+	bool canReconnect();
+	NeovimConnector* reconnect();
 
 	NeovimError errorCause();
 	QString errorString();
@@ -124,6 +134,12 @@ private:
 	Neovim *m_neovimobj;
 	uint64_t m_channel;
 	QTextCodec *m_encoding;
+
+	// Store connection arguments for reconnect()
+	NeovimConnectionType m_ctype;
+	QStringList m_connParams;
+	QString m_connSocket, m_connHost;
+	int m_connPort;
 };
 } // namespace NeovimQt
 Q_DECLARE_METATYPE(NeovimQt::NeovimConnector::NeovimError)

@@ -18,7 +18,7 @@ namespace NeovimQt {
  */
 NeovimConnector::NeovimConnector(QIODevice *dev)
 :QObject(), reqid(0), m_dev(dev), m_error(NoError), m_neovimobj(NULL), 
-	m_channel(0), m_encoding(0)
+	m_channel(0), m_encoding(0), m_ctype(OtherConnection)
 {
 	qRegisterMetaType<NeovimError>("NeovimError");
 
@@ -689,6 +689,9 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 	p->start("nvim", args);
 
 	NeovimConnector *c = new NeovimConnector(p);
+	c->m_ctype = SpawnedConnection;
+	c->m_connParams = params;
+
 	connect(p, SIGNAL(error(QProcess::ProcessError)),
 			c, SLOT(processError(QProcess::ProcessError)));
 	connect(p, SIGNAL(finished(int, QProcess::ExitStatus)),
@@ -703,6 +706,10 @@ NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 {
 	QLocalSocket *s = new QLocalSocket();
 	NeovimConnector *c = new NeovimConnector(s);
+
+	c->m_ctype = SocketConnection;
+	c->m_connSocket = path;
+
 	connect(s, SIGNAL(error(QLocalSocket::LocalSocketError)),
 			c, SLOT(socketError()));
 	connect(s, &QLocalSocket::connected,
@@ -718,6 +725,11 @@ NeovimConnector* NeovimConnector::connectToHost(const QString& host, int port)
 {
 	QTcpSocket *s = new QTcpSocket();
 	NeovimConnector *c = new NeovimConnector(s);
+
+	c->m_ctype = HostConnection;
+	c->m_connHost = host;
+	c->m_connPort = port;
+
 	connect(s, SIGNAL(error(QAbstractSocket::SocketError)),
 			c, SLOT(socketError()));
 	connect(s, &QAbstractSocket::connected,
@@ -772,6 +784,32 @@ void NeovimConnector::processError(QProcess::ProcessError err)
 void NeovimConnector::socketError()
 {
 	setError(SocketError, m_dev->errorString());
+}
+
+bool NeovimConnector::canReconnect()
+{
+	return m_ctype != OtherConnection;
+}
+
+/**
+ * Create a new connection using the same parameters as the current one.
+ *
+ * This is the equivalent of creating a new object with spawn(), connectToHost(),
+ * or connectToSocket()
+ *
+ * If canReconnect() returns false, this function will return NULL.
+ */
+NeovimConnector* NeovimConnector::reconnect()
+{
+	switch(m_ctype) {
+	case SpawnedConnection:
+		return NeovimConnector::spawn(m_connParams);
+	case HostConnection:
+		return NeovimConnector::connectToHost(m_connHost, m_connPort);
+	case SocketConnection:
+		return NeovimConnector::connectToSocket(m_connSocket);
+	}
+	return NULL;
 }
 
 /**
