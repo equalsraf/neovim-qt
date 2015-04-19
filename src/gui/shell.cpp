@@ -509,12 +509,15 @@ void Shell::paintEvent(QPaintEvent *ev)
 void Shell::keyPressEvent(QKeyEvent *ev)
 {
 	if (!m_nvim || !m_attached) {
+		QWidget::keyPressEvent(ev);
 		return;
 	}
+
 	// FIXME mousehide - conceal mouse pointer when typing
 
 	QString inp = Input.convertKey(ev->text(), ev->key(), ev->modifiers());
 	if (inp.isEmpty()) {
+		QWidget::keyPressEvent(ev);
 		return;
 	}
 
