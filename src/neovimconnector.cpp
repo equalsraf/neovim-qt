@@ -808,7 +808,10 @@ NeovimConnector* NeovimConnector::reconnect()
 		return NeovimConnector::connectToHost(m_connHost, m_connPort);
 	case SocketConnection:
 		return NeovimConnector::connectToSocket(m_connSocket);
+	default:
+		return NULL;
 	}
+	// NOT-REACHED
 	return NULL;
 }
 

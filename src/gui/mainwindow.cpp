@@ -5,7 +5,7 @@
 namespace NeovimQt {
 
 MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
-:QMainWindow(parent), m_errorWidget(0), m_shell(0), m_nvim(0)
+:QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0)
 {
 	m_errorWidget = new ErrorWidget();
 	newDockWidgetFor(m_errorWidget);
