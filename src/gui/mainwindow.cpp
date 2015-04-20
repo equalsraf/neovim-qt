@@ -52,6 +52,8 @@ void MainWindow::neovimExited(int status)
 		m_errorWidget->setText(m_nvim->errorString());
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
 		m_errorWidget->setVisible(true);
+	} else if (status == 0 && m_nvim->errorCause() == NeovimConnector::NoError) {
+		close();
 	}
 }
 
