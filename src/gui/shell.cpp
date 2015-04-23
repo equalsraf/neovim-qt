@@ -15,7 +15,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_foreground(Qt::black), m_background(Qt::white),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
-	m_resizing(false), m_logo(QPixmap(":/neovim.png"))
+	m_resizing(false), m_logo(QPixmap(":/neovim.png")),
+	m_neovimBusy(false)
 {
 	QFont f;
 	f.setStyleStrategy(QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics) );
@@ -400,6 +401,10 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 	} else if (name == "set_title"){
 		handleSetTitle(opargs);
 	} else if (name == "cursor_off"){
+	} else if (name == "busy_start"){
+		handleBusy(true);
+	} else if (name == "busy_stop"){
+		handleBusy(false);
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
@@ -431,6 +436,17 @@ void Shell::handleSetTitle(const QVariantList& opargs)
 	}
 	QString title = m_nvim->decode(opargs.at(0).toByteArray());
 	emit neovimTitleChanged(title);
+}
+
+void Shell::handleBusy(bool busy)
+{
+	m_neovimBusy = busy;
+	if (busy) {
+		this->setCursor(Qt::WaitCursor);
+	} else {
+		this->unsetCursor();
+	}
+	emit neovimBusy(busy);
 }
 
 // FIXME: fix QVariant type conversions
@@ -663,6 +679,11 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 	}
 
 	return QVariant();
+}
+
+bool Shell::neovimBusy() const
+{
+	return m_neovimBusy;
 }
 
 } // Namespace

@@ -13,6 +13,7 @@ namespace NeovimQt {
 class Shell: public QWidget
 {
 	Q_OBJECT
+	Q_PROPERTY(bool neovimBusy READ neovimBusy() NOTIFY neovimBusy())
 public:
 	Shell(NeovimConnector *nvim, QWidget *parent=0);
 	~Shell();
@@ -20,8 +21,12 @@ public:
 	QSize sizeHint() const;
 	static QColor color(qint64 color, const QColor& fallback=QColor());
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const;
+	bool neovimBusy() const;
+
 signals:
 	void neovimTitleChanged(const QString &title);
+	void neovimBusy(bool);
+
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 
@@ -61,6 +66,7 @@ protected:
 	virtual void handleInsertMode(QPainter& painter);
 	virtual void handleSetTitle(const QVariantList& opargs);
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
+	virtual void handleBusy(bool);
 private:
 	bool m_attached;
         void setAttached(bool);
@@ -87,6 +93,9 @@ private:
 	bool m_resizing;
 	QLabel *m_tooltip;
         QPixmap m_logo;
+
+	// Properties
+	bool m_neovimBusy;
 };
 
 } // Namespace
