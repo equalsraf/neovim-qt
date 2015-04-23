@@ -42,7 +42,7 @@ protected:
 	QSize neovimSize() const;
 	QPoint neovimCursorTopLeft() const;
 	QSize neovimCharSize() const;
-	void setCursor(quint64 col, quint64 row);
+	void setNeovimCursor(quint64 col, quint64 row);
 	void setupPainter(QPainter&);
 
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;

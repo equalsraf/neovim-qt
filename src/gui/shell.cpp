@@ -375,7 +375,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 			return;
 		}
 		QRect cursorRect(neovimCursorTopLeft(), neovimCharSize());
-		setCursor(opargs.at(0).toULongLong(), opargs.at(1).toULongLong());
+		setNeovimCursor(opargs.at(0).toULongLong(), opargs.at(1).toULongLong());
 	} else if (name == "highlight_set") {
 		if (opargs.size() != 1 && (QMetaType::Type)opargs.at(0).type() != QMetaType::QVariantMap) {
 			qWarning() << "Unexpected argument for redraw:" << name << opargs;
@@ -406,7 +406,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 
 }
 
-void Shell::setCursor(quint64 row, quint64 col)
+void Shell::setNeovimCursor(quint64 row, quint64 col)
 {
 	update(QRect(neovimCursorTopLeft(), neovimCharSize()));
 	m_cursor_pos = QPoint(col, row);
