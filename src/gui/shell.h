@@ -76,6 +76,7 @@ private:
 	QRect m_scroll_region;
 
 	QFont m_font;
+	bool m_font_bold, m_font_italic, m_font_underline;
 	QFontMetrics *m_fm;
 
 	QImage m_image;

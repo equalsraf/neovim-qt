@@ -11,7 +11,8 @@
 namespace NeovimQt {
 
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
-:QWidget(parent), m_attached(false), m_nvim(nvim), m_rows(1), m_cols(1), m_fm(NULL),
+:QWidget(parent), m_attached(false), m_nvim(nvim), m_rows(1), m_cols(1),
+	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_fm(NULL),
 	m_foreground(Qt::black), m_background(Qt::white),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
@@ -206,19 +207,18 @@ void Shell::handleHighlightSet(const QVariantMap& attrs, QPainter& painter)
 	} else {
 		m_hg_foreground = m_foreground;
 	}
-	painter.setPen(m_hg_foreground);
 
 	if (attrs.contains("background")) {
 		m_hg_background = color(attrs.value("background").toLongLong(), m_background);
 	} else {
 		m_hg_background = m_background;
 	}
-	painter.setBackground(m_hg_background);
 
-	QFont f = painter.font();
-	f.setBold(attrs.value("bold").toBool());
-	f.setItalic(attrs.value("italic").toBool());
-	painter.setFont(f);
+	// TODO: undercurl
+	m_font_bold = attrs.value("bold").toBool();
+	m_font_italic = attrs.value("italic").toBool();
+	m_font_underline = attrs.value("undercurl").toBool();
+	setupPainter(painter);
 }
 
 /**
@@ -298,17 +298,21 @@ void Shell::handleScroll(const QVariantList& args, QPainter& painter)
 
 	QImage copy = m_image.copy(rect);
 	painter.drawImage(pos, copy);
-	painter.eraseRect(exposed);
+	// Scroll always uses the background color, not the highlight
+	painter.fillRect(exposed, m_background);
 	update(m_scroll_region);
 }
 
 /** Ready a painter with Neovim settings */
 void Shell::setupPainter(QPainter& painter)
 {
-	painter.setFont(m_font);
 	painter.setPen(m_hg_foreground);
 	painter.setBackground(m_hg_background);
-	painter.setFont(m_font);
+	QFont f(m_font);
+	f.setBold(m_font_bold);
+	f.setItalic(m_font_italic);
+	f.setUnderline(m_font_underline);
+	painter.setFont(f);
 }
 
 void Shell::handleSetScrollRegion(const QVariantList& opargs)
