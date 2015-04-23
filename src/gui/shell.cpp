@@ -389,9 +389,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 	} else if (name == "set_scroll_region"){
 		handleSetScrollRegion(opargs);
 	} else if (name == "mouse_on"){
-		QApplication::restoreOverrideCursor();
+		this->unsetCursor();
 	} else if (name == "mouse_off"){
-		QApplication::setOverrideCursor(Qt::BlankCursor);
+		this->setCursor(Qt::BlankCursor);
 	} else if (name == "normal_mode"){
 		handleNormalMode(painter);
 	} else if (name == "insert_mode"){
