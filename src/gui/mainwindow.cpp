@@ -26,7 +26,8 @@ void MainWindow::init(NeovimConnector *c)
 	m_nvim = c;
 	m_shell = new Shell(c);
 	setCentralWidget(m_shell);
-
+	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)),
+			this, SLOT(neovimSetTitle(const QString &)));
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &MainWindow::neovimExited);
 	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
@@ -55,6 +56,11 @@ void MainWindow::neovimExited(int status)
 	} else if (status == 0 && m_nvim->errorCause() == NeovimConnector::NoError) {
 		close();
 	}
+}
+
+void MainWindow::neovimSetTitle(const QString &title)
+{
+	this->setWindowTitle(title);
 }
 
 void MainWindow::reconnectNeovim()

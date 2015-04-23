@@ -397,6 +397,8 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 	} else if (name == "insert_mode"){
 		handleInsertMode(painter);
 	} else if (name == "cursor_on"){
+	} else if (name == "set_title"){
+		handleSetTitle(opargs);
 	} else if (name == "cursor_off"){
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
@@ -419,6 +421,16 @@ void Shell::handleNormalMode(QPainter& painter)
 void Shell::handleInsertMode(QPainter& painter)
 {
 	m_insertMode = true;
+}
+
+void Shell::handleSetTitle(const QVariantList& opargs)
+{
+	if (opargs.size() != 1 || !opargs.at(0).canConvert<QByteArray>()) {
+		qWarning() << "Unexpected arguments for set_title:" << opargs;
+		return;
+	}
+	QString title = m_nvim->decode(opargs.at(0).toByteArray());
+	emit neovimTitleChanged(title);
 }
 
 // FIXME: fix QVariant type conversions

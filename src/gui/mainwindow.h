@@ -14,11 +14,11 @@ class MainWindow: public QMainWindow
 	Q_OBJECT
 public:
 	MainWindow(NeovimConnector *, QWidget *parent=0);
-
 protected:
         QDockWidget* newDockWidgetFor(QWidget *);
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 private slots:
+	void neovimSetTitle(const QString &title);
 	void neovimExited(int status);
 	void reconnectNeovim();
 private:

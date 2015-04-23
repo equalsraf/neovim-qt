@@ -20,7 +20,8 @@ public:
 	QSize sizeHint() const;
 	static QColor color(qint64 color, const QColor& fallback=QColor());
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const;
-
+signals:
+	void neovimTitleChanged(const QString &title);
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 
@@ -58,6 +59,7 @@ protected:
 	virtual void handleScroll(const QVariantList& args, QPainter& painter);
 	virtual void handleNormalMode(QPainter& painter);
 	virtual void handleInsertMode(QPainter& painter);
+	virtual void handleSetTitle(const QVariantList& opargs);
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 private:
 	bool m_attached;
