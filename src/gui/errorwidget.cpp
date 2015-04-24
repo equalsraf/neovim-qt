@@ -8,7 +8,7 @@ ErrorWidget::ErrorWidget(QWidget *parent)
 :QWidget(parent), m_errorLabel(0), m_closeButton(0)
 {
 	m_errorLabel = new QLabel();
-	m_closeButton = new QPushButton(tr("Reconnect"));
+	m_closeButton = new QPushButton(tr("Retry"));
 
 	connect(m_closeButton, &QPushButton::clicked,
 			this, &ErrorWidget::reconnectNeovim);
