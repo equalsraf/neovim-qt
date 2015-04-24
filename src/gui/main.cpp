@@ -49,7 +49,11 @@ int main(int argc, char **argv)
 		c = NeovimQt::NeovimConnector::spawn(args);
 	}
 
+#ifdef NEOVIMQT_GUI_WIDGET
+	NeovimQt::Shell *win = new NeovimQt::Shell(c);
+#else
 	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c);
+#endif
 	win->show();
 	return app.exec();
 }
