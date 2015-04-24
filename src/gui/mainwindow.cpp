@@ -30,6 +30,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, SLOT(neovimSetTitle(const QString &)));
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &MainWindow::neovimExited);
+	connect(m_nvim, &NeovimConnector::error,
+			this, &MainWindow::neovimError);
 	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
 			this, &MainWindow::reconnectNeovim);
 	m_shell->setFocus(Qt::OtherFocusReason);
@@ -56,6 +58,12 @@ void MainWindow::neovimExited(int status)
 	} else if (status == 0 && m_nvim->errorCause() == NeovimConnector::NoError) {
 		close();
 	}
+}
+void MainWindow::neovimError(NeovimConnector::NeovimError err)
+{
+	m_errorWidget->setText(m_nvim->errorString());
+	m_errorWidget->showReconnect(m_nvim->canReconnect());
+	m_errorWidget->setVisible(true);
 }
 
 void MainWindow::neovimSetTitle(const QString &title)

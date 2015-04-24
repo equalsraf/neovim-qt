@@ -20,6 +20,7 @@ protected:
 private slots:
 	void neovimSetTitle(const QString &title);
 	void neovimExited(int status);
+	void neovimError(NeovimConnector::NeovimError);
 	void reconnectNeovim();
 private:
 	void init(NeovimConnector *);
