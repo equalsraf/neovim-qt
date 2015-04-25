@@ -1,0 +1,35 @@
+version: '{build}'
+skip_tags: true
+os: MinGW
+shallow_clone: true
+environment:
+  matrix:
+  - CMAKE_GENERATOR: Visual Studio 12
+    QTDIR: C:/Qt/5.4/msvc2013_opengl
+configuration:
+- RelWithDebInfo
+- Debug
+matrix:
+  fast_finish: true
+build_script:
+- set CMAKE_PREFIX_PATH=%QTDIR%
+- set PATH=%PATH%;%QTDIR%/bin
+# Build Msgpack
+- mkdir build-third-party
+- cd build-third-party
+  # FYI CMAKE_BUILD_TYPE does not work with VS generators, use --config
+- cmake -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=%configuration% -DCMAKE_INSTALL_PREFIX=../INSTALL ../third-party
+- cmake --build . --config %configuration% --target install
+- cd ..
+# Build nvim-qt
+- mkdir build
+- cd build
+- cmake -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=%configuration% -DCMAKE_INSTALL_PREFIX=../INSTALL ..
+  # FYI CMAKE_BUILD_TYPE does not work with VS generators, use --config
+- cmake --build . --config %configuration% --target install
+# Deploy shared libraries
+- call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
+- if "%configuration%" == "RelWithDebInfo" windeployqt --libdir ../INSTALL/bin --release --compiler-runtime --no-webkit2 --no-webkit ../INSTALL/bin
+artifacts:
+- path: build/bin
+  name: neovim-qt

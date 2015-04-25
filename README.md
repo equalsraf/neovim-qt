@@ -1,6 +1,8 @@
 
 A library to talk with neovim in Qt
 
+[![Build status](https://ci.appveyor.com/api/projects/status/c252f54mfjcuud8x?svg=true)](https://ci.appveyor.com/project/equalsraf/neovim-qt)
+
 ## Build
 
     $ mkdir build
