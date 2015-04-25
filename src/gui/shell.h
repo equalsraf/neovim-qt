@@ -18,9 +18,9 @@ public:
 	Shell(NeovimConnector *nvim, QWidget *parent=0);
 	~Shell();
 	QSize sizeIncrement() const;
-	QSize sizeHint() const;
+	QSize sizeHint() const Q_DECL_OVERRIDE;
 	static QColor color(qint64 color, const QColor& fallback=QColor());
-	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const;
+	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
 
 signals:
@@ -38,7 +38,7 @@ protected slots:
 
 protected:
 	void tooltip(const QString& text);
-	virtual void inputMethodEvent(QInputMethodEvent *event);
+	virtual void inputMethodEvent(QInputMethodEvent *event) Q_DECL_OVERRIDE;
 
 	quint64 neovimWidth() const;
 	quint64 neovimHeight() const;
