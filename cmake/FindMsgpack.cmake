@@ -1,7 +1,7 @@
 include(CheckLibraryExists)
 
 find_path(MSGPACK_INCLUDE_DIR
-    NAMES msgpack.hpp
+    NAMES msgpack.h
 )
 
 find_library(MSGPACK_LIBRARY
