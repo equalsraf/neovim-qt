@@ -9,3 +9,7 @@ add_executable(nvim-qt-widget EXCLUDE_FROM_ALL main.cpp shell.cpp input.cpp ${NE
 set_target_properties(nvim-qt-widget PROPERTIES COMPILE_DEFINITIONS NEOVIMQT_GUI_WIDGET )
 target_link_libraries(nvim-qt-widget ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt)
 
+if(WIN32)
+	include(WinDeployQt)
+	WinDeployQt(TARGET nvim-qt INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
+endif()
