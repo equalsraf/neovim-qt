@@ -18,7 +18,7 @@ namespace NeovimQt {
  */
 NeovimConnector::NeovimConnector(QIODevice *dev)
 :QObject(), reqid(0), m_dev(dev), m_error(NoError), m_neovimobj(NULL), 
-	m_channel(0), m_encoding(0), m_ctype(OtherConnection)
+	m_channel(0), m_encoding(0), m_ctype(OtherConnection), m_ready(false)
 {
 	qRegisterMetaType<NeovimError>("NeovimError");
 
@@ -53,6 +53,7 @@ NeovimConnector::~NeovimConnector()
  */
 void NeovimConnector::setError(NeovimError err, const QString& msg)
 {
+	m_ready = false;
 	if (m_error == NoError && err != NoError) {
 		m_error = err;
 		m_errorString = msg;
@@ -452,10 +453,16 @@ void NeovimConnector::encodingChanged(const QVariant&  obj)
 	const QByteArray enc_name = obj.toByteArray();
 	m_encoding = QTextCodec::codecForName(enc_name);
 	if (m_encoding) {
+		m_ready = true;
 		emit ready();
 	} else {
 		setError(UnsupportedEncoding, QString("Unsupported &encoding (%1)").arg(QString::fromLatin1(enc_name)));
 	}
+}
+
+bool NeovimConnector::isReady()
+{
+	return m_ready;
 }
 
 /**
@@ -665,9 +672,11 @@ void NeovimConnector::dispatchNotification(msgpack_object& nt)
  * Get main NeovimObject
  *
  * \warning Do not call this before NeovimConnector::ready as been signaled
+ * \see NeovimConnector::isReady
  */
 Neovim* NeovimConnector::neovimObject()
 {
+	Q_ASSERT(m_ready);
 	if ( !m_neovimobj ) {
 		m_neovimobj = new Neovim(this);
 	}

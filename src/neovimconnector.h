@@ -19,6 +19,7 @@ class NeovimConnector: public QObject
 {
 	friend class Neovim;
 	Q_OBJECT
+	Q_PROPERTY(bool ready READ isReady NOTIFY ready)
 	Q_ENUMS(NeovimError)
 public:
 	enum NeovimError {
@@ -81,6 +82,7 @@ public:
 	};
 
 
+	bool isReady();
 	Neovim* neovimObject();
 	uint64_t channel();
 	QString decode(const QByteArray&);
@@ -140,6 +142,7 @@ private:
 	QStringList m_connParams;
 	QString m_connSocket, m_connHost;
 	int m_connPort;
+	bool m_ready;
 };
 } // namespace NeovimQt
 Q_DECLARE_METATYPE(NeovimQt::NeovimConnector::NeovimError)
