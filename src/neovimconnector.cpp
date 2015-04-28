@@ -131,7 +131,6 @@ QByteArray NeovimConnector::encode(const QString& in)
  */
 Neovim* NeovimConnector::neovimObject()
 {
-	Q_ASSERT(m_ready);
 	if ( !m_neovimobj ) {
 		m_neovimobj = new Neovim(this);
 	}
