@@ -13,9 +13,11 @@
 namespace NeovimQt {
 
 class MsgpackIODevice;
+class NeovimConnectorHelper;
 class NeovimConnector: public QObject
 {
 	friend class Neovim;
+	friend class NeovimConnectorHelper;
 	Q_OBJECT
 	Q_PROPERTY(bool ready READ isReady NOTIFY ready)
 	Q_ENUMS(NeovimError)
@@ -72,21 +74,15 @@ protected:
 	void setError(NeovimError err, const QString& msg);
 	void clearError();
 
-	// Function table
-	void addFunctions(const msgpack_object& ftable);
-
 protected slots:
 	void discoverMetadata();
-	void handleMetadata(uint32_t, Function::FunctionId, const msgpack_object& result);
-	void handleMetadataError(uint32_t msgid, Function::FunctionId,
-		const QString& msg, const msgpack_object& errobj);
 	void processError(QProcess::ProcessError);
 	void socketError();
 	void msgpackError();
-	void encodingChanged(const QVariant&);
 
 private:
 	MsgpackIODevice *m_dev;
+	NeovimConnectorHelper *m_helper;
 	QString m_errorString;
 	NeovimError m_error;
 

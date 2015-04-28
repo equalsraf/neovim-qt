@@ -3,8 +3,8 @@
 #include <QMetaMethod>
 #include <QLocalSocket>
 #include "neovimrequest.h"
+#include "neovimconnectorhelper.h"
 #include "msgpackiodevice.h"
-#include "util.h"
 
 namespace NeovimQt {
 
@@ -19,9 +19,10 @@ namespace NeovimQt {
  * Create a new Neovim API connection from an open IO device
  */
 NeovimConnector::NeovimConnector(QIODevice *dev)
-:QObject(), m_dev(0), m_error(NoError), m_neovimobj(NULL), 
+:QObject(), m_dev(0), m_helper(0), m_error(NoError), m_neovimobj(NULL), 
 	m_channel(0), m_ctype(OtherConnection), m_ready(false)
 {
+	m_helper = new NeovimConnectorHelper(this);
 	m_dev = new MsgpackIODevice(dev, this);
 	qRegisterMetaType<NeovimError>("NeovimError");
 
@@ -103,106 +104,9 @@ void NeovimConnector::discoverMetadata()
 {
 	NeovimRequest *r = m_dev->startRequestUnchecked("vim_get_api_info", 0);
 	connect(r, &NeovimRequest::finished,
-			this, &NeovimConnector::handleMetadata);
+			m_helper, &NeovimConnectorHelper::handleMetadata);
 	connect(r, &NeovimRequest::error,
-			this, &NeovimConnector::handleMetadataError);
-}
-
-/**
- * Handle the *functions* attribute in the metadata
- */
-void NeovimConnector::addFunctions(const msgpack_object& ftable)
-{
-	if ( ftable.type != MSGPACK_OBJECT_ARRAY ) {
-		setError( UnexpectedMsg,
-				tr("Found unexpected data type when unpacking function table"));
-		return;
-	}
-
-	QList<Function::FunctionId> supported;
-	for (uint32_t i=0; i<ftable.via.array.size; i++) {
-		Function::FunctionId fid = Function::functionId(Function::fromMsgpack(ftable.via.array.ptr[i]));
-		if (fid != Function::NEOVIM_FN_NULL) {
-			supported.append(fid);
-		}
-	}
-
-	if ( Function::knownFunctions.size() != supported.size() ) {
-		setError( APIMisMatch,
-				tr("API methods mismatch: Cannot connect to this instance of Neovim, its version is likely too old, or the API has changed"));
-		return;
-	}
-}
-
-void NeovimConnector::handleMetadataError(uint32_t msgid, Function::FunctionId,
-		const QString& msg, const msgpack_object& errobj)
-{
-	setError( NoMetadata,
-		tr("Unable to get Neovim api information"));
-	// TODO: better error message (from result?)
-	return;
-}
-
-/**
- * Process metadata object returned by Neovim
- *
- * - Set channel_id
- * - Check if all functions we need are available
- */
-void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, const msgpack_object& result)
-{
-	if ( result.type != MSGPACK_OBJECT_ARRAY || 
-			result.via.array.size != 2 ||
-			result.via.array.ptr[0].type != MSGPACK_OBJECT_POSITIVE_INTEGER ||
-			result.via.array.ptr[1].type != MSGPACK_OBJECT_MAP ) {
-		setError(UnexpectedMsg,
-				tr("Unable to unpack metadata response description, unexpected data type"));
-		return;
-	}
-
-	m_channel = result.via.array.ptr[0].via.u64;
-
-	const msgpack_object metadata = result.via.array.ptr[1];
-	if (metadata.type != MSGPACK_OBJECT_MAP) {
-		setError(MetadataDescriptorError,
-				tr("Found unexpected data type for metadata description"));
-		return;
-	}
-
-	for (uint32_t i=0; i< metadata.via.map.size; i++) {
-		QByteArray key;
-		if (decodeMsgpack(metadata.via.map.ptr[i].key, key)) {
-			setError(MetadataDescriptorError,
-				tr("Found unexpected data type for metadata key"));
-			continue;
-		}
-		if ( key == "functions" ) {
-			addFunctions(metadata.via.map.ptr[i].val);
-		} else if ( key == "classes" ) {
-		}
-	}
-
-	if (errorCause() == NoError) {
-		// Get &encoding before we signal readyness
-		connect(neovimObject(), &Neovim::on_vim_get_option,
-				this, &NeovimConnector::encodingChanged);
-		neovimObject()->vim_get_option("encoding");
-	}
-}
-
-/**
- * Called after metadata discovery, to get the &encoding
- */
-void NeovimConnector::encodingChanged(const QVariant&  obj)
-{
-	disconnect(neovimObject(), &Neovim::on_vim_get_option,
-			this, &NeovimConnector::encodingChanged);
-	m_dev->setEncoding(obj.toByteArray());
-	const QByteArray enc_name = obj.toByteArray();
-	if (m_dev->setEncoding(enc_name)) {
-		m_ready = true;
-		emit ready();
-	}
+			m_helper, &NeovimConnectorHelper::handleMetadataError);
 }
 
 bool NeovimConnector::isReady()
