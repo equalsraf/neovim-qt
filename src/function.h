@@ -24,7 +24,7 @@ public:
 	Function();
 	Function(const QString& ret, const QString& name, QList<QPair<QString,QString> > params, bool can_fail);
 	Function(const QString& ret, const QString& name, QList<QString> paramTypes, bool can_fail);
-	bool isValid();
+	bool isValid() const;
 	bool operator==(const Function& other);
 	static Function fromMsgpack(const msgpack_object&);
 	static QList<QPair<QString,QString> > parseParameters(const msgpack_object& obj);
@@ -44,6 +44,7 @@ public:
 	 * signature. The list is populated at compile time from a code generator.
 	 */
 	const static QList<Function> knownFunctions;
+	static FunctionId functionId(const Function&);
 private:
 	bool m_valid;
 };

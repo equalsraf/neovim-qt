@@ -13,7 +13,6 @@
 namespace NeovimQt {
 
 class MsgpackIODevice;
-class NeovimRequest;
 class NeovimConnector: public QObject
 {
 	friend class Neovim;
@@ -74,9 +73,7 @@ protected:
 	void clearError();
 
 	// Function table
-	Function::FunctionId addFunction(const msgpack_object& ftable);
 	void addFunctions(const msgpack_object& ftable);
-	void addClasses(const msgpack_object& ftable);
 
 protected slots:
 	void discoverMetadata();

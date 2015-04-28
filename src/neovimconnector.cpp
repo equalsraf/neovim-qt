@@ -121,7 +121,7 @@ void NeovimConnector::addFunctions(const msgpack_object& ftable)
 
 	QList<Function::FunctionId> supported;
 	for (uint32_t i=0; i<ftable.via.array.size; i++) {
-		Function::FunctionId fid = addFunction(ftable.via.array.ptr[i]);
+		Function::FunctionId fid = Function::functionId(Function::fromMsgpack(ftable.via.array.ptr[i]));
 		if (fid != Function::NEOVIM_FN_NULL) {
 			supported.append(fid);
 		}
@@ -131,51 +131,6 @@ void NeovimConnector::addFunctions(const msgpack_object& ftable)
 		setError( APIMisMatch,
 				tr("API methods mismatch: Cannot connect to this instance of Neovim, its version is likely too old, or the API has changed"));
 		return;
-	}
-}
-
-/**
- * Add a function, return the FunctionId or NEOVIM_FN_NULL if the
- * funciton is uknown
- */
-Function::FunctionId NeovimConnector::addFunction(const msgpack_object& fun)
-{
-	if ( fun.type != MSGPACK_OBJECT_MAP ) {
-		setError( UnexpectedMsg,
-			tr("Found unexpected data type when unpacking function"));
-		return Function::NEOVIM_FN_NULL;
-	}	
-
-	Function f = Function::fromMsgpack(fun);
-	if ( !f.isValid() ) {
-		setError( UnexpectedMsg,
-			tr("Error parsing function metadata"));
-		return Function::NEOVIM_FN_NULL;
-	}
-	int index = Function::knownFunctions.indexOf(f);
-	if ( index != -1 ) {
-		return Function::FunctionId(index);
-	}
-	qDebug() << "Found unknown function in metadata" << f.signature();
-	return Function::NEOVIM_FN_NULL;
-}
-
-/**
- * Handle the *classes* attribute in the metadata
- */
-void NeovimConnector::addClasses(const msgpack_object& ctable)
-{
-	if ( ctable.type != MSGPACK_OBJECT_ARRAY ) {
-		setError( UnexpectedMsg,
-			tr("Found unexpected data type when unpacking class table"));
-		return;
-	}
-	for (uint32_t i=0; i<ctable.via.array.size; i++) {
-		if ( ctable.via.array.ptr[i].type != MSGPACK_OBJECT_BIN ) {
-			setError( UnexpectedMsg,
-					tr("Found unexpected data type for class name"));
-			return;
-		}
 	}
 }
 
@@ -224,15 +179,14 @@ void NeovimConnector::handleMetadata(uint32_t msgid, Function::FunctionId, const
 		if ( key == "functions" ) {
 			addFunctions(metadata.via.map.ptr[i].val);
 		} else if ( key == "classes" ) {
-			addClasses(metadata.via.map.ptr[i].val);
 		}
 	}
 
 	if (errorCause() == NoError) {
 		// Get &encoding before we signal readyness
-		neovimObject()->vim_get_option("encoding");
 		connect(neovimObject(), &Neovim::on_vim_get_option,
 				this, &NeovimConnector::encodingChanged);
+		neovimObject()->vim_get_option("encoding");
 	}
 }
 
@@ -302,9 +256,6 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 			c, SIGNAL(processExited(int)));
 	connect(p, &QProcess::started,
 			c, &NeovimConnector::discoverMetadata);
-	// The connector raised and error because the IO device is
-	// closed - reset error state
-	c->clearError();
 	p->start("nvim", args);
 	return c;
 }
@@ -321,9 +272,6 @@ NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 			c, SLOT(socketError()));
 	connect(s, &QLocalSocket::connected,
 			c, &NeovimConnector::discoverMetadata);
-	// The connector raised and error because the IO device is
-	// closed - reset error state
-	c->clearError();
 	s->connectToServer(path);
 	return c;
 }
@@ -341,7 +289,6 @@ NeovimConnector* NeovimConnector::connectToHost(const QString& host, int port)
 			c, SLOT(socketError()));
 	connect(s, &QAbstractSocket::connected,
 			c, &NeovimConnector::discoverMetadata);
-	c->clearError();
 	s->connectToHost(host, port);
 	return c;
 }

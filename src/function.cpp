@@ -61,7 +61,7 @@ Function::Function(const QString& ret, const QString& name, QList<QString> param
 /**
  * Returns true if this function has all the necessary attributes
  */
-bool Function::isValid()
+bool Function::isValid() const
 {
 	return m_valid;
 }
@@ -101,11 +101,13 @@ Function Function::fromMsgpack(const msgpack_object& fun)
 {
 	Function f;
 	if ( fun.type != MSGPACK_OBJECT_MAP ) {
+		qDebug() << "Found unexpected data type when unpacking function" << fun;
 		return f;
 	}
 
 	for (uint32_t i=0; i<fun.via.map.size; i++) {
 		if ( fun.via.map.ptr[i].key.type != MSGPACK_OBJECT_BIN ) {
+			qDebug() << "Found unexpected data type when unpacking function" << fun;
 			return f;
 		}
 
@@ -113,21 +115,25 @@ Function Function::fromMsgpack(const msgpack_object& fun)
 		msgpack_object& val = fun.via.map.ptr[i].val;
 		if ( key == "return_type" ) {
 			if ( val.type != MSGPACK_OBJECT_BIN ) {
+				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
 			f.return_type = QString::fromUtf8(val.via.bin.ptr, val.via.bin.size);
 		} else if ( key == "name" ) {
 			if ( val.type != MSGPACK_OBJECT_BIN ) {
+				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
 			f.name = QString::fromUtf8(val.via.bin.ptr, val.via.bin.size);
 		} else if ( key == "can_fail" ) {
 			if ( val.type != MSGPACK_OBJECT_BOOLEAN ) {
+				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
 			f.can_fail = val.via.boolean;
 		} else if ( key == "parameters" ) {
 			if ( val.type != MSGPACK_OBJECT_ARRAY ) {
+				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
 			f.parameters = parseParameters(val);
@@ -197,6 +203,24 @@ QString Function::signature() const
 	}
 	return  QString("%1 %2(%3)%4").arg(return_type).arg(name).arg(sigparams.join(", ")).arg(notes);
 }
+
+/**
+ * return the FunctionId or NEOVIM_FN_NULL if the
+ * function is uknown
+ */
+Function::FunctionId Function::functionId(const Function& f)
+{
+	if ( !f.isValid() ) {
+		return Function::NEOVIM_FN_NULL;
+	}
+	int index = Function::knownFunctions.indexOf(f);
+	if ( index != -1 ) {
+		return Function::FunctionId(index);
+	}
+	qDebug() << "Unknown Neovim function" << f.signature();
+	return Function::NEOVIM_FN_NULL;
+}
+
 
 } // Namespace
 
