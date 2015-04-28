@@ -51,7 +51,8 @@ function(WinDeployQt)
 	endif()
 
 	add_custom_target(windeployqt ${_deploy_PROGRAM} ${_ARGS}
-		$<TARGET_FILE:${_deploy_TARGET}>)
+		$<TARGET_FILE:${_deploy_TARGET}>
+		DEPENDS ${_deploy_TARGET})
 endfunction()
 
 
