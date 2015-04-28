@@ -35,6 +35,10 @@ void MainWindow::init(NeovimConnector *c)
 	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
 			this, &MainWindow::reconnectNeovim);
 	m_shell->setFocus(Qt::OtherFocusReason);
+
+	if (m_nvim->errorCause()) {
+		neovimError(m_nvim->errorCause());
+	}
 }
 
 QDockWidget* MainWindow::newDockWidgetFor(QWidget *w)
