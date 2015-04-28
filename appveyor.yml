@@ -27,8 +27,6 @@ build_script:
 - cmake -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=%configuration% -DCMAKE_INSTALL_PREFIX=../INSTALL ..
 # FYI CMAKE_BUILD_TYPE does not work with VS generators, use --config
 - cmake --build . --config %configuration% --target windeployqt
-#- call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86
-#- if "%configuration%" == "RelWithDebInfo" windeployqt --libdir ../INSTALL/bin --release --compiler-runtime --no-webkit2 --no-webkit ../INSTALL/bin
 artifacts:
 - path: build/bin
   name: neovim-qt
