@@ -1,4 +1,4 @@
-// Auto generated 2015-04-02 14:51:10.959077
+// Auto generated 2015-04-28 16:04:57.389355
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
@@ -64,34 +64,6 @@ public slots:
 	void buffer_insert(int64_t buffer, int64_t lnum, QList<QByteArray> lines);
 	// ArrayOf(Integer, 2) buffer_get_mark(Buffer buffer, String name, ) !fails
 	void buffer_get_mark(int64_t buffer, QByteArray name);
-	// Buffer window_get_buffer(Window window, ) !fails
-	void window_get_buffer(int64_t window);
-	// ArrayOf(Integer, 2) window_get_cursor(Window window, ) !fails
-	void window_get_cursor(int64_t window);
-	// void window_set_cursor(Window window, ArrayOf(Integer, 2) pos, ) !fails
-	void window_set_cursor(int64_t window, QPoint pos);
-	// Integer window_get_height(Window window, ) !fails
-	void window_get_height(int64_t window);
-	// void window_set_height(Window window, Integer height, ) !fails
-	void window_set_height(int64_t window, int64_t height);
-	// Integer window_get_width(Window window, ) !fails
-	void window_get_width(int64_t window);
-	// void window_set_width(Window window, Integer width, ) !fails
-	void window_set_width(int64_t window, int64_t width);
-	// Object window_get_var(Window window, String name, ) !fails
-	void window_get_var(int64_t window, QByteArray name);
-	// Object window_set_var(Window window, String name, Object value, ) !fails
-	void window_set_var(int64_t window, QByteArray name, QVariant value);
-	// Object window_get_option(Window window, String name, ) !fails
-	void window_get_option(int64_t window, QByteArray name);
-	// void window_set_option(Window window, String name, Object value, ) !fails
-	void window_set_option(int64_t window, QByteArray name, QVariant value);
-	// ArrayOf(Integer, 2) window_get_position(Window window, ) !fails
-	void window_get_position(int64_t window);
-	// Tabpage window_get_tabpage(Window window, ) !fails
-	void window_get_tabpage(int64_t window);
-	// Boolean window_is_valid(Window window, ) 
-	void window_is_valid(int64_t window);
 	// void vim_command(String str, ) !fails
 	void vim_command(QByteArray str);
 	// void vim_feedkeys(String keys, String mode, Boolean escape_csi, ) 
@@ -156,6 +128,34 @@ public slots:
 	void vim_unsubscribe(QByteArray event);
 	// Integer vim_name_to_color(String name, ) 
 	void vim_name_to_color(QByteArray name);
+	// Buffer window_get_buffer(Window window, ) !fails
+	void window_get_buffer(int64_t window);
+	// ArrayOf(Integer, 2) window_get_cursor(Window window, ) !fails
+	void window_get_cursor(int64_t window);
+	// void window_set_cursor(Window window, ArrayOf(Integer, 2) pos, ) !fails
+	void window_set_cursor(int64_t window, QPoint pos);
+	// Integer window_get_height(Window window, ) !fails
+	void window_get_height(int64_t window);
+	// void window_set_height(Window window, Integer height, ) !fails
+	void window_set_height(int64_t window, int64_t height);
+	// Integer window_get_width(Window window, ) !fails
+	void window_get_width(int64_t window);
+	// void window_set_width(Window window, Integer width, ) !fails
+	void window_set_width(int64_t window, int64_t width);
+	// Object window_get_var(Window window, String name, ) !fails
+	void window_get_var(int64_t window, QByteArray name);
+	// Object window_set_var(Window window, String name, Object value, ) !fails
+	void window_set_var(int64_t window, QByteArray name, QVariant value);
+	// Object window_get_option(Window window, String name, ) !fails
+	void window_get_option(int64_t window, QByteArray name);
+	// void window_set_option(Window window, String name, Object value, ) !fails
+	void window_set_option(int64_t window, QByteArray name, QVariant value);
+	// ArrayOf(Integer, 2) window_get_position(Window window, ) !fails
+	void window_get_position(int64_t window);
+	// Tabpage window_get_tabpage(Window window, ) !fails
+	void window_get_tabpage(int64_t window);
+	// Boolean window_is_valid(Window window, ) 
+	void window_is_valid(int64_t window);
 
 signals:
 	void on_ui_try_resize();
@@ -220,47 +220,6 @@ signals:
 
 	void on_buffer_get_mark(QPoint);
 	void err_buffer_get_mark(const QString&, const QVariant&);
-
-	void on_window_get_buffer(int64_t);
-	void err_window_get_buffer(const QString&, const QVariant&);
-
-	void on_window_get_cursor(QPoint);
-	void err_window_get_cursor(const QString&, const QVariant&);
-
-	void on_window_set_cursor(void);
-	void err_window_set_cursor(const QString&, const QVariant&);
-
-	void on_window_get_height(int64_t);
-	void err_window_get_height(const QString&, const QVariant&);
-
-	void on_window_set_height(void);
-	void err_window_set_height(const QString&, const QVariant&);
-
-	void on_window_get_width(int64_t);
-	void err_window_get_width(const QString&, const QVariant&);
-
-	void on_window_set_width(void);
-	void err_window_set_width(const QString&, const QVariant&);
-
-	void on_window_get_var(QVariant);
-	void err_window_get_var(const QString&, const QVariant&);
-
-	void on_window_set_var(QVariant);
-	void err_window_set_var(const QString&, const QVariant&);
-
-	void on_window_get_option(QVariant);
-	void err_window_get_option(const QString&, const QVariant&);
-
-	void on_window_set_option(void);
-	void err_window_set_option(const QString&, const QVariant&);
-
-	void on_window_get_position(QPoint);
-	void err_window_get_position(const QString&, const QVariant&);
-
-	void on_window_get_tabpage(int64_t);
-	void err_window_get_tabpage(const QString&, const QVariant&);
-
-	void on_window_is_valid(bool);
 
 	void on_vim_command(void);
 	void err_vim_command(const QString&, const QVariant&);
@@ -341,6 +300,47 @@ signals:
 	void on_vim_unsubscribe(void);
 
 	void on_vim_name_to_color(int64_t);
+
+	void on_window_get_buffer(int64_t);
+	void err_window_get_buffer(const QString&, const QVariant&);
+
+	void on_window_get_cursor(QPoint);
+	void err_window_get_cursor(const QString&, const QVariant&);
+
+	void on_window_set_cursor(void);
+	void err_window_set_cursor(const QString&, const QVariant&);
+
+	void on_window_get_height(int64_t);
+	void err_window_get_height(const QString&, const QVariant&);
+
+	void on_window_set_height(void);
+	void err_window_set_height(const QString&, const QVariant&);
+
+	void on_window_get_width(int64_t);
+	void err_window_get_width(const QString&, const QVariant&);
+
+	void on_window_set_width(void);
+	void err_window_set_width(const QString&, const QVariant&);
+
+	void on_window_get_var(QVariant);
+	void err_window_get_var(const QString&, const QVariant&);
+
+	void on_window_set_var(QVariant);
+	void err_window_set_var(const QString&, const QVariant&);
+
+	void on_window_get_option(QVariant);
+	void err_window_get_option(const QString&, const QVariant&);
+
+	void on_window_set_option(void);
+	void err_window_set_option(const QString&, const QVariant&);
+
+	void on_window_get_position(QPoint);
+	void err_window_get_position(const QString&, const QVariant&);
+
+	void on_window_get_tabpage(int64_t);
+	void err_window_get_tabpage(const QString&, const QVariant&);
+
+	void on_window_is_valid(bool);
 
 };
 } // namespace

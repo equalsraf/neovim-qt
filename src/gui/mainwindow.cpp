@@ -93,5 +93,5 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 	}
 }
 
-}; // Namespace
+} // Namespace
 

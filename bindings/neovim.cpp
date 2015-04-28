@@ -2,20 +2,24 @@
 #include "neovim.h"
 #include "neovimconnector.h"
 #include "neovimrequest.h"
+#include "msgpackiodevice.h"
+#include "util.h"
 
 namespace NeovimQt {
 
 Neovim::Neovim(NeovimConnector *c)
 :m_c(c)
 {
+	connect(m_c->m_dev, &MsgpackIODevice::notification,
+			this, &Neovim::neovimNotification);
 }
 
 
 void Neovim::ui_try_resize(int64_t width, int64_t height)
 {
-	NeovimRequest *r = m_c->startRequestUnchecked("ui_try_resize", 2);
-	m_c->send(width);
-	m_c->send(height);
+	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("ui_try_resize", 2);
+	m_c->m_dev->send(width);
+	m_c->m_dev->send(height);
 	connect(r, &NeovimRequest::finished, this, &Neovim::on_ui_try_resize);
 }
 
@@ -24,12 +28,12 @@ void Neovim::ui_try_resize(int64_t width, int64_t height)
 {% for f in functions %}
 void Neovim::{{f.name}}({{f.argstring}})
 {
-	NeovimRequest *r = m_c->startRequestUnchecked("{{f.name}}", {{f.argcount}});
+	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("{{f.name}}", {{f.argcount}});
 	r->setFunction(Function::NEOVIM_FN_{{f.name.upper()}});
 	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
 {% for param in f.parameters %}
-	m_c->{{param.sendmethod}}({{param.name}});
+	m_c->m_dev->{{param.sendmethod}}({{param.name}});
 {% endfor %}
 }
 {% endfor %}

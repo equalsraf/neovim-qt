@@ -7,13 +7,12 @@
 #include <QProcess>
 #include <QTextCodec>
 #include <QTcpSocket>
-#include <msgpack.h>
-#include "util.h"
 #include "function.h"
 #include "auto/neovim.h"
 
 namespace NeovimQt {
 
+class MsgpackIODevice;
 class NeovimRequest;
 class NeovimConnector: public QObject
 {
@@ -24,9 +23,6 @@ class NeovimConnector: public QObject
 public:
 	enum NeovimError {
 		NoError=0,
-		DeviceNotOpen,
-		InvalidDevice,
-		InvalidMsgpack,
 		NoMetadata,
 		MetadataDescriptorError,
 		UnexpectedMsg,
@@ -34,8 +30,8 @@ public:
 		NoSuchMethod,
 		FailedToStart,
 		Crashed,
-		UnsupportedEncoding,
 		SocketError,
+		MsgpackError,
 		RuntimeMsgpackError,
 	};
 
@@ -47,7 +43,6 @@ public:
         };
 
 	NeovimConnector(QIODevice* s);
-	~NeovimConnector();
 	static NeovimConnector* spawn(const QStringList& params=QStringList());
 	static NeovimConnector* connectToSocket(const QString&);
 	static NeovimConnector* connectToHost(const QString& host, int port);
@@ -62,25 +57,6 @@ public:
 	// FIXME: remove this
 	void attachUi(int64_t width, int64_t height);
 	void detachUi();
-
-	NeovimRequest* startRequestUnchecked(const QString& method, uint32_t argcount);
-
-	// Methods to pack datatypes as message pack
-	// This is what you can use for arguments after startRequest
-	void send(int64_t);
-	void send(const QVariant&);
-	void send(const QByteArray&);
-	void send(bool);
-	void send(const QList<QByteArray>& list);
-
-	template <class T>
-	void sendArrayOf(const QList<T>& list) {
-		msgpack_pack_array(&m_pk, list.size());
-		foreach(const T& elem, list) {
-			send(elem);
-		}
-	};
-
 
 	bool isReady();
 	Neovim* neovimObject();
@@ -97,45 +73,28 @@ protected:
 	void setError(NeovimError err, const QString& msg);
 	void clearError();
 
-	// Message handlers
-	void dispatch(msgpack_object& obj);
-	void dispatchRequest(msgpack_object& obj);
-	void dispatchResponse(msgpack_object& obj);
-	void dispatchNotification(msgpack_object& obj);
-	void sendError(const msgpack_object& req, const QString& msg);
-
 	// Function table
 	Function::FunctionId addFunction(const msgpack_object& ftable);
 	void addFunctions(const msgpack_object& ftable);
 	void addClasses(const msgpack_object& ftable);
-	QList<QByteArray> parseParameterTypes(const msgpack_object&);
-	uint32_t msgId();
 
 protected slots:
 	void discoverMetadata();
-	void dataAvailable();
 	void handleMetadata(uint32_t, Function::FunctionId, const msgpack_object& result);
 	void handleMetadataError(uint32_t msgid, Function::FunctionId,
 		const QString& msg, const msgpack_object& errobj);
 	void processError(QProcess::ProcessError);
 	void socketError();
+	void msgpackError();
 	void encodingChanged(const QVariant&);
 
 private:
-	static int msgpack_write_cb(void* data, const char* buf, unsigned long int len);
-
-	uint32_t reqid;
-	QIODevice *m_dev;
-	msgpack_packer m_pk;
-	msgpack_unpacker m_uk;
-
-	QHash<uint32_t, NeovimRequest*> m_requests;
+	MsgpackIODevice *m_dev;
 	QString m_errorString;
 	NeovimError m_error;
 
 	Neovim *m_neovimobj;
 	uint64_t m_channel;
-	QTextCodec *m_encoding;
 
 	// Store connection arguments for reconnect()
 	NeovimConnectionType m_ctype;

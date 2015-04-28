@@ -19,6 +19,6 @@ public:
 
 extern InputConv Input;
 
-}; //Namespace
+} //Namespace
 
 #endif

@@ -1,5 +1,7 @@
 #include "neovimrequest.h"
 #include "neovimconnector.h"
+#include "msgpackiodevice.h"
+#include "util.h"
 
 namespace NeovimQt {
 
@@ -18,10 +20,10 @@ namespace NeovimQt {
 /**
  * Creates a new NeovimRequest, identified by id
  *
- * \see NeovimQt::NeovimConnector::msgId
+ * \see NeovimQt::MsgpackIODevice::msgId
  */
-NeovimRequest::NeovimRequest(uint32_t id, NeovimConnector *c, QObject *parent)
-:QObject(parent), m_id(id), m_c(c), m_function(Function::NEOVIM_FN_NULL)
+NeovimRequest::NeovimRequest(uint32_t id, MsgpackIODevice *dev, QObject *parent)
+:QObject(parent), m_id(id), m_dev(dev), m_function(Function::NEOVIM_FN_NULL)
 {
 }
 
@@ -45,7 +47,7 @@ void NeovimRequest::processResponse(const msgpack_object& res, bool failed)
 			res.via.array.size >= 2 ) {
 		QByteArray val;
 		if (!decodeMsgpack(res.via.array.ptr[1], val)) {
-			emit error(this->m_id, m_function, m_c->decode(val), res);
+			emit error(this->m_id, m_function, m_dev->decode(val), res);
 			return;
 		}
 	}

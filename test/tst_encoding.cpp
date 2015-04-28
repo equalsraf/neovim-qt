@@ -2,6 +2,7 @@
 #include <QtTest/QtTest>
 #include <QLocalSocket>
 #include <neovimconnector.h>
+#include <util.h>
 
 class TestEncoding: public QObject
 {
