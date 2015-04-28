@@ -57,6 +57,10 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 			this, &Shell::neovimError);
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &Shell::neovimExited);
+
+	if (m_nvim->isReady()) {
+		neovimIsReady();
+	}
 }
 
 Shell::~Shell()
