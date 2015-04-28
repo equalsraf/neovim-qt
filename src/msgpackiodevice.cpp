@@ -106,11 +106,15 @@ void MsgpackIODevice::sendError(const msgpack_object& req, const QString& msg)
 	if ( req.via.array.ptr[0].via.u64 != 0 ) {
 		qFatal("Errors can only be send as replies to Requests(type=0)");
 	}
+	sendError(req.via.array.ptr[1].via.u64, msg);
+}
 
+void MsgpackIODevice::sendError(uint64_t msgid, const QString& msg)
+{
 	// [type(1), msgid, error, result(nil)]
 	msgpack_pack_array(&m_pk, 4);
 	msgpack_pack_int(&m_pk, 1); // 1 = Response
-	msgpack_pack_int(&m_pk, req.via.array.ptr[1].via.u64);
+	msgpack_pack_int(&m_pk, msgid);
 	QByteArray utf8 = msg.toUtf8();
 	msgpack_pack_bin(&m_pk, utf8.size());
 	msgpack_pack_bin_body(&m_pk, utf8.constData(), utf8.size());
@@ -198,6 +202,24 @@ void MsgpackIODevice::dispatchRequest(msgpack_object& req)
 }
 
 /**
+ * Send back a response [type(1), msgid(uint), error(...), result(...)]
+ */
+bool MsgpackIODevice::sendResponse(uint64_t msgid, const QVariant& err, const QVariant& res)
+{
+	if (!checkVariant(err) || !checkVariant(res)) {
+		sendError(msgid, tr("Internal server error, could not serialize response"));
+		return false;
+	}
+
+	msgpack_pack_array(&m_pk, 4);
+	msgpack_pack_int(&m_pk, 1);
+	msgpack_pack_int(&m_pk, msgid);
+	send(err);
+	send(res);
+	return true;
+}
+
+/**
  * Handle response messages
  *
  * [type(1), msgid(uint), error(str?), result(...)]
@@ -237,7 +259,7 @@ void MsgpackIODevice::dispatchNotification(msgpack_object& nt)
 	QVariant val; 
 	if (decodeMsgpack(nt.via.array.ptr[2], val) ||
 			(QMetaType::Type)val.type() != QMetaType::QVariantList  ) {
-		qDebug() << "Unable to unpack notification parameters";
+		qDebug() << "Unable to unpack notification parameters" << nt;
 		return;
 	}
 	emit notification(methodName, val.toList());

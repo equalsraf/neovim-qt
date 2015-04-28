@@ -47,13 +47,15 @@ public:
 	QByteArray encode(const QString&);
 	QString decode(const QByteArray&);
 
+	bool sendResponse(uint64_t msgid, const QVariant& err, const QVariant& res);
+
 signals:
 	void error(MsgpackError);
 	void notification(const QByteArray &name, const QVariantList& args);
 
 protected:
-
 	void sendError(const msgpack_object& req, const QString& msg);
+	void sendError(uint64_t msgid, const QString& msg);
 	void dispatch(msgpack_object& obj);
 	void dispatchRequest(msgpack_object& obj);
 	void dispatchResponse(msgpack_object& obj);
