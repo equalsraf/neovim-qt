@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QAbstractSocket>
-#include <QHash>
 #include <QProcess>
 #include <QTextCodec>
 #include <QTcpSocket>

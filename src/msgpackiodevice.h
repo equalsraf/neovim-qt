@@ -2,6 +2,7 @@
 #define NEOVIM_QT_MSGPACKIODEVICE
 
 #include <QIODevice>
+#include <QHash>
 #include <msgpack.h>
 
 namespace NeovimQt {
