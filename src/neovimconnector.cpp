@@ -685,7 +685,6 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 	QStringList args = params;
 	args << "--embed";
 	args << "-T" << "abstract_ui";
-	p->start("nvim", args);
 
 	NeovimConnector *c = new NeovimConnector(p);
 	c->m_ctype = SpawnedConnection;
@@ -697,7 +696,8 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 			c, SIGNAL(processExited(int)));
 	// The connector raised and error because the IO device is
 	// closed - reset error state
-	c->setError(NoError, "");
+	c->clearError();
+	p->start("nvim", args);
 	return c;
 }
 
@@ -768,7 +768,7 @@ void NeovimConnector::processError(QProcess::ProcessError err)
 {
 	switch(err) {
 	case QProcess::FailedToStart:
-		setError(FailedToStart, "Unable to start the Neovim process");
+		setError(FailedToStart, m_dev->errorString());
 		break;
 	case QProcess::Crashed:
 		setError(Crashed, "The Neovim process has crashed");
