@@ -1,5 +1,5 @@
 version: '{build}'
-skip_tags: true
+skip_tags: false
 os: MinGW
 shallow_clone: true
 environment:
