@@ -11,5 +11,5 @@ target_link_libraries(nvim-qt-widget ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt)
 
 if(WIN32)
 	include(WinDeployQt)
-	WinDeployQt(TARGET nvim-qt INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
+	WinDeployQt(TARGET nvim-qt COMPILER_RUNTIME INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
 endif()
