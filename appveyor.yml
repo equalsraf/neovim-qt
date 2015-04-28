@@ -31,7 +31,7 @@ artifacts:
 - path: build/bin
   name: neovim-qt
 deploy:
-  release: neovim-qt-$(APPVEYOR_REPO_TAG_NAME)
+  release: neovim-qt-$(APPVEYOR_REPO_TAG_NAME)-$(APPVEYOR_BUILD_VERSION)
   description: Automated builds (Appveyor)
   provider: GitHub
   auth_token:
