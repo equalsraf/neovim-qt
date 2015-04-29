@@ -220,6 +220,23 @@ bool MsgpackIODevice::sendResponse(uint64_t msgid, const QVariant& err, const QV
 	return true;
 }
 
+/*
+ * Send [type(2), method, params]
+ * Returns false if the params could not be serialized
+ */
+bool MsgpackIODevice::sendNotification(const QByteArray& method, const QVariantList& params)
+{
+	if (!checkVariant(params)) {
+		return false;
+	}
+
+	msgpack_pack_array(&m_pk, 3);
+	msgpack_pack_int(&m_pk, 2);
+	send(method);
+	send(params);
+	return true;
+}
+
 /**
  * Handle response messages
  *

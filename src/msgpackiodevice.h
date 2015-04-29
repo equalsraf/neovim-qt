@@ -51,6 +51,7 @@ public:
 	QString decode(const QByteArray&);
 
 	bool sendResponse(uint64_t msgid, const QVariant& err, const QVariant& res);
+	bool sendNotification(const QByteArray& method, const QVariantList& params);
 
 signals:
 	void error(MsgpackError);
