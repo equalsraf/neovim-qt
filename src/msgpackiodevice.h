@@ -12,6 +12,7 @@ class MsgpackIODevice: public QObject
 {
 	Q_OBJECT
 	Q_ENUMS(MsgpackError)
+	Q_PROPERTY(MsgpackError error READ errorCause NOTIFY error)
 	Q_PROPERTY(QByteArray encoding READ encoding WRITE setEncoding)
 public:
 	enum MsgpackError {
@@ -25,6 +26,7 @@ public:
 
 	bool isOpen() {return m_dev->isOpen();}
 	QString errorString() const;
+	MsgpackError errorCause() const {return m_error;};
 
 	QByteArray encoding() const;
 	bool setEncoding(const QByteArray&);
