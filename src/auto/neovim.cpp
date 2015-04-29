@@ -1,4 +1,4 @@
-// Auto generated 2015-04-29 21:07:24.913484
+// Auto generated 2015-04-29 21:20:21.930954
 #include "neovim.h"
 #include "neovimconnector.h"
 #include "msgpackrequest.h"
@@ -597,7 +597,7 @@ void Neovim::window_is_valid(int64_t window)
 
 // Handlers
 
-void Neovim::handleResponseError(uint32_t msgid, Function::FunctionId fun, const QString& msg, const msgpack_object& res)
+void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const QString& msg, const msgpack_object& res)
 {
 	QVariant errObj;
 	if (decodeMsgpack(res, errObj)) {
@@ -754,7 +754,7 @@ void Neovim::handleResponseError(uint32_t msgid, Function::FunctionId fun, const
 	}
 }
 
-void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, const msgpack_object& res)
+void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const msgpack_object& res)
 {
 	switch(fun) {
 	case Function::NEOVIM_FN_TABPAGE_GET_WINDOWS:

@@ -18,7 +18,7 @@ NeovimConnectorHelper::NeovimConnectorHelper(NeovimConnector *c)
 {
 }
 
-void NeovimConnectorHelper::handleMetadataError(uint32_t msgid, Function::FunctionId,
+void NeovimConnectorHelper::handleMetadataError(quint32 msgid, Function::FunctionId,
 		const QString& msg, const msgpack_object& errobj)
 {
 	m_c->setError(NeovimConnector::NoMetadata,
@@ -33,7 +33,7 @@ void NeovimConnectorHelper::handleMetadataError(uint32_t msgid, Function::Functi
  * - Set channel_id
  * - Check if all functions we need are available
  */
-void NeovimConnectorHelper::handleMetadata(uint32_t msgid, Function::FunctionId, const msgpack_object& result)
+void NeovimConnectorHelper::handleMetadata(quint32 msgid, Function::FunctionId, const msgpack_object& result)
 {
 	if ( result.type != MSGPACK_OBJECT_ARRAY || 
 			result.via.array.size != 2 ||
@@ -53,7 +53,7 @@ void NeovimConnectorHelper::handleMetadata(uint32_t msgid, Function::FunctionId,
 		return;
 	}
 
-	for (uint32_t i=0; i< metadata.via.map.size; i++) {
+	for (quint32 i=0; i< metadata.via.map.size; i++) {
 		QByteArray key;
 		if (decodeMsgpack(metadata.via.map.ptr[i].key, key)) {
 			m_c->setError(NeovimConnector::MetadataDescriptorError,
@@ -102,7 +102,7 @@ void NeovimConnectorHelper::addFunctions(const msgpack_object& ftable)
 	}
 
 	QList<Function::FunctionId> supported;
-	for (uint32_t i=0; i<ftable.via.array.size; i++) {
+	for (quint32 i=0; i<ftable.via.array.size; i++) {
 		Function::FunctionId fid = Function::functionId(Function::fromMsgpack(ftable.via.array.ptr[i]));
 		if (fid != Function::NEOVIM_FN_NULL) {
 			supported.append(fid);

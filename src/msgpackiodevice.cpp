@@ -311,9 +311,9 @@ QString MsgpackIODevice::errorString() const
  * Returns a MsgpackRequest object. You can connect to
  * its finished() SIGNAL to handle the response
  */
-MsgpackRequest* MsgpackIODevice::startRequestUnchecked(const QString& method, uint32_t argcount)
+MsgpackRequest* MsgpackIODevice::startRequestUnchecked(const QString& method, quint32 argcount)
 {
-	uint32_t msgid = msgId();
+	quint32 msgid = msgId();
 	// [type(0), msgid, method, args]
 	msgpack_pack_array(&m_pk, 4);
 	msgpack_pack_int(&m_pk, 0);
@@ -331,7 +331,7 @@ MsgpackRequest* MsgpackIODevice::startRequestUnchecked(const QString& method, ui
 /**
  * Returns a new msgid that can be used for a msg
  */
-uint32_t MsgpackIODevice::msgId()
+quint32 MsgpackIODevice::msgId()
 {
 	return this->m_reqid++;
 }

@@ -31,8 +31,8 @@ public:
 	QByteArray encoding() const;
 	bool setEncoding(const QByteArray&);
 
-	uint32_t msgId();
-	MsgpackRequest* startRequestUnchecked(const QString& method, uint32_t argcount);
+	quint32 msgId();
+	MsgpackRequest* startRequestUnchecked(const QString& method, quint32 argcount);
 
 	void send(int64_t);
 	void send(const QVariant&);
@@ -72,12 +72,12 @@ protected slots:
 private:
 	static int msgpack_write_cb(void* data, const char* buf, unsigned long int len);
 
-	uint32_t m_reqid;
+	quint32 m_reqid;
 	QIODevice *m_dev;
 	QTextCodec *m_encoding;
 	msgpack_packer m_pk;
 	msgpack_unpacker m_uk;
-	QHash<uint32_t, MsgpackRequest*> m_requests;
+	QHash<quint32, MsgpackRequest*> m_requests;
 
 	QString m_errorString;
 	MsgpackError m_error;

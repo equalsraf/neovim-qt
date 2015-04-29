@@ -40,7 +40,7 @@ void Neovim::{{f.name}}({{f.argstring}})
 
 // Handlers
 
-void Neovim::handleResponseError(uint32_t msgid, Function::FunctionId fun, const QString& msg, const msgpack_object& res)
+void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const QString& msg, const msgpack_object& res)
 {
 	QVariant errObj;
 	if (decodeMsgpack(res, errObj)) {
@@ -60,7 +60,7 @@ void Neovim::handleResponseError(uint32_t msgid, Function::FunctionId fun, const
 	}
 }
 
-void Neovim::handleResponse(uint32_t msgid, Function::FunctionId fun, const msgpack_object& res)
+void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const msgpack_object& res)
 {
 	switch(fun) {
 {% for f in functions %}
