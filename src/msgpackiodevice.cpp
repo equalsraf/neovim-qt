@@ -15,7 +15,7 @@ namespace NeovimQt {
 
 
 MsgpackIODevice::MsgpackIODevice(QIODevice *dev, QObject *parent)
-:QObject(parent), m_reqid(0), m_dev(dev), m_encoding(0), m_error(NoError)
+:QObject(parent), m_reqid(0), m_dev(dev), m_encoding(0), m_reqHandler(0), m_error(NoError)
 {
 	qRegisterMetaType<MsgpackError>("MsgpackError");
 	m_dev->setParent(this);
@@ -189,17 +189,38 @@ void MsgpackIODevice::dispatch(msgpack_object& req)
  */
 void MsgpackIODevice::dispatchRequest(msgpack_object& req)
 {
-	qDebug() << "Received request for unknown method" << req.via.array.ptr[2];
 	uint64_t msgid = req.via.array.ptr[1].via.u64;
+	QByteArray errmsg("Unknown method");
+	QVariant params;
+	QByteArray method;
 
+	if (!m_reqHandler) {
+		goto err;
+	}
+
+	if (decodeMsgpack(req.via.array.ptr[2], method)) {
+		qDebug() << "Found unexpected method in request" << req;
+		goto err;
+	}
+	if (decodeMsgpack(req.via.array.ptr[3], params)) {
+		qDebug() << "Found unexpected parameters in request" << req;
+		goto err;
+	}
+	m_reqHandler->handleRequest(this, msgid, method, params.toList());
+
+err:
 	// Send error reply [type(1), msgid, error, NIL]
 	msgpack_pack_array(&m_pk, 4);
 	msgpack_pack_int(&m_pk, 1);
 	msgpack_pack_int(&m_pk, msgid);
-	QByteArray err = "Unknown method";
-	msgpack_pack_bin(&m_pk, err.size());
-	msgpack_pack_bin_body(&m_pk, err.constData(), err.size());
+	msgpack_pack_bin(&m_pk, errmsg.size());
+	msgpack_pack_bin_body(&m_pk, errmsg.constData(), errmsg.size());
 	msgpack_pack_nil(&m_pk);
+}
+
+void MsgpackIODevice::setRequestHandler(MsgpackRequestHandler *h)
+{
+	m_reqHandler = h;
 }
 
 /**

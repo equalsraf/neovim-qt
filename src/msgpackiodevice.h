@@ -8,6 +8,7 @@
 namespace NeovimQt {
 
 class MsgpackRequest;
+class MsgpackRequestHandler;
 class MsgpackIODevice: public QObject
 {
 	Q_OBJECT
@@ -53,6 +54,7 @@ public:
 	bool sendResponse(uint64_t msgid, const QVariant& err, const QVariant& res);
 	bool sendNotification(const QByteArray& method, const QVariantList& params);
 
+	void setRequestHandler(MsgpackRequestHandler *);
 signals:
 	void error(MsgpackError);
 	void notification(const QByteArray &name, const QVariantList& args);
@@ -78,9 +80,15 @@ private:
 	msgpack_packer m_pk;
 	msgpack_unpacker m_uk;
 	QHash<quint32, MsgpackRequest*> m_requests;
+	MsgpackRequestHandler *m_reqHandler;
 
 	QString m_errorString;
 	MsgpackError m_error;
+};
+
+class MsgpackRequestHandler {
+public:
+	virtual void handleRequest(MsgpackIODevice*, quint32 msgid, const QByteArray&, const QVariantList&)=0;
 };
 
 } // Namespace NeovimQt
