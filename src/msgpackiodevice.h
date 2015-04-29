@@ -7,7 +7,7 @@
 
 namespace NeovimQt {
 
-class NeovimRequest;
+class MsgpackRequest;
 class MsgpackIODevice: public QObject
 {
 	Q_OBJECT
@@ -32,7 +32,7 @@ public:
 	bool setEncoding(const QByteArray&);
 
 	uint32_t msgId();
-	NeovimRequest* startRequestUnchecked(const QString& method, uint32_t argcount);
+	MsgpackRequest* startRequestUnchecked(const QString& method, uint32_t argcount);
 
 	void send(int64_t);
 	void send(const QVariant&);
@@ -77,7 +77,7 @@ private:
 	QTextCodec *m_encoding;
 	msgpack_packer m_pk;
 	msgpack_unpacker m_uk;
-	QHash<uint32_t, NeovimRequest*> m_requests;
+	QHash<uint32_t, MsgpackRequest*> m_requests;
 
 	QString m_errorString;
 	MsgpackError m_error;

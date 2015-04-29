@@ -1,7 +1,7 @@
-// Auto generated 2015-04-28 16:04:57.404004
+// Auto generated 2015-04-29 21:07:24.913484
 #include "neovim.h"
 #include "neovimconnector.h"
-#include "neovimrequest.h"
+#include "msgpackrequest.h"
 #include "msgpackiodevice.h"
 #include "util.h"
 
@@ -17,99 +17,99 @@ Neovim::Neovim(NeovimConnector *c)
 
 void Neovim::ui_try_resize(int64_t width, int64_t height)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("ui_try_resize", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("ui_try_resize", 2);
 	m_c->m_dev->send(width);
 	m_c->m_dev->send(height);
-	connect(r, &NeovimRequest::finished, this, &Neovim::on_ui_try_resize);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::on_ui_try_resize);
 }
 
 
 // Slots
 void Neovim::tabpage_get_windows(int64_t tabpage)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_windows", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_windows", 1);
 	r->setFunction(Function::NEOVIM_FN_TABPAGE_GET_WINDOWS);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(tabpage);
 }
 void Neovim::tabpage_get_var(int64_t tabpage, QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_var", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_var", 2);
 	r->setFunction(Function::NEOVIM_FN_TABPAGE_GET_VAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(tabpage);
 	m_c->m_dev->send(name);
 }
 void Neovim::tabpage_set_var(int64_t tabpage, QByteArray name, QVariant value)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_set_var", 3);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_set_var", 3);
 	r->setFunction(Function::NEOVIM_FN_TABPAGE_SET_VAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(tabpage);
 	m_c->m_dev->send(name);
 	m_c->m_dev->send(value);
 }
 void Neovim::tabpage_get_window(int64_t tabpage)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_window", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_window", 1);
 	r->setFunction(Function::NEOVIM_FN_TABPAGE_GET_WINDOW);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(tabpage);
 }
 void Neovim::tabpage_is_valid(int64_t tabpage)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_is_valid", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_is_valid", 1);
 	r->setFunction(Function::NEOVIM_FN_TABPAGE_IS_VALID);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(tabpage);
 }
 void Neovim::buffer_line_count(int64_t buffer)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_line_count", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_line_count", 1);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_LINE_COUNT);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 }
 void Neovim::buffer_get_line(int64_t buffer, int64_t index)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_line", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_line", 2);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_GET_LINE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(index);
 }
 void Neovim::buffer_set_line(int64_t buffer, int64_t index, QByteArray line)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_line", 3);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_line", 3);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_SET_LINE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(index);
 	m_c->m_dev->send(line);
 }
 void Neovim::buffer_del_line(int64_t buffer, int64_t index)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_del_line", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_del_line", 2);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_DEL_LINE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(index);
 }
 void Neovim::buffer_get_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_line_slice", 5);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_line_slice", 5);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_GET_LINE_SLICE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(start);
 	m_c->m_dev->send(end);
@@ -118,10 +118,10 @@ void Neovim::buffer_get_line_slice(int64_t buffer, int64_t start, int64_t end, b
 }
 void Neovim::buffer_set_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end, QList<QByteArray> replacement)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_line_slice", 6);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_line_slice", 6);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_SET_LINE_SLICE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(start);
 	m_c->m_dev->send(end);
@@ -131,126 +131,126 @@ void Neovim::buffer_set_line_slice(int64_t buffer, int64_t start, int64_t end, b
 }
 void Neovim::buffer_get_var(int64_t buffer, QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_var", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_var", 2);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_GET_VAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(name);
 }
 void Neovim::buffer_set_var(int64_t buffer, QByteArray name, QVariant value)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_var", 3);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_var", 3);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_SET_VAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(name);
 	m_c->m_dev->send(value);
 }
 void Neovim::buffer_get_option(int64_t buffer, QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_option", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_option", 2);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_GET_OPTION);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(name);
 }
 void Neovim::buffer_set_option(int64_t buffer, QByteArray name, QVariant value)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_option", 3);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_option", 3);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_SET_OPTION);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(name);
 	m_c->m_dev->send(value);
 }
 void Neovim::buffer_get_number(int64_t buffer)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_number", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_number", 1);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_GET_NUMBER);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 }
 void Neovim::buffer_get_name(int64_t buffer)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_name", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_name", 1);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_GET_NAME);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 }
 void Neovim::buffer_set_name(int64_t buffer, QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_name", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_name", 2);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_SET_NAME);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(name);
 }
 void Neovim::buffer_is_valid(int64_t buffer)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_is_valid", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_is_valid", 1);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_IS_VALID);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 }
 void Neovim::buffer_insert(int64_t buffer, int64_t lnum, QList<QByteArray> lines)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_insert", 3);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_insert", 3);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_INSERT);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(lnum);
 	m_c->m_dev->sendArrayOf(lines);
 }
 void Neovim::buffer_get_mark(int64_t buffer, QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_mark", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_mark", 2);
 	r->setFunction(Function::NEOVIM_FN_BUFFER_GET_MARK);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(name);
 }
 void Neovim::vim_command(QByteArray str)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_command", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_command", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_COMMAND);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(str);
 }
 void Neovim::vim_feedkeys(QByteArray keys, QByteArray mode, bool escape_csi)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_feedkeys", 3);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_feedkeys", 3);
 	r->setFunction(Function::NEOVIM_FN_VIM_FEEDKEYS);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(keys);
 	m_c->m_dev->send(mode);
 	m_c->m_dev->send(escape_csi);
 }
 void Neovim::vim_input(QByteArray keys)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_input", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_input", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_INPUT);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(keys);
 }
 void Neovim::vim_replace_termcodes(QByteArray str, bool from_part, bool do_lt, bool special)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_replace_termcodes", 4);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_replace_termcodes", 4);
 	r->setFunction(Function::NEOVIM_FN_VIM_REPLACE_TERMCODES);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(str);
 	m_c->m_dev->send(from_part);
 	m_c->m_dev->send(do_lt);
@@ -258,340 +258,340 @@ void Neovim::vim_replace_termcodes(QByteArray str, bool from_part, bool do_lt, b
 }
 void Neovim::vim_command_output(QByteArray str)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_command_output", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_command_output", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_COMMAND_OUTPUT);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(str);
 }
 void Neovim::vim_eval(QByteArray str)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_eval", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_eval", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_EVAL);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(str);
 }
 void Neovim::vim_strwidth(QByteArray str)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_strwidth", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_strwidth", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_STRWIDTH);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(str);
 }
 void Neovim::vim_list_runtime_paths()
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_list_runtime_paths", 0);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_list_runtime_paths", 0);
 	r->setFunction(Function::NEOVIM_FN_VIM_LIST_RUNTIME_PATHS);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 }
 void Neovim::vim_change_directory(QByteArray dir)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_change_directory", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_change_directory", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_CHANGE_DIRECTORY);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(dir);
 }
 void Neovim::vim_get_current_line()
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_current_line", 0);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_current_line", 0);
 	r->setFunction(Function::NEOVIM_FN_VIM_GET_CURRENT_LINE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 }
 void Neovim::vim_set_current_line(QByteArray line)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_current_line", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_current_line", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_SET_CURRENT_LINE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(line);
 }
 void Neovim::vim_del_current_line()
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_del_current_line", 0);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_del_current_line", 0);
 	r->setFunction(Function::NEOVIM_FN_VIM_DEL_CURRENT_LINE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 }
 void Neovim::vim_get_var(QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_var", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_var", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_GET_VAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(name);
 }
 void Neovim::vim_set_var(QByteArray name, QVariant value)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_var", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_var", 2);
 	r->setFunction(Function::NEOVIM_FN_VIM_SET_VAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(name);
 	m_c->m_dev->send(value);
 }
 void Neovim::vim_get_vvar(QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_vvar", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_vvar", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_GET_VVAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(name);
 }
 void Neovim::vim_get_option(QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_option", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_option", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_GET_OPTION);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(name);
 }
 void Neovim::vim_set_option(QByteArray name, QVariant value)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_option", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_option", 2);
 	r->setFunction(Function::NEOVIM_FN_VIM_SET_OPTION);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(name);
 	m_c->m_dev->send(value);
 }
 void Neovim::vim_out_write(QByteArray str)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_out_write", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_out_write", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_OUT_WRITE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(str);
 }
 void Neovim::vim_err_write(QByteArray str)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_err_write", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_err_write", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_ERR_WRITE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(str);
 }
 void Neovim::vim_report_error(QByteArray str)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_report_error", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_report_error", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_REPORT_ERROR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(str);
 }
 void Neovim::vim_get_buffers()
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_buffers", 0);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_buffers", 0);
 	r->setFunction(Function::NEOVIM_FN_VIM_GET_BUFFERS);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 }
 void Neovim::vim_get_current_buffer()
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_current_buffer", 0);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_current_buffer", 0);
 	r->setFunction(Function::NEOVIM_FN_VIM_GET_CURRENT_BUFFER);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 }
 void Neovim::vim_set_current_buffer(int64_t buffer)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_current_buffer", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_current_buffer", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_SET_CURRENT_BUFFER);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(buffer);
 }
 void Neovim::vim_get_windows()
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_windows", 0);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_windows", 0);
 	r->setFunction(Function::NEOVIM_FN_VIM_GET_WINDOWS);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 }
 void Neovim::vim_get_current_window()
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_current_window", 0);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_current_window", 0);
 	r->setFunction(Function::NEOVIM_FN_VIM_GET_CURRENT_WINDOW);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 }
 void Neovim::vim_set_current_window(int64_t window)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_current_window", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_current_window", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_SET_CURRENT_WINDOW);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 }
 void Neovim::vim_get_tabpages()
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_tabpages", 0);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_tabpages", 0);
 	r->setFunction(Function::NEOVIM_FN_VIM_GET_TABPAGES);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 }
 void Neovim::vim_get_current_tabpage()
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_current_tabpage", 0);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_current_tabpage", 0);
 	r->setFunction(Function::NEOVIM_FN_VIM_GET_CURRENT_TABPAGE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 }
 void Neovim::vim_set_current_tabpage(int64_t tabpage)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_current_tabpage", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_set_current_tabpage", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_SET_CURRENT_TABPAGE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(tabpage);
 }
 void Neovim::vim_subscribe(QByteArray event)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_subscribe", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_subscribe", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_SUBSCRIBE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(event);
 }
 void Neovim::vim_unsubscribe(QByteArray event)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_unsubscribe", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_unsubscribe", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_UNSUBSCRIBE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(event);
 }
 void Neovim::vim_name_to_color(QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("vim_name_to_color", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_name_to_color", 1);
 	r->setFunction(Function::NEOVIM_FN_VIM_NAME_TO_COLOR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(name);
 }
 void Neovim::window_get_buffer(int64_t window)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_get_buffer", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_buffer", 1);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_BUFFER);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 }
 void Neovim::window_get_cursor(int64_t window)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_get_cursor", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_cursor", 1);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_CURSOR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 }
 void Neovim::window_set_cursor(int64_t window, QPoint pos)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_set_cursor", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_cursor", 2);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_CURSOR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 	m_c->m_dev->send(pos);
 }
 void Neovim::window_get_height(int64_t window)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_get_height", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_height", 1);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_HEIGHT);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 }
 void Neovim::window_set_height(int64_t window, int64_t height)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_set_height", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_height", 2);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_HEIGHT);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 	m_c->m_dev->send(height);
 }
 void Neovim::window_get_width(int64_t window)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_get_width", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_width", 1);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_WIDTH);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 }
 void Neovim::window_set_width(int64_t window, int64_t width)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_set_width", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_width", 2);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_WIDTH);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 	m_c->m_dev->send(width);
 }
 void Neovim::window_get_var(int64_t window, QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_get_var", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_var", 2);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_VAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 	m_c->m_dev->send(name);
 }
 void Neovim::window_set_var(int64_t window, QByteArray name, QVariant value)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_set_var", 3);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_var", 3);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_VAR);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 	m_c->m_dev->send(name);
 	m_c->m_dev->send(value);
 }
 void Neovim::window_get_option(int64_t window, QByteArray name)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_get_option", 2);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_option", 2);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_OPTION);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 	m_c->m_dev->send(name);
 }
 void Neovim::window_set_option(int64_t window, QByteArray name, QVariant value)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_set_option", 3);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_option", 3);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_OPTION);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 	m_c->m_dev->send(name);
 	m_c->m_dev->send(value);
 }
 void Neovim::window_get_position(int64_t window)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_get_position", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_position", 1);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_POSITION);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 }
 void Neovim::window_get_tabpage(int64_t window)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_get_tabpage", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_tabpage", 1);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_TABPAGE);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 }
 void Neovim::window_is_valid(int64_t window)
 {
-	NeovimRequest *r = m_c->m_dev->startRequestUnchecked("window_is_valid", 1);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_is_valid", 1);
 	r->setFunction(Function::NEOVIM_FN_WINDOW_IS_VALID);
-	connect(r, &NeovimRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &NeovimRequest::error, this, &Neovim::handleResponseError);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(window);
 }
 

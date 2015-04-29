@@ -2,7 +2,7 @@
 #include <QTextCodec>
 #include "msgpackiodevice.h"
 #include "util.h"
-#include "neovimrequest.h"
+#include "msgpackrequest.h"
 
 namespace NeovimQt {
 
@@ -252,7 +252,7 @@ void MsgpackIODevice::dispatchResponse(msgpack_object& resp)
 		return;
 	}
 
-	NeovimRequest *req = m_requests.take(msgid);
+	MsgpackRequest *req = m_requests.take(msgid);
 	if ( resp.via.array.ptr[2].type != MSGPACK_OBJECT_NIL ) {
 		// Error response
 		req->processResponse(resp.via.array.ptr[2], true);
@@ -308,10 +308,10 @@ QString MsgpackIODevice::errorString() const
  *
  * Use send() to pass on each of the call parameters
  *
- * Returns a NeovimRequest object. You can connect to
+ * Returns a MsgpackRequest object. You can connect to
  * its finished() SIGNAL to handle the response
  */
-NeovimRequest* MsgpackIODevice::startRequestUnchecked(const QString& method, uint32_t argcount)
+MsgpackRequest* MsgpackIODevice::startRequestUnchecked(const QString& method, uint32_t argcount)
 {
 	uint32_t msgid = msgId();
 	// [type(0), msgid, method, args]
@@ -323,7 +323,7 @@ NeovimRequest* MsgpackIODevice::startRequestUnchecked(const QString& method, uin
 	msgpack_pack_bin_body(&m_pk, utf8.constData(), utf8.size());
 	msgpack_pack_array(&m_pk, argcount);
 
-	NeovimRequest *r = new NeovimRequest( msgid, this);
+	MsgpackRequest *r = new MsgpackRequest( msgid, this);
 	m_requests.insert(msgid, r);
 	return r;
 }

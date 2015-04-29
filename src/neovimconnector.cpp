@@ -2,7 +2,7 @@
 #include <QtGlobal>
 #include <QMetaMethod>
 #include <QLocalSocket>
-#include "neovimrequest.h"
+#include "msgpackrequest.h"
 #include "neovimconnectorhelper.h"
 #include "msgpackiodevice.h"
 
@@ -102,10 +102,10 @@ uint64_t NeovimConnector::channel()
  */
 void NeovimConnector::discoverMetadata()
 {
-	NeovimRequest *r = m_dev->startRequestUnchecked("vim_get_api_info", 0);
-	connect(r, &NeovimRequest::finished,
+	MsgpackRequest *r = m_dev->startRequestUnchecked("vim_get_api_info", 0);
+	connect(r, &MsgpackRequest::finished,
 			m_helper, &NeovimConnectorHelper::handleMetadata);
-	connect(r, &NeovimRequest::error,
+	connect(r, &MsgpackRequest::error,
 			m_helper, &NeovimConnectorHelper::handleMetadataError);
 }
 

@@ -1,28 +1,27 @@
-#include "neovimrequest.h"
-#include "neovimconnector.h"
+#include "msgpackrequest.h"
 #include "msgpackiodevice.h"
 #include "util.h"
 
 namespace NeovimQt {
 
 /**
- * \class NeovimQt::NeovimRequest
+ * \class NeovimQt::MsgpackRequest
  *
- * \brief A NeovimRequest represents an ongoing API call
+ * \brief A MsgpackRequest represents an ongoing API call
  */
 
 /**
- * \fn NeovimQt::NeovimRequest::finished
+ * \fn NeovimQt::MsgpackRequest::finished
  *
  * \brief The request has finished
  */
 
 /**
- * Creates a new NeovimRequest, identified by id
+ * Creates a new MsgpackRequest, identified by id
  *
  * \see NeovimQt::MsgpackIODevice::msgId
  */
-NeovimRequest::NeovimRequest(uint32_t id, MsgpackIODevice *dev, QObject *parent)
+MsgpackRequest::MsgpackRequest(quint32 id, MsgpackIODevice *dev, QObject *parent)
 :QObject(parent), m_id(id), m_dev(dev), m_function(Function::NEOVIM_FN_NULL)
 {
 }
@@ -30,9 +29,9 @@ NeovimRequest::NeovimRequest(uint32_t id, MsgpackIODevice *dev, QObject *parent)
 /**
  * Process the response message for this call
  *
- * \see NeovimQt::NeovimRequest::finished
+ * \see NeovimQt::MsgpackRequest::finished
  */
-void NeovimRequest::processResponse(const msgpack_object& res, bool failed)
+void MsgpackRequest::processResponse(const msgpack_object& res, bool failed)
 {
 	if (!failed) {
 		emit finished(this->m_id, m_function, res);
@@ -59,7 +58,7 @@ void NeovimRequest::processResponse(const msgpack_object& res, bool failed)
  * The value NEOVIM_FN_NULL indicates this call will not go through the
  * the generated function handlers.
  */
-Function::FunctionId NeovimRequest::function()
+Function::FunctionId MsgpackRequest::function()
 {
 	return m_function;
 }
@@ -70,7 +69,7 @@ Function::FunctionId NeovimRequest::function()
  * NeovimQt has auto-generated call handlers (in NeovimQt::NeovimConnector::neovimObject)
  * that will be used to process the response
  */
-void NeovimRequest::setFunction(Function::FunctionId f)
+void MsgpackRequest::setFunction(Function::FunctionId f)
 {
 	m_function = f;
 }
