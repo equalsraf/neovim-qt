@@ -41,7 +41,7 @@ MsgpackIODevice::~MsgpackIODevice()
 QByteArray MsgpackIODevice::encoding() const
 {
 	if (m_encoding) {
-		m_encoding->name();
+		return m_encoding->name();
 	}
 	return QByteArray();
 }
@@ -56,7 +56,7 @@ bool MsgpackIODevice::setEncoding(const QByteArray& name)
 {
 	m_encoding = QTextCodec::codecForName(name);
 	if (!m_encoding) {
-		setError(UnsupportedEncoding, QString("Unsupported &encoding (%1)").arg(QString::fromLatin1(name)));
+		setError(UnsupportedEncoding, QString("Unsupported encoding (%1)").arg(QString::fromLatin1(name)));
 		return false;
 	}
 	return true;
