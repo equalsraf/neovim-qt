@@ -17,6 +17,7 @@ namespace NeovimQt {
 MsgpackIODevice::MsgpackIODevice(QIODevice *dev, QObject *parent)
 :QObject(parent), m_reqid(0), m_dev(dev), m_encoding(0), m_error(NoError)
 {
+	qRegisterMetaType<MsgpackError>("MsgpackError");
 	m_dev->setParent(this);
 
 	// MSVC: wont build without the (mspack_packer_write) cast

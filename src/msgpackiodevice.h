@@ -83,5 +83,6 @@ private:
 };
 
 } // Namespace NeovimQt
+Q_DECLARE_METATYPE(NeovimQt::MsgpackIODevice::MsgpackError)
 
 #endif
