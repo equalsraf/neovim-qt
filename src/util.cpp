@@ -3,67 +3,6 @@
 namespace NeovimQt {
 
 /**
- * Some Neovim functions take arguments of type **Object** which works an
- * abstract container for various data types - In this lib we use QVariant
- * for this purpose
- *
- * The problem being that QVariant can encapsulate some data types that cannot
- * be serialised at as msgpack data, or just would not make sense for Neovim to
- * handle.
- *
- * Ideally we would detect such errors early on and avoid sending those objects
- * entirely - this function checks if QVariant objects are admissible
- */
-bool checkVariant(const QVariant& var)
-{
-	switch((QMetaType::Type)var.type()) {
-	case QMetaType::UnknownType:
-		break;
-	case QMetaType::Bool:
-		break;
-	case QMetaType::Int:
-		break;
-	case QMetaType::UInt:
-		break;
-	case QMetaType::Float:
-		break;
-	case QMetaType::QString:
-		break;
-	case QMetaType::Double:
-		break;
-	case QMetaType::QByteArray:
-		break;
-	case QMetaType::QVariantList:
-		foreach(const QVariant& elem, var.toList()) {
-			if (!checkVariant(elem)) {
-				return false;
-			}
-		}
-		break;
-	case QMetaType::QVariantMap:
-		{
-		const QVariantMap& m = var.toMap();
-		QMapIterator<QString,QVariant> it(m);
-		while(it.hasNext()) {
-			it.next();
-			if (!checkVariant(it.key())) {
-				return false;
-			}
-			if (!checkVariant(it.value())) {
-				return false;
-			}
-		}
-		}
-		break;
-	case QMetaType::QPoint:
-		break;
-	default:
-		return false;
-	}
-	return true;
-}
-
-/**
  * Convert msgpack object into QByteArray
  */
 bool decodeMsgpack(const msgpack_object& in, bool& out)

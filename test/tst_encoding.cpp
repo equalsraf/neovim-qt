@@ -11,7 +11,6 @@ private slots:
 	void initTestCase();
 	void encodeString();
 	void map();
-	void checkVariant();
 protected:
 	NeovimQt::NeovimConnector *m_c;
 };
@@ -55,28 +54,6 @@ void TestEncoding::map()
 			});
 	QTest::qWait(500);
 	disconnect(conn);
-}
-
-/**
- * QVariant can represent content that cannot be serialized into
- * msgpack, ::checkVariant is used by NeovimConnector::send to
- * verify it
- */
-void TestEncoding::checkVariant()
-{
-	// Some Unsupported types
-	QVERIFY(!NeovimQt::checkVariant(QRect()));
-
-	// Supported types
-	QVERIFY(NeovimQt::checkVariant(QVariant()));
-	QVERIFY(NeovimQt::checkVariant(true));
-	QVERIFY(NeovimQt::checkVariant(42));
-	QVERIFY(NeovimQt::checkVariant(4.4));
-	QVERIFY(NeovimQt::checkVariant(QString("test")));
-	QVERIFY(NeovimQt::checkVariant(QByteArray()));
-	QVERIFY(NeovimQt::checkVariant(QVariantList() << "test"));
-	QVERIFY(NeovimQt::checkVariant(QVariantMap()));
-	QVERIFY(NeovimQt::checkVariant(QPoint(1,1)));
 }
 
 void TestEncoding::initTestCase()
