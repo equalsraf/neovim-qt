@@ -66,14 +66,6 @@ bool checkVariant(const QVariant& var)
 /**
  * Convert msgpack object into QByteArray
  */
-QByteArray toByteArray(const msgpack_object& obj)
-{
-	if ( obj.type != MSGPACK_OBJECT_BIN ) {
-		return QByteArray();
-	}
-	return QByteArray(obj.via.bin.ptr, obj.via.bin.size);
-}
-
 bool decodeMsgpack(const msgpack_object& in, bool& out)
 {
 	if ( in.type != MSGPACK_OBJECT_BOOLEAN) {

@@ -11,7 +11,6 @@ QDebug operator<<(QDebug dbg, const NeovimQt::Function& f);
 namespace NeovimQt {
 
 bool checkVariant(const QVariant&);
-QByteArray toByteArray(const msgpack_object&);
 bool decodeMsgpack(const msgpack_object& in, bool& out);
 bool decodeMsgpack(const msgpack_object& in, QByteArray& out);
 bool decodeMsgpack(const msgpack_object& in, QPoint& out);
