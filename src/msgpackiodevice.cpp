@@ -412,7 +412,9 @@ void MsgpackIODevice::send(const QVariant& var)
 
 	switch((QMetaType::Type)var.type()) {
 	case QMetaType::Void:
+	case QMetaType::UnknownType:
 		msgpack_pack_nil(&m_pk);
+		break;
 	case QMetaType::Bool:
 		send(var.toBool());
 		break;
