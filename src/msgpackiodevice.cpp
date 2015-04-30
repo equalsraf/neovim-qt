@@ -207,6 +207,7 @@ void MsgpackIODevice::dispatchRequest(msgpack_object& req)
 		goto err;
 	}
 	m_reqHandler->handleRequest(this, msgid, method, params.toList());
+	return;
 
 err:
 	// Send error reply [type(1), msgid, error, NIL]
