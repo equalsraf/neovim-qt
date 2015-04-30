@@ -40,8 +40,21 @@ void Neovim::{{f.name}}({{f.argstring}})
 
 // Handlers
 
-void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const QString& msg, const msgpack_object& res)
+void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const msgpack_object& res)
 {
+
+	// TODO: support Neovim error types Exception/Validation/etc
+	QString errMsg;
+	if (res.type == MSGPACK_OBJECT_ARRAY &&
+			res.via.array.size >= 2 ) {
+		QByteArray val;
+		if (decodeMsgpack(res.via.array.ptr[1], val)) {
+			errMsg = tr("Received unsupported Neovim error type");
+		} else {
+			errMsg = m_c->m_dev->decode(val);
+		}
+	}
+
 	QVariant errObj;
 	if (decodeMsgpack(res, errObj)) {
 		m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking error object in function response");
@@ -51,7 +64,7 @@ void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const 
 {% for f in functions %}
 {% if f.can_fail %}
 	case Function::NEOVIM_FN_{{f.name.upper()}}:
-		emit err_{{f.name}}(msg, errObj);
+		emit err_{{f.name}}(errMsg, errObj);
 		break;
 {% endif %}
 {% endfor %}

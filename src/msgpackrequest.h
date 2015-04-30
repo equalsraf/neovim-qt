@@ -10,14 +10,13 @@ class MsgpackRequest: public QObject {
 	Q_OBJECT
 public:
 	MsgpackRequest(quint32 id, MsgpackIODevice *dev, QObject *parent=0);
-	void processResponse(const msgpack_object& res, bool failed=false);
 	void setFunction(Function::FunctionId);
 	Function::FunctionId function();
+	const quint32 id;
 signals:
-	void finished(quint32 msgid, Function::FunctionId fun, const msgpack_object&);
-	void error(quint32 msgid, Function::FunctionId fun, const QString& msg, const msgpack_object&);
+	void finished(quint32 msgid, Function::FunctionId fun, const msgpack_object& resp);
+	void error(quint32 msgid, Function::FunctionId fun, const msgpack_object& err);
 private:
-	quint32 m_id;
 	MsgpackIODevice *m_dev;
 	Function::FunctionId m_function;
 };

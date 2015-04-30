@@ -276,9 +276,9 @@ void MsgpackIODevice::dispatchResponse(msgpack_object& resp)
 	MsgpackRequest *req = m_requests.take(msgid);
 	if ( resp.via.array.ptr[2].type != MSGPACK_OBJECT_NIL ) {
 		// Error response
-		req->processResponse(resp.via.array.ptr[2], true);
+		emit req->error(req->id, req->function(), resp.via.array.ptr[2]);
 	} else {
-		req->processResponse(resp.via.array.ptr[3], false);
+		emit req->finished(req->id, req->function(), resp.via.array.ptr[3]);
 	}
 	req->deleteLater();
 }

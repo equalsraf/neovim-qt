@@ -1,4 +1,4 @@
-// Auto generated 2015-04-29 21:20:21.930954
+// Auto generated 2015-04-30 09:05:43.434924
 #include "neovim.h"
 #include "neovimconnector.h"
 #include "msgpackrequest.h"
@@ -597,8 +597,21 @@ void Neovim::window_is_valid(int64_t window)
 
 // Handlers
 
-void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const QString& msg, const msgpack_object& res)
+void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const msgpack_object& res)
 {
+
+	// TODO: support Neovim error types Exception/Validation/etc
+	QString errMsg;
+	if (res.type == MSGPACK_OBJECT_ARRAY &&
+			res.via.array.size >= 2 ) {
+		QByteArray val;
+		if (decodeMsgpack(res.via.array.ptr[1], val)) {
+			errMsg = tr("Received unsupported Neovim error type");
+		} else {
+			errMsg = m_c->m_dev->decode(val);
+		}
+	}
+
 	QVariant errObj;
 	if (decodeMsgpack(res, errObj)) {
 		m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking error object in function response");
@@ -606,148 +619,148 @@ void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const 
 	}
 	switch(fun) {
 	case Function::NEOVIM_FN_TABPAGE_GET_WINDOWS:
-		emit err_tabpage_get_windows(msg, errObj);
+		emit err_tabpage_get_windows(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_TABPAGE_GET_VAR:
-		emit err_tabpage_get_var(msg, errObj);
+		emit err_tabpage_get_var(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_TABPAGE_SET_VAR:
-		emit err_tabpage_set_var(msg, errObj);
+		emit err_tabpage_set_var(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW:
-		emit err_tabpage_get_window(msg, errObj);
+		emit err_tabpage_get_window(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_LINE_COUNT:
-		emit err_buffer_line_count(msg, errObj);
+		emit err_buffer_line_count(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_LINE:
-		emit err_buffer_get_line(msg, errObj);
+		emit err_buffer_get_line(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_LINE:
-		emit err_buffer_set_line(msg, errObj);
+		emit err_buffer_set_line(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_DEL_LINE:
-		emit err_buffer_del_line(msg, errObj);
+		emit err_buffer_del_line(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_LINE_SLICE:
-		emit err_buffer_get_line_slice(msg, errObj);
+		emit err_buffer_get_line_slice(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_LINE_SLICE:
-		emit err_buffer_set_line_slice(msg, errObj);
+		emit err_buffer_set_line_slice(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_VAR:
-		emit err_buffer_get_var(msg, errObj);
+		emit err_buffer_get_var(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_VAR:
-		emit err_buffer_set_var(msg, errObj);
+		emit err_buffer_set_var(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_OPTION:
-		emit err_buffer_get_option(msg, errObj);
+		emit err_buffer_get_option(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_OPTION:
-		emit err_buffer_set_option(msg, errObj);
+		emit err_buffer_set_option(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_NUMBER:
-		emit err_buffer_get_number(msg, errObj);
+		emit err_buffer_get_number(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_NAME:
-		emit err_buffer_get_name(msg, errObj);
+		emit err_buffer_get_name(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_NAME:
-		emit err_buffer_set_name(msg, errObj);
+		emit err_buffer_set_name(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_INSERT:
-		emit err_buffer_insert(msg, errObj);
+		emit err_buffer_insert(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_MARK:
-		emit err_buffer_get_mark(msg, errObj);
+		emit err_buffer_get_mark(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_COMMAND:
-		emit err_vim_command(msg, errObj);
+		emit err_vim_command(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_COMMAND_OUTPUT:
-		emit err_vim_command_output(msg, errObj);
+		emit err_vim_command_output(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_EVAL:
-		emit err_vim_eval(msg, errObj);
+		emit err_vim_eval(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_STRWIDTH:
-		emit err_vim_strwidth(msg, errObj);
+		emit err_vim_strwidth(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_CHANGE_DIRECTORY:
-		emit err_vim_change_directory(msg, errObj);
+		emit err_vim_change_directory(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_GET_CURRENT_LINE:
-		emit err_vim_get_current_line(msg, errObj);
+		emit err_vim_get_current_line(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_SET_CURRENT_LINE:
-		emit err_vim_set_current_line(msg, errObj);
+		emit err_vim_set_current_line(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_DEL_CURRENT_LINE:
-		emit err_vim_del_current_line(msg, errObj);
+		emit err_vim_del_current_line(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_GET_VAR:
-		emit err_vim_get_var(msg, errObj);
+		emit err_vim_get_var(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_SET_VAR:
-		emit err_vim_set_var(msg, errObj);
+		emit err_vim_set_var(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_GET_VVAR:
-		emit err_vim_get_vvar(msg, errObj);
+		emit err_vim_get_vvar(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_GET_OPTION:
-		emit err_vim_get_option(msg, errObj);
+		emit err_vim_get_option(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_SET_OPTION:
-		emit err_vim_set_option(msg, errObj);
+		emit err_vim_set_option(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_SET_CURRENT_BUFFER:
-		emit err_vim_set_current_buffer(msg, errObj);
+		emit err_vim_set_current_buffer(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_SET_CURRENT_WINDOW:
-		emit err_vim_set_current_window(msg, errObj);
+		emit err_vim_set_current_window(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_VIM_SET_CURRENT_TABPAGE:
-		emit err_vim_set_current_tabpage(msg, errObj);
+		emit err_vim_set_current_tabpage(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_BUFFER:
-		emit err_window_get_buffer(msg, errObj);
+		emit err_window_get_buffer(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_CURSOR:
-		emit err_window_get_cursor(msg, errObj);
+		emit err_window_get_cursor(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_CURSOR:
-		emit err_window_set_cursor(msg, errObj);
+		emit err_window_set_cursor(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_HEIGHT:
-		emit err_window_get_height(msg, errObj);
+		emit err_window_get_height(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_HEIGHT:
-		emit err_window_set_height(msg, errObj);
+		emit err_window_set_height(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_WIDTH:
-		emit err_window_get_width(msg, errObj);
+		emit err_window_get_width(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_WIDTH:
-		emit err_window_set_width(msg, errObj);
+		emit err_window_set_width(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_VAR:
-		emit err_window_get_var(msg, errObj);
+		emit err_window_get_var(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_VAR:
-		emit err_window_set_var(msg, errObj);
+		emit err_window_set_var(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_OPTION:
-		emit err_window_get_option(msg, errObj);
+		emit err_window_get_option(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_SET_OPTION:
-		emit err_window_set_option(msg, errObj);
+		emit err_window_set_option(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_POSITION:
-		emit err_window_get_position(msg, errObj);
+		emit err_window_get_position(errMsg, errObj);
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_TABPAGE:
-		emit err_window_get_tabpage(msg, errObj);
+		emit err_window_get_tabpage(errMsg, errObj);
 		break;
 	default:
 		m_c->setError(NeovimConnector::RuntimeMsgpackError, QString("Received error for function that should not fail: %s").arg(fun));

@@ -1,4 +1,4 @@
-// Auto generated 2015-04-29 21:20:21.903136
+// Auto generated 2015-04-30 09:05:43.390958
 const QList<Function> Function::knownFunctions = QList<Function>()
 << Function("ArrayOf(Window)", "tabpage_get_windows",
 	QList<QString>()

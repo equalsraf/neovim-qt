@@ -14,7 +14,7 @@ public:
 public slots:
 	void handleMetadata(quint32, Function::FunctionId, const msgpack_object& result);
 	void handleMetadataError(quint32 msgid, Function::FunctionId,
-		const QString& msg, const msgpack_object& errobj);
+		const msgpack_object& errobj);
 	void encodingChanged(const QVariant&);
 protected:
 	void addFunctions(const msgpack_object& ftable);

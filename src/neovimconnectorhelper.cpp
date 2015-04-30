@@ -19,7 +19,7 @@ NeovimConnectorHelper::NeovimConnectorHelper(NeovimConnector *c)
 }
 
 void NeovimConnectorHelper::handleMetadataError(quint32 msgid, Function::FunctionId,
-		const QString& msg, const msgpack_object& errobj)
+		const msgpack_object& errobj)
 {
 	m_c->setError(NeovimConnector::NoMetadata,
 		tr("Unable to get Neovim api information"));
