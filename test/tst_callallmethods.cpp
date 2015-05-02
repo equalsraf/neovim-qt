@@ -31,7 +31,9 @@ private:
 void TestCallAllMethods::initTestCase()
 {
 	m_c = NeovimQt::NeovimConnector::spawn();
-	QSignalSpy onReady(m_c, &NeovimQt::NeovimConnector::ready);
+	QSignalSpy onReady(m_c, SIGNAL(ready()));
+	QVERIFY(onReady.isValid());
+
 	QVERIFY(SPYWAIT(onReady));
 }
 
@@ -40,7 +42,9 @@ void TestCallAllMethods::vim_get_current_buffer()
 	QVERIFY(m_c->neovimObject());
 	NeovimQt::Neovim *obj = m_c->neovimObject();
 
-	QSignalSpy result(obj, &NeovimQt::Neovim::on_vim_get_current_buffer);
+	QSignalSpy result(obj, SIGNAL(on_vim_get_current_buffer(int64_t)));
+	QVERIFY(result.isValid());
+
 	obj->vim_get_current_buffer();
 	QVERIFY(SPYWAIT(result));
 }
@@ -50,7 +54,9 @@ void TestCallAllMethods::vim_list_runtime_paths()
 	QVERIFY(m_c->neovimObject());
 	NeovimQt::Neovim *obj = m_c->neovimObject();
 
-	QSignalSpy result(obj, &NeovimQt::Neovim::on_vim_list_runtime_paths);
+	QSignalSpy result(obj, SIGNAL(on_vim_list_runtime_paths(QList<QByteArray>)));
+	QVERIFY(result.isValid());
+
 	obj->vim_list_runtime_paths();
 	QVERIFY(SPYWAIT(result));
 }
@@ -61,7 +67,8 @@ void TestCallAllMethods::callAll()
 
 	NeovimQt::Neovim *obj = m_c->neovimObject();
 	const QMetaObject *meta = obj->metaObject();
-	QSignalSpy neovimErrors(m_c, &NeovimQt::NeovimConnector::error);
+	QSignalSpy neovimErrors(m_c, SIGNAL(error(NeovimError)));
+	QVERIFY(neovimErrors.isValid());
 	for (int i=0; i<meta->methodCount(); i++) {
 		QMetaMethod meth = meta->method(i);
 		if ( meth.methodType() != QMetaMethod::Slot ||

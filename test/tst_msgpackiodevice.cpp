@@ -41,7 +41,9 @@ private:
 		QVERIFY(server->isListening());
 
 		QTcpSocket *client = new QTcpSocket(this);
-		QSignalSpy onConnected(client, &QTcpSocket::connected);
+		QSignalSpy onConnected(client, SIGNAL(connected()));
+		QVERIFY(onConnected.isValid());
+
 		client->connectToHost(server->serverAddress(), server->serverPort());
 		QVERIFY(SPYWAIT(onConnected));
 		QVERIFY(server->hasPendingConnections());
@@ -70,7 +72,9 @@ private slots:
 	}
 
 	void setInvalidEncoding() {
-		QSignalSpy onError(one, &MsgpackIODevice::error);
+		QSignalSpy onError(one, SIGNAL(error(MsgpackError)));
+		QVERIFY(onError.isValid());
+
 		// Ignore qWarn
 		QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Unsupported encoding"));
 		QCOMPARE(one->setEncoding("invalid-encoding"), false);
@@ -80,7 +84,9 @@ private slots:
 	}
 
 	void recvError() {
-		QSignalSpy onError(two, &MsgpackIODevice::error);
+		QSignalSpy onError(two, SIGNAL(error(MsgpackError)));
+		QVERIFY(onError.isValid());
+
 		// Ignore qWarn
 		QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Invalid msgpack"));
 		one->send(QByteArray("Hello!"));
@@ -96,7 +102,9 @@ private slots:
 		params << 1 << QByteArray("one") << -3 << list;
 		QByteArray method("testNotification");
 
-		QSignalSpy onNotification(two, &MsgpackIODevice::notification);
+		QSignalSpy onNotification(two, SIGNAL(notification(QByteArray, QVariantList)));
+		QVERIFY(onNotification.isValid());
+
 		one->sendNotification(method, params);
 		QVERIFY(SPYWAIT(onNotification));
 
@@ -108,7 +116,9 @@ private slots:
 	void request() {
 		auto req = one->startRequestUnchecked("testRequest", 0);
 		
-		QSignalSpy gotResp(req, &MsgpackRequest::error);
+		QSignalSpy gotResp(req, SIGNAL(error(quint32, Function::FunctionId, QVariant)));
+		QVERIFY(gotResp.isValid());
+
 		QVERIFY2(SPYWAIT(gotResp), "By default all requests get an error");
 
 		// Now test with an actual response
@@ -116,7 +126,9 @@ private slots:
 		handler->response = 42;
 		two->setRequestHandler(handler);
 
-		QSignalSpy gotReq(handler, &RequestHandler::receivedRequest);
+		QSignalSpy gotReq(handler, SIGNAL(receivedRequest(quint32, QByteArray, QVariantList)));
+		QVERIFY(gotReq.isValid());
+
 		auto req2 = one->startRequestUnchecked("testRequest2", 1);
 		one->send(QByteArray("hello"));
 		QVERIFY(SPYWAIT(gotReq));
@@ -127,7 +139,8 @@ private slots:
 		QCOMPARE(signal.at(1).toByteArray(), QByteArray("testRequest2"));
 		QCOMPARE(signal.at(2).toList().at(0).toByteArray(), QByteArray("hello"));
 
-		QSignalSpy gotResp2(req2, &MsgpackRequest::finished);
+		QSignalSpy gotResp2(req2, SIGNAL(finished(quint32, Function::FunctionId, QVariant)));
+		QVERIFY(gotResp2.isValid());
 		QVERIFY2(SPYWAIT(gotResp2), "RequestHandler sends back a response");
 	}
 
