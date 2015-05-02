@@ -3,6 +3,7 @@
 #include <QtTest/QtTest>
 #include <neovimconnector.h>
 #include <auto/neovim.h>
+#include "common.h"
 
 /**
  * This is the closest I can get to writing a 5 minute unit test without
@@ -17,35 +18,19 @@ class TestCallAllMethods: public QObject
 {
 	Q_OBJECT
 
-protected slots:
-	void callAll();
-
 private slots:
 	void initTestCase();
-	void connectionError(NeovimQt::NeovimConnector::NeovimError);
-	void error(const QString& errmsg);
+	void callAll();
 
 private:
 	NeovimQt::NeovimConnector *m_c;
-	bool m_errors;
 };
 
 void TestCallAllMethods::initTestCase()
 {
-	m_errors = false;
-
 	m_c = NeovimQt::NeovimConnector::spawn();
-
-	connect(m_c, &NeovimQt::NeovimConnector::ready,
-			this, &TestCallAllMethods::callAll);
-	QTest::qWait(500);
-	QVERIFY(!m_errors);
-}
-
-void TestCallAllMethods::error(const QString& errmsg)
-{
-	qWarning() << errmsg;
-	m_errors = true;
+	QSignalSpy onReady(m_c, &NeovimQt::NeovimConnector::ready);
+	QVERIFY(SPYWAIT(onReady));
 }
 
 void TestCallAllMethods::callAll()
@@ -53,9 +38,8 @@ void TestCallAllMethods::callAll()
 	QVERIFY(m_c->neovimObject());
 
 	NeovimQt::Neovim *obj = m_c->neovimObject();
-	connect(m_c->neovimObject(), &NeovimQt::Neovim::error,
-			this, &TestCallAllMethods::error);
 	const QMetaObject *meta = obj->metaObject();
+	QSignalSpy neovimErrors(m_c, &NeovimQt::NeovimConnector::error);
 	for (int i=0; i<meta->methodCount(); i++) {
 		QMetaMethod meth = meta->method(i);
 		if ( meth.methodType() != QMetaMethod::Slot ||
@@ -74,13 +58,7 @@ void TestCallAllMethods::callAll()
 			qDebug() << "Skipping" << meth.methodSignature();
 		}
 	}
-
-}
-
-void TestCallAllMethods::connectionError(NeovimQt::NeovimConnector::NeovimError err)
-{
-	qDebug() << m_c->errorString();
-	QVERIFY(false);
+	QVERIFY2(!SPYWAIT(neovimErrors), "Fatal errors");
 }
 
 QTEST_MAIN(TestCallAllMethods)
