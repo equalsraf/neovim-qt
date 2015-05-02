@@ -3,6 +3,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QRegularExpression>
+#include <QBuffer>
 
 #include <msgpackiodevice.h>
 #include <msgpackrequest.h>
@@ -60,6 +61,16 @@ private slots:
 		resetLoop();
 	}
 
+	void cleanup() {
+		delete one;
+		delete two;
+	}
+
+	void invalidDevice() {
+		MsgpackIODevice *io = new MsgpackIODevice(new QBuffer);
+		QCOMPARE(io->errorCause(), MsgpackIODevice::InvalidDevice);
+	}
+
 	void defaultValues() {
 		QVERIFY(one->encoding().isEmpty());
 		QCOMPARE(one->errorCause(), MsgpackIODevice::NoError);
@@ -82,14 +93,32 @@ private slots:
 		QCOMPARE(one->errorCause(), MsgpackIODevice::UnsupportedEncoding);
 	}
 
+	/**
+	 * These errors are not fatal but increase coverage
+	 */
 	void recvError() {
-		QSignalSpy onError(two, SIGNAL(error(MsgpackError)));
-		QVERIFY(onError.isValid());
-
-		// Ignore qWarn
 		one->send(QByteArray("Hello!"));
-		QVERIFY(SPYWAIT(onError));
-		QCOMPARE(two->errorCause(), MsgpackIODevice::InvalidMsgpack);
+		
+		// An array of size 1 is an invalid msgpack-rpc
+		QVariantList brokenRequest;
+		brokenRequest << 42;
+		one->send(brokenRequest);
+
+		// Invalid method
+		QVariantList brokenRequest2;
+		brokenRequest2 << "X" << 42 << 42 << 42;
+		one->send(brokenRequest2);
+
+		// Invalid method
+		QVariantList brokenRequest3;
+		brokenRequest2 << 0 << 42 << 42 << 42;
+		one->send(brokenRequest3);
+
+		// Just to finish
+		auto req = one->startRequestUnchecked("testRequest", 0);
+		QSignalSpy gotResp(req, SIGNAL(error(quint32, Function::FunctionId, QVariant)));
+		QVERIFY(gotResp.isValid());
+		QVERIFY2(SPYWAIT(gotResp), "By default all requests get an error");
 	}
 
 	void notification() {

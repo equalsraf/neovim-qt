@@ -132,7 +132,7 @@ void MsgpackIODevice::dispatch(msgpack_object& req)
 	//
 
 	if (req.type != MSGPACK_OBJECT_ARRAY) {
-		setError(InvalidMsgpack, "Received Invalid msgpack: not an array");
+		qDebug() << "Received Invalid msgpack: not an array";
 		return;
 	}
 
