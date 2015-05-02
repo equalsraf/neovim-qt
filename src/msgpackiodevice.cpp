@@ -545,7 +545,7 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QVariant& out)
 
 	default:
 		out = QVariant();
-		qWarning() << "Unsupported type found in Object" << in.type;
+		qWarning() << "Unsupported type found in Object" << in.type << in;
 		return true;
 	}
 	return false;
