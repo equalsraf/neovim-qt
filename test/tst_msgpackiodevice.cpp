@@ -76,7 +76,6 @@ private slots:
 		QVERIFY(onError.isValid());
 
 		// Ignore qWarn
-		QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Unsupported encoding"));
 		QCOMPARE(one->setEncoding("invalid-encoding"), false);
 
 		QVERIFY(SPYWAIT(onError));
@@ -88,7 +87,6 @@ private slots:
 		QVERIFY(onError.isValid());
 
 		// Ignore qWarn
-		QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Invalid msgpack"));
 		one->send(QByteArray("Hello!"));
 		QVERIFY(SPYWAIT(onError));
 		QCOMPARE(two->errorCause(), MsgpackIODevice::InvalidMsgpack);
