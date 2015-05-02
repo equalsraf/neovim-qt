@@ -10,6 +10,14 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 	add_definitions(-Werror -Wall -Wextra -Wno-unused-parameter -std=c++11 -Wfatal-errors)
 endif()
 
+option(USE_GCOV "Enable gcov support" OFF)
+if(USE_GCOV)
+	message(STATUS "Enabling coverage")
+	set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} --coverage")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+endif()
+
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
