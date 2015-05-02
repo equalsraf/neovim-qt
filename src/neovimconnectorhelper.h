@@ -12,12 +12,12 @@ public:
 	NeovimConnectorHelper(NeovimConnector *);
 
 public slots:
-	void handleMetadata(quint32, Function::FunctionId, const msgpack_object& result);
+	void handleMetadata(quint32, Function::FunctionId, const QVariant& result);
 	void handleMetadataError(quint32 msgid, Function::FunctionId,
-		const msgpack_object& errobj);
+		const QVariant& errobj);
 	void encodingChanged(const QVariant&);
 protected:
-	void addFunctions(const msgpack_object& ftable);
+	bool checkFunctions(const QVariantList& ftable);
 private:
 	NeovimConnector *m_c;
 

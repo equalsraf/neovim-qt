@@ -68,6 +68,14 @@ protected:
 	void dispatchResponse(msgpack_object& obj);
 	void dispatchNotification(msgpack_object& obj);
 
+	bool decodeMsgpack(const msgpack_object& in, int64_t& out);
+	bool decodeMsgpack(const msgpack_object& in, QVariant& out);
+	bool decodeMsgpack(const msgpack_object& in, QByteArray& out);
+	bool decodeMsgpack(const msgpack_object& in, bool& out);
+	bool decodeMsgpack(const msgpack_object& in, QList<QByteArray>& out);
+	bool decodeMsgpack(const msgpack_object& in, QList<int64_t>& out);
+	bool decodeMsgpack(const msgpack_object& in, QPoint& out);
+
 protected slots:
 	void setError(MsgpackError err, const QString& msg);
 	void dataAvailable();

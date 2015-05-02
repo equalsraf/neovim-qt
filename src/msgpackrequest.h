@@ -14,8 +14,8 @@ public:
 	Function::FunctionId function();
 	const quint32 id;
 signals:
-	void finished(quint32 msgid, Function::FunctionId fun, const msgpack_object& resp);
-	void error(quint32 msgid, Function::FunctionId fun, const msgpack_object& err);
+	void finished(quint32 msgid, Function::FunctionId fun, const QVariant& resp);
+	void error(quint32 msgid, Function::FunctionId fun, const QVariant& err);
 private:
 	MsgpackIODevice *m_dev;
 	Function::FunctionId m_function;

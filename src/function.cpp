@@ -1,7 +1,6 @@
 #include "function.h"
 #include <QMetaMethod>
 #include <QStringList>
-#include "util.h"
 
 namespace NeovimQt {
 
@@ -94,58 +93,54 @@ bool Function::operator==(const Function& other)
 	return true;
 }
 
-/**
- * Deserialise a msgpack function description
- */
-Function Function::fromMsgpack(const msgpack_object& fun)
+Function Function::fromVariant(const QVariant& fun)
 {
 	Function f;
-	if ( fun.type != MSGPACK_OBJECT_MAP ) {
+	if (!fun.canConvert<QVariantMap>()) {
 		qDebug() << "Found unexpected data type when unpacking function" << fun;
 		return f;
 	}
 
-	for (uint32_t i=0; i<fun.via.map.size; i++) {
-		QByteArray key;
-		if (decodeMsgpack(fun.via.map.ptr[i].key, key)) {
-			qDebug() << "Found unexpected data type when unpacking function" << fun;
-			return f;
-		}
-		msgpack_object& val = fun.via.map.ptr[i].val;
-		if ( key == "return_type" ) {
-			if ( val.type != MSGPACK_OBJECT_BIN ) {
+	const QVariantMap& m = fun.toMap();
+	QMapIterator<QString,QVariant> it(m);
+	while(it.hasNext()) {
+		it.next();
+
+		if ( it.key() == "return_type" ) {
+			if (!it.value().canConvert<QByteArray>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.return_type = QString::fromUtf8(val.via.bin.ptr, val.via.bin.size);
-		} else if ( key == "name" ) {
-			if ( val.type != MSGPACK_OBJECT_BIN ) {
+			f.return_type = QString::fromUtf8(it.value().toByteArray());
+		} else if ( it.key() == "name" ) {
+			if (!it.value().canConvert<QByteArray>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.name = QString::fromUtf8(val.via.bin.ptr, val.via.bin.size);
-		} else if ( key == "can_fail" ) {
-			if ( val.type != MSGPACK_OBJECT_BOOLEAN ) {
+			f.name = QString::fromUtf8(it.value().toByteArray());
+		} else if ( it.key() == "can_fail" ) {
+			if (!it.value().canConvert<bool>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.can_fail = val.via.boolean;
-		} else if ( key == "parameters" ) {
-			if ( val.type != MSGPACK_OBJECT_ARRAY ) {
+			f.can_fail = it.value().toBool();
+		} else if ( it.key() == "parameters" ) {
+			if (!it.value().canConvert<QVariantList>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.parameters = parseParameters(val);
-		} else if ( key == "id" ) {
+			f.parameters = parseParameters(it.value().toList());
+		} else if ( it.key() == "id" ) {
 			// Deprecated
-		} else if ( key == "receives_channel_id" ) {
+		} else if ( it.key() == "receives_channel_id" ) {
 			// Internal
-		} else if ( key == "deferred" ) {
+		} else if ( it.key() == "deferred" ) {
 			// Internal
 		} else {
-			qWarning() << "Unsupported function attribute"<< key << val.type;
+			qWarning() << "Unsupported function attribute"<< it.key() << it.value();
 		}
 	}
+
 	f.m_valid = true;
 	return f;
 }
@@ -156,33 +151,26 @@ Function Function::fromMsgpack(const msgpack_object& fun)
  * i.e. [Type0 name0 Type1 name1 ... ] -> [Type0 Type1 ...]
  *
  */
-QList<QPair<QString,QString> > Function::parseParameters(const msgpack_object& obj)
+QList<QPair<QString,QString> > Function::parseParameters(const QVariantList& obj)
 {
 	QList<QPair<QString,QString> > fail;
-	if ( obj.type != MSGPACK_OBJECT_ARRAY ) {
-		return fail;
-	}
-
 	QList<QPair<QString,QString> > res;
-	for (uint32_t i=0; i<obj.via.array.size; i++) {
-		msgpack_object& param = obj.via.array.ptr[i];
-		if ( param.type != MSGPACK_OBJECT_ARRAY ) {
+	foreach(const QVariant& val, obj) {
+
+		const QVariantList& params = val.toList();
+		if ( params.size() % 2 != 0 ) {
 			return fail;
 		}
 
-		if ( param.via.array.size % 2 != 0 ) {
-			return fail;
-		}
-
-		for (uint32_t j=0; j<param.via.array.size; j+=2) {
+		for (int j=0; j<params.size(); j+=2) {
 			QByteArray type, name;
-			if (decodeMsgpack(param.via.array.ptr[j], type)) {
+			if (!params.at(j).canConvert<QByteArray>() || 
+					!params.at(j+1).canConvert<QByteArray>()) {
 				return fail;
 			}
-			if (decodeMsgpack(param.via.array.ptr[j+1], name)) {
-				return fail;
-			}
-			QPair<QString,QString> arg(type, name);
+			QPair<QString,QString> arg(
+					QString::fromUtf8(params.at(j).toByteArray()),
+					QString::fromUtf8(params.at(j+1).toByteArray()));
 			res.append(arg);
 		}
 	}

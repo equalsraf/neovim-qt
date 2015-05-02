@@ -86,7 +86,7 @@ private:
 	NeovimError m_error;
 
 	Neovim *m_neovimobj;
-	uint64_t m_channel;
+	quint64 m_channel;
 
 	// Store connection arguments for reconnect()
 	NeovimConnectionType m_ctype;

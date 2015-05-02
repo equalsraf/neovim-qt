@@ -27,7 +27,8 @@ public:
 	bool isValid() const;
 	bool operator==(const Function& other);
 	static Function fromMsgpack(const msgpack_object&);
-	static QList<QPair<QString,QString> > parseParameters(const msgpack_object& obj);
+	static Function fromVariant(const QVariant&);
+	static QList<QPair<QString,QString> > parseParameters(const QVariantList& obj);
 
 	/** Whether this function call fail without returning*/
 	bool can_fail;

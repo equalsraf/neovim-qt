@@ -13,7 +13,6 @@ namespace NeovimQt {
  *
  */
 
-
 MsgpackIODevice::MsgpackIODevice(QIODevice *dev, QObject *parent)
 :QObject(parent), m_reqid(0), m_dev(dev), m_encoding(0), m_reqHandler(0), m_error(NoError)
 {
@@ -277,10 +276,21 @@ void MsgpackIODevice::dispatchResponse(msgpack_object& resp)
 	MsgpackRequest *req = m_requests.take(msgid);
 	if ( resp.via.array.ptr[2].type != MSGPACK_OBJECT_NIL ) {
 		// Error response
-		emit req->error(req->id, req->function(), resp.via.array.ptr[2]);
+		QVariant val;
+		if (decodeMsgpack(resp.via.array.ptr[2], val)) {
+			qWarning() << "Error decoding response error object";
+			goto err;
+		}
+		emit req->error(req->id, req->function(), val);
 	} else {
-		emit req->finished(req->id, req->function(), resp.via.array.ptr[3]);
+		QVariant val;
+		if (decodeMsgpack(resp.via.array.ptr[3], val)) {
+			qWarning() << "Error decoding response object";
+			goto err;
+		}
+		emit req->finished(req->id, req->function(), val);
 	}
+err:
 	req->deleteLater();
 }
 
@@ -358,13 +368,19 @@ quint32 MsgpackIODevice::msgId()
 	return this->m_reqid++;
 }
 
-
-/**
- * Serialise a value into the msgpack stream
- */
 void MsgpackIODevice::send(int64_t i)
 {
 	msgpack_pack_int64(&m_pk, i);
+}
+bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, int64_t& out)
+{
+	if ( in.type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
+		qWarning() << "Attempting to decode as int64_t when type is" << in.type << in;
+		out = -1;
+		return true;
+	}
+	out = in.via.i64;
+	return false;
 }
 
 /**
@@ -375,6 +391,17 @@ void MsgpackIODevice::send(const QByteArray& bin)
 	msgpack_pack_bin(&m_pk, bin.size());
 	msgpack_pack_bin_body(&m_pk, bin.constData(), bin.size());
 }
+bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QByteArray& out)
+{
+	if ( in.type != MSGPACK_OBJECT_BIN) {
+		qWarning() << "Attempting to decode as QByteArray when type is" << in.type << in;
+		out = QByteArray();
+		return true;
+	}
+	out = QByteArray(in.via.bin.ptr, in.via.bin.size);
+	return false;
+}
+
 
 /**
  * Serialise a valud into the msgpack stream
@@ -387,6 +414,17 @@ void MsgpackIODevice::send(bool b)
 		msgpack_pack_false(&m_pk);
 	}
 }
+bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, bool& out)
+{
+	if ( in.type != MSGPACK_OBJECT_BOOLEAN) {
+		qWarning() << "Attempting to decode as bool when type is" << in.type << in;
+		out = false;
+		return true;
+	}
+	out = in.via.boolean;
+	return false;
+}
+
 
 void MsgpackIODevice::send(const QList<QByteArray>& list)
 {
@@ -395,6 +433,124 @@ void MsgpackIODevice::send(const QList<QByteArray>& list)
 		send(elem);
 	}
 }
+bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QList<QByteArray>& out)
+{
+	out.clear();
+	if ( in.type != MSGPACK_OBJECT_ARRAY) {
+		qWarning() << "Attempting to decode as QList<QByteArray> when type is" << in.type << in;
+		return true;
+	}
+
+	for (uint64_t i=0; i<in.via.array.size; i++) {
+		QByteArray val;
+		if (decodeMsgpack(in.via.array.ptr[i], val)) {
+			out.clear();
+			return true;
+		}
+		out.append(val);
+	}
+	return false;
+}
+
+bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QList<int64_t>& out)
+{
+	out.clear();
+	if ( in.type != MSGPACK_OBJECT_ARRAY) {
+		qWarning() << "Attempting to decode as QList<int64_t> when type is" << in.type << in;
+		return true;
+	}
+
+	for (uint64_t i=0; i<in.via.array.size; i++) {
+		int64_t val;
+		if (decodeMsgpack(in.via.array.ptr[i], val)) {
+			out.clear();
+			return true;
+		}
+		out.append(val);
+	}
+	return false;
+}
+
+/**
+ * We use QVariants for RPC functions that use the *Object* type do not use
+ * this in any other conditions
+ */
+bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QVariant& out)
+{
+	switch (in.type) {
+	case MSGPACK_OBJECT_NIL:
+		out = QVariant();
+		break;
+	case MSGPACK_OBJECT_BOOLEAN:
+		out = in.via.boolean;
+		break;
+	case MSGPACK_OBJECT_NEGATIVE_INTEGER:
+		out = QVariant((qint64)in.via.i64);
+		break;
+	case MSGPACK_OBJECT_POSITIVE_INTEGER:
+		out = QVariant((quint64)in.via.u64);
+		break;
+	case MSGPACK_OBJECT_FLOAT:
+		out = in.via.f64;
+		break;
+	case MSGPACK_OBJECT_BIN:
+		{
+		QByteArray val;
+		if (decodeMsgpack(in, val)) {
+			qWarning() << "Error unpacking ByteArray as QVariant";
+			out = QVariant();
+			return true;
+		}
+		out = val;
+		}
+		break;
+	case MSGPACK_OBJECT_ARRAY:
+		// Either a QVariantList or a QStringList
+		{
+		QVariantList ls;
+		for (uint64_t i=0; i<in.via.array.size; i++) {
+			QVariant v;
+			bool failed = decodeMsgpack(in.via.array.ptr[i], v);
+			if (failed) {
+				qWarning() << "Error unpacking Map as QVariantList";
+				out = QVariant();
+				return true;
+			}
+			ls.append(v);
+		}
+		out = ls;
+		}
+		break;
+	case MSGPACK_OBJECT_MAP:
+		{
+		QVariantMap m;
+		for (uint64_t i=0; i<in.via.map.size; i++) {
+			QByteArray key;
+			if (decodeMsgpack(in.via.map.ptr[i].key, key)) {
+				qWarning() << "Error decoding Object(Map) key";
+				out = QVariant();
+				return true;
+			}
+			QVariant val;
+			if (decodeMsgpack(in.via.map.ptr[i].val, val)) {
+				qWarning() << "Error decoding Object(Map) value";
+				out = QVariant();
+				return true;
+			}
+			m.insert(key,val);
+		}
+		out = m;
+		}
+		break;
+
+	default:
+		out = QVariant();
+		qWarning() << "Unsupported type found in Object" << in.type;
+		return true;
+	}
+	return false;
+}
+
 
 /**
  * Serialise a value into the msgpack stream
@@ -464,6 +620,29 @@ void MsgpackIODevice::send(const QVariant& var)
 		msgpack_pack_nil(&m_pk);
 		qWarning() << "There is a BUG in the QVariant serializer" << var.type();
 	}
+}
+
+bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QPoint& out)
+{
+	if ( in.type != MSGPACK_OBJECT_ARRAY || in.via.array.size != 2 ) {
+		goto fail;
+	}
+	int64_t col, row;
+	if (decodeMsgpack(in.via.array.ptr[0], row)) {
+		goto fail;
+	}
+	if (decodeMsgpack(in.via.array.ptr[1], col)) {
+		goto fail;
+	}
+
+	// QPoint is (x,y)  neovim Position is (row, col)
+	out = QPoint(col, row);
+	return false;
+
+fail:
+	qWarning() << "Attempting to decode as QPoint failed" << in.type << in;
+	out =  QPoint();
+	return true;
 }
 
 /**

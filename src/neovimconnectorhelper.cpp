@@ -1,3 +1,5 @@
+#include <QMap>
+
 #include "neovimconnectorhelper.h"
 #include "neovimconnector.h"
 #include "msgpackiodevice.h"
@@ -19,7 +21,7 @@ NeovimConnectorHelper::NeovimConnectorHelper(NeovimConnector *c)
 }
 
 void NeovimConnectorHelper::handleMetadataError(quint32 msgid, Function::FunctionId,
-		const msgpack_object& errobj)
+		const QVariant& errobj)
 {
 	m_c->setError(NeovimConnector::NoMetadata,
 		tr("Unable to get Neovim api information"));
@@ -33,36 +35,28 @@ void NeovimConnectorHelper::handleMetadataError(quint32 msgid, Function::Functio
  * - Set channel_id
  * - Check if all functions we need are available
  */
-void NeovimConnectorHelper::handleMetadata(quint32 msgid, Function::FunctionId, const msgpack_object& result)
+void NeovimConnectorHelper::handleMetadata(quint32 msgid, Function::FunctionId, const QVariant& result)
 {
-	if ( result.type != MSGPACK_OBJECT_ARRAY || 
-			result.via.array.size != 2 ||
-			result.via.array.ptr[0].type != MSGPACK_OBJECT_POSITIVE_INTEGER ||
-			result.via.array.ptr[1].type != MSGPACK_OBJECT_MAP ) {
+	const QVariantList asList = result.toList();
+	if (asList.size() != 2 || 
+			!asList.at(0).canConvert<quint64>() ||
+			!asList.at(1).canConvert<QVariantMap>()) {
 		m_c->setError(NeovimConnector::UnexpectedMsg,
 				tr("Unable to unpack metadata response description, unexpected data type"));
-		return;
 	}
 
-	m_c->m_channel = result.via.array.ptr[0].via.u64;
+	m_c->m_channel = asList.at(0).toUInt();
+	const QVariantMap metadata = asList.at(1).toMap();
+	QMapIterator<QString,QVariant> it(metadata);
 
-	const msgpack_object metadata = result.via.array.ptr[1];
-	if (metadata.type != MSGPACK_OBJECT_MAP) {
-		m_c->setError(NeovimConnector::MetadataDescriptorError,
-				tr("Found unexpected data type for metadata description"));
-		return;
-	}
-
-	for (quint32 i=0; i< metadata.via.map.size; i++) {
-		QByteArray key;
-		if (decodeMsgpack(metadata.via.map.ptr[i].key, key)) {
-			m_c->setError(NeovimConnector::MetadataDescriptorError,
-				tr("Found unexpected data type for metadata key"));
-			continue;
-		}
-		if ( key == "functions" ) {
-			addFunctions(metadata.via.map.ptr[i].val);
-		} else if ( key == "classes" ) {
+	while (it.hasNext()) {
+		it.next();
+		if (it.key() == "functions") {
+			if (!checkFunctions(it.value().toList())) {
+				m_c->setError(NeovimConnector::APIMisMatch,
+						tr("API methods mismatch: Cannot connect to this instance of Neovim, its version is likely too old, or the API has changed"));
+				return;
+			}
 		}
 	}
 
@@ -89,32 +83,21 @@ void NeovimConnectorHelper::encodingChanged(const QVariant&  obj)
 	}
 }
 
-
 /**
- * Handle the *functions* attribute in the metadata
+ * Check function table from api_metadata[1]
+ * Returns false if there is an API mismatch
  */
-void NeovimConnectorHelper::addFunctions(const msgpack_object& ftable)
+bool NeovimConnectorHelper::checkFunctions(const QVariantList& ftable)
 {
-	if ( ftable.type != MSGPACK_OBJECT_ARRAY ) {
-		m_c->setError(NeovimConnector::UnexpectedMsg,
-				tr("Found unexpected data type when unpacking function table"));
-		return;
-	}
-
 	QList<Function::FunctionId> supported;
-	for (quint32 i=0; i<ftable.via.array.size; i++) {
-		Function::FunctionId fid = Function::functionId(Function::fromMsgpack(ftable.via.array.ptr[i]));
+	foreach(const QVariant& val, ftable) {
+		Function::FunctionId fid = Function::functionId(Function::fromVariant(val));
 		if (fid != Function::NEOVIM_FN_NULL) {
 			supported.append(fid);
 		}
 	}
-
-	if ( Function::knownFunctions.size() != supported.size() ) {
-		m_c->setError(NeovimConnector::APIMisMatch,
-				tr("API methods mismatch: Cannot connect to this instance of Neovim, its version is likely too old, or the API has changed"));
-		return;
-	}
+	// true if all the generated functions are supported
+	return Function::knownFunctions.size() == supported.size();
 }
-
 
 } // Namespace NeovimQt

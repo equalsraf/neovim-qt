@@ -1,6 +1,5 @@
 #include "msgpackrequest.h"
 #include "msgpackiodevice.h"
-#include "util.h"
 
 namespace NeovimQt {
 
