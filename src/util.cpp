@@ -7,23 +7,6 @@ bool decode(const QVariant& in, QVariant& out)
 	out = in;
 	return false;
 }
-bool decode(const QVariant& in, QList<int64_t>& out)
-{
-	out.clear();
-	if ((QMetaType::Type)in.type() != QMetaType::QVariantList) {
-		qWarning() << "Attempting to decode as QList<int64_t> when type is" << in.type() << in;
-		return true;
-	}
-	foreach(const QVariant val, in.toList()) {
-		if (!val.canConvert<int64_t>()) {
-			return false;
-		}
-	}
-	foreach(const QVariant val, in.toList()) {
-		out.append(val.value<int64_t>());
-	}
-	return false;
-}
 
 } // namespace
 

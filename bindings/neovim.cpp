@@ -7,9 +7,31 @@
 
 namespace NeovimQt {
 
+/* Unpack Neovim EXT types Window, Buffer Tabpage which are all
+ * uint64_t see Neovim:msgpack_rpc_to_
+ */
+QVariant unpackBuffer(MsgpackIODevice *dev, const char* in, quint32 size)
+{
+	msgpack_unpacked result;
+	msgpack_unpacked_init(&result);
+	msgpack_unpack_return ret = msgpack_unpack_next(&result, in, size, NULL);
+	msgpack_unpacked_destroy(&result);
+
+	if (ret != MSGPACK_UNPACK_SUCCESS) {
+		return QVariant();
+	}
+	return QVariant((quint64)result.data.via.u64);
+}
+#define unpackWindow unpackBuffer
+#define unpackTabpage unpackBuffer
+
 Neovim::Neovim(NeovimConnector *c)
 :m_c(c)
 {
+	// EXT types
+	{% for typename in exttypes %}
+	m_c->m_dev->registerExtType({{exttypes[typename]}}, unpack{{typename}});
+	{% endfor %}
 	connect(m_c->m_dev, &MsgpackIODevice::notification,
 			this, &Neovim::neovimNotification);
 }

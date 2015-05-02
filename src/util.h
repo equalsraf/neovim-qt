@@ -12,7 +12,24 @@ namespace NeovimQt {
 
 // Methods used to turn QVariant into native types,
 // used by neovim.cpp to decode QVariants
-bool decode(const QVariant& in, QList<int64_t>& out);
+template <class T>
+bool decode(const QVariant& in, QList<T>& out)
+{
+	out.clear();
+	if ((QMetaType::Type)in.type() != QMetaType::QVariantList) {
+		qWarning() << "Attempting to decode as QList<...> when type is" << in.type() << in;
+		return true;
+	}
+	foreach(const QVariant val, in.toList()) {
+		if (!val.canConvert<T>()) {
+			return false;
+		}
+	}
+	foreach(const QVariant val, in.toList()) {
+		out.append(val.value<T>());
+	}
+	return false;
+}
 bool decode(const QVariant& in, QVariant& out);
 template <class T>
 bool decode(const QVariant& in, T& out) {

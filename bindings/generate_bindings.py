@@ -206,6 +206,8 @@ if __name__ == '__main__':
             env['date'] = datetime.datetime.now()
             functions = [Function(f) for f in api['functions'] if f['name'] != 'vim_get_api_info']
             env['functions'] = [f for f in functions if f.valid]
+            exttypes = { typename:info['id'] for typename,info in api['types'].items()}
+            env['exttypes'] = exttypes
             generate_file(name, outpath, **env)
 
     else:

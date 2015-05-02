@@ -20,6 +20,8 @@ class TestCallAllMethods: public QObject
 
 private slots:
 	void initTestCase();
+	void vim_get_current_buffer();
+	void vim_list_runtime_paths();
 	void callAll();
 
 private:
@@ -31,6 +33,26 @@ void TestCallAllMethods::initTestCase()
 	m_c = NeovimQt::NeovimConnector::spawn();
 	QSignalSpy onReady(m_c, &NeovimQt::NeovimConnector::ready);
 	QVERIFY(SPYWAIT(onReady));
+}
+
+void TestCallAllMethods::vim_get_current_buffer()
+{
+	QVERIFY(m_c->neovimObject());
+	NeovimQt::Neovim *obj = m_c->neovimObject();
+
+	QSignalSpy result(obj, &NeovimQt::Neovim::on_vim_get_current_buffer);
+	obj->vim_get_current_buffer();
+	QVERIFY(SPYWAIT(result));
+}
+
+void TestCallAllMethods::vim_list_runtime_paths()
+{
+	QVERIFY(m_c->neovimObject());
+	NeovimQt::Neovim *obj = m_c->neovimObject();
+
+	QSignalSpy result(obj, &NeovimQt::Neovim::on_vim_list_runtime_paths);
+	obj->vim_list_runtime_paths();
+	QVERIFY(SPYWAIT(result));
 }
 
 void TestCallAllMethods::callAll()

@@ -542,7 +542,18 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QVariant& out)
 		out = m;
 		}
 		break;
-
+	case MSGPACK_OBJECT_EXT:
+		if (m_extTypes.contains(in.via.ext.type)) {
+			out = m_extTypes.value(in.via.ext.type)(this, in.via.ext.ptr, in.via.ext.size);
+			if (!out.isValid()) {
+				qWarning() << "EXT unpacking failed" << in.via.ext.type;
+				return true;
+			}
+		} else {
+			out = QVariant();
+			qWarning() << "Unsupported EXT type found in Object" << in.via.ext.type;
+		}
+		break;
 	default:
 		out = QVariant();
 		qWarning() << "Unsupported type found in Object" << in.type << in;
@@ -551,6 +562,10 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QVariant& out)
 	return false;
 }
 
+void MsgpackIODevice::registerExtType(int8_t type, msgpackExtDecoder fun)
+{
+	m_extTypes.insert(type, fun);
+}
 
 /**
  * Serialise a value into the msgpack stream

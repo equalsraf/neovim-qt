@@ -8,7 +8,6 @@
 #include <QDebug>
 #include <QStringList>
 #include <QPoint>
-#include <msgpack.h>
 
 namespace NeovimQt {
 
@@ -26,7 +25,6 @@ public:
 	Function(const QString& ret, const QString& name, QList<QString> paramTypes, bool can_fail);
 	bool isValid() const;
 	bool operator==(const Function& other);
-	static Function fromMsgpack(const msgpack_object&);
 	static Function fromVariant(const QVariant&);
 	static QList<QPair<QString,QString> > parseParameters(const QVariantList& obj);
 

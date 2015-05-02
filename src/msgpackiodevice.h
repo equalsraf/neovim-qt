@@ -56,6 +56,9 @@ public:
 	bool sendNotification(const QByteArray& method, const QVariantList& params);
 
 	void setRequestHandler(MsgpackRequestHandler *);
+
+	typedef QVariant (*msgpackExtDecoder)(MsgpackIODevice*, const char* data, quint32 size);
+	void registerExtType(int8_t type, msgpackExtDecoder);
 signals:
 	void error(MsgpackError);
 	void notification(const QByteArray &name, const QVariantList& args);
@@ -90,6 +93,7 @@ private:
 	msgpack_unpacker m_uk;
 	QHash<quint32, MsgpackRequest*> m_requests;
 	MsgpackRequestHandler *m_reqHandler;
+	QHash<int8_t, msgpackExtDecoder> m_extTypes;
 
 	QString m_errorString;
 	MsgpackError m_error;
