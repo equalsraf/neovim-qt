@@ -294,6 +294,11 @@ err:
 	req->deleteLater();
 }
 
+QList<quint32> MsgpackIODevice::pendingRequests() const
+{
+	return m_requests.keys();
+}
+
 /**
  * [type(2), method, params]
  *

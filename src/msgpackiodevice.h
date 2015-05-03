@@ -59,6 +59,8 @@ public:
 
 	typedef QVariant (*msgpackExtDecoder)(MsgpackIODevice*, const char* data, quint32 size);
 	void registerExtType(int8_t type, msgpackExtDecoder);
+
+	QList<quint32> pendingRequests() const;
 signals:
 	void error(MsgpackError);
 	void notification(const QByteArray &name, const QVariantList& args);
