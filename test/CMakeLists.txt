@@ -8,6 +8,7 @@ function(add_xtest SOURCE_NAME)
 endfunction()
 
 add_xtest(tst_neovimobject)
+add_xtest(tst_neovimconnector)
 add_xtest(tst_callallmethods)
 add_xtest(tst_encoding)
 add_xtest(tst_msgpackiodevice)
