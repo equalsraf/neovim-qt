@@ -5,7 +5,6 @@
 #include <QAbstractSocket>
 #include <QProcess>
 #include <QTextCodec>
-#include <QTcpSocket>
 #include "function.h"
 #include "auto/neovim.h"
 

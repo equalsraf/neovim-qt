@@ -2,6 +2,7 @@
 #include <QtGlobal>
 #include <QMetaMethod>
 #include <QLocalSocket>
+#include <QTcpSocket>
 #include "msgpackrequest.h"
 #include "neovimconnectorhelper.h"
 #include "msgpackiodevice.h"
