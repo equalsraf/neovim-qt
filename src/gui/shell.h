@@ -32,6 +32,7 @@ signals:
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
+	bool setGuiFont(const QString& fdesc);
 
 protected slots:
 	void neovimIsReady();
