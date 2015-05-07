@@ -31,13 +31,13 @@ artifacts:
 - path: build/bin
   name: neovim-qt
 deploy:
-  release: neovim-qt-$(APPVEYOR_REPO_TAG_NAME)-$(APPVEYOR_BUILD_VERSION)
+  tag: staging
   description: Automated builds (Appveyor)
   provider: GitHub
   auth_token:
     secure: Hx2tU6GZPZNB6qGjHcIqa1tEm8fVGXZUVfXyjboVrPcmA9OWMTXhLxayDzMMl3kD
   artifact: build\neovim-qt.zip
+  prerelease: true
   on:
     appveyor_repo_tag: true
     configuration: RelWithDebInfo
-  draft: true
