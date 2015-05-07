@@ -51,6 +51,39 @@ private slots:
 		QCOMPARE(c->decode(bytes), s);
 
 	}
+
+	void connectToNeovimTCP() {
+		// These 2 cases WILL FAIL because there is no Neovim instance running
+		NeovimConnector *c = NeovimConnector::connectToNeovim("127.0.0.1:64999");
+		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
+		QVERIFY(onError.isValid());
+		QVERIFY(SPYWAIT(onError));
+
+		QCOMPARE(c->errorCause(), NeovimConnector::SocketError);
+		c->deleteLater();
+	}
+
+	void connectToNeovimSocket() {
+		NeovimConnector *c = NeovimConnector::connectToNeovim("NoSuchFile");
+		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
+		QVERIFY(onError.isValid());
+		// The signal might be emited before we get to connect
+		SPYWAIT(onError);
+
+		QCOMPARE(c->errorCause(), NeovimConnector::SocketError);
+		c->deleteLater();
+	}
+
+	void connectToNeovimEnvEmpty() {
+		// This is the same as ::spawn()
+		NeovimConnector *c = NeovimConnector::connectToNeovim("");
+		QSignalSpy onReady(c, SIGNAL(ready()));
+		QVERIFY(onReady.isValid());
+		QVERIFY(SPYWAIT(onReady));
+
+		c->deleteLater();
+	}
+
 };
 
 } // Namespace NeovimQt
