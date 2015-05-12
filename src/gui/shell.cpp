@@ -74,6 +74,7 @@ void Shell::setAttached(bool attached)
 {
 	setAttribute(Qt::WA_StaticContents, attached);
 	m_attached = attached;
+	update();
 }
 
 /** Neovim shell width in pixels (does not include extra margin) */
