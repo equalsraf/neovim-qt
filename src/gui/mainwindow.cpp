@@ -59,7 +59,11 @@ void MainWindow::neovimExited(int status)
 		m_errorWidget->setText(m_nvim->errorString());
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
 		m_errorWidget->setVisible(true);
-	} else if (status == 0 && m_nvim->errorCause() == NeovimConnector::NoError) {
+	} else if (status != 0) {
+		m_errorWidget->setText(QString("Neovim exited with status code (%1)").arg(status));
+		m_errorWidget->showReconnect(m_nvim->canReconnect());
+		m_errorWidget->setVisible(true);
+	} else {
 		close();
 	}
 }
