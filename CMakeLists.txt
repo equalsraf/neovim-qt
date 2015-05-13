@@ -1,19 +1,19 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(neovim-qt)
 
-if ( NOT EXISTS ${NEOVIM_EXEC} )
+if(NOT EXISTS ${NEOVIM_EXEC})
 	set(NEOVIM_EXEC nvim)
-endif ( NOT EXISTS ${NEOVIM_EXEC} )
+endif()
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 		"${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	add_definitions(-Werror -Wall -Wextra -Wno-unused-parameter -std=c++11 -Wfatal-errors)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Wno-unused-parameter -std=c++11 -Wfatal-errors")
 endif()
 
 option(USE_GCOV "Enable gcov support" OFF)
 if(USE_GCOV)
 	message(STATUS "Enabling coverage")
-	set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} --coverage")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
 endif()
@@ -31,7 +31,12 @@ find_package(Qt5Network REQUIRED)
 find_package(Qt5Test REQUIRED)
 
 # msgpack
-find_package(Msgpack REQUIRED)
+option(USE_SYSTEM_MSGPACK "Use system msgpack libraries " OFF)
+if(USE_SYSTEM_MSGPACK)
+	find_package(Msgpack REQUIRED)
+else()
+	add_subdirectory(third-party)
+endif()
 include_directories(${MSGPACK_INCLUDE_DIRS})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")

@@ -22,4 +22,9 @@ if(NOT rv EQUAL 0)
 endif()
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/msgpack-c-cpp-1.0.0)
+set(MSGPACK_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/msgpack-c-cpp-1.0.0/)
+add_subdirectory(${MSGPACK_SOURCE_DIR})
+
+# Similar enough to FindMsgpack
+set(MSGPACK_INCLUDE_DIRS ${MSGPACK_SOURCE_DIR}/include PARENT_SCOPE)
+set(MSGPACK_LIBRARIES msgpack-static PARENT_SCOPE)
