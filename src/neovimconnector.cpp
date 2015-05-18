@@ -147,8 +147,7 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 {
 	QProcess *p = new QProcess();
 	QStringList args = params;
-	args << "--embed";
-	args << "-T" << "abstract_ui";
+	args << "--embed" << "--headless";
 
 	NeovimConnector *c = new NeovimConnector(p);
 	c->m_ctype = SpawnedConnection;
