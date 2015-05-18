@@ -51,18 +51,29 @@ InputConv::InputConv() {
  * Return keyboard modifier prefix 
  *
  * e.g. C-, A- or C-S-A-
+ *
+ * WIN32: Ctrl+Alt are never passed together, since we can't distinguish
+ * between Ctrl+Alt and AltGr (see Vim/os_win32.c).
  */
 QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 {
 	// FIXME: Mac and Meta check the Qt docs
 	QString modprefix;
-	if ( mod & Qt::ControlModifier ) {
+	if ( mod & Qt::ControlModifier
+#ifdef Q_OS_WIN32
+		&& !(mod & Qt::AltModifier)
+#endif
+	   ) {
 		modprefix += "C-";
 	}
 	if ( mod & Qt::ShiftModifier ) {
 		modprefix += "S-";
 	}
-	if ( mod & Qt::AltModifier ) {
+	if ( mod & Qt::AltModifier
+#ifdef Q_OS_WIN32
+		&& !(mod & Qt::ControlModifier)
+#endif
+	   ) {
 		modprefix += "A-";
 	}
 	return modprefix;
