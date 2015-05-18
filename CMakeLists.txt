@@ -24,6 +24,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
+# konsole_wcwidth.h
+include_directories(third-party)
+
 # Qt
 set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets REQUIRED)

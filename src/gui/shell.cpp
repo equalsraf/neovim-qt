@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include "input.h"
+#include "konsole_wcwidth.h"
 
 namespace NeovimQt {
 
@@ -242,10 +243,12 @@ void Shell::handlePut(const QVariantList& args, QPainter& painter)
 
 	if (!text.isEmpty()) {
 		painter.save();
-		// Clip the text - but still allow it to go into the next cell, it
-		// may be a fullwidth char
+
+		const QChar& c = text.at(0);
+		// fullwidth chars take up two columns
+		int charWidth = konsole_wcwidth(c.unicode());
 		QRect clipRect(neovimCursorTopLeft(),
-				QSize(neovimCellWidth()*2, neovimRowHeight()));
+				QSize(neovimCellWidth()*charWidth, neovimRowHeight()));
 		painter.setClipRect(clipRect);
 
 		// Draw text at the baseline
