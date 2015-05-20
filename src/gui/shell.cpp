@@ -38,6 +38,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	setAttribute(Qt::WA_OpaquePaintEvent, true);
 
 	setFocusPolicy(Qt::StrongFocus);
+	setMouseTracking(true);
 
 	// IM Tooltip
 	setAttribute(Qt::WA_InputMethodEnabled, true);
@@ -596,6 +597,49 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 
 	m_nvim->neovimObject()->vim_input(m_nvim->encode(inp));
 	// FIXME: bytes might not be written, and need to be buffered
+}
+
+void Shell::neovimMouseEvent(QMouseEvent *ev)
+{
+	QPoint pos(ev->x()/neovimCellWidth(),
+			ev->y()/neovimRowHeight());
+	QString inp;
+	if (ev->type() == QEvent::MouseMove) {
+		Qt::MouseButton bt;
+		if (ev->buttons() & Qt::LeftButton) {
+			bt = Qt::LeftButton;
+		} else if (ev->buttons() & Qt::RightButton) {
+			bt = Qt::RightButton;
+		} else if (ev->buttons() & Qt::MidButton) {
+			bt = Qt::MidButton;
+		} else {
+			return;
+		}
+		inp = Input.convertMouse(bt, ev->type(), ev->modifiers(), pos);
+	} else {
+		inp = Input.convertMouse(ev->button(), ev->type(), ev->modifiers(), pos);
+	}
+	if (inp.isEmpty()) {
+		return;
+	}
+	m_nvim->neovimObject()->vim_input(inp.toLatin1());
+}
+void Shell::mousePressEvent(QMouseEvent *ev)
+{
+	neovimMouseEvent(ev);
+}
+void Shell::mouseReleaseEvent(QMouseEvent *ev)
+{
+	neovimMouseEvent(ev);
+}
+void Shell::mouseMoveEvent(QMouseEvent *ev)
+{
+	QPoint pos(ev->x()/neovimCellWidth(),
+			ev->y()/neovimRowHeight());
+	if (pos != m_mouse_pos) {
+		m_mouse_pos = pos;
+		neovimMouseEvent(ev);
+	}
 }
 
 void Shell::resizeNeovim(const QSize& newSize)

@@ -80,6 +80,56 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 }
 
 /**
+ * Convert mouse event information into Neovim key notation
+ *
+ * @type is one of the Qt mouse event types
+ * @pos is in Neovim Coordinates
+ * see QMouseEvent
+ *
+ * If the event is not valid for Neovim, returns an empty string
+ */
+QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::KeyboardModifiers mod, QPoint pos)
+{
+	QString buttonName;
+	switch(bt) {
+	case Qt::LeftButton:
+		buttonName += "Left";
+		break;
+	case Qt::RightButton:
+		buttonName += "Right";
+		break;
+	case Qt::MidButton:
+		buttonName += "Middle";
+		break;
+	case Qt::NoButton:
+		break;
+	default:
+		return "";
+	}
+
+	QString evType;
+	switch(type) {
+	case QEvent::MouseButtonDblClick:
+		// FIXME: for now treat this a regular press
+		//buttonName = "2-" + buttonName + "Mouse";
+	case QEvent::MouseButtonPress:
+		evType += "Mouse";
+		break;
+	case QEvent::MouseButtonRelease:
+		evType += "Release";
+		break;
+	case QEvent::MouseMove:
+		evType += "Drag";
+		break;
+	default:
+		return "";
+	}
+
+	QString inp = QString("<%1%2%3><%4,%5>").arg(modPrefix(mod)).arg(buttonName).arg(evType).arg(pos.x()).arg(pos.y());
+	return inp;
+}
+
+/**
  * Convert Qt key input into Neovim key-notation
  *
  * see QKeyEvent

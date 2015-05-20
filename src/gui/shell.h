@@ -68,6 +68,11 @@ protected:
 	virtual void handleSetTitle(const QVariantList& opargs);
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 	virtual void handleBusy(bool);
+
+	void neovimMouseEvent(QMouseEvent *ev);
+	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
+	virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
+	virtual void mouseMoveEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 private:
 	bool m_attached;
         void setAttached(bool);
@@ -95,6 +100,7 @@ private:
 	bool m_resizing;
 	QLabel *m_tooltip;
         QPixmap m_logo;
+	QPoint m_mouse_pos;
 
 	// Properties
 	bool m_neovimBusy;
