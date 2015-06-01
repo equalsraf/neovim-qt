@@ -12,6 +12,12 @@ configuration:
 matrix:
   fast_finish: true
 build_script:
+- set SEMVER=0.0.0
+# Build packages as 0.1.2-ci{build}
+- set PKG_VERSION=%SEMVER%-ci%APPVEYOR_BUILD_NUMBER%
+# Build packages for tags as 0.1.2-TAGNAME
+- if DEFINED APPVEYOR_REPO_TAG_NAME set PKG_VERSION=%SEMVER%-%APPVEYOR_REPO_TAG_NAME%
+- echo %PKG_VERSION%
 - set CMAKE_PREFIX_PATH=%QTDIR%
 - set PATH=%PATH%;%QTDIR%/bin
 # Build Msgpack
@@ -27,17 +33,25 @@ build_script:
 - cmake -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=%configuration% -DCMAKE_INSTALL_PREFIX=../INSTALL ..
 # FYI CMAKE_BUILD_TYPE does not work with VS generators, use --config
 - cmake --build . --config %configuration% --target windeployqt
+- nuget pack -Version %PKG_VERSION% ..\contrib\neovim-qt.nuspec
 artifacts:
 - path: build/bin
   name: neovim-qt
+- path: 'build/*.nupkg'
+  name: nupkgs
 deploy:
-  tag: staging
-  description: Automated builds (Appveyor)
-  provider: GitHub
-  auth_token:
-    secure: Hx2tU6GZPZNB6qGjHcIqa1tEm8fVGXZUVfXyjboVrPcmA9OWMTXhLxayDzMMl3kD
-  artifact: build\neovim-qt.zip
-  prerelease: true
-  on:
-    appveyor_repo_tag: true
-    configuration: RelWithDebInfo
+  - provider: NuGet
+    server: https://www.myget.org/F/equalsraf/api/v2/package
+    api_key:
+      secure: /KlyY91ZSbxwxOjQQlKsNnvCg+m0xjwSwhwAsbg/cjwSm1sfMhIqUQA8K/qww6RM
+    skip_symbols: true
+  - provider: GitHub
+    tag: staging
+    description: Automated builds (Appveyor)
+    auth_token:
+      secure: Hx2tU6GZPZNB6qGjHcIqa1tEm8fVGXZUVfXyjboVrPcmA9OWMTXhLxayDzMMl3kD
+    artifact: build\neovim-qt.zip
+    prerelease: true
+    on:
+      appveyor_repo_tag: true
+      configuration: RelWithDebInfo
