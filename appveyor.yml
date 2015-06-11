@@ -46,7 +46,6 @@ deploy:
       secure: /KlyY91ZSbxwxOjQQlKsNnvCg+m0xjwSwhwAsbg/cjwSm1sfMhIqUQA8K/qww6RM
     skip_symbols: true
   - provider: GitHub
-    tag: staging
     description: Automated builds (Appveyor)
     auth_token:
       secure: Hx2tU6GZPZNB6qGjHcIqa1tEm8fVGXZUVfXyjboVrPcmA9OWMTXhLxayDzMMl3kD
