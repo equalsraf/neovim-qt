@@ -34,6 +34,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimError);
 	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
 			this, &MainWindow::reconnectNeovim);
+	connect(m_shell, &Shell::neovimResized,
+			this, &MainWindow::neovimWidgetResized);
 	m_shell->setFocus(Qt::OtherFocusReason);
 
 	if (m_nvim->errorCause()) {
@@ -94,6 +96,22 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 		QWidget::closeEvent(ev);
 	} else {
 		ev->ignore();
+	}
+}
+
+void MainWindow::neovimWidgetResized(const QSize& newSize)
+{
+	if ((windowState() & Qt::WindowMaximized)) {
+		if (newSize.width() > width() || newSize.height() > height()) {
+			// If the Neovim shell is larger than the main window, resize it
+			// to fit
+			// TODO: size() is not ideal, if the mainwindow has toolbars, or
+			// docks this will be incorrect
+			m_shell->resizeNeovim(size());
+		}
+	} else {
+		// Dont use ::adjustSize() here, it does not respect the new sizeHint()
+		resize(sizeHint());
 	}
 }
 

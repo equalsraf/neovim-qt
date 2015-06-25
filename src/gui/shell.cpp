@@ -79,13 +79,13 @@ void Shell::setAttached(bool attached)
 }
 
 /** Neovim shell width in pixels (does not include extra margin) */
-quint64 Shell::neovimWidth() const
+int Shell::neovimWidth() const
 {
 	return m_cols*neovimCellWidth();
 }
 
 /** Neovim shell height in pixels (does not include extra margin) */
-quint64 Shell::neovimHeight() const
+int Shell::neovimHeight() const
 {
 	return m_rows*neovimRowHeight();
 }
@@ -172,7 +172,7 @@ void Shell::neovimExited(int status)
 }
 
 /**
- * Neovim was resized
+ * Neovim requested a resize
  *
  * - update cols/rows
  * - reset the cursor, scroll_region
@@ -197,11 +197,7 @@ void Shell::handleResize(uint64_t cols, uint64_t rows)
 		}
 		m_image.swap(new_image);
 		updateGeometry();
-		// If this is not the result of a resize event (i.e. Vim spontaneously 
-		// asked for a resize) then try to adjust the widget geometry
-		if (!m_resizing) {
-			adjustSize();
-		}
+		emit neovimResized(neovimSize());
 	}
 }
 
@@ -587,15 +583,10 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 	// FIXME: bytes might not be written, and need to be buffered
 }
 
-void Shell::resizeEvent(QResizeEvent *ev)
+void Shell::resizeNeovim(const QSize& newSize)
 {
-	if (!m_attached) {
-		QWidget::resizeEvent(ev);
-		return;
-	}
-	// Call Neovim to resize
-	uint64_t cols = ev->size().width()/neovimCellWidth();
-	uint64_t rows = ev->size().height()/neovimRowHeight();
+	uint64_t cols = newSize.width()/neovimCellWidth();
+	uint64_t rows = newSize.height()/neovimRowHeight();
 
 	// Neovim will ignore simultaneous calls to ui_try_resize
 	if (!m_resizing && m_nvim && m_attached &&
@@ -603,6 +594,16 @@ void Shell::resizeEvent(QResizeEvent *ev)
 		m_nvim->neovimObject()->ui_try_resize(cols, rows);
 		m_resizing = true;
 	}
+}
+
+void Shell::resizeEvent(QResizeEvent *ev)
+{
+	if (!m_attached) {
+		QWidget::resizeEvent(ev);
+		return;
+	}
+
+	resizeNeovim(ev->size());
 	QWidget::resizeEvent(ev);
 }
 
