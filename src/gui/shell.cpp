@@ -148,7 +148,7 @@ void Shell::neovimIsReady()
 			this, &Shell::handleNeovimNotification);
 	// FIXME: this API will change
 	QRect screenRect = QApplication::desktop()->availableGeometry(this);
-	m_nvim->attachUi(screenRect.width()/neovimCellWidth(), screenRect.height()/neovimRowHeight());
+	m_nvim->attachUi(screenRect.width()*0.66/neovimCellWidth(), screenRect.height()*0.66/neovimRowHeight());
 
 	connect(m_nvim->neovimObject(), &Neovim::on_ui_try_resize,
 			this, &Shell::neovimResizeFinished);
