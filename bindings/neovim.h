@@ -2,9 +2,10 @@
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
-#include <msgpack.h>
+
 namespace NeovimQt {
 class NeovimConnector;
+class MsgpackRequest;
 class Neovim: public QObject
 {
 
@@ -24,7 +25,7 @@ public slots:
 
 {% for f in functions %}
 	// {{f.signature()}}
-	void {{f.name}}({{f.argstring}});
+	MsgpackRequest* {{f.name}}({{f.argstring}});
 {% endfor %}
 
 signals:

@@ -48,7 +48,7 @@ void Neovim::ui_try_resize(int64_t width, int64_t height)
 
 // Slots
 {% for f in functions %}
-void Neovim::{{f.name}}({{f.argstring}})
+MsgpackRequest* Neovim::{{f.name}}({{f.argstring}})
 {
 	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("{{f.name}}", {{f.argcount}});
 	r->setFunction(Function::NEOVIM_FN_{{f.name.upper()}});
@@ -57,6 +57,7 @@ void Neovim::{{f.name}}({{f.argstring}})
 {% for param in f.parameters %}
 	m_c->m_dev->{{param.sendmethod}}({{param.name}});
 {% endfor %}
+	return r;
 }
 {% endfor %}
 
