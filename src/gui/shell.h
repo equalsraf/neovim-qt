@@ -36,11 +36,13 @@ public slots:
 
 protected slots:
 	void neovimIsReady();
+        void neovimFontVarOk(quint32, Function::FunctionId, const QVariant&);
 	void neovimError(NeovimConnector::NeovimError);
 	void neovimExited(int);
 	void neovimResizeFinished();
 	void mouseClickReset();
 	void mouseClickIncrement(Qt::MouseButton bt);
+        void init();
 
 protected:
 	void tooltip(const QString& text);

@@ -2,6 +2,7 @@
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
+#include "msgpack.h"
 
 namespace NeovimQt {
 class NeovimConnector;

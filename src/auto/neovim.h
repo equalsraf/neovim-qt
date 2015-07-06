@@ -1,7 +1,8 @@
-// Auto generated 2015-07-06 13:33:15.483169
+// Auto generated 2015-07-06 14:02:18.160348
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
+#include "msgpack.h"
 
 namespace NeovimQt {
 class NeovimConnector;

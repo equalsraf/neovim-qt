@@ -6,6 +6,7 @@
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QKeyEvent>
+#include "msgpackrequest.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
 
@@ -194,6 +195,27 @@ void Shell::neovimIsReady()
 	if (!m_nvim || !m_nvim->neovimObject()) {
 		return;
 	}
+
+	// Check g:Guifont for a font from user settings
+	MsgpackRequest *r = m_nvim->neovimObject()->vim_get_var("Guifont");
+	connect(r, &MsgpackRequest::finished,
+			this, &Shell::neovimFontVarOk);
+	connect(r, &MsgpackRequest::error,
+			this, &Shell::init);
+}
+
+void Shell::neovimFontVarOk(quint32, Function::FunctionId, const QVariant& ret)
+{
+	setGuiFont(m_nvim->decode(ret.toByteArray()));
+	init();
+}
+
+/**
+ * Attach to Neovim UI and connect the necessary signals. This is called
+ * after we know the font metrics (and the expected window dimensions)
+ */
+void Shell::init()
+{
 	// FIXME: Don't set this here, wait for return from ui_attach instead
 	setAttached(true);
 
