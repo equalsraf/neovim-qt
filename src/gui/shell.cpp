@@ -401,10 +401,13 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 		this->unsetCursor();
 	} else if (name == "mouse_off"){
 		this->setCursor(Qt::BlankCursor);
-	} else if (name == "normal_mode"){
-		handleNormalMode(painter);
-	} else if (name == "insert_mode"){
-		handleInsertMode(painter);
+	} else if (name == "mode_change"){
+		if (opargs.size() != 1) {
+			qWarning() << "Unexpected argument for change_mode:" << opargs;
+			return;
+		}
+		QString mode = m_nvim->decode(opargs.at(0).toByteArray());
+		handleModeChange(mode);
 	} else if (name == "cursor_on"){
 	} else if (name == "set_title"){
 		handleSetTitle(opargs);
@@ -426,14 +429,14 @@ void Shell::setNeovimCursor(quint64 row, quint64 col)
 	update(QRect(neovimCursorTopLeft(), neovimCharSize()));
 }
 
-void Shell::handleNormalMode(QPainter& painter)
+void Shell::handleModeChange(const QString& mode)
 {
-	m_insertMode = false;
-}
-
-void Shell::handleInsertMode(QPainter& painter)
-{
-	m_insertMode = true;
+	// TODO: Implement visual aids for other modes
+	if (mode == "insert") {
+		m_insertMode = true;
+	} else {
+		m_insertMode = false;
+	}
 }
 
 void Shell::handleSetTitle(const QVariantList& opargs)
