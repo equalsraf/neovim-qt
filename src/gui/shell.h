@@ -64,8 +64,7 @@ protected:
 	virtual void handleHighlightSet(const QVariantMap& args, QPainter& painter);
 	virtual void handleRedraw(const QByteArray& name, const QVariantList& args, QPainter& painter);
 	virtual void handleScroll(const QVariantList& args, QPainter& painter);
-	virtual void handleNormalMode(QPainter& painter);
-	virtual void handleInsertMode(QPainter& painter);
+	virtual void handleModeChange(const QString& mode);
 	virtual void handleSetTitle(const QVariantList& opargs);
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 	virtual void handleBusy(bool);
