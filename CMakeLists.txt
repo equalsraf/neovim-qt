@@ -7,7 +7,7 @@ endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 		"${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Wno-unused-parameter -std=c++11 -Wfatal-errors")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -std=c++11 -Wfatal-errors")
 endif()
 
 option(USE_GCOV "Enable gcov support" OFF)
