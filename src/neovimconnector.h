@@ -62,6 +62,7 @@ public:
 	uint64_t channel();
 	QString decode(const QByteArray&);
 	QByteArray encode(const QString&);
+	NeovimConnectionType connectionType();
 
 signals:
 	void ready();

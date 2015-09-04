@@ -253,6 +253,11 @@ bool NeovimConnector::canReconnect()
 	return m_ctype != OtherConnection;
 }
 
+NeovimConnector::NeovimConnectionType NeovimConnector::connectionType()
+{
+	return m_ctype;
+}
+
 /**
  * Create a new connection using the same parameters as the current one.
  *

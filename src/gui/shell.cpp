@@ -632,7 +632,10 @@ void Shell::changeEvent( QEvent *ev)
 
 void Shell::closeEvent(QCloseEvent *ev)
 {
-	if (m_attached) {
+	if (m_attached &&
+		m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
+		// If attached to a spawned Neovim process, ignore the event
+		// and try to close Neovim as :qa
 		ev->ignore();
 		m_nvim->neovimObject()->vim_command("qa");
 	} else {
