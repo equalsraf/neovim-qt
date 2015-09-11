@@ -39,6 +39,10 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 
 	setFocusPolicy(Qt::StrongFocus);
 	setMouseTracking(true);
+	m_mouseclick_timer.setInterval(QApplication::doubleClickInterval());
+	m_mouseclick_timer.setSingleShot(true);
+	connect(&m_mouseclick_timer, &QTimer::timeout,
+			this, &Shell::mouseClickReset);
 
 	// IM Tooltip
 	setAttribute(Qt::WA_InputMethodEnabled, true);
@@ -615,9 +619,10 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 		} else {
 			return;
 		}
-		inp = Input.convertMouse(bt, ev->type(), ev->modifiers(), pos);
+		inp = Input.convertMouse(bt, ev->type(), ev->modifiers(), pos, 0);
 	} else {
-		inp = Input.convertMouse(ev->button(), ev->type(), ev->modifiers(), pos);
+		inp = Input.convertMouse(ev->button(), ev->type(), ev->modifiers(), pos,
+						m_mouseclick_count);
 	}
 	if (inp.isEmpty()) {
 		return;
@@ -626,7 +631,35 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 }
 void Shell::mousePressEvent(QMouseEvent *ev)
 {
+	m_mouseclick_timer.start();
+	mouseClickIncrement(ev->button());
 	neovimMouseEvent(ev);
+}
+/** Reset state for mouse N-click tracking */
+void Shell::mouseClickReset()
+{
+	m_mouseclick_count = 0;
+	m_mouseclick_pending = Qt::NoButton;
+	m_mouseclick_timer.stop();
+}
+/**
+ * Increment consecutive mouse click count
+ *
+ * Since Vim only supports up to 4-click events the counter
+ * rotates after 4 clicks.
+ */
+void Shell::mouseClickIncrement(Qt::MouseButton bt)
+{
+	if (m_mouseclick_pending != Qt::NoButton && bt != m_mouseclick_pending) {
+		mouseClickReset();
+	}
+
+	m_mouseclick_pending = bt;
+	if (m_mouseclick_count > 3) {
+		m_mouseclick_count = 1;
+	} else {
+		m_mouseclick_count += 1;
+	}
 }
 void Shell::mouseReleaseEvent(QMouseEvent *ev)
 {
@@ -638,6 +671,7 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 			ev->y()/neovimRowHeight());
 	if (pos != m_mouse_pos) {
 		m_mouse_pos = pos;
+		mouseClickReset();
 		neovimMouseEvent(ev);
 	}
 }

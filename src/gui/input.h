@@ -17,7 +17,7 @@ public:
 
 	QHash<int, QString> specialKeys;
 	QHash<QString, QString> replaceKeys;
-	QString convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::KeyboardModifiers mod, QPoint pos);
+	QString convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::KeyboardModifiers mod, QPoint pos, short clicksCount);
 };
 
 extern InputConv Input;

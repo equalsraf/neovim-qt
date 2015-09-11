@@ -6,6 +6,7 @@
 #include <QFont>
 #include <QBackingStore>
 #include <QLabel>
+#include <QTimer>
 #include "neovimconnector.h"
 
 namespace NeovimQt {
@@ -37,6 +38,8 @@ protected slots:
 	void neovimError(NeovimConnector::NeovimError);
 	void neovimExited(int);
 	void neovimResizeFinished();
+	void mouseClickReset();
+	void mouseClickIncrement(Qt::MouseButton bt);
 
 protected:
 	void tooltip(const QString& text);
@@ -101,6 +104,10 @@ private:
 	QLabel *m_tooltip;
         QPixmap m_logo;
 	QPoint m_mouse_pos;
+	// 2/3/4 mouse click tracking
+	QTimer m_mouseclick_timer;
+	short m_mouseclick_count;
+	Qt::MouseButton m_mouseclick_pending;
 
 	// Properties
 	bool m_neovimBusy;
