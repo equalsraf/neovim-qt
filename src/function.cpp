@@ -134,8 +134,8 @@ Function Function::fromVariant(const QVariant& fun)
 			// Deprecated
 		} else if ( it.key() == "receives_channel_id" ) {
 			// Internal
-		} else if ( it.key() == "deferred" ) {
-			// Internal
+		} else if ( it.key() == "deferred" || it.key() == "async" ) {
+			// Internal, "deferred" renamed "async" in neovim/ccdeb91
 		} else {
 			qWarning() << "Unsupported function attribute"<< it.key() << it.value();
 		}
