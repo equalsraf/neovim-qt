@@ -1,5 +1,5 @@
 
-Qt5 library and tools for interacting with Neovim.
+Neovim client library and GUI, in Qt5.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ For Unix call
     $ cmake ..
     $ make
 
-for Windows both MSVC and Mingw are supported. Try the following
+for Windows both MSVC and Mingw are supported. Use the following
 
     $ mkdir build
     $ cd build
