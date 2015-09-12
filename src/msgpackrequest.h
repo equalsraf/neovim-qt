@@ -12,6 +12,7 @@ public:
 	MsgpackRequest(quint32 id, MsgpackIODevice *dev, QObject *parent=0);
 	void setFunction(Function::FunctionId);
 	Function::FunctionId function();
+	/** The identifier for this Msgpack request */
 	const quint32 id;
 signals:
 	void finished(quint32 msgid, Function::FunctionId fun, const QVariant& resp);

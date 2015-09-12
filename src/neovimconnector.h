@@ -17,6 +17,10 @@ class NeovimConnector: public QObject
 	friend class Neovim;
 	friend class NeovimConnectorHelper;
 	Q_OBJECT
+	/**
+	 * True if the Neovim instance is ready
+	 * @see neovimObject
+	 */
 	Q_PROPERTY(bool ready READ isReady NOTIFY ready)
 	Q_ENUMS(NeovimError)
 public:
@@ -34,6 +38,7 @@ public:
 		RuntimeMsgpackError,
 	};
 
+	/** Underlying connection used to read Neovim */
         enum NeovimConnectionType {
 		OtherConnection,
 		SpawnedConnection,
@@ -65,6 +70,7 @@ public:
 	NeovimConnectionType connectionType();
 
 signals:
+	/** Emitted when Neovim is ready @see ready */
 	void ready();
 	void error(NeovimError);
 	void processExited(int exitCode);

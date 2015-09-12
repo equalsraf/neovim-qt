@@ -25,6 +25,7 @@ public:
 	MsgpackIODevice(QIODevice *, QObject *parent=0);
 	~MsgpackIODevice();
 
+	/** True if the underlying IO device is open @see QIODevice::isOpen */
 	bool isOpen() {return m_dev->isOpen();}
 	QString errorString() const;
 	MsgpackError errorCause() const {return m_error;};
@@ -57,12 +58,14 @@ public:
 
 	void setRequestHandler(MsgpackRequestHandler *);
 
+	/** Typedef for msgpack-to-Qvariant decoder @see registerExtType */
 	typedef QVariant (*msgpackExtDecoder)(MsgpackIODevice*, const char* data, quint32 size);
 	void registerExtType(int8_t type, msgpackExtDecoder);
 
 	QList<quint32> pendingRequests() const;
 signals:
 	void error(MsgpackError);
+	/** A notification with the given name and arguments was received */
 	void notification(const QByteArray &name, const QVariantList& args);
 
 protected:

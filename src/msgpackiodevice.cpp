@@ -9,7 +9,7 @@ namespace NeovimQt {
 /**
  * \class NeovimQt::MsgpackIODevice
  * 
- * \brief A msgpack-rpc channel
+ * \brief A msgpack-rpc channel build on top of QIODevice
  *
  */
 
@@ -38,6 +38,7 @@ MsgpackIODevice::~MsgpackIODevice()
 	msgpack_unpacker_destroy(&m_uk);
 }
 
+/** The encoding used by the MsgpackIODevice::encode and MsgpackIODevice::decode methods @see setEncoding */
 QByteArray MsgpackIODevice::encoding() const
 {
 	if (m_encoding) {
@@ -218,6 +219,7 @@ err:
 	msgpack_pack_nil(&m_pk);
 }
 
+/** Assign a handler for Msgpack-RPC requests */
 void MsgpackIODevice::setRequestHandler(MsgpackRequestHandler *h)
 {
 	m_reqHandler = h;
@@ -241,7 +243,7 @@ bool MsgpackIODevice::sendResponse(uint64_t msgid, const QVariant& err, const QV
 	return true;
 }
 
-/*
+/**
  * Send [type(2), method, params]
  * Returns false if the params could not be serialized
  */
@@ -294,6 +296,7 @@ err:
 	req->deleteLater();
 }
 
+/** Return list of pending request ids */
 QList<quint32> MsgpackIODevice::pendingRequests() const
 {
 	return m_requests.keys();
@@ -331,6 +334,7 @@ void MsgpackIODevice::setError(MsgpackError err, const QString& msg)
 	emit error(m_error);
 }
 
+/** Return error string for the current error */
 QString MsgpackIODevice::errorString() const
 {
 	if (m_error) {
@@ -567,6 +571,11 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QVariant& out)
 	return false;
 }
 
+/**
+ * Register a function to decode Msgpack EXT types
+ *
+ * @see msgpackExtDecoder
+ */
 void MsgpackIODevice::registerExtType(int8_t type, msgpackExtDecoder fun)
 {
 	m_extTypes.insert(type, fun);

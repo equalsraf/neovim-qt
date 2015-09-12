@@ -20,6 +20,7 @@ NeovimConnectorHelper::NeovimConnectorHelper(NeovimConnector *c)
 {
 }
 
+/** Handle Msgpack-rpc errors when fetching the API metadata */
 void NeovimConnectorHelper::handleMetadataError(quint32 msgid, Function::FunctionId,
 		const QVariant& errobj)
 {

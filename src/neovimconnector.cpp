@@ -53,6 +53,7 @@ void NeovimConnector::setError(NeovimError err, const QString& msg)
 	}
 }
 
+/** Reset error state */
 void NeovimConnector::clearError()
 {
 	m_error = NoError;
@@ -75,6 +76,11 @@ QString NeovimConnector::errorString()
 	return m_errorString;
 }
 
+/**
+ * Inform Neovim we are a GUI with the given width/height and want
+ * to receive UI events. With/Height are expressed in cells.
+ * \warning This method might be moved to class Neovim
+ */
 void NeovimConnector::attachUi(int64_t width, int64_t height)
 {
 	// FIXME: this should be in class Neovim
@@ -84,6 +90,10 @@ void NeovimConnector::attachUi(int64_t width, int64_t height)
 	m_dev->send(true);
 }
 
+/**
+ * Stop receiving UI updates
+ * \warning This method might be moved to class Neovim
+ */
 void NeovimConnector::detachUi()
 {
 	// FIXME: this should be in class Neovim
@@ -110,15 +120,27 @@ void NeovimConnector::discoverMetadata()
 			m_helper, &NeovimConnectorHelper::handleMetadataError);
 }
 
+/**
+ * True if the Neovim instance is ready
+ * @see ready
+ */
 bool NeovimConnector::isReady()
 {
 	return m_ready;
 }
 
+/**
+ * Decode a byte array as a string according to 'encoding'
+ */
 QString NeovimConnector::decode(const QByteArray& in)
 {
 	return m_dev->decode(in);
 }
+/**
+ * Encode a string into the appropriate encoding for this Neovim instance
+ *
+ * see :h 'encoding'
+ */
 QByteArray NeovimConnector::encode(const QString& in)
 {
 	return m_dev->encode(in);
@@ -127,8 +149,8 @@ QByteArray NeovimConnector::encode(const QString& in)
 /**
  * Get main NeovimObject
  *
- * \warning Do not call this before NeovimConnector::ready as been signaled
- * \see NeovimConnector::isReady
+ * @warning Do not call this before NeovimConnector::ready as been signaled
+ * @see NeovimConnector::isReady
  */
 Neovim* NeovimConnector::neovimObject()
 {
@@ -140,8 +162,7 @@ Neovim* NeovimConnector::neovimObject()
 
 /**
  * Launch an embedded Neovim process
- *
- * Use ::processExited to know when the process has exited
+ * @see processExited
  */
 NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 {
@@ -163,6 +184,13 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 	return c;
 }
 
+/**
+ * Connect to Neovim using a local UNIX socket.
+ *
+ * This method also works in Windows, using named pipes.
+ *
+ * @see QLocalSocket
+ */
 NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 {
 	QLocalSocket *s = new QLocalSocket();
@@ -179,6 +207,12 @@ NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 	return c;
 }
 
+/**
+ * Connect to a Neovim through a TCP connection
+ *
+ * @param host is a valid hostname or IP address
+ * @param port is the TCP port
+ */
 NeovimConnector* NeovimConnector::connectToHost(const QString& host, int port)
 {
 	QTcpSocket *s = new QTcpSocket();
@@ -196,6 +230,14 @@ NeovimConnector* NeovimConnector::connectToHost(const QString& host, int port)
 	return c;
 }
 
+/**
+ * Connect to a running instance of Neovim (if available).
+ *
+ * This method gets the Neovim endpoint from the NVIM_LISTEN_ADDRESS environment
+ * variable, if it is not available a new Neovim instance is spawned().
+ *
+ * @see spawn()
+ */
 NeovimConnector* NeovimConnector::connectToNeovim(const QString& server)
 {
 	QString addr = server;
@@ -238,21 +280,29 @@ void NeovimConnector::processError(QProcess::ProcessError err)
 	}
 }
 
+/** Handle errors from QLocalSocket or QTcpSocket */
 void NeovimConnector::socketError()
 {
 	setError(SocketError, m_dev->errorString());
 }
 
+/** Handle errors in MsgpackIODevice */
 void NeovimConnector::msgpackError()
 {
 	setError(MsgpackError, m_dev->errorString());
 }
 
+/**
+ * True if NeovimConnector::reconnect can be called to reconnect with Neovim. This
+ * is true unless you built the NeovimConnector ctor directly instead
+ * of using on of the static methods.
+ */
 bool NeovimConnector::canReconnect()
 {
 	return m_ctype != OtherConnection;
 }
 
+/** @see NeovimConnector::NeovimConnectionType */
 NeovimConnector::NeovimConnectionType NeovimConnector::connectionType()
 {
 	return m_ctype;
@@ -283,24 +333,10 @@ NeovimConnector* NeovimConnector::reconnect()
 }
 
 /**
- * \fn NeovimQt::NeovimConnector::ready()
- *
- * This signal is emitted when the connector has beem able to successfuly setup
- * a connection with Neovim. Some methods SHOULD NOT be called before the signal
- * is emitted, otherwise you get an invalid object or NULL pointer.
- */
-
-/**
  * \fn NeovimQt::NeovimConnector::error(NeovimError)
  *
  * This signal is emitted when an error occurs. Use NeovimConnector::errorString
  * to get an error message.
- */
-
-/**
- * \fn NeovimQt::Neovim::neovimNotification(const QByteArray &name, const QVariantList& args)
- *
- * Signal emitted when Neovim sends a notification with given name and args
  */
 
 /**
