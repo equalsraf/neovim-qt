@@ -2,7 +2,7 @@ set(QTLIBS Qt5::Network Qt5::Widgets)
 
 include_directories(..)
 qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
-add_executable(nvim-qt main.cpp shell.cpp input.cpp errorwidget.cpp mainwindow.cpp
+add_executable(nvim-qt WIN32 main.cpp shell.cpp input.cpp errorwidget.cpp mainwindow.cpp
 	${NEOVIM_RCC_SOURCES}
 	${CMAKE_SOURCE_DIR}/third-party/konsole_wcwidth.cpp)
 target_link_libraries(nvim-qt ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt)
