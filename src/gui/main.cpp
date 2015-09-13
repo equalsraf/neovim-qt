@@ -1,7 +1,26 @@
 #include <QApplication>
 #include <QFontDatabase>
+#include <QtGlobal>
+#include <QFile>
 #include "neovimconnector.h"
 #include "mainwindow.h"
+
+/**
+ * A log handler for Qt messages, all messages are dumped into the file
+ * passed via the NEOVIM_QT_LOG variable. Some information is only available
+ * in debug builds (e.g. qDebug is only called in debug builds).
+ *
+ * In UNIX Qt prints messages to the console output, but in Windows this is
+ * the only way to get Qt's debug/warning messages.
+ */
+void logger(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
+{
+	QFile logFile(qgetenv("NEOVIM_QT_LOG"));
+	if (logFile.open(QIODevice::Append | QIODevice::Text)) {
+		QTextStream stream(&logFile);
+		stream << msg << "\n";
+	}
+}
 
 /**
  * Neovim Qt GUI
@@ -18,6 +37,10 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	app.setApplicationDisplayName("Neovim");
 	app.setWindowIcon(QIcon(":/neovim.png"));
+
+	if (!qgetenv("NEOVIM_QT_LOG").isEmpty()) {
+		qInstallMessageHandler(logger);
+	}
 
 	// Load bundled fonts
 	if (QFontDatabase::addApplicationFont(":/DejaVuSansMono.ttf") == -1) {
