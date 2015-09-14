@@ -42,20 +42,6 @@ int main(int argc, char **argv)
 		qInstallMessageHandler(logger);
 	}
 
-	// Load bundled fonts
-	if (QFontDatabase::addApplicationFont(":/DejaVuSansMono.ttf") == -1) {
-		qWarning("Unable to load bundled font");
-	}
-	if (QFontDatabase::addApplicationFont(":/DejaVuSansMono-Bold.ttf") == -1) {
-		qWarning("Unable to load bundled bold font");
-	}
-	if (QFontDatabase::addApplicationFont(":/DejaVuSansMono-Oblique.ttf") == -1) {
-		qWarning("Unable to load bundled italic font");
-	}
-	if (QFontDatabase::addApplicationFont(":/DejaVuSansMono-BoldOblique.ttf") == -1) {
-		qWarning("Unable to load bundled bold/italic font");
-	}
-
 	QString server;
 	QStringList args = app.arguments().mid(1);
 	int serverIdx = args.indexOf("--server");

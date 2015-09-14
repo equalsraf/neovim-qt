@@ -21,7 +21,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_resizing(false), m_logo(QPixmap(":/neovim.png")),
 	m_neovimBusy(false)
 {
-	setGuiFont("DejaVu Sans Mono:h11");
+	setGuiFont("Monospace");
 
 	m_image = QImage(neovimSize(), QImage::Format_ARGB32_Premultiplied);
 

@@ -1,9 +1,5 @@
 <!DOCTYPE RCC><RCC VERSION="1.0">
 <qresource>
   <file alias="neovim.png">../../third-party/neovim.png</file>
-  <file alias="DejaVuSansMono.ttf">../../third-party/DejaVuSansMono.ttf</file>
-  <file alias="DejaVuSansMono-Bold.ttf">../../third-party/DejaVuSansMono-Bold.ttf</file>
-  <file alias="DejaVuSansMono-Oblique.ttf">../../third-party/DejaVuSansMono-Oblique.ttf</file>
-  <file alias="DejaVuSansMono-BoldOblique.ttf">../../third-party/DejaVuSansMono-BoldOblique.ttf</file>
 </qresource>
 </RCC>
