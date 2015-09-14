@@ -100,16 +100,19 @@ bool Shell::setGuiFont(const QString& fdesc)
 	QFontInfo fi(f);
 	if (fi.family().compare(f.family(), Qt::CaseInsensitive) != 0 &&
 			f.family().compare("Monospace", Qt::CaseInsensitive) != 0) {
-		m_nvim->neovimObject()->vim_report_error("Unknown font");
+		QString errmsg = QString("Unknown font: %1").arg(f.family());
+		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
 		return false;
 	}
 	if ( !fi.fixedPitch() ) {
-		m_nvim->neovimObject()->vim_report_error("Font needs to be a fixed pitch font");
+		QString errmsg = QString("%1 is not a fixed pitch font").arg(f.family());
+		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
 		return false;
 	}
 
 	if (isBadMonospace(f)) {
-		m_nvim->neovimObject()->vim_report_error("Font metrics are not fixed pitch for all variants");
+		QString errmsg = QString("%1 has non fixed metrics for its variants").arg(f.family());
+		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
 		return false;
 	}
 
