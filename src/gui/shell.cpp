@@ -78,12 +78,10 @@ bool Shell::setGuiFont(const QString& fdesc)
 	}
 
 	QFont f;
-	f.setStyleStrategy(QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics) );
-	f.setStyleHint(QFont::TypeWriter);
+	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
 	f.setFamily(attrs.at(0));
 	f.setFixedPitch(true);
 	f.setKerning(false);
-	f.setFixedPitch(true);
 
 	foreach(QString attr, attrs) {
 		if (attr.size() >= 2 && attr[0] == 'h') {
@@ -925,7 +923,7 @@ bool Shell::isBadMonospace(const QFont& f)
 	QFont fb(f);
 	fb.setBold(true);
 	QFont fbi(fb);
-	fbi.setItalic(false);
+	fbi.setItalic(true);
 
 	QFontMetrics fm_normal(f);
 	QFontMetrics fm_italic(fi);
