@@ -23,3 +23,7 @@ if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
 	include(WinDeployQt)
 	WinDeployQt(TARGET nvim-qt COMPILER_RUNTIME INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
 endif()
+
+add_executable(fontinfo EXCLUDE_FROM_ALL fontinfo.cpp)
+target_link_libraries(fontinfo Qt5::Gui)
+
