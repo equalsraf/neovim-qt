@@ -13,7 +13,7 @@ namespace NeovimQt {
 
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 :QWidget(parent), m_attached(false), m_nvim(nvim), m_rows(1), m_cols(1),
-	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_fm(NULL),
+	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false), m_fm(NULL),
 	m_foreground(Qt::black), m_background(Qt::white),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
@@ -219,7 +219,9 @@ void Shell::handleHighlightSet(const QVariantMap& attrs, QPainter& painter)
 	// TODO: undercurl
 	m_font_bold = attrs.value("bold").toBool();
 	m_font_italic = attrs.value("italic").toBool();
-	m_font_underline = attrs.value("undercurl").toBool();
+	m_font_undercurl = attrs.value("undercurl").toBool();
+	// enable underline ONLY if undercurl is already not on
+	m_font_underline = attrs.value("underline").toBool() && !m_font_undercurl;
 	setupPainter(painter);
 }
 
@@ -251,6 +253,16 @@ void Shell::handlePut(const QVariantList& args, QPainter& painter)
 		QPoint pos(m_cursor_pos.x()*neovimCellWidth(), m_cursor_pos.y()*neovimRowHeight()+m_fm->ascent());
 		painter.drawText(pos, text.at(0));
 
+		if (m_font_undercurl) {
+			// Draw "undercurl" at the bottom of the cell
+			// FIXME: use correct highlight color instead of red
+			// TODO: draw a proper undercurl
+			painter.setPen(QPen(Qt::red, 1, Qt::DashDotDotLine));
+			QPoint start = clipRect.bottomLeft();
+			QPoint end = clipRect.bottomRight();
+			start.ry()--; end.ry()--;
+			painter.drawLine(start, end);
+		}
 		painter.restore();
 	}
 
