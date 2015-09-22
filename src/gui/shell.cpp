@@ -676,6 +676,34 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 	}
 }
 
+void Shell::wheelEvent(QWheelEvent *ev)
+{
+	int horiz, vert;
+	horiz = ev->angleDelta().x();
+	vert = ev->angleDelta().y();
+	if (horiz == 0 && vert == 0) {
+		return;
+	}
+
+	QPoint pos(ev->x()/neovimCellWidth(),
+			ev->y()/neovimRowHeight());
+
+	QString inp;
+	if (vert != 0) {
+		inp += QString("<%1ScrollWheel%2><%3,%4>")
+			.arg(Input.modPrefix(ev->modifiers()))
+			.arg(vert > 0 ? "Up" : "Down")
+			.arg(pos.x()).arg(pos.y());
+	}
+	if (horiz != 0) {
+		inp += QString("<%1ScrollWheel%2><%3,%4>")
+			.arg(Input.modPrefix(ev->modifiers()))
+			.arg(horiz > 0 ? "Right" : "Left")
+			.arg(pos.x()).arg(pos.y());
+	}
+	m_nvim->neovimObject()->vim_input(inp.toLatin1());
+}
+
 void Shell::resizeNeovim(const QSize& newSize)
 {
 	uint64_t cols = newSize.width()/neovimCellWidth();

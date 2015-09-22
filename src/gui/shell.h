@@ -44,6 +44,7 @@ protected slots:
 protected:
 	void tooltip(const QString& text);
 	virtual void inputMethodEvent(QInputMethodEvent *event) Q_DECL_OVERRIDE;
+	virtual void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
 
 	int neovimWidth() const;
 	int neovimHeight() const;
