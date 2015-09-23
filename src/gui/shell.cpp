@@ -22,6 +22,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_neovimBusy(false)
 {
 	m_font = createFont("Monospace");
+	m_font.setPointSize(10);
 	m_fm = new QFontMetrics(m_font);
 
 	m_image = QImage(neovimSize(), QImage::Format_ARGB32_Premultiplied);
