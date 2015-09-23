@@ -81,6 +81,9 @@ protected:
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseMoveEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
+
+	static QFont createFont(const QString& family);
+
 private:
 	bool m_attached;
         void setAttached(bool);

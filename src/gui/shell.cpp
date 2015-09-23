@@ -21,7 +21,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_resizing(false), m_logo(QPixmap(":/neovim.png")),
 	m_neovimBusy(false)
 {
-	setGuiFont("Monospace");
+	m_font = createFont("Monospace");
+	m_fm = new QFontMetrics(m_font);
 
 	m_image = QImage(neovimSize(), QImage::Format_ARGB32_Premultiplied);
 
@@ -61,6 +62,21 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 }
 
 /**
+ * Create QFont for the given family. This is the same
+ * QFont::setFamily but sets some common options to enforce
+ * fixed pitched fonts.
+ */
+QFont Shell::createFont(const QString& family)
+{
+	QFont f;
+	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
+	f.setFamily(family);
+	f.setFixedPitch(true);
+	f.setKerning(false);
+	return f;
+}
+
+/**
  * Set the GUI font, or display the current font
  */
 bool Shell::setGuiFont(const QString& fdesc)
@@ -77,12 +93,7 @@ bool Shell::setGuiFont(const QString& fdesc)
 		return false;
 	}
 
-	QFont f;
-	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
-	f.setFamily(attrs.at(0));
-	f.setFixedPitch(true);
-	f.setKerning(false);
-
+	QFont f = createFont(attrs.at(0));
 	foreach(QString attr, attrs) {
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok = false;
