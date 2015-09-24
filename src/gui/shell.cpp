@@ -121,9 +121,8 @@ bool Shell::setGuiFont(const QString& fdesc)
 	}
 
 	if (isBadMonospace(f)) {
-		QString errmsg = QString("%1 has non fixed metrics for its variants").arg(f.family());
+		QString errmsg = QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family());
 		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
-		return false;
 	}
 
 	m_font = f;
