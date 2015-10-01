@@ -1,5 +1,15 @@
 #include <QAbstractSocket>
 #include <QTextCodec>
+#include <QSocketNotifier>
+
+// read/write
+#ifdef _WIN32
+# include <io.h>
+# include "stdinreader.h"
+#else
+# include <unistd.h>
+#endif
+
 #include "msgpackiodevice.h"
 #include "util.h"
 #include "msgpackrequest.h"
@@ -13,22 +23,45 @@ namespace NeovimQt {
  *
  */
 
+/**
+ * Build a MsgpackIODevice that reads from stdin and writes to
+ * stdout
+ */
+MsgpackIODevice* MsgpackIODevice::fromStdinOut(QObject *parent)
+{
+	MsgpackIODevice *rpc = new MsgpackIODevice(NULL, parent);
+	msgpack_packer_init(&rpc->m_pk, rpc, (msgpack_packer_write)MsgpackIODevice::msgpack_write_to_stdout);
+#ifdef _WIN32
+	StdinReader *rsn = new StdinReader(msgpack_unpacker_buffer_capacity(&rpc->m_uk), rpc);
+	connect(rsn, &StdinReader::dataAvailable,
+			rpc, &MsgpackIODevice::dataAvailableStdin);
+	rsn->start();
+#else
+	QSocketNotifier *rsn = new QSocketNotifier(0, QSocketNotifier::Read, rpc);
+	connect(rsn, &QSocketNotifier::activated,
+			rpc, &MsgpackIODevice::dataAvailableFd);
+#endif
+	return rpc;
+}
+
 MsgpackIODevice::MsgpackIODevice(QIODevice *dev, QObject *parent)
 :QObject(parent), m_reqid(0), m_dev(dev), m_encoding(0), m_reqHandler(0), m_error(NoError)
 {
 	qRegisterMetaType<MsgpackError>("MsgpackError");
-	m_dev->setParent(this);
-
-	// MSVC: wont build without the (mspack_packer_write) cast
-	msgpack_packer_init(&m_pk, this, (msgpack_packer_write)MsgpackIODevice::msgpack_write_cb);
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
 
-	connect(m_dev, &QAbstractSocket::readyRead,
-			this, &MsgpackIODevice::dataAvailable);
+	if (m_dev) {
+		// MSVC: wont build without the (mspack_packer_write) cast
+		msgpack_packer_init(&m_pk, this, (msgpack_packer_write)MsgpackIODevice::msgpack_write_to_dev);
 
-	if ( !m_dev->isSequential() ) {
-		setError(InvalidDevice, tr("IO device needs to be sequential"));
-		return;
+		m_dev->setParent(this);
+		connect(m_dev, &QAbstractSocket::readyRead,
+				this, &MsgpackIODevice::dataAvailable);
+
+		if ( !m_dev->isSequential() ) {
+			setError(InvalidDevice, tr("IO device needs to be sequential"));
+			return;
+		}
 	}
 }
 
@@ -36,6 +69,17 @@ MsgpackIODevice::~MsgpackIODevice()
 {
 	//msgpack_packer_destroy(&m_pk);
 	msgpack_unpacker_destroy(&m_uk);
+}
+
+bool MsgpackIODevice::isOpen()
+{
+	if (m_error == InvalidDevice) {
+		return false;
+	} else if (m_dev) {
+		return m_dev->isOpen();
+	} else {
+		return true;
+	}
 }
 
 /** The encoding used by the MsgpackIODevice::encode and MsgpackIODevice::decode methods @see setEncoding */
@@ -63,39 +107,85 @@ bool MsgpackIODevice::setEncoding(const QByteArray& name)
 	return true;
 }
 
-/**
- * Called when the msgpack packer has data to write
- */
-int MsgpackIODevice::msgpack_write_cb(void* data, const char* buf, unsigned long int len)
+int MsgpackIODevice::msgpack_write_to_stdout(void* data, const char* buf, unsigned long int len)
 {
 	MsgpackIODevice *c = static_cast<MsgpackIODevice*>(data);
-	return c->m_dev->write(buf, len);
+	qint64 bytes = write(1, buf, len);
+	if (bytes == -1) {
+		c->setError(InvalidDevice, tr("Error writing to device"));
+	}
+	return bytes;
+}
+
+int MsgpackIODevice::msgpack_write_to_dev(void* data, const char* buf, unsigned long int len)
+{
+	MsgpackIODevice *c = static_cast<MsgpackIODevice*>(data);
+	qint64 bytes = c->m_dev->write(buf, len);
+	if (bytes == -1) {
+		c->setError(InvalidDevice, tr("Error writing to device"));
+	}
+	return bytes;
 }
 
 /**
- * Called when new data is available to be parsed
+ * Process incoming data.
+ *
+ * \see fromStdinOut() and StdinReader()
+ */
+void MsgpackIODevice::dataAvailableStdin(const QByteArray& data)
+{
+	if ( (quint64)data.length() > msgpack_unpacker_buffer_capacity(&m_uk)) {
+		setError(InvalidDevice, tr("Error when reading from stdin, BUG(buffered data exceeds capaciy)"));
+		return;
+	} else if ( data.length() > 0 ) {
+		memcpy(msgpack_unpacker_buffer(&m_uk), data.constData(), data.length());
+		msgpack_unpacker_buffer_consumed(&m_uk, data.length());
+		msgpack_unpacked result;
+		msgpack_unpacked_init(&result);
+		while(msgpack_unpacker_next(&m_uk, &result)) {
+			dispatch(result.data);
+		}
+	}
+}
+
+/**
+ * Process incoming data from the given fd.
+ *
+ * \see fromStdinOut() and QSocketNotifier()
+ */
+void MsgpackIODevice::dataAvailableFd(int fd)
+{
+	qint64 bytes = read(fd, msgpack_unpacker_buffer(&m_uk),
+			msgpack_unpacker_buffer_capacity(&m_uk));
+	if (bytes > 0) {
+		msgpack_unpacker_buffer_consumed(&m_uk, bytes);
+		msgpack_unpacked result;
+		msgpack_unpacked_init(&result);
+		while(msgpack_unpacker_next(&m_uk, &result)) {
+			dispatch(result.data);
+		}
+	} else if (bytes == -1) {
+		setError(InvalidDevice, tr("Error when reading from device"));
+	}
+}
+
+/**
+ * Process incoming data from the underlying device
+ *
+ * \see QIODevice()
  */
 void MsgpackIODevice::dataAvailable()
 {
-	qint64 read = 1;
-	while (read > 0) {
-		if ( msgpack_unpacker_buffer_capacity(&m_uk) == 0 ) {
-			if ( !msgpack_unpacker_reserve_buffer(&m_uk, 8192 ) ) {
-				// FIXME: error out
-				qWarning() << "Could not allocate memory in unpack buffer";
-				return;
-			}
+	qint64 bytes = m_dev->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
+	if ( bytes > 0 ) {
+		msgpack_unpacker_buffer_consumed(&m_uk, bytes);
+		msgpack_unpacked result;
+		msgpack_unpacked_init(&result);
+		while(msgpack_unpacker_next(&m_uk, &result)) {
+			dispatch(result.data);
 		}
-
-		read = m_dev->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
-		if ( read > 0 ) {
-			msgpack_unpacker_buffer_consumed(&m_uk, read);
-			msgpack_unpacked result;
-			msgpack_unpacked_init(&result);
-			while(msgpack_unpacker_next(&m_uk, &result)) {
-				dispatch(result.data);
-			}
-		}
+	} else if (bytes == -1) {
+		setError(InvalidDevice, tr("Error when reading from device"));
 	}
 }
 
@@ -340,8 +430,10 @@ QString MsgpackIODevice::errorString() const
 {
 	if (m_error) {
 		return m_errorString;
-	} else {
+	} else if (m_dev) {
 		return m_dev->errorString();
+	} else {
+		return QString();
 	}
 }
 

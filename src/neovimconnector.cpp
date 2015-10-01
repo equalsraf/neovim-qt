@@ -20,11 +20,15 @@ namespace NeovimQt {
  * Create a new Neovim API connection from an open IO device
  */
 NeovimConnector::NeovimConnector(QIODevice *dev)
-:QObject(), m_dev(0), m_helper(0), m_error(NoError), m_neovimobj(NULL), 
+:NeovimConnector(new MsgpackIODevice(dev))
+{
+}
+
+NeovimConnector::NeovimConnector(MsgpackIODevice *dev)
+:QObject(), m_dev(dev), m_helper(0), m_error(NoError), m_neovimobj(NULL),
 	m_channel(0), m_ctype(OtherConnection), m_ready(false)
 {
 	m_helper = new NeovimConnectorHelper(this);
-	m_dev = new MsgpackIODevice(dev, this);
 	qRegisterMetaType<NeovimError>("NeovimError");
 
 	connect(m_dev, &MsgpackIODevice::error,
@@ -258,6 +262,11 @@ NeovimConnector* NeovimConnector::connectToNeovim(const QString& server)
 		}
 	}
 	return connectToSocket(addr);
+}
+
+NeovimConnector* NeovimConnector::fromStdinOut()
+{
+	return new NeovimConnector(MsgpackIODevice::fromStdinOut());
 }
 
 /**

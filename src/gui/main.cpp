@@ -42,20 +42,24 @@ int main(int argc, char **argv)
 		qInstallMessageHandler(logger);
 	}
 
-	QString server;
 	QStringList args = app.arguments().mid(1);
-	int serverIdx = args.indexOf("--server");
-	if (serverIdx != -1 && args.size() > serverIdx+1) {
-		server = args.at(serverIdx+1);
-		args.removeAt(serverIdx);
-		args.removeAt(serverIdx);
-	}
-
 	NeovimQt::NeovimConnector *c;
-	if (!server.isEmpty()) {
-		c = NeovimQt::NeovimConnector::connectToNeovim(server);
+	if (args.indexOf("--embed") != -1) {
+		c = NeovimQt::NeovimConnector::fromStdinOut();
 	} else {
-		c = NeovimQt::NeovimConnector::spawn(args);
+		QString server;
+		int serverIdx = args.indexOf("--server");
+		if (serverIdx != -1 && args.size() > serverIdx+1) {
+			server = args.at(serverIdx+1);
+			args.removeAt(serverIdx);
+			args.removeAt(serverIdx);
+		}
+
+		if (!server.isEmpty()) {
+			c = NeovimQt::NeovimConnector::connectToNeovim(server);
+		} else {
+			c = NeovimQt::NeovimConnector::spawn(args);
+		}
 	}
 
 #ifdef NEOVIMQT_GUI_WIDGET

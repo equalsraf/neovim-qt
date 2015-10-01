@@ -54,6 +54,11 @@ foreach(CFGNAME ${CMAKE_CONFIGURATION_TYPES})
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFGNAME} ${CMAKE_BINARY_DIR}/lib)
 endforeach()
 
+if(MSVC)
+  # Allow use of deprecated function names in MSVC (read/write)
+  add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+endif()
+
 add_subdirectory(src)
 add_subdirectory(doc)
 enable_testing()
