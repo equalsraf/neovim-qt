@@ -66,6 +66,8 @@ void NeovimConnectorHelper::handleMetadata(quint32 msgid, Function::FunctionId, 
 		connect(m_c->neovimObject(), &Neovim::on_vim_get_option,
 				this, &NeovimConnectorHelper::encodingChanged);
 		m_c->neovimObject()->vim_get_option("encoding");
+	} else {
+		qWarning() << "Error retrieving metadata" << m_c->errorString();
 	}
 }
 
@@ -81,6 +83,8 @@ void NeovimConnectorHelper::encodingChanged(const QVariant&  obj)
 	if (m_c->m_dev->setEncoding(enc_name)) {
 		m_c->m_ready = true;
 		emit m_c->ready();
+	} else {
+		qWarning() << "Unable to set encoding" << obj;
 	}
 }
 

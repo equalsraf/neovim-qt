@@ -11,6 +11,7 @@ private slots:
 	void initTestCase();
 	void encodeString();
 	void map();
+	void stringsAreBinaryNotUtf8();
 protected:
 	NeovimQt::NeovimConnector *m_c;
 };
@@ -51,6 +52,22 @@ void TestEncoding::map()
 	conn = connect(m_c->neovimObject(), &NeovimQt::Neovim::on_vim_get_var,
 			[map](const QVariant& v) {
 				QVERIFY(v == map);
+			});
+	QTest::qWait(500);
+	disconnect(conn);
+}
+
+// A reminder that Strings in the Neovim API are binary data
+// that may or may not conform to encoding
+void TestEncoding::stringsAreBinaryNotUtf8()
+{
+	QByteArray data = "\xc3\x28";
+	m_c->neovimObject()->vim_set_current_line(data);
+	m_c->neovimObject()->vim_get_current_line();
+	QMetaObject::Connection conn;
+	conn = connect(m_c->neovimObject(), &NeovimQt::Neovim::on_vim_get_current_line,
+			[data](const QVariant& v) {
+				QCOMPARE(v.toByteArray(), data);
 			});
 	QTest::qWait(500);
 	disconnect(conn);

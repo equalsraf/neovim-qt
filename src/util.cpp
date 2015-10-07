@@ -32,6 +32,9 @@ QDebug operator<<(QDebug dbg, const msgpack_object& obj)
 	case MSGPACK_OBJECT_FLOAT:
 		dbg.space() <<  obj.via.f64;
 		break;
+	case MSGPACK_OBJECT_STR:
+		dbg.space() << QByteArray(obj.via.str.ptr, obj.via.str.size);
+		break;
 	case MSGPACK_OBJECT_BIN:
 		dbg.space() << QByteArray(obj.via.bin.ptr, obj.via.bin.size);
 		break;

@@ -155,8 +155,9 @@ void MsgpackIODevice::dispatch(msgpack_object& req)
 			sendError(req, tr("Msg Id must be a positive integer"));
 			return;
 		}
-		if (req.via.array.ptr[2].type != MSGPACK_OBJECT_BIN) {
-			qDebug() << "Received Invalid request: method MUST be a binary string" << req.via.array.ptr[2];
+		if (req.via.array.ptr[2].type != MSGPACK_OBJECT_BIN &&
+				req.via.array.ptr[2].type != MSGPACK_OBJECT_STR) {
+			qDebug() << "Received Invalid request: method MUST be a String" << req.via.array.ptr[2];
 			sendError(req, tr("Method id must be a positive integer"));
 			return;
 		}
@@ -402,12 +403,15 @@ void MsgpackIODevice::send(const QByteArray& bin)
 }
 bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QByteArray& out)
 {
-	if ( in.type != MSGPACK_OBJECT_BIN) {
+	if ( in.type == MSGPACK_OBJECT_BIN) {
+		out = QByteArray(in.via.bin.ptr, in.via.bin.size);
+	} else if ( in.type == MSGPACK_OBJECT_STR) {
+		out = QByteArray(in.via.str.ptr, in.via.str.size);
+	} else {
 		qWarning() << "Attempting to decode as QByteArray when type is" << in.type << in;
 		out = QByteArray();
 		return true;
 	}
-	out = QByteArray(in.via.bin.ptr, in.via.bin.size);
 	return false;
 }
 
@@ -502,6 +506,7 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QVariant& out)
 	case MSGPACK_OBJECT_FLOAT:
 		out = in.via.f64;
 		break;
+	case MSGPACK_OBJECT_STR:
 	case MSGPACK_OBJECT_BIN:
 		{
 		QByteArray val;
