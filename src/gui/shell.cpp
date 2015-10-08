@@ -417,7 +417,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 	} else if (name == "mouse_on"){
 		this->unsetCursor();
 	} else if (name == "mouse_off"){
-		this->setCursor(Qt::BlankCursor);
+		this->setCursor(Qt::ForbiddenCursor);
 	} else if (name == "mode_change"){
 		if (opargs.size() != 1) {
 			qWarning() << "Unexpected argument for change_mode:" << opargs;
