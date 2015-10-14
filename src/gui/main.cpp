@@ -7,7 +7,7 @@
 
 /**
  * A log handler for Qt messages, all messages are dumped into the file
- * passed via the NEOVIM_QT_LOG variable. Some information is only available
+ * passed via the NVIM_QT_LOG variable. Some information is only available
  * in debug builds (e.g. qDebug is only called in debug builds).
  *
  * In UNIX Qt prints messages to the console output, but in Windows this is
@@ -15,7 +15,7 @@
  */
 void logger(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
-	QFile logFile(qgetenv("NEOVIM_QT_LOG"));
+	QFile logFile(qgetenv("NVIM_QT_LOG"));
 	if (logFile.open(QIODevice::Append | QIODevice::Text)) {
 		QTextStream stream(&logFile);
 		stream << msg << "\n";
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	app.setApplicationDisplayName("Neovim");
 	app.setWindowIcon(QIcon(":/neovim.png"));
 
-	if (!qgetenv("NEOVIM_QT_LOG").isEmpty()) {
+	if (!qgetenv("NVIM_QT_LOG").isEmpty()) {
 		qInstallMessageHandler(logger);
 	}
 
