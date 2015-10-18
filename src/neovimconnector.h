@@ -77,6 +77,9 @@ signals:
 	void error(NeovimError);
 	void processExited(int exitCode);
 
+public slots:
+	void fatalTimeout();
+
 protected:
 	void setError(NeovimError err, const QString& msg);
 	void clearError();

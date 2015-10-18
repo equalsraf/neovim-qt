@@ -122,6 +122,9 @@ void NeovimConnector::discoverMetadata()
 			m_helper, &NeovimConnectorHelper::handleMetadata);
 	connect(r, &MsgpackRequest::error,
 			m_helper, &NeovimConnectorHelper::handleMetadataError);
+	connect(r, &MsgpackRequest::timeout,
+			this, &NeovimConnector::fatalTimeout);
+	r->setTimeout(10000);
 }
 
 /**
@@ -299,6 +302,18 @@ void NeovimConnector::socketError()
 void NeovimConnector::msgpackError()
 {
 	setError(MsgpackError, m_dev->errorString());
+}
+
+/**
+ * Raise a fatal error for a Neovim timeout
+ *
+ * Sometimes Neovim takes too long to respond to some requests, or maybe
+ * the channel is stuck. In such cases it is preferable to raise and error,
+ * internally this is what discoverMetadata does if Neovim does not reply.
+ */
+void NeovimConnector::fatalTimeout()
+{
+	setError(RuntimeMsgpackError, "Neovim is taking too long to respond");
 }
 
 /**
