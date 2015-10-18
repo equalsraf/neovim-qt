@@ -199,6 +199,25 @@ private slots:
 		QCOMPARE(one->msgId(), (quint32)4);
 	}
 
+	void timeout() {
+		QBuffer buf;
+		buf.open(QBuffer::ReadWrite);
+
+		// This will actually trigger a fatal error because the buffer
+		// is not a valid device, but is still enough to get the timeout
+		// below
+		MsgpackIODevice *dev = new MsgpackIODevice(&buf);
+
+		MsgpackRequest *r = dev->startRequestUnchecked("testTimeout", 0);
+		r->setTimeout(3);
+
+		QSignalSpy timedOut(r, SIGNAL(timeout(quint32)));
+		QVERIFY(timedOut.isValid());
+		QVERIFY(SPYWAIT(timedOut));
+		QVariantList params = timedOut.at(0);
+		QCOMPARE(params.at(0).toUInt(), r->id);
+	}
+
 };
 
 } // Namespace NeovimQt

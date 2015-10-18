@@ -366,8 +366,22 @@ MsgpackRequest* MsgpackIODevice::startRequestUnchecked(const QString& method, qu
 	msgpack_pack_array(&m_pk, argcount);
 
 	MsgpackRequest *r = new MsgpackRequest( msgid, this);
+	connect(r, &MsgpackRequest::timeout,
+			this, &MsgpackIODevice::requestTimeout);
 	m_requests.insert(msgid, r);
 	return r;
+}
+
+/**
+ * Request timed out, discard it
+ */
+void MsgpackIODevice::requestTimeout(quint32 id)
+{
+	if (m_requests.contains(id)) {
+		MsgpackRequest *r = m_requests.take(id);
+		r->deleteLater();
+		qWarning() << "Request" << id << "timed out:"  << r->function();
+	}
 }
 
 /**

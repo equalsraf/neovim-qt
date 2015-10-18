@@ -87,6 +87,7 @@ protected:
 protected slots:
 	void setError(MsgpackError err, const QString& msg);
 	void dataAvailable();
+	void requestTimeout(quint32 id);
 
 private:
 	static int msgpack_write_cb(void* data, const char* buf, unsigned long int len);
