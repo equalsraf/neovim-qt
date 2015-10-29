@@ -88,7 +88,11 @@ QString NeovimConnector::errorString()
 void NeovimConnector::attachUi(int64_t width, int64_t height)
 {
 	// FIXME: this should be in class Neovim
-	m_dev->startRequestUnchecked("ui_attach", 3);
+	MsgpackRequest *r = m_dev->startRequestUnchecked("ui_attach", 3);
+	connect(r, &MsgpackRequest::timeout,
+			this, &NeovimConnector::fatalTimeout);
+	r->setTimeout(10000);
+
 	m_dev->send(width);
 	m_dev->send(height);
 	m_dev->send(true);
