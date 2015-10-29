@@ -87,6 +87,23 @@ private slots:
 		c->deleteLater();
 	}
 
+	void metadataTimeout() {
+		// Connect to a TCP socket that will never respond, should trigger
+		// a timeout for the discoverMetadata call
+		QTcpServer *server = new QTcpServer();
+		server->listen(QHostAddress::LocalHost);
+		QVERIFY(server->isListening());
+
+		NeovimConnector *c = NeovimConnector::connectToNeovim(
+			QString("%1:%2")
+				.arg(server->serverAddress().toString())
+				.arg(server->serverPort()));
+		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
+		QVERIFY(onError.isValid());
+		QVERIFY(SPYWAIT2(onError, 10000));
+		QCOMPARE(c->errorCause(), NeovimConnector::RuntimeMsgpackError);
+		c->deleteLater();
+	}
 };
 
 } // Namespace NeovimQt
