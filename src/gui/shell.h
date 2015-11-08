@@ -50,11 +50,13 @@ protected slots:
 	void mouseClickReset();
 	void mouseClickIncrement(Qt::MouseButton bt);
         void init();
+        void updateWindowId();
 
 protected:
 	void tooltip(const QString& text);
 	virtual void inputMethodEvent(QInputMethodEvent *event) Q_DECL_OVERRIDE;
 	virtual void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
+        bool event(QEvent *event) Q_DECL_OVERRIDE;
 
 	int neovimWidth() const;
 	int neovimHeight() const;
