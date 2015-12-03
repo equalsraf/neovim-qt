@@ -176,16 +176,25 @@ void MsgpackIODevice::dataAvailableFd(int fd)
  */
 void MsgpackIODevice::dataAvailable()
 {
-	qint64 bytes = m_dev->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
-	if ( bytes > 0 ) {
-		msgpack_unpacker_buffer_consumed(&m_uk, bytes);
-		msgpack_unpacked result;
-		msgpack_unpacked_init(&result);
-		while(msgpack_unpacker_next(&m_uk, &result)) {
-			dispatch(result.data);
+	qint64 read = 1;
+	while (read > 0) {
+		if ( msgpack_unpacker_buffer_capacity(&m_uk) == 0 ) {
+			if ( !msgpack_unpacker_reserve_buffer(&m_uk, 8192 ) ) {
+				// FIXME: error out
+				qWarning() << "Could not allocate memory in unpack buffer";
+				return;
+			}
 		}
-	} else if (bytes == -1) {
-		setError(InvalidDevice, tr("Error when reading from device"));
+
+		read = m_dev->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
+		if ( read > 0 ) {
+			msgpack_unpacker_buffer_consumed(&m_uk, read);
+			msgpack_unpacked result;
+			msgpack_unpacked_init(&result);
+			while(msgpack_unpacker_next(&m_uk, &result)) {
+				dispatch(result.data);
+			}
+		}
 	}
 }
 
