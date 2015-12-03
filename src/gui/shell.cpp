@@ -213,18 +213,29 @@ void Shell::neovimIsReady()
 		return;
 	}
 
+	init();
+
 	// Check g:Guifont for a font from user settings
 	MsgpackRequest *r = m_nvim->neovimObject()->vim_get_var("Guifont");
 	connect(r, &MsgpackRequest::finished,
 			this, &Shell::neovimFontVarOk);
 	connect(r, &MsgpackRequest::error,
-			this, &Shell::init);
+			this, &Shell::attach);
 }
 
 void Shell::neovimFontVarOk(quint32, Function::FunctionId, const QVariant& ret)
 {
 	setGuiFont(m_nvim->decode(ret.toByteArray()));
-	init();
+	attach();
+}
+
+void Shell::attach()
+{
+	// FIXME: Don't set this here, wait for return from ui_attach instead
+	setAttached(true);
+	// FIXME: this API will change
+	QRect screenRect = QApplication::desktop()->availableGeometry(this);
+	m_nvim->attachUi(screenRect.width()*0.66/neovimCellWidth(), screenRect.height()*0.66/neovimRowHeight());
 }
 
 /**
@@ -233,14 +244,8 @@ void Shell::neovimFontVarOk(quint32, Function::FunctionId, const QVariant& ret)
  */
 void Shell::init()
 {
-	// FIXME: Don't set this here, wait for return from ui_attach instead
-	setAttached(true);
-
 	connect(m_nvim->neovimObject(), &Neovim::neovimNotification,
 			this, &Shell::handleNeovimNotification);
-	// FIXME: this API will change
-	QRect screenRect = QApplication::desktop()->availableGeometry(this);
-	m_nvim->attachUi(screenRect.width()*0.66/neovimCellWidth(), screenRect.height()*0.66/neovimRowHeight());
 
 	connect(m_nvim->neovimObject(), &Neovim::on_ui_try_resize,
 			this, &Shell::neovimResizeFinished);

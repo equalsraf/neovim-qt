@@ -44,6 +44,7 @@ protected slots:
 	void mouseClickReset();
 	void mouseClickIncrement(Qt::MouseButton bt);
         void init();
+	void attach();
 
 protected:
 	void tooltip(const QString& text);
