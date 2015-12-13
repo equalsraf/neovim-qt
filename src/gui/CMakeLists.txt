@@ -27,3 +27,5 @@ endif()
 add_executable(fontinfo EXCLUDE_FROM_ALL fontinfo.cpp)
 target_link_libraries(fontinfo Qt5::Gui)
 
+include(GNUInstallDirs)
+install(TARGETS nvim-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
