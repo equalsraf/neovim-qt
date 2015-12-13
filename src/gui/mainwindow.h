@@ -2,10 +2,11 @@
 #define NEOVIM_QT_MAINWINDOW
 
 #include <QMainWindow>
-#include <QDockWidget>
 #include "neovimconnector.h"
 #include "errorwidget.h"
 #include "shell.h"
+
+class QVBoxLayout;
 
 namespace NeovimQt {
 
@@ -15,7 +16,6 @@ class MainWindow: public QMainWindow
 public:
 	MainWindow(NeovimConnector *, QWidget *parent=0);
 protected:
-        QDockWidget* newDockWidgetFor(QWidget *);
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 private slots:
 	void neovimSetTitle(const QString &title);
@@ -28,6 +28,7 @@ private:
         NeovimConnector *m_nvim;
 	ErrorWidget *m_errorWidget;
 	Shell *m_shell;
+	QVBoxLayout *m_layout;
 };
 
 } // Namespace
