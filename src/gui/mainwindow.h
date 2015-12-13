@@ -14,9 +14,12 @@ class MainWindow: public QMainWindow
 	Q_OBJECT
 public:
 	MainWindow(NeovimConnector *, QWidget *parent=0);
+public slots:
+	void delayedShow(bool show=true);
 protected:
         QDockWidget* newDockWidgetFor(QWidget *);
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
+	void showIfDelayed();
 private slots:
 	void neovimSetTitle(const QString &title);
 	void neovimExited(int status);
@@ -28,6 +31,7 @@ private:
         NeovimConnector *m_nvim;
 	ErrorWidget *m_errorWidget;
 	Shell *m_shell;
+	bool m_delayedShow;
 };
 
 } // Namespace

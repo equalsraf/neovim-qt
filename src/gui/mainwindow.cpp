@@ -5,7 +5,8 @@
 namespace NeovimQt {
 
 MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
-:QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0)
+:QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
+	m_delayedShow(false)
 {
 	m_errorWidget = new ErrorWidget();
 	newDockWidgetFor(m_errorWidget);
@@ -57,6 +58,8 @@ QDockWidget* MainWindow::newDockWidgetFor(QWidget *w)
 /** The Neovim process has exited */
 void MainWindow::neovimExited(int status)
 {
+	showIfDelayed();
+
 	if (m_nvim->errorCause() != NeovimConnector::NoError) {
 		m_errorWidget->setText(m_nvim->errorString());
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
@@ -71,6 +74,8 @@ void MainWindow::neovimExited(int status)
 }
 void MainWindow::neovimError(NeovimConnector::NeovimError err)
 {
+	showIfDelayed();
+
 	switch(err) {
 	case NeovimConnector::FailedToStart:
 		m_errorWidget->setText("Unable to start nvim: " + m_nvim->errorString());
@@ -107,6 +112,8 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 
 void MainWindow::neovimWidgetResized(const QSize& newSize)
 {
+	showIfDelayed();
+
 	if ((windowState() & Qt::WindowMaximized)) {
 		if (newSize.width() > width() || newSize.height() > height()) {
 			// If the Neovim shell is larger than the main window, resize it
@@ -119,6 +126,27 @@ void MainWindow::neovimWidgetResized(const QSize& newSize)
 		// Dont use ::adjustSize() here, it does not respect the new sizeHint()
 		resize(sizeHint());
 	}
+}
+
+/**
+ * Call show() after a 1s delay or when Neovim connects,
+ * whichever comes first
+ */
+void MainWindow::delayedShow(bool show)
+{
+	m_delayedShow = show;
+	QTimer *t = new QTimer(this);
+	t->setSingleShot(true);
+	t->setInterval(1000);
+	connect(t, &QTimer::timeout, this, &QMainWindow::show);
+}
+
+void MainWindow::showIfDelayed()
+{
+	if (m_delayedShow && !isVisible()) {
+		this->show();
+	}
+	m_delayedShow = false;
 }
 
 } // Namespace

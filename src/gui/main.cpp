@@ -64,10 +64,11 @@ int main(int argc, char **argv)
 
 #ifdef NEOVIMQT_GUI_WIDGET
 	NeovimQt::Shell *win = new NeovimQt::Shell(c);
+	win->show();
 #else
 	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c);
+	win->delayedShow();
 #endif
-	win->show();
 	return app.exec();
 }
 
