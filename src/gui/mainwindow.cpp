@@ -107,6 +107,10 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 
 void MainWindow::neovimWidgetResized(const QSize& newSize)
 {
+	if (!isVisible()) {
+		show();
+	}
+
 	if ((windowState() & Qt::WindowMaximized)) {
 		if (newSize.width() > width() || newSize.height() > height()) {
 			// If the Neovim shell is larger than the main window, resize it

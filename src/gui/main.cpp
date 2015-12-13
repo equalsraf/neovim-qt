@@ -2,6 +2,7 @@
 #include <QFontDatabase>
 #include <QtGlobal>
 #include <QFile>
+#include <QTimer>
 #include "neovimconnector.h"
 #include "mainwindow.h"
 
@@ -67,7 +68,10 @@ int main(int argc, char **argv)
 #else
 	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c);
 #endif
-	win->show();
+	// Window is shown on first resize, however if the nvim is taking too
+	// long to start, open the window manually to display possible errors
+	// to user.
+	QTimer::singleShot(1000, win, [&]() { win->show(); });
 	return app.exec();
 }
 
