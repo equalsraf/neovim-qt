@@ -29,3 +29,7 @@ target_link_libraries(fontinfo Qt5::Gui)
 
 include(GNUInstallDirs)
 install(TARGETS nvim-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(FILES ${CMAKE_SOURCE_DIR}/third-party/neovim.png
+        RENAME nvim-qt.png
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps/)
