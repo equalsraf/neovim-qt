@@ -6,6 +6,7 @@
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QKeyEvent>
+#include <QLayout>
 #include "msgpackrequest.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
@@ -297,6 +298,12 @@ void Shell::handleResize(uint64_t cols, uint64_t rows)
 		}
 		m_image.swap(new_image);
 		updateGeometry();
+		// Layout recalculation is done in next event cycle, but we start
+		// rendering right after emitting the neovimResized() signal.
+		if (parentWidget() && parentWidget()->layout()) {
+			parentWidget()->layout()->invalidate();
+			parentWidget()->layout()->activate();
+		}
 		emit neovimResized(neovimSize());
 	}
 }

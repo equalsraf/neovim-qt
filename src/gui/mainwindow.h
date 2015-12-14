@@ -2,10 +2,11 @@
 #define NEOVIM_QT_MAINWINDOW
 
 #include <QMainWindow>
-#include <QDockWidget>
 #include "neovimconnector.h"
 #include "errorwidget.h"
 #include "shell.h"
+
+class QVBoxLayout;
 
 namespace NeovimQt {
 
@@ -17,7 +18,6 @@ public:
 public slots:
 	void delayedShow(bool show=true);
 protected:
-        QDockWidget* newDockWidgetFor(QWidget *);
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 	void showIfDelayed();
 private slots:
@@ -32,6 +32,7 @@ private:
 	ErrorWidget *m_errorWidget;
 	Shell *m_shell;
 	bool m_delayedShow;
+	QVBoxLayout *m_layout;
 };
 
 } // Namespace
