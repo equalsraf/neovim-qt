@@ -195,6 +195,11 @@ QSize Shell::sizeHint() const
 	}
 }
 
+QSize Shell::minimumSizeHint() const
+{
+	return 5 * neovimCharSize();
+}
+
 /** Pixel size of the Neovim shell */
 QSize Shell::neovimSize() const
 {
