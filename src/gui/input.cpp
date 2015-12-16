@@ -45,6 +45,10 @@ InputConv::InputConv() {
 	specialKeys.insert(Qt::Key_Backslash, "Bslash");
 	specialKeys.insert(Qt::Key_Less, "lt");
 	specialKeys.insert(Qt::Key_Space, "Space");
+	specialKeys.insert(Qt::Key_Control, "Ctrl");
+	specialKeys.insert(Qt::Key_Shift, "Shift");
+	specialKeys.insert(Qt::Key_Meta, "Meta");
+	specialKeys.insert(Qt::Key_Alt, "Alt");
 }
 
 /**
@@ -54,28 +58,12 @@ InputConv::InputConv() {
  *
  * WIN32: Ctrl+Alt are never passed together, since we can't distinguish
  * between Ctrl+Alt and AltGr (see Vim/os_win32.c).
+ * This is work in progress. Removing the prefix to send the appropriate keywords to neovim.
  */
 QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 {
 	// FIXME: Mac and Meta check the Qt docs
 	QString modprefix;
-	if ( mod & Qt::ControlModifier
-#ifdef Q_OS_WIN32
-		&& !(mod & Qt::AltModifier)
-#endif
-	   ) {
-		modprefix += "C-";
-	}
-	if ( mod & Qt::ShiftModifier ) {
-		modprefix += "S-";
-	}
-	if ( mod & Qt::AltModifier
-#ifdef Q_OS_WIN32
-		&& !(mod & Qt::ControlModifier)
-#endif
-	   ) {
-		modprefix += "A-";
-	}
 	return modprefix;
 }
 
