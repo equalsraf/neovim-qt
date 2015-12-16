@@ -91,7 +91,7 @@ void NeovimConnector::attachUi(int64_t width, int64_t height)
 	MsgpackRequest *r = m_dev->startRequestUnchecked("ui_attach", 3);
 	connect(r, &MsgpackRequest::timeout,
 			this, &NeovimConnector::fatalTimeout);
-	r->setTimeout(10000);
+	r->setTimeout(5000);
 
 	m_dev->send(width);
 	m_dev->send(height);
@@ -128,7 +128,7 @@ void NeovimConnector::discoverMetadata()
 			m_helper, &NeovimConnectorHelper::handleMetadataError);
 	connect(r, &MsgpackRequest::timeout,
 			this, &NeovimConnector::fatalTimeout);
-	r->setTimeout(10000);
+	r->setTimeout(5000);
 }
 
 /**
