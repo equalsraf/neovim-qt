@@ -132,13 +132,21 @@ void MainWindow::neovimWidgetResized(const QSize& newSize)
  * Call show() after a 1s delay or when Neovim connects,
  * whichever comes first
  */
-void MainWindow::delayedShow(bool show)
+void MainWindow::delayedShow(bool enable)
 {
-	m_delayedShow = show;
-	QTimer *t = new QTimer(this);
-	t->setSingleShot(true);
-	t->setInterval(1000);
-	connect(t, &QTimer::timeout, this, &QMainWindow::show);
+	if (m_nvim->errorCause() != NeovimConnector::NoError) {
+		show();
+		return;
+	}
+
+	m_delayedShow = enable;
+	if (enable) {
+		QTimer *t = new QTimer(this);
+		t->setSingleShot(true);
+		t->setInterval(1000);
+		connect(t, &QTimer::timeout, this, &QMainWindow::show);
+		t->start();
+	}
 }
 
 void MainWindow::showIfDelayed()
