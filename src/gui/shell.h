@@ -37,13 +37,13 @@ public slots:
 
 protected slots:
 	void neovimIsReady();
-        void neovimFontVarOk(quint32, Function::FunctionId, const QVariant&);
+	void neovimFontVarOk(quint32, Function::FunctionId, const QVariant&);
 	void neovimError(NeovimConnector::NeovimError);
 	void neovimExited(int);
 	void neovimResizeFinished();
 	void mouseClickReset();
 	void mouseClickIncrement(Qt::MouseButton bt);
-        void init();
+	void init();
 
 protected:
 	void tooltip(const QString& text);
@@ -62,7 +62,7 @@ protected:
 
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
 	virtual void keyPressEvent(QKeyEvent *ev) Q_DECL_OVERRIDE;
-        void paintLogo(QPainter&);
+	void paintLogo(QPainter&);
 	virtual void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
 	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
@@ -86,7 +86,7 @@ protected:
 
 private:
 	bool m_attached;
-        void setAttached(bool);
+	void setAttached(bool);
 
 	NeovimConnector *m_nvim;
 	uint64_t m_rows, m_cols;
@@ -110,7 +110,7 @@ private:
 	bool m_insertMode;
 	bool m_resizing;
 	QLabel *m_tooltip;
-        QPixmap m_logo;
+	QPixmap m_logo;
 	QPoint m_mouse_pos;
 	// 2/3/4 mouse click tracking
 	QTimer m_mouseclick_timer;
