@@ -37,17 +37,19 @@ private:
 	MsgpackIODevice *one, *two;
 	void resetLoop() {
 		QTcpServer *server = new QTcpServer();
-		server->listen(QHostAddress::LocalHost);
+		QVERIFY(server->listen(QHostAddress::LocalHost));
 
 		QVERIFY(server->isListening());
 
 		QTcpSocket *client = new QTcpSocket(this);
 		QSignalSpy onConnected(client, SIGNAL(connected()));
 		QVERIFY(onConnected.isValid());
+		QSignalSpy onNewConnection(server, SIGNAL(newConnection()));
+		QVERIFY(onNewConnection.isValid());
 
 		client->connectToHost(server->serverAddress(), server->serverPort());
 		QVERIFY(SPYWAIT(onConnected));
-		QVERIFY(server->hasPendingConnections());
+		QVERIFY(SPYWAIT(onNewConnection));
 
 		QTcpSocket *other = server->nextPendingConnection();
 
