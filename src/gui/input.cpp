@@ -57,21 +57,25 @@ InputConv::InputConv() {
  */
 QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 {
-	// FIXME: Mac and Meta check the Qt docs
 	QString modprefix;
-	if ( mod & Qt::ControlModifier
+#ifdef Q_OS_MAC
+	if ( mod & CmdModifier ) {
+		modprefix += "D-"; // like MacVim does
+	}
+#endif
+	if ( mod & ControlModifier
 #ifdef Q_OS_WIN32
-		&& !(mod & Qt::AltModifier)
+		&& !(mod & AltModifier)
 #endif
 	   ) {
 		modprefix += "C-";
 	}
-	if ( mod & Qt::ShiftModifier ) {
+	if ( mod & ShiftModifier ) {
 		modprefix += "S-";
 	}
-	if ( mod & Qt::AltModifier
+	if ( mod & AltModifier
 #ifdef Q_OS_WIN32
-		&& !(mod & Qt::ControlModifier)
+		&& !(mod & ControlModifier)
 #endif
 	   ) {
 		modprefix += "A-";
@@ -148,37 +152,51 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 {
 	if (specialKeys.contains(k)) {
 		return QString("<%1%2>").arg(modPrefix(mod)).arg(specialKeys.value(k));
-	} else if (text.isEmpty()) {
-		// This is a special key we can't handle
-		return QString();
 	}
 
+	QChar c;
 	// Escape < and backslash
 	if (text == "<") {
 		return QString("<%1%2>").arg(modPrefix(mod)).arg("lt");
-	}
-	if (text == "\\") {
+	} else if (text == "\\") {
 		return QString("<%1%2>").arg(modPrefix(mod)).arg("Bslash");
+	} else if (text.isEmpty()) {
+		// on macs, text is empty for ctrl+key and cmd+key combos (with or without alt)
+		if (mod & ControlModifier || mod & CmdModifier) {
+			// ignore ctrl, alt and cmd key combos by themselves
+			QList<Qt::Key> keys = { Key_Control, Key_Alt, Key_Cmd };
+			if (keys.contains((Qt::Key)k)) {
+				return QString();
+			} else {
+				// key code will be the value of the char (hopefully)
+				c = QChar(k);
+			}
+		} else {
+			// This is a special key we can't handle
+			return QString();
+		}
+	} else {
+		// Key event compression is disabled, text has one char
+		c = text.at(0);
 	}
 
-	QChar c = text.at(0);
 	// Remove SHIFT
 	if (c.unicode() < 0x100 && !c.isLetterOrNumber() && c.isPrint()) {
-		mod &= ~Qt::ShiftModifier;
+		mod &= ~ShiftModifier;
 	}
 
 	// Remove CTRL empty characters at the start of the ASCII range
 	if (c.unicode() < 0x20) {
-		mod &= ~Qt::ControlModifier;
+		mod &= ~ControlModifier;
 	}
 
 	// Format with prefix if necessary
 	QString prefix = modPrefix(mod);
 	if (!prefix.isEmpty()) {
-		return QString("<%1%2>").arg(prefix).arg(text);
+		return QString("<%1%2>").arg(prefix).arg(c);
 	}
 
-	return text;
+	return QString(c);
 }
 
 } // Namespace
