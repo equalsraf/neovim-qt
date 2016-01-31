@@ -5,7 +5,7 @@ find_path(MSGPACK_INCLUDE_DIR
 )
 
 find_library(MSGPACK_LIBRARY
-    NAMES msgpack libmsgpack.a
+    NAMES msgpack msgpackc libmsgpack.a libmsgpackc.a
 )
 
 mark_as_advanced(MSGPACK_INCLUDE_DIR MSGPACK_LIBRARY)

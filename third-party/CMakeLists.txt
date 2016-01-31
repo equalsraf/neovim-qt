@@ -6,9 +6,9 @@ project(neovim-qt-deps)
 #
 # Get Msgpack
 #
-set(MSGPACK_VERSION 1.3.0)
+set(MSGPACK_VERSION 1.4.0)
 set(MSGPACK_URL https://github.com/msgpack/msgpack-c/archive/cpp-${MSGPACK_VERSION}.tar.gz)
-set(MSGPACK_SHA256 6b846e45611fc98d28e665000306ac109ea7ca7df55927cd06dd7f821f9b1896)
+set(MSGPACK_SHA256 387a6e7b38b1a316275298cd9c3556630798a3b46ece13942a3b276306222c88)
 
 message(STATUS "Downloading Msgpack...")
 set(MSGPACK_TARBALL msgpack-${MSGPACK_VERSION}.tar.gz)
@@ -28,4 +28,4 @@ add_subdirectory(${MSGPACK_SOURCE_DIR} EXCLUDE_FROM_ALL)
 
 # Similar enough to FindMsgpack
 set(MSGPACK_INCLUDE_DIRS ${MSGPACK_SOURCE_DIR}/include PARENT_SCOPE)
-set(MSGPACK_LIBRARIES msgpack-static PARENT_SCOPE)
+set(MSGPACK_LIBRARIES msgpackc-static PARENT_SCOPE)
