@@ -21,7 +21,7 @@ void TestInput::specialKeys()
 #ifdef Q_OS_MAC
 			// On Mac Control is actually the Cmd key, which we
 			// don't support yet
-			QString("<%1>").arg(input.specialKeys.value(k)));
+			QString("<D-%1>").arg(input.specialKeys.value(k)));
 #else
 			QString("<C-%1>").arg(input.specialKeys.value(k)));
 #endif
