@@ -523,6 +523,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 		handleBusy(true);
 	} else if (name == "busy_stop"){
 		handleBusy(false);
+	} else if (name == "set_icon") {
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
