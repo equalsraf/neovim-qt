@@ -24,9 +24,6 @@ if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
 	WinDeployQt(TARGET nvim-qt COMPILER_RUNTIME INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
 endif()
 
-add_executable(fontinfo EXCLUDE_FROM_ALL fontinfo.cpp)
-target_link_libraries(fontinfo Qt5::Gui)
-
 include(GNUInstallDirs)
 install(TARGETS nvim-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
