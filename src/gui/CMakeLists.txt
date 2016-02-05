@@ -7,17 +7,13 @@ if(WIN32)
 	enable_language(RC)
 endif()
 
+add_subdirectory(shellwidget)
+
 add_executable(nvim-qt WIN32 main.cpp shell.cpp input.cpp errorwidget.cpp mainwindow.cpp
 	${NEOVIM_RCC_SOURCES}
 	${CMAKE_SOURCE_DIR}/third-party/konsole_wcwidth.cpp
 	${RES_FILE})
-target_link_libraries(nvim-qt ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt)
-
-add_executable(nvim-qt-widget EXCLUDE_FROM_ALL main.cpp shell.cpp input.cpp 
-	${NEOVIM_RCC_SOURCES}
-	${CMAKE_SOURCE_DIR}/third-party/konsole_wcwidth.cpp)
-set_target_properties(nvim-qt-widget PROPERTIES COMPILE_DEFINITIONS NEOVIMQT_GUI_WIDGET )
-target_link_libraries(nvim-qt-widget ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt)
+target_link_libraries(nvim-qt ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt qshellwidget)
 
 if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
 	include(WinDeployQt)

@@ -13,24 +13,15 @@
 namespace NeovimQt {
 
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
-:QWidget(parent), m_attached(false), m_nvim(nvim), m_rows(1), m_cols(1),
-	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false), m_fm(NULL),
-	m_foreground(Qt::black), m_background(Qt::white),
+:ShellWidget(parent), m_attached(false), m_nvim(nvim),
+	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
 	m_resizing(false), m_logo(QPixmap(":/neovim.png")),
 	m_neovimBusy(false)
 {
-	m_font = createFont(DEFAULT_FONT);
-	m_font.setPointSize(10);
-	m_fm = new QFontMetrics(m_font);
-
-	m_image = QImage(neovimSize(), QImage::Format_ARGB32_Premultiplied);
-
 	setAttribute(Qt::WA_KeyCompression, false);
-	setAttribute(Qt::WA_OpaquePaintEvent, true);
 
-	setFocusPolicy(Qt::StrongFocus);
 	setMouseTracking(true);
 	m_mouseclick_timer.setInterval(QApplication::doubleClickInterval());
 	m_mouseclick_timer.setSingleShot(true);
@@ -56,25 +47,19 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 			this, &Shell::neovimError);
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &Shell::neovimExited);
+	connect(this, &ShellWidget::fontError,
+			this, &Shell::fontError);
 
 	if (m_nvim->isReady()) {
 		neovimIsReady();
 	}
 }
 
-/**
- * Create QFont for the given family. This is the same
- * QFont::setFamily but sets some common options to enforce
- * fixed pitched fonts.
- */
-QFont Shell::createFont(const QString& family)
+void Shell::fontError(const QString& msg)
 {
-	QFont f;
-	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
-	f.setFamily(family);
-	f.setFixedPitch(true);
-	f.setKerning(false);
-	return f;
+	if (m_attached) {
+		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(msg));
+	}
 }
 
 /**
@@ -83,8 +68,9 @@ QFont Shell::createFont(const QString& family)
 bool Shell::setGuiFont(const QString& fdesc)
 {
 	if (fdesc.isEmpty()) {
-		QFontInfo fi(m_font);
-		QByteArray desc = m_nvim->encode(QString("%1:h%2\n").arg(fi.family()).arg(m_font.pointSize()));
+		QByteArray desc = m_nvim->encode(QString("%1:h%2\n")
+					.arg(fontFamily())
+					.arg(fontSize()));
 		m_nvim->neovimObject()->vim_out_write(desc);
 		return true;
 	}
@@ -94,7 +80,7 @@ bool Shell::setGuiFont(const QString& fdesc)
 		return false;
 	}
 
-	QFont f = createFont(attrs.at(0));
+	int pointSize = font().pointSize();
 	foreach(QString attr, attrs) {
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok = false;
@@ -103,30 +89,10 @@ bool Shell::setGuiFont(const QString& fdesc)
 				m_nvim->neovimObject()->vim_report_error("Invalid font height");
 				return false;
 			}
-			f.setPointSize(height);
+			pointSize = height;
 		}
 	}
-
-	QFontInfo fi(f);
-	if (fi.family().compare(f.family(), Qt::CaseInsensitive) != 0 &&
-			f.family().compare("Monospace", Qt::CaseInsensitive) != 0) {
-		QString errmsg = QString("Unknown font: %1").arg(f.family());
-		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
-		return false;
-	}
-	if ( !fi.fixedPitch() ) {
-		QString errmsg = QString("%1 is not a fixed pitch font").arg(f.family());
-		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
-		return false;
-	}
-
-	if (isBadMonospace(f)) {
-		QString errmsg = QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family());
-		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
-	}
-
-	m_font = f;
-	m_fm = new QFontMetrics(f);
+	setShellFont(attrs.at(0), pointSize);
 
 	if (m_attached) {
 		resizeNeovim(size());
@@ -144,67 +110,15 @@ Shell::~Shell()
 
 void Shell::setAttached(bool attached)
 {
-	setAttribute(Qt::WA_StaticContents, attached);
 	m_attached = attached;
 	update();
 }
 
-/** Neovim shell width in pixels (does not include extra margin) */
-int Shell::neovimWidth() const
-{
-	return m_cols*neovimCellWidth();
-}
-
-/** Neovim shell height in pixels (does not include extra margin) */
-int Shell::neovimHeight() const
-{
-	return m_rows*neovimRowHeight();
-}
-
-/** Height of a row (in pixels)*/
-quint64 Shell::neovimRowHeight() const
-{
-	// The leading may be negative making the linespacing
-	// smaller than height
-	return qMax(m_fm->lineSpacing(), m_fm->height());
-}
-
-/** Width of a char (in pixels)*/
-quint64 Shell::neovimCellWidth() const
-{
-	return m_fm->width('W');
-}
-
-/** Pixel size for a char cell */
-QSize Shell::neovimCharSize() const
-{
-	return QSize(neovimCellWidth(), neovimRowHeight());
-}
-
-QSize Shell::sizeIncrement() const
-{
-	return neovimCharSize();
-}
-
-QSize Shell::sizeHint() const
-{
-	if (m_attached) {
-		return neovimSize();
-	} else {
-		return QWidget::sizeHint();
-	}
-}
-
-/** Pixel size of the Neovim shell */
-QSize Shell::neovimSize() const
-{
-	return QSize(neovimWidth(), neovimHeight());
-}
-
-/** The top left corner position (pixel) for the cursor */
+/// The top left corner position (pixel) for the cursor
 QPoint Shell::neovimCursorTopLeft() const
 {
-	return QPoint(m_cursor_pos.x()*neovimCellWidth(), m_cursor_pos.y()*neovimRowHeight());
+	return QPoint(m_cursor_pos.x()*cellSize().width(),
+			m_cursor_pos.y()*cellSize().height());
 }
 
 void Shell::neovimIsReady()
@@ -240,7 +154,7 @@ void Shell::init()
 			this, &Shell::handleNeovimNotification);
 	// FIXME: this API will change
 	QRect screenRect = QApplication::desktop()->availableGeometry(this);
-	m_nvim->attachUi(screenRect.width()*0.66/neovimCellWidth(), screenRect.height()*0.66/neovimRowHeight());
+	m_nvim->attachUi(screenRect.width()*0.66/cellSize().width(), screenRect.height()*0.66/cellSize().height());
 
 	connect(m_nvim->neovimObject(), &Neovim::on_ui_try_resize,
 			this, &Shell::neovimResizeFinished);
@@ -272,58 +186,45 @@ void Shell::neovimExited(int status)
  * - update cols/rows
  * - reset the cursor, scroll_region
  */
-void Shell::handleResize(uint64_t cols, uint64_t rows)
+void Shell::handleResize(uint64_t n_cols, uint64_t n_rows)
 {
 	// TODO: figure out how to handle cases when Neovim wants one
 	// size but the user is resizing to another
-	bool needs_resize = (rows != m_rows || cols != m_cols);
-
-	m_rows = rows;
-	m_cols = cols;
+	bool needs_resize = (n_rows != rows() || n_cols != columns());
+	resizeShell(n_rows, n_cols);
 	m_cursor_pos = QPoint(0,0);
-	m_scroll_region = QRect(QPoint(0,0), neovimSize());
+	m_scroll_region = QRect(QPoint(0,0), QPoint(columns(), rows()));
 
 	if (needs_resize) {
-		QImage new_image = QImage(neovimSize(), QImage::Format_ARGB32_Premultiplied);
-		{
-			// copy the old contents into the new canvas
-			QPainter painter(&new_image);
-			painter.drawImage(QPoint(0,0), m_image);
-		}
-		m_image.swap(new_image);
 		updateGeometry();
-		emit neovimResized(neovimSize());
 	}
 }
 
-void Shell::handleHighlightSet(const QVariantMap& attrs, QPainter& painter)
+void Shell::handleHighlightSet(const QVariantMap& attrs)
 {
 	if (attrs.contains("foreground")) {
 		// TODO: When does Neovim send -1
-		m_hg_foreground = color(attrs.value("foreground").toLongLong(), m_foreground);
+		m_hg_foreground = color(attrs.value("foreground").toLongLong(), foreground());
 	} else {
-		m_hg_foreground = m_foreground;
+		m_hg_foreground = foreground();
 	}
 
 	if (attrs.contains("background")) {
-		m_hg_background = color(attrs.value("background").toLongLong(), m_background);
+		m_hg_background = color(attrs.value("background").toLongLong(), background());
 	} else {
-		m_hg_background = m_background;
+		m_hg_background = background();
 	}
 
 	// TODO: undercurl
 	m_font_bold = attrs.value("bold").toBool();
 	m_font_italic = attrs.value("italic").toBool();
 	m_font_undercurl = attrs.value("undercurl").toBool();
-	// enable underline ONLY if undercurl is already not on
+	// enable underline ONLY if undercurl is not on
 	m_font_underline = attrs.value("underline").toBool() && !m_font_undercurl;
-	setupPainter(painter);
 }
 
-/**
- * Paint a character and advance the cursor by one
- */
-void Shell::handlePut(const QVariantList& args, QPainter& painter)
+/// Paint a character and advance the cursor
+void Shell::handlePut(const QVariantList& args)
 {
 	if (args.size() != 1 || (QMetaType::Type)args.at(0).type() != QMetaType::QByteArray) {
 		qWarning() << "Unexpected arguments for redraw:put" << args;
@@ -331,40 +232,18 @@ void Shell::handlePut(const QVariantList& args, QPainter& painter)
 	}
 
 	QString text = m_nvim->decode(args.at(0).toByteArray());
-	QRect updateRect(neovimCursorTopLeft(),
-			QSize(neovimCellWidth(), neovimRowHeight()));
 
 	if (!text.isEmpty()) {
-		painter.save();
-
-		const QChar& c = text.at(0);
-		// fullwidth chars take up two columns
-		int charWidth = konsole_wcwidth(c.unicode());
-		QRect clipRect(neovimCursorTopLeft(),
-				QSize(neovimCellWidth()*charWidth, neovimRowHeight()));
-		painter.setClipRect(clipRect);
-
-		// Draw text at the baseline
-		QPoint pos(m_cursor_pos.x()*neovimCellWidth(), m_cursor_pos.y()*neovimRowHeight()+m_fm->ascent());
-		painter.drawText(pos, text.at(0));
-
-		if (m_font_undercurl) {
-			// Draw "undercurl" at the bottom of the cell
-			// FIXME: use correct highlight color instead of red
-			// TODO: draw a proper undercurl
-			painter.setPen(QPen(Qt::red, 1, Qt::DashDotDotLine));
-			QPoint start = clipRect.bottomLeft();
-			QPoint end = clipRect.bottomRight();
-			start.ry()--; end.ry()--;
-			painter.drawLine(start, end);
-		}
-		painter.restore();
+		int cols = put(text, m_cursor_pos.y(), m_cursor_pos.x(),
+				m_hg_foreground, m_hg_background,
+				m_font_bold, m_font_italic,
+				m_font_underline, m_font_undercurl);
+		// Move cursor ahead
+		update(QRect(neovimCursorTopLeft(), cellSize()));
+		m_cursor_pos.setX(m_cursor_pos.x() + cols);
+		update(QRect(neovimCursorTopLeft(), cellSize()));
 	}
 
-	update(updateRect);
-	// Move cursor ahead
-	m_cursor_pos.setX(m_cursor_pos.x() + 1);
-	update(QRect(neovimCursorTopLeft(), neovimCharSize()));
 }
 
 /**
@@ -376,54 +255,23 @@ void Shell::handlePut(const QVariantList& args, QPainter& painter)
  * - The scrolled area can be the entire shell, or a region defined
  *   by the set_scroll_region notification
  */
-void Shell::handleScroll(const QVariantList& args, QPainter& painter)
+void Shell::handleScroll(const QVariantList& args)
 {
 	if (!args.at(0).canConvert<qint64>()) {
 		qWarning() << "Unexpected arguments for redraw:scroll" << args;
 		return;
 	}
-
 	qint64 count = args.at(0).toULongLong();
-	QRect exposed;	// Area exposed after the scroll, that needs repainting
-	QRect rect;	// Area to be moved
-	QPoint pos;	// Position where the image will be drawn
-	if (count == 0) {
-		return;
-	} else if (count > 0) {
-		// Scroll lines to the top
-		exposed = QRect(QPoint(m_scroll_region.left(), m_scroll_region.bottom()-count*neovimRowHeight()+1),
-				QSize(m_scroll_region.width(), count*neovimRowHeight()));
-		rect = QRect(QPoint(m_scroll_region.left(), m_scroll_region.top()+count*neovimRowHeight()),
-				QPoint(m_scroll_region.right(), m_scroll_region.bottom()));
-		pos = m_scroll_region.topLeft();
-	} else {
-		count = -count;
-		// Scroll lines to the bottom
-		exposed = QRect(m_scroll_region.topLeft(),
-				QSize(m_scroll_region.width(), count*neovimRowHeight()));
-		rect = QRect(m_scroll_region.topLeft(),
-				QPoint(m_scroll_region.right(), m_scroll_region.bottom()-count*neovimRowHeight()));
-		pos = m_scroll_region.topLeft();
-		pos.setY(pos.y()+count*neovimRowHeight());
-	}
 
-	QImage copy = m_image.copy(rect);
-	painter.drawImage(pos, copy);
-	// Scroll always uses the background color, not the highlight
-	painter.fillRect(exposed, m_background);
-	update(m_scroll_region);
-}
+	scrollShellRegion(m_scroll_region.top(), m_scroll_region.bottom(),
+			m_scroll_region.left(), m_scroll_region.right(),
+			count);
 
-/** Ready a painter with Neovim settings */
-void Shell::setupPainter(QPainter& painter)
-{
-	painter.setPen(m_hg_foreground);
-	painter.setBackground(m_hg_background);
-	QFont f(m_font);
-	f.setBold(m_font_bold);
-	f.setItalic(m_font_italic);
-	f.setUnderline(m_font_underline);
-	painter.setFont(f);
+	// Redraw over the old cursor - if it was painted earlier it will be
+	// scrolled with the content
+	QPoint old_cursor_pos = m_cursor_pos;
+	old_cursor_pos.setY(old_cursor_pos.y()-count);
+	update(absoluteShellRect(old_cursor_pos.y(), old_cursor_pos.x(), 1, 1));
 }
 
 void Shell::handleSetScrollRegion(const QVariantList& opargs)
@@ -439,28 +287,32 @@ void Shell::handleSetScrollRegion(const QVariantList& opargs)
 	left = opargs.at(2).toULongLong();
 	right = opargs.at(3).toULongLong();
 
-	m_scroll_region = QRect(QPoint(left*neovimCellWidth(), top*neovimRowHeight()),
-				QPoint((right+1)*neovimCellWidth(), (bot+1)*neovimRowHeight()-1));
+	m_scroll_region = QRect(QPoint(left, top),
+				QPoint(right+1, bot+1));
 }
 
-void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPainter& painter)
+void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 {
 	if (name == "update_fg") {
 		if (opargs.size() != 1 || !opargs.at(0).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
-		m_foreground = color(opargs.at(0).toLongLong(), m_foreground);
-		m_hg_foreground = m_foreground;
-		painter.setPen(m_hg_foreground);
+		qint64 val = opargs.at(0).toLongLong();
+		if (val != -1) {
+			setForeground(QRgb(val));
+		}
+		m_hg_foreground = foreground();
 	} else if (name == "update_bg") {
 		if (opargs.size() != 1 || !opargs.at(0).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
-		m_background = color(opargs.at(0).toLongLong(), m_background);
-		m_hg_background = m_background;
-		painter.setBackground(m_hg_background);
+		qint64 val = opargs.at(0).toLongLong();
+		if (val != -1) {
+			setBackground(QRgb(val));
+		}
+		m_hg_background = background();
 		update();
 	} else if (name == "resize") {
 		if (opargs.size() != 2 || !opargs.at(0).canConvert<quint64>() ||
@@ -468,40 +320,31 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
-
-		painter.end();
 		handleResize(opargs.at(0).toULongLong(), opargs.at(1).toULongLong());
-		painter.begin(&m_image);
-		setupPainter(painter);
 	} else if (name == "clear") {
-		painter.fillRect(rect(), m_background);
-		update();
+		clearShell(m_hg_background);
 	} else if (name == "bell"){
 		QApplication::beep();
 	} else if (name == "eol_clear") {
-		QPoint tl = neovimCursorTopLeft();
-		QPoint br(neovimWidth()-1, tl.y()+neovimRowHeight()-1);
-		QRect clearRect = QRect(tl, br);
-		painter.fillRect(clearRect, m_background);
-		update(clearRect);
+		clearRegion(m_cursor_pos.y(), m_cursor_pos.x(),
+				m_cursor_pos.y()+1, columns());
 	} else if (name == "cursor_goto"){
 		if (opargs.size() != 2 || !opargs.at(0).canConvert<quint64>() ||
 				!opargs.at(1).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
-		QRect cursorRect(neovimCursorTopLeft(), neovimCharSize());
 		setNeovimCursor(opargs.at(0).toULongLong(), opargs.at(1).toULongLong());
 	} else if (name == "highlight_set") {
 		if (opargs.size() != 1 && (QMetaType::Type)opargs.at(0).type() != QMetaType::QVariantMap) {
 			qWarning() << "Unexpected argument for redraw:" << name << opargs;
 			return;
 		}
-		handleHighlightSet(opargs.at(0).toMap(), painter);
+		handleHighlightSet(opargs.at(0).toMap());
 	} else if (name == "put") {
-		handlePut(opargs, painter);
+		handlePut(opargs );
 	} else if (name == "scroll"){
-		handleScroll(opargs, painter);
+		handleScroll(opargs);
 	} else if (name == "set_scroll_region"){
 		handleSetScrollRegion(opargs);
 	} else if (name == "mouse_on"){
@@ -532,9 +375,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs, QPa
 
 void Shell::setNeovimCursor(quint64 row, quint64 col)
 {
-	update(QRect(neovimCursorTopLeft(), neovimCharSize()));
+	update(QRect(neovimCursorTopLeft(), cellSize()));
 	m_cursor_pos = QPoint(col, row);
-	update(QRect(neovimCursorTopLeft(), neovimCharSize()));
+	update(QRect(neovimCursorTopLeft(), cellSize()));
 }
 
 void Shell::handleModeChange(const QString& mode)
@@ -582,9 +425,6 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		return;
 	}
 
-	QPainter painter(&m_image);
-	setupPainter(painter);
-
 	foreach(const QVariant& update_item, args) {
 		if ((QMetaType::Type)update_item.type() != QMetaType::QVariantList) {
 			qWarning() << "Received unexpected redraw operation" << update_item;
@@ -600,20 +440,6 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		const QByteArray& name = redrawupdate.at(0).toByteArray();
 		const QVariantList& update_args = redrawupdate.mid(1);
 
-		if (name == "put") {
-			// A redraw:put does three things
-			// 1. Paints the cell background
-			// 2. Draws a char
-			// 3. Advance the cursor by one
-			//
-			// We draw the background here and leave 2/3 to handlePut
-			quint64 cells = update_args.size();
-			QRect bgRect(neovimCursorTopLeft(),
-					QSize(cells*neovimCellWidth(), neovimRowHeight())
-				);
-			painter.eraseRect(bgRect);
-		}
-
 		foreach (const QVariant& opargs_var, update_args) {
 			if ((QMetaType::Type)opargs_var.type() != QMetaType::QVariantList) {
 				qWarning() << "Received unexpected redraw arguments, expecting list" << opargs_var;
@@ -621,21 +447,14 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			}
 
 			const QVariantList& opargs = opargs_var.toList();
-			handleRedraw(name, opargs, painter);
+			handleRedraw(name, opargs);
 		}
 	}
-#if 0
-	// Dump all paint events as jpg files for debugging
-	static quint64 count = 0;
-	qDebug() << "Redraw:" << count;
-	m_image.save(QString("debug-paint-%1.jpg").arg(count++));
-#endif
-
 }
 
 /**
  * Draws the Neovim logo at the center of the widget.
- * If the is too small do nothing.
+ * If the size is too small do nothing.
  */
 void Shell::paintLogo(QPainter& p)
 {
@@ -649,34 +468,24 @@ void Shell::paintLogo(QPainter& p)
 
 void Shell::paintEvent(QPaintEvent *ev)
 {
-	QPainter painter(this);
 	if (!m_attached) {
+		QPainter painter(this);
 		painter.fillRect(rect(), Qt::white);
 		paintLogo(painter);
 		return;
 	}
 
-	QRegion imageReg(QRect(QPoint(0,0),neovimSize()));
-	QRegion intersection = imageReg.intersected(ev->region());
-	QRegion diff = ev->region().subtracted(imageReg);
-
-	foreach(QRect rect, intersection.rects()) {
-		painter.drawImage(rect, m_image, rect);
-	}
-
-	// Paint margins
-	foreach(QRect rect, diff.rects()) {
-		painter.fillRect( rect, m_background);
-	}
+	ShellWidget::paintEvent(ev);
 
 	// paint cursor - we are not actually using Neovim colors yet,
 	// just invert the shell colors by painting white with XoR
 	if (ev->region().contains(neovimCursorTopLeft())) {
-		QRect cursorRect(neovimCursorTopLeft(), neovimCharSize());
+		QRect cursorRect(neovimCursorTopLeft(), cellSize());
 
 		if (m_insertMode) {
 			cursorRect.setWidth(2);
 		}
+		QPainter painter(this);
 		painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
 		painter.fillRect(cursorRect, m_cursor_color);
 	}
@@ -703,8 +512,8 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 
 void Shell::neovimMouseEvent(QMouseEvent *ev)
 {
-	QPoint pos(ev->x()/neovimCellWidth(),
-			ev->y()/neovimRowHeight());
+	QPoint pos(ev->x()/cellSize().width(),
+			ev->y()/cellSize().height());
 	QString inp;
 	if (ev->type() == QEvent::MouseMove) {
 		Qt::MouseButton bt;
@@ -765,8 +574,8 @@ void Shell::mouseReleaseEvent(QMouseEvent *ev)
 }
 void Shell::mouseMoveEvent(QMouseEvent *ev)
 {
-	QPoint pos(ev->x()/neovimCellWidth(),
-			ev->y()/neovimRowHeight());
+	QPoint pos(ev->x()/cellSize().width(),
+			ev->y()/cellSize().height());
 	if (pos != m_mouse_pos) {
 		m_mouse_pos = pos;
 		mouseClickReset();
@@ -783,8 +592,8 @@ void Shell::wheelEvent(QWheelEvent *ev)
 		return;
 	}
 
-	QPoint pos(ev->x()/neovimCellWidth(),
-			ev->y()/neovimRowHeight());
+	QPoint pos(ev->x()/cellSize().width(),
+			ev->y()/cellSize().height());
 
 	QString inp;
 	if (vert != 0) {
@@ -804,13 +613,13 @@ void Shell::wheelEvent(QWheelEvent *ev)
 
 void Shell::resizeNeovim(const QSize& newSize)
 {
-	uint64_t cols = newSize.width()/neovimCellWidth();
-	uint64_t rows = newSize.height()/neovimRowHeight();
+	uint64_t n_cols = newSize.width()/cellSize().width();
+	uint64_t n_rows = newSize.height()/cellSize().height();
 
 	// Neovim will ignore simultaneous calls to ui_try_resize
 	if (!m_resizing && m_nvim && m_attached &&
-			(cols != m_cols || rows != m_rows) ) {
-		m_nvim->neovimObject()->ui_try_resize(cols, rows);
+			(n_cols != columns() || n_rows != rows()) ) {
+		m_nvim->neovimObject()->ui_try_resize(n_cols, n_rows);
 		m_resizing = true;
 	}
 }
@@ -818,12 +627,12 @@ void Shell::resizeNeovim(const QSize& newSize)
 void Shell::resizeEvent(QResizeEvent *ev)
 {
 	if (!m_attached) {
-		QWidget::resizeEvent(ev);
+		ShellWidget::resizeEvent(ev);
 		return;
 	}
 
 	resizeNeovim(ev->size());
-	QWidget::resizeEvent(ev);
+	ShellWidget::resizeEvent(ev);
 }
 
 /**
@@ -896,7 +705,7 @@ void Shell::tooltip(const QString& text)
 	}
 
 	if ( !m_tooltip->isVisible() ) {
-		m_tooltip->setMinimumHeight(neovimRowHeight());
+		m_tooltip->setMinimumHeight(cellSize().height());
 		m_tooltip->move(neovimCursorTopLeft() );
 		m_tooltip->show();
 	}
@@ -922,7 +731,7 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 	if ( query == Qt::ImFont) {
 		return font();
 	} else if ( query == Qt::ImMicroFocus ) {
-		return QRect(neovimCursorTopLeft(), QSize(0, neovimRowHeight()));
+		return QRect(neovimCursorTopLeft(), QSize(0, cellSize().height()));
 	}
 
 	return QVariant();

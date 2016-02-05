@@ -62,9 +62,9 @@ if(MSVC)
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
 endif()
 
+enable_testing()
 add_subdirectory(src)
 add_subdirectory(doc)
-enable_testing()
 add_subdirectory(test)
 
 # Bindings
