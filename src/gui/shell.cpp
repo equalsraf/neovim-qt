@@ -859,6 +859,18 @@ void Shell::closeEvent(QCloseEvent *ev)
 	}
 }
 
+void Shell::focusInEvent(QFocusEvent *ev)
+{
+	m_nvim->neovimObject()->vim_input("<FocusGained>");
+	QWidget::focusInEvent(ev);
+}
+
+void Shell::focusOutEvent(QFocusEvent *ev)
+{
+	m_nvim->neovimObject()->vim_input("<FocusLost>");
+	QWidget::focusOutEvent(ev);
+}
+
 QColor Shell::color(qint64 color, const QColor& fallback)
 {
 	if (color == -1) {

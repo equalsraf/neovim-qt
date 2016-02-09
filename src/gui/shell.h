@@ -72,6 +72,8 @@ protected:
 	virtual void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
 	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
+	virtual void focusInEvent(QFocusEvent *ev) Q_DECL_OVERRIDE;
+	virtual void focusOutEvent(QFocusEvent *ev) Q_DECL_OVERRIDE;
 
 	virtual void handleResize(uint64_t cols, uint64_t rows);
 	virtual void handlePut(const QVariantList& args, QPainter&);
