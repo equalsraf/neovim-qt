@@ -33,18 +33,12 @@ build_script:
 - cmake -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=%configuration% -DCMAKE_INSTALL_PREFIX=../INSTALL ..
 # FYI CMAKE_BUILD_TYPE does not work with VS generators, use --config
 - cmake --build . --config %configuration% --target windeployqt
-- nuget pack -Version %PKG_VERSION% ..\contrib\neovim-qt.nuspec
 artifacts:
 - path: build/bin
   name: neovim-qt
 - path: 'build/*.nupkg'
   name: nupkgs
 deploy:
-  - provider: NuGet
-    server: https://www.myget.org/F/equalsraf/api/v2/package
-    api_key:
-      secure: /KlyY91ZSbxwxOjQQlKsNnvCg+m0xjwSwhwAsbg/cjwSm1sfMhIqUQA8K/qww6RM
-    skip_symbols: true
   - provider: GitHub
     description: Automated builds (Appveyor)
     auth_token:
