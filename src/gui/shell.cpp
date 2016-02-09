@@ -824,7 +824,6 @@ bool Shell::event(QEvent *event)
 #ifdef _WIN32
 	if (event->type() == QEvent::WinIdChange){
 		updateWindowId();
-		return true;
 	}
 #endif
 	return QWidget::event(event);
