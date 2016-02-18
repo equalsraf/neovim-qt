@@ -3,41 +3,23 @@ skip_tags: false
 os: MinGW
 shallow_clone: true
 environment:
-  VCINSTALLDIR: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\
   matrix:
-  - CMAKE_GENERATOR: Visual Studio 12
-    QTDIR: C:/Qt/5.4/msvc2013_opengl
+  - CMAKE_GENERATOR: MinGW Makefiles
+    QTDIR: C:\Qt\5.5\mingw492_32
+    MINGW: C:\Qt\Tools\mingw492_32
+    SCRIPT: contrib\appveyor-mingw.bat
+  - VCINSTALLDIR: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\
+    QTDIR: C:\Qt\5.5\msvc2013
+    SCRIPT: contrib\appveyor-msvc.bat
 configuration:
 - RelWithDebInfo
 matrix:
   fast_finish: true
 build_script:
-- set SEMVER=0.0.0
-# Build packages as 0.1.2-ci{build}
-- set PKG_VERSION=%SEMVER%-ci%APPVEYOR_BUILD_NUMBER%
-# Build packages for tags as 0.1.2-TAGNAME
-- if DEFINED APPVEYOR_REPO_TAG_NAME set PKG_VERSION=%SEMVER%-%APPVEYOR_REPO_TAG_NAME%
-- echo %PKG_VERSION%
-- set CMAKE_PREFIX_PATH=%QTDIR%
-- set PATH=%PATH%;%QTDIR%/bin
-# Build Msgpack
-- mkdir build-third-party
-- cd build-third-party
-  # FYI CMAKE_BUILD_TYPE does not work with VS generators, use --config
-- cmake -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=%configuration% -DCMAKE_INSTALL_PREFIX=../INSTALL ../third-party
-- cmake --build . --config %configuration% --target install
-- cd ..
-# Build nvim-qt
-- mkdir build
-- cd build
-- cmake -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=%configuration% -DCMAKE_INSTALL_PREFIX=../INSTALL ..
-# FYI CMAKE_BUILD_TYPE does not work with VS generators, use --config
-- cmake --build . --config %configuration% --target windeployqt
+- cmd: '%SCRIPT%'
 artifacts:
 - path: build/bin
   name: neovim-qt
-- path: 'build/*.nupkg'
-  name: nupkgs
 deploy:
   - provider: GitHub
     description: Automated builds (Appveyor)
