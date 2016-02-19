@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 
 #include <QCloseEvent>
+#include <QVBoxLayout>
 
 namespace NeovimQt {
 
@@ -9,8 +10,15 @@ MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
 	m_delayedShow(false)
 {
 	m_errorWidget = new ErrorWidget();
-	newDockWidgetFor(m_errorWidget);
 	m_errorWidget->setVisible(false);
+
+	QWidget *w = new QWidget(this);
+	m_layout = new QVBoxLayout(w);
+	m_layout->setSpacing(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
+	m_layout->addWidget(m_errorWidget);
+	w->setLayout(m_layout);
+	setCentralWidget(w);
 
 	init(c);
 }
@@ -26,7 +34,10 @@ void MainWindow::init(NeovimConnector *c)
 
 	m_nvim = c;
 	m_shell = new Shell(c);
-	setCentralWidget(m_shell);
+	m_shell->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	m_layout->takeAt(1);
+	m_layout->addWidget(m_shell);
+
 	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)),
 			this, SLOT(neovimSetTitle(const QString &)));
 	connect(m_nvim, &NeovimConnector::processExited,
@@ -42,17 +53,6 @@ void MainWindow::init(NeovimConnector *c)
 	if (m_nvim->errorCause()) {
 		neovimError(m_nvim->errorCause());
 	}
-}
-
-QDockWidget* MainWindow::newDockWidgetFor(QWidget *w)
-{
-	QDockWidget *dock = new QDockWidget(this);
-	dock->setAllowedAreas(Qt::TopDockWidgetArea);
-	dock->setWidget(w);
-	dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
-	dock->setTitleBarWidget(new QWidget(this));
-	addDockWidget(Qt::TopDockWidgetArea, dock);
-	return dock;
 }
 
 /** The Neovim process has exited */
