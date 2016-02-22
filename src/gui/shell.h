@@ -49,7 +49,8 @@ protected slots:
 	void neovimResizeFinished();
 	void mouseClickReset();
 	void mouseClickIncrement(Qt::MouseButton bt);
-        void init();
+	void init();
+	void attach();
 
 protected:
 	void tooltip(const QString& text);
