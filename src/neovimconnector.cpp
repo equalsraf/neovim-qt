@@ -191,6 +191,11 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 			c, SIGNAL(processExited(int)));
 	connect(p, &QProcess::started,
 			c, &NeovimConnector::discoverMetadata);
+
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	env.insert("NVIM_TUI_ENABLE_TRUE_COLOR", "1");
+	p->setProcessEnvironment(env);
+
 	p->start("nvim", args);
 	return c;
 }
