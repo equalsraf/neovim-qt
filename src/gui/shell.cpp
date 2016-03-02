@@ -80,7 +80,7 @@ QFont Shell::createFont(const QString& family)
 /**
  * Set the GUI font, or display the current font
  */
-bool Shell::setGuiFont(const QString& fdesc)
+bool Shell::setGuiFont(const QString& fdesc, bool force)
 {
 	if (fdesc.isEmpty()) {
 		QFontInfo fi(m_font);
@@ -114,15 +114,17 @@ bool Shell::setGuiFont(const QString& fdesc)
 		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
 		return false;
 	}
-	if ( !fi.fixedPitch() ) {
-		QString errmsg = QString("%1 is not a fixed pitch font").arg(f.family());
-		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
-		return false;
-	}
+	if (!force) {
+		if ( !fi.fixedPitch() ) {
+			QString errmsg = QString("%1 is not a fixed pitch font").arg(f.family());
+			m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
+			return false;
+		}
 
-	if (isBadMonospace(f)) {
-		QString errmsg = QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family());
-		m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
+		if (isBadMonospace(f)) {
+			QString errmsg = QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family());
+			m_nvim->neovimObject()->vim_report_error(m_nvim->encode(errmsg));
+		}
 	}
 
 	m_font = f;
@@ -573,9 +575,15 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 {
 	if (name == "Gui" && args.size() > 0) {
 		QString guiEvName = m_nvim->decode(args.at(0).toByteArray());
-		if (guiEvName == "SetFont" && args.size() == 2) {
-			QString fdesc = m_nvim->decode(args.at(1).toByteArray());
-			setGuiFont(fdesc);
+		if (guiEvName == "SetFont") {
+			if (args.size() == 2) {
+				QString fdesc = m_nvim->decode(args.at(1).toByteArray());
+				setGuiFont(fdesc);
+			} else if (args.size() == 3) {
+				QString fdesc = m_nvim->decode(args.at(1).toByteArray());
+				bool force = args.at(2) == 1;
+				setGuiFont(fdesc, force);
+			}
 		}
 		return;
 	} else if (name != "redraw") {
