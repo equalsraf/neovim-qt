@@ -121,6 +121,25 @@ QPoint Shell::neovimCursorTopLeft() const
 			m_cursor_pos.y()*cellSize().height());
 }
 
+/// Get the area filled by the cursor
+QRect Shell::neovimCursorRect() const
+{
+	return neovimCursorRect(m_cursor_pos);
+}
+
+/// Get the area filled by the cursor at an arbitrary
+/// position
+QRect Shell::neovimCursorRect(QPoint at) const
+{
+	const Cell& c = contents().constValue(at.y(), at.x());
+	bool wide = c.doubleWidth;
+	QRect r(neovimCursorTopLeft(), cellSize());
+	if (wide) {
+		r.setWidth(r.width()*2);
+	}
+	return r;
+}
+
 void Shell::neovimIsReady()
 {
 	if (!m_nvim || !m_nvim->neovimObject()) {
@@ -239,9 +258,9 @@ void Shell::handlePut(const QVariantList& args)
 				m_font_bold, m_font_italic,
 				m_font_underline, m_font_undercurl);
 		// Move cursor ahead
-		update(QRect(neovimCursorTopLeft(), cellSize()));
+		update(neovimCursorRect());
 		m_cursor_pos.setX(m_cursor_pos.x() + cols);
-		update(QRect(neovimCursorTopLeft(), cellSize()));
+		update(neovimCursorRect());
 	}
 
 }
@@ -263,15 +282,16 @@ void Shell::handleScroll(const QVariantList& args)
 	}
 	qint64 count = args.at(0).toULongLong();
 
+	// Keep track of the cursor position, repaint
+	// over its hold position after the scroll
+	QPoint old_cursor_pos = m_cursor_pos;
+	old_cursor_pos.setY(old_cursor_pos.y()-count);
+	QRect cr = neovimCursorRect(old_cursor_pos);
+
 	scrollShellRegion(m_scroll_region.top(), m_scroll_region.bottom(),
 			m_scroll_region.left(), m_scroll_region.right(),
 			count);
-
-	// Redraw over the old cursor - if it was painted earlier it will be
-	// scrolled with the content
-	QPoint old_cursor_pos = m_cursor_pos;
-	old_cursor_pos.setY(old_cursor_pos.y()-count);
-	update(absoluteShellRect(old_cursor_pos.y(), old_cursor_pos.x(), 1, 1));
+	update(cr);
 }
 
 void Shell::handleSetScrollRegion(const QVariantList& opargs)
@@ -375,9 +395,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 
 void Shell::setNeovimCursor(quint64 row, quint64 col)
 {
-	update(QRect(neovimCursorTopLeft(), cellSize()));
+	update(neovimCursorRect());
 	m_cursor_pos = QPoint(col, row);
-	update(QRect(neovimCursorTopLeft(), cellSize()));
+	update(neovimCursorRect());
 }
 
 void Shell::handleModeChange(const QString& mode)
@@ -480,10 +500,14 @@ void Shell::paintEvent(QPaintEvent *ev)
 	// paint cursor - we are not actually using Neovim colors yet,
 	// just invert the shell colors by painting white with XoR
 	if (ev->region().contains(neovimCursorTopLeft())) {
+		bool wide = contents().constValue(m_cursor_pos.y(),
+						m_cursor_pos.x()).doubleWidth;
 		QRect cursorRect(neovimCursorTopLeft(), cellSize());
 
 		if (m_insertMode) {
 			cursorRect.setWidth(2);
+		} else if (wide) {
+			cursorRect.setWidth(cursorRect.width()*2);
 		}
 		QPainter painter(this);
 		painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);

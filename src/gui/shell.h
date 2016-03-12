@@ -63,6 +63,8 @@ protected:
 	quint64 neovimCellWidth() const;
 	QSize neovimSize() const;
 	QPoint neovimCursorTopLeft() const;
+	QRect neovimCursorRect() const;
+	QRect neovimCursorRect(QPoint at) const;
 	QSize neovimCharSize() const;
 	void setNeovimCursor(quint64 col, quint64 row);
 

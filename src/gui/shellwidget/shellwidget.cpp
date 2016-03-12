@@ -107,32 +107,40 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 		for (int i=start_row; i<=end_row && i < m_contents.rows(); i++) {
 			for (int j=start_col; j<=end_col && j < m_contents.columns();
 					j++) {
-				QRect r = absoluteShellRect(i, j, 1, 1);
+
 				const Cell& cell = m_contents.constValue(i,j);
-				if (cell.backgroundColor.isValid()) {
-					p.fillRect(r, cell.backgroundColor);
-				} else {
-					p.fillRect(r, m_bgColor);
-				}
-				if (cell.foregroundColor.isValid()) {
-					p.setPen(cell.foregroundColor);
-				} else {
-					p.setPen(m_fgColor);
-				}
+				int chars = cell.doubleWidth ? 2 : 1;
+				QRect r = absoluteShellRect(i, j, 1, chars);
 
-				if (cell.bold || cell.italic || cell.underline) {
-					QFont f = p.font();
-					f.setBold(cell.bold);
-					f.setItalic(cell.italic);
-					f.setUnderline(cell.underline);
-					p.setFont(f);
-				} else {
-					p.setFont(font());
-				}
+				if (j <= 0 || !contents().constValue(i, j-1).doubleWidth) {
+					// Only paint bg/fg if this is not the second cell
+					// of a wide char
+					if (cell.backgroundColor.isValid()) {
+						p.fillRect(r, cell.backgroundColor);
+					} else {
+						p.fillRect(r, m_bgColor);
+					}
 
-				// Draw chars at the baseline
-				QPoint pos(r.left(), r.top()+m_ascent);
-				p.drawText(pos, QString::fromRawData(&cell.c, 1));
+					if (cell.foregroundColor.isValid()) {
+						p.setPen(cell.foregroundColor);
+					} else {
+						p.setPen(m_fgColor);
+					}
+
+					if (cell.bold || cell.italic || cell.underline) {
+						QFont f = p.font();
+						f.setBold(cell.bold);
+						f.setItalic(cell.italic);
+						f.setUnderline(cell.underline);
+						p.setFont(f);
+					} else {
+						p.setFont(font());
+					}
+
+					// Draw chars at the baseline
+					QPoint pos(r.left(), r.top()+m_ascent);
+					p.drawText(pos, QString::fromRawData(&cell.c, 1));
+				}
 
 				// Draw "undercurl" at the bottom of the cell
 				if (cell.undercurl) {
