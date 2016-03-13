@@ -120,10 +120,8 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 	}
 }
 
-/**
- * Call show() after a 1s delay or when Neovim connects,
- * whichever comes first
- */
+/// Call show() after a 1s delay or when Neovim attachment
+/// is complete, whichever comes first
 void MainWindow::delayedShow(bool enable)
 {
 	if (m_nvim->errorCause() != NeovimConnector::NoError) {
@@ -136,6 +134,7 @@ void MainWindow::delayedShow(bool enable)
 		QTimer *t = new QTimer(this);
 		t->setSingleShot(true);
 		t->setInterval(1000);
+		connect(m_shell, &Shell::neovimResized, this, &QMainWindow::show);
 		connect(t, &QTimer::timeout, this, &QMainWindow::show);
 		t->start();
 	}
