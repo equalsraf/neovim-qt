@@ -34,6 +34,7 @@ public:
 signals:
 	void neovimTitleChanged(const QString &title);
 	void neovimBusy(bool);
+	void neovimResized(int rows, int cols);
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);

@@ -216,6 +216,7 @@ void Shell::handleResize(uint64_t n_cols, uint64_t n_rows)
 
 	if (needs_resize) {
 		updateGeometry();
+		emit neovimResized(rows(), columns());
 	}
 }
 
