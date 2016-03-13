@@ -29,6 +29,8 @@ void MainWindow::init(NeovimConnector *c)
 	setCentralWidget(m_shell);
 	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)),
 			this, SLOT(neovimSetTitle(const QString &)));
+	connect(m_shell, &Shell::neovimResized,
+			this, &MainWindow::neovimWidgetResized);
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &MainWindow::neovimExited);
 	connect(m_nvim, &NeovimConnector::error,
@@ -88,6 +90,16 @@ void MainWindow::neovimError(NeovimConnector::NeovimError err)
 void MainWindow::neovimSetTitle(const QString &title)
 {
 	this->setWindowTitle(title);
+}
+
+void MainWindow::neovimWidgetResized()
+{
+	if (isMaximized() || isFullScreen()) {
+		// FIXME: for now do nothing, we may have to trigger
+		// a shell resize here
+	} else {
+		resize(sizeHint());
+	}
 }
 
 void MainWindow::reconnectNeovim()

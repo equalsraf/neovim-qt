@@ -183,6 +183,7 @@ void ShellWidget::resizeEvent(QResizeEvent *ev)
 	int cols = ev->size().width() / m_cellSize.width();
 	int rows = ev->size().height() / m_cellSize.height();
 	resizeShell(rows, cols);
+	QWidget::resizeEvent(ev);
 }
 
 QSize ShellWidget::sizeHint() const
@@ -191,9 +192,12 @@ QSize ShellWidget::sizeHint() const
 				m_cellSize.height()*m_contents.rows());
 }
 
-void ShellWidget::resizeShell(int rows, int columns)
+void ShellWidget::resizeShell(int n_rows, int n_columns)
 {
-	m_contents.resize(rows, columns);
+	if (n_rows != rows() || n_columns != columns()) {
+		m_contents.resize(n_rows, n_columns);
+		updateGeometry();
+	}
 }
 
 void ShellWidget::setBackground(const QColor& color)

@@ -199,25 +199,31 @@ void Shell::neovimExited(int status)
 	}
 }
 
-/**
- * Neovim requested a resize
- *
- * - update cols/rows
- * - reset the cursor, scroll_region
- */
+/// Neovim requested a resize
+///
+/// - update cols/rows
+/// - reset the cursor, scroll_region
 void Shell::handleResize(uint64_t n_cols, uint64_t n_rows)
 {
-	// TODO: figure out how to handle cases when Neovim wants one
-	// size but the user is resizing to another
-	bool needs_resize = (n_rows != rows() || n_cols != columns());
-	resizeShell(n_rows, n_cols);
 	m_cursor_pos = QPoint(0,0);
 	m_scroll_region = QRect(QPoint(0,0), QPoint(columns(), rows()));
 
-	if (needs_resize) {
-		updateGeometry();
-		emit neovimResized(rows(), columns());
+	resizeShell(n_rows, n_cols);
+	if (isWindow()) {
+		// Never call resize on a maximized window
+		// QTBUG-45806
+		if (isMaximized() || isFullScreen()) {
+			// Resize Neovim to fill the window
+			int pref_cols = size().width()/cellSize().width();
+			int pref_rows = size().height()/cellSize().height();
+			if (columns() != pref_cols || rows() != pref_rows) {
+				resizeNeovim(pref_cols, pref_rows);
+			}
+		} else {
+			resize(sizeHint());
+		}
 	}
+	emit neovimResized(rows(), columns());
 }
 
 void Shell::handleHighlightSet(const QVariantMap& attrs)
@@ -636,14 +642,30 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	m_nvim->neovimObject()->vim_input(inp.toLatin1());
 }
 
+/// Resize remote Neovim (pixel coordinates)
+///
+/// The given size is rounded down to the nearest
+/// row/column count.
 void Shell::resizeNeovim(const QSize& newSize)
 {
 	uint64_t n_cols = newSize.width()/cellSize().width();
 	uint64_t n_rows = newSize.height()/cellSize().height();
+	resizeNeovim(n_cols, n_rows);
+}
 
-	// Neovim will ignore simultaneous calls to ui_try_resize
-	if (!m_resizing && m_nvim && m_attached &&
-			(n_cols != columns() || n_rows != rows()) ) {
+/// Resize remote Neovim.
+///
+/// Neovim ignores concurrent resizes. If you call this method while
+/// a resize is already in progress, the later call is delayed until
+/// the previous one is finished.
+void Shell::resizeNeovim(uint64_t n_cols, uint64_t n_rows)
+{
+	if (!m_nvim || !m_attached || (n_cols == columns() && n_rows == rows())) {
+		return;
+	}
+	if (m_resizing) {
+		m_resize_neovim_pending = QSize(n_cols, n_rows);
+	} else {
 		m_nvim->neovimObject()->ui_try_resize(n_cols, n_rows);
 		m_resizing = true;
 	}
@@ -666,6 +688,11 @@ void Shell::resizeEvent(QResizeEvent *ev)
 void Shell::neovimResizeFinished()
 {
 	m_resizing = false;
+	if (m_resize_neovim_pending.isValid()) {
+		resizeNeovim(m_resize_neovim_pending.width(),
+				m_resize_neovim_pending.height());
+		m_resize_neovim_pending = QSize();
+	}
 }
 
 void Shell::changeEvent( QEvent *ev)

@@ -39,6 +39,7 @@ signals:
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
+	void resizeNeovim(uint64_t n_cols, uint64_t n_rows);
 	bool setGuiFont(const QString& fdesc);
 
 protected slots:
@@ -107,6 +108,7 @@ private:
 	bool m_cursor;
 	bool m_insertMode;
 	bool m_resizing;
+	QSize m_resize_neovim_pending;
 	QLabel *m_tooltip;
         QPixmap m_logo;
 	QPoint m_mouse_pos;

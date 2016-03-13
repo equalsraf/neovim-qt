@@ -22,6 +22,7 @@ protected:
 	void showIfDelayed();
 private slots:
 	void neovimSetTitle(const QString &title);
+	void neovimWidgetResized();
 	void neovimExited(int status);
 	void neovimError(NeovimConnector::NeovimError);
 	void reconnectNeovim();
