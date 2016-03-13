@@ -11,6 +11,8 @@ ShellWidget::ShellWidget(QWidget *parent)
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_KeyCompression, false);
 	setFocusPolicy(Qt::StrongFocus);
+	setSizePolicy(QSizePolicy::Expanding,
+			QSizePolicy::Expanding);
 	setMouseTracking(true);
 
 	setDefaultFont();
