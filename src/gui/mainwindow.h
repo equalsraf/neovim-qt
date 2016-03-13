@@ -25,7 +25,6 @@ private slots:
 	void neovimExited(int status);
 	void neovimError(NeovimConnector::NeovimError);
 	void reconnectNeovim();
-	void neovimWidgetResized(const QSize& newSize);
 private:
 	void init(NeovimConnector *);
         NeovimConnector *m_nvim;

@@ -33,7 +33,6 @@ public:
 
 signals:
 	void neovimTitleChanged(const QString &title);
-	void neovimResized(const QSize& newSize);
 	void neovimBusy(bool);
 
 public slots:
@@ -57,15 +56,9 @@ protected:
 	virtual void inputMethodEvent(QInputMethodEvent *event) Q_DECL_OVERRIDE;
 	virtual void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
 
-	int neovimWidth() const;
-	int neovimHeight() const;
-	quint64 neovimRowHeight() const;
-	quint64 neovimCellWidth() const;
-	QSize neovimSize() const;
 	QPoint neovimCursorTopLeft() const;
 	QRect neovimCursorRect() const;
 	QRect neovimCursorRect(QPoint at) const;
-	QSize neovimCharSize() const;
 	void setNeovimCursor(quint64 col, quint64 row);
 
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
