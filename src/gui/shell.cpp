@@ -162,21 +162,21 @@ void Shell::neovimFontVarOk(quint32, Function::FunctionId, const QVariant& ret)
 
 /**
  * Attach to Neovim UI and connect the necessary signals. This is called
- * after we know the font metrics (and the expected window dimensions)
+ * after we know the font metrics
  */
 void Shell::init()
 {
-	// FIXME: Don't set this here, wait for return from ui_attach instead
-	setAttached(true);
-
 	connect(m_nvim->neovimObject(), &Neovim::neovimNotification,
 			this, &Shell::handleNeovimNotification);
-	// FIXME: this API will change
-	QRect screenRect = QApplication::desktop()->availableGeometry(this);
-	m_nvim->attachUi(screenRect.width()*0.66/cellSize().width(), screenRect.height()*0.66/cellSize().height());
-
 	connect(m_nvim->neovimObject(), &Neovim::on_ui_try_resize,
 			this, &Shell::neovimResizeFinished);
+
+	QRect screenRect = QApplication::desktop()->availableGeometry(this);
+	// FIXME: this API will change
+	MsgpackRequest *req = m_nvim->attachUi(screenRect.width()*0.66/cellSize().width(),
+			screenRect.height()*0.66/cellSize().height());
+	connect(req, &MsgpackRequest::finished,
+			this, &Shell::setAttached);
 
 	// Subscribe to GUI events
 	m_nvim->neovimObject()->vim_subscribe("Gui");

@@ -86,9 +86,11 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseMoveEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 
+private slots:
+        void setAttached(bool attached=true);
+
 private:
 	bool m_attached;
-        void setAttached(bool);
 
 	NeovimConnector *m_nvim;
 

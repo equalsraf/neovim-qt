@@ -61,7 +61,7 @@ public:
 	QString errorString();
 
 	// FIXME: remove this
-	void attachUi(int64_t width, int64_t height);
+	MsgpackRequest* attachUi(int64_t width, int64_t height);
 	void detachUi();
 
 	bool isReady();

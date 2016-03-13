@@ -85,7 +85,7 @@ QString NeovimConnector::errorString()
  * to receive UI events. With/Height are expressed in cells.
  * \warning This method might be moved to class Neovim
  */
-void NeovimConnector::attachUi(int64_t width, int64_t height)
+MsgpackRequest* NeovimConnector::attachUi(int64_t width, int64_t height)
 {
 	// FIXME: this should be in class Neovim
 	MsgpackRequest *r = m_dev->startRequestUnchecked("ui_attach", 3);
@@ -96,6 +96,7 @@ void NeovimConnector::attachUi(int64_t width, int64_t height)
 	m_dev->send(width);
 	m_dev->send(height);
 	m_dev->send(true);
+	return r;
 }
 
 /**
