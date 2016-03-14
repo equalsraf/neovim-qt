@@ -179,8 +179,18 @@ Neovim* NeovimConnector::neovimObject()
 NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 {
 	QProcess *p = new QProcess();
-	QStringList args = params;
-	args << "--embed" << "--headless";
+	QStringList args;
+	if (params.indexOf("--") == -1) {
+		args.append(params);
+		args << "--embed" << "--headless";
+	} else {
+		// Neovim accepts a -- argument after which only
+		// filenames are passed
+		int idx = params.indexOf("--");
+		args.append(params.mid(0, idx));
+		args << "--embed" << "--headless";
+		args.append(params.mid(idx));
+	}
 
 	NeovimConnector *c = new NeovimConnector(p);
 	c->m_ctype = SpawnedConnection;
