@@ -54,6 +54,8 @@ int main(int argc, char **argv)
 		QCoreApplication::translate("main", "geometry")));
 	parser.addOption(QCommandLineOption("maximized",
 		QCoreApplication::translate("main", "Maximize the window on startup")));
+	parser.addOption(QCommandLineOption("fullscreen",
+		QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
 	parser.addPositionalArgument("...", "Additional arguments are fowarded to Neovim", "[-- ...]");
 	parser.addHelpOption();
 
@@ -86,14 +88,18 @@ int main(int argc, char **argv)
 #ifdef NEOVIMQT_GUI_WIDGET
 	NeovimQt::Shell *win = new NeovimQt::Shell(c);
 	win->show();
-	if (parser.isSet("maximized")) {
+	if (parser.isSet("fullscreen")) {
+		win->showFullScreen();
+	} else if (parser.isSet("maximized")) {
 		win->showMaximized();
 	} else {
 		win->show();
 	}
 #else
 	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c);
-	if (parser.isSet("maximized")) {
+	if (parser.isSet("fullscreen")) {
+		win->delayedShow(NeovimQt::MainWindow::DelayedShow::FullScreen);
+	} else if (parser.isSet("maximized")) {
 		win->delayedShow(NeovimQt::MainWindow::DelayedShow::Maximized);
 	} else {
 		win->delayedShow();
