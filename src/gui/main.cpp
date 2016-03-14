@@ -2,6 +2,7 @@
 #include <QFontDatabase>
 #include <QtGlobal>
 #include <QFile>
+#include <QCommandLineParser>
 #include "neovimconnector.h"
 #include "mainwindow.h"
 
@@ -42,23 +43,41 @@ int main(int argc, char **argv)
 		qInstallMessageHandler(logger);
 	}
 
-	QStringList args = app.arguments().mid(1);
+	QCommandLineParser parser;
+	parser.addOption(QCommandLineOption("embed",
+		QCoreApplication::translate("main", "Communicate with Neovim over stdin/out")));
+	parser.addOption(QCommandLineOption("server",
+		QCoreApplication::translate("main", "Connect to existing Neovim instance"),
+		QCoreApplication::translate("main", "addr")));
+	parser.addOption(QCommandLineOption("geometry",
+		QCoreApplication::translate("main", "Initial window geometry"),
+		QCoreApplication::translate("main", "geometry")));
+	parser.addPositionalArgument("...", "Additional arguments are fowarded to Neovim", "[-- ...]");
+	parser.addHelpOption();
+
+	int sep = app.arguments().indexOf("--");
+	QStringList neovimArgs;
+	if (sep != -1) {
+		QStringList args = app.arguments().mid(0, sep);
+		neovimArgs += app.arguments().mid(sep+1);
+		parser.process(app.arguments());
+	} else {
+		parser.process(app.arguments());
+	}
+
+	if (parser.isSet("help")) {
+		parser.showHelp();
+	}
+
 	NeovimQt::NeovimConnector *c;
-	if (args.indexOf("--embed") != -1) {
+	if (parser.isSet("embed")) {
 		c = NeovimQt::NeovimConnector::fromStdinOut();
 	} else {
-		QString server;
-		int serverIdx = args.indexOf("--server");
-		if (serverIdx != -1 && args.size() > serverIdx+1) {
-			server = args.at(serverIdx+1);
-			args.removeAt(serverIdx);
-			args.removeAt(serverIdx);
-		}
-
-		if (!server.isEmpty()) {
+		if (parser.isSet("server")) {
+			QString server = parser.value("server");
 			c = NeovimQt::NeovimConnector::connectToNeovim(server);
 		} else {
-			c = NeovimQt::NeovimConnector::spawn(args);
+			c = NeovimQt::NeovimConnector::spawn(neovimArgs);
 		}
 	}
 
