@@ -6,7 +6,7 @@ namespace NeovimQt {
 
 MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
 :QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
-	m_delayedShow(false)
+	m_delayedShow(DelayedShow::Disabled)
 {
 	m_errorWidget = new ErrorWidget();
 	newDockWidgetFor(m_errorWidget);
@@ -122,30 +122,36 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 
 /// Call show() after a 1s delay or when Neovim attachment
 /// is complete, whichever comes first
-void MainWindow::delayedShow(bool enable)
+void MainWindow::delayedShow(DelayedShow type)
 {
+	m_delayedShow = type;
 	if (m_nvim->errorCause() != NeovimConnector::NoError) {
-		show();
+		showIfDelayed();
 		return;
 	}
 
-	m_delayedShow = enable;
-	if (enable) {
+	if (type != DelayedShow::Disabled) {
 		QTimer *t = new QTimer(this);
 		t->setSingleShot(true);
 		t->setInterval(1000);
-		connect(m_shell, &Shell::neovimResized, this, &QMainWindow::show);
-		connect(t, &QTimer::timeout, this, &QMainWindow::show);
+		connect(m_shell, &Shell::neovimResized, this, &MainWindow::showIfDelayed);
+		connect(t, &QTimer::timeout, this, &MainWindow::showIfDelayed);
 		t->start();
 	}
 }
 
 void MainWindow::showIfDelayed()
 {
-	if (m_delayedShow && !isVisible()) {
-		this->show();
+	if (!isVisible()) {
+		if (m_delayedShow == DelayedShow::Normal) {
+			show();
+		} else if (m_delayedShow == DelayedShow::Maximized) {
+			showMaximized();
+		} else if (m_delayedShow == DelayedShow::FullScreen) {
+			showFullScreen();
+		}
 	}
-	m_delayedShow = false;
+	m_delayedShow = DelayedShow::Disabled;
 }
 
 } // Namespace

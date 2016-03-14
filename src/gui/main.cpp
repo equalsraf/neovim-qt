@@ -52,6 +52,8 @@ int main(int argc, char **argv)
 	parser.addOption(QCommandLineOption("geometry",
 		QCoreApplication::translate("main", "Initial window geometry"),
 		QCoreApplication::translate("main", "geometry")));
+	parser.addOption(QCommandLineOption("maximized",
+		QCoreApplication::translate("main", "Maximize the window on startup")));
 	parser.addPositionalArgument("...", "Additional arguments are fowarded to Neovim", "[-- ...]");
 	parser.addHelpOption();
 
@@ -84,9 +86,18 @@ int main(int argc, char **argv)
 #ifdef NEOVIMQT_GUI_WIDGET
 	NeovimQt::Shell *win = new NeovimQt::Shell(c);
 	win->show();
+	if (parser.isSet("maximized")) {
+		win->showMaximized();
+	} else {
+		win->show();
+	}
 #else
 	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c);
-	win->delayedShow();
+	if (parser.isSet("maximized")) {
+		win->delayedShow(NeovimQt::MainWindow::DelayedShow::Maximized);
+	} else {
+		win->delayedShow();
+	}
 #endif
 	return app.exec();
 }
