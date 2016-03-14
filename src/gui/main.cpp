@@ -6,14 +6,13 @@
 #include "neovimconnector.h"
 #include "mainwindow.h"
 
-/**
- * A log handler for Qt messages, all messages are dumped into the file
- * passed via the NVIM_QT_LOG variable. Some information is only available
- * in debug builds (e.g. qDebug is only called in debug builds).
- *
- * In UNIX Qt prints messages to the console output, but in Windows this is
- * the only way to get Qt's debug/warning messages.
- */
+
+/// A log handler for Qt messages, all messages are dumped into the file
+/// passed via the NVIM_QT_LOG variable. Some information is only available
+/// in debug builds (e.g. qDebug is only called in debug builds).
+///
+/// In UNIX Qt prints messages to the console output, but in Windows this is
+/// the only way to get Qt's debug/warning messages.
 void logger(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
 	QFile logFile(qgetenv("NVIM_QT_LOG"));
@@ -23,16 +22,6 @@ void logger(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 	}
 }
 
-/**
- * Neovim Qt GUI
- *
- * Usage:
- *   nvim-qt --server <SOCKET>
- *   nvim-qt [...]
- *
- * When --server is not provided, a Neovim instance will be spawned. All arguments
- * are passed to the Neovim process.
- */
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
