@@ -22,6 +22,7 @@ class Shell: public ShellWidget
 {
 	Q_OBJECT
 	Q_PROPERTY(bool neovimBusy READ neovimBusy() NOTIFY neovimBusy())
+	Q_PROPERTY(bool neovimAttached READ neovimAttached() NOTIFY neovimAttached())
 public:
 	Shell(NeovimConnector *nvim, QWidget *parent=0);
 	~Shell();
@@ -30,11 +31,13 @@ public:
 	static bool isBadMonospace(const QFont& f);
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
+	bool neovimAttached() const;
 
 signals:
 	void neovimTitleChanged(const QString &title);
 	void neovimBusy(bool);
 	void neovimResized(int rows, int cols);
+	void neovimAttached(bool);
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);

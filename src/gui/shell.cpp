@@ -111,6 +111,7 @@ Shell::~Shell()
 void Shell::setAttached(bool attached)
 {
 	m_attached = attached;
+	emit neovimAttached(attached);
 	update();
 }
 
@@ -776,6 +777,11 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 bool Shell::neovimBusy() const
 {
 	return m_neovimBusy;
+}
+
+bool Shell::neovimAttached() const
+{
+	return m_attached;
 }
 
 /**
