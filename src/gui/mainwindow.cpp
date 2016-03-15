@@ -9,8 +9,8 @@ MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
 	m_delayedShow(DelayedShow::Disabled)
 {
 	m_errorWidget = new ErrorWidget();
-	newDockWidgetFor(m_errorWidget);
-	m_errorWidget->setVisible(false);
+	m_stack.addWidget(m_errorWidget);
+	setCentralWidget(&m_stack);
 
 	init(c);
 }
@@ -19,6 +19,7 @@ void MainWindow::init(NeovimConnector *c)
 {
 	if (m_shell) {
 		m_shell->deleteLater();
+		m_stack.removeWidget(m_shell);
 	}
 	if (m_nvim) {
 		m_nvim->deleteLater();
@@ -26,7 +27,8 @@ void MainWindow::init(NeovimConnector *c)
 
 	m_nvim = c;
 	m_shell = new Shell(c);
-	setCentralWidget(m_shell);
+	m_stack.insertWidget(1, m_shell);
+	m_stack.setCurrentIndex(1);
 	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)),
 			this, SLOT(neovimSetTitle(const QString &)));
 	connect(m_shell, &Shell::neovimResized,
@@ -44,17 +46,6 @@ void MainWindow::init(NeovimConnector *c)
 	}
 }
 
-QDockWidget* MainWindow::newDockWidgetFor(QWidget *w)
-{
-	QDockWidget *dock = new QDockWidget(this);
-	dock->setAllowedAreas(Qt::TopDockWidgetArea);
-	dock->setWidget(w);
-	dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
-	dock->setTitleBarWidget(new QWidget(this));
-	addDockWidget(Qt::TopDockWidgetArea, dock);
-	return dock;
-}
-
 /** The Neovim process has exited */
 void MainWindow::neovimExited(int status)
 {
@@ -63,11 +54,11 @@ void MainWindow::neovimExited(int status)
 	if (m_nvim->errorCause() != NeovimConnector::NoError) {
 		m_errorWidget->setText(m_nvim->errorString());
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
-		m_errorWidget->setVisible(true);
+		m_stack.setCurrentIndex(0);
 	} else if (status != 0) {
 		m_errorWidget->setText(QString("Neovim exited with status code (%1)").arg(status));
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
-		m_errorWidget->setVisible(true);
+		m_stack.setCurrentIndex(0);
 	} else {
 		close();
 	}
@@ -84,7 +75,7 @@ void MainWindow::neovimError(NeovimConnector::NeovimError err)
 		m_errorWidget->setText(m_nvim->errorString());
 	}
 	m_errorWidget->showReconnect(m_nvim->canReconnect());
-	m_errorWidget->setVisible(true);
+	m_stack.setCurrentIndex(0);
 }
 
 void MainWindow::neovimSetTitle(const QString &title)
@@ -107,7 +98,7 @@ void MainWindow::reconnectNeovim()
 	if (m_nvim->canReconnect()) {
 		init(m_nvim->reconnect());
 	}
-	m_errorWidget->setVisible(false);
+	m_stack.setCurrentIndex(1);
 }
 
 void MainWindow::closeEvent(QCloseEvent *ev)

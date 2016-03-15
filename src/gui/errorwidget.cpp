@@ -1,5 +1,6 @@
 #include "errorwidget.h"
 
+#include <QVBoxLayout>
 #include <QHBoxLayout>
 
 namespace NeovimQt {
@@ -10,14 +11,23 @@ ErrorWidget::ErrorWidget(QWidget *parent)
 	m_errorLabel = new QLabel();
 	m_closeButton = new QPushButton(tr("Retry"));
 
+	m_image = new QLabel();
+	m_image->setPixmap(QPixmap(":/neovim.png").scaled(64, 64, Qt::KeepAspectRatio));
+
 	connect(m_closeButton, &QPushButton::clicked,
 			this, &ErrorWidget::reconnectNeovim);
 
-	QHBoxLayout *layout = new QHBoxLayout();
-	layout->addWidget(m_errorLabel);
-	layout->addStretch();
-	layout->addWidget(m_closeButton);
-	setLayout(layout);
+	QHBoxLayout *inner_layout = new QHBoxLayout();
+	inner_layout->addStretch();
+	inner_layout->addWidget(m_image);
+	inner_layout->addWidget(m_errorLabel);
+	inner_layout->addWidget(m_closeButton);
+	inner_layout->addStretch();
+	QVBoxLayout *outer_layout = new QVBoxLayout();
+	outer_layout->addStretch();
+	outer_layout->addLayout(inner_layout);
+	outer_layout->addStretch();
+	setLayout(outer_layout);
 }
 
 void ErrorWidget::setText(const QString& text)

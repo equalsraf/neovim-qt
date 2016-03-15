@@ -19,6 +19,7 @@ signals:
 
 private:
 	QLabel *m_errorLabel;
+	QLabel *m_image;
 	QPushButton *m_closeButton;
 };
 

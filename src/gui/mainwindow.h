@@ -2,7 +2,7 @@
 #define NEOVIM_QT_MAINWINDOW
 
 #include <QMainWindow>
-#include <QDockWidget>
+#include <QStackedWidget>
 #include "neovimconnector.h"
 #include "errorwidget.h"
 #include "shell.h"
@@ -24,7 +24,6 @@ public:
 public slots:
 	void delayedShow(DelayedShow type=DelayedShow::Normal);
 protected:
-        QDockWidget* newDockWidgetFor(QWidget *);
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 private slots:
 	void neovimSetTitle(const QString &title);
@@ -39,6 +38,7 @@ private:
 	ErrorWidget *m_errorWidget;
 	Shell *m_shell;
 	DelayedShow m_delayedShow;
+	QStackedWidget m_stack;
 };
 
 } // Namespace
