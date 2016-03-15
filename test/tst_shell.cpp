@@ -22,6 +22,23 @@ private slots:
 			QVERIFY(SPYWAIT(onResize));
 		}
 	}
+
+	void uiStart() {
+		QStringList args;
+		args << "-u" << "NONE";
+		NeovimConnector *c = NeovimConnector::spawn(args);
+		Shell *s = new Shell(c);
+		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QVERIFY(onAttached.isValid());
+		QVERIFY(SPYWAIT(onAttached));
+		QVERIFY(s->neovimAttached());
+
+		s->repaint();
+
+		QPixmap p = s->grab();
+		p.save("tst_shell_start.jpg");
+
+	}
 protected:
 	NeovimQt::NeovimConnector *m_c;
 };
