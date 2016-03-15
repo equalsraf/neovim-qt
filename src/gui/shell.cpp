@@ -209,16 +209,7 @@ void Shell::handleResize(uint64_t n_cols, uint64_t n_rows)
 	if (isWindow()) {
 		// Never call resize on a maximized window
 		// QTBUG-45806
-		if (isMaximized() || isFullScreen()) {
-			// Resize Neovim to fill the window
-			int pref_cols = size().width()/cellSize().width();
-			int pref_rows = size().height()/cellSize().height();
-			if (columns() != pref_cols || rows() != pref_rows) {
-				resizeNeovim(pref_cols, pref_rows);
-			}
-		} else {
-			resize(sizeHint());
-		}
+		resizeNeovim(size());
 	}
 	emit neovimResized(rows(), columns());
 }

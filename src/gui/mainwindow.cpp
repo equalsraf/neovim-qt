@@ -88,7 +88,7 @@ void MainWindow::neovimWidgetResized()
 	if (isMaximized() || isFullScreen()) {
 		m_shell->resizeNeovim(geometry().size());
 	} else {
-		resize(sizeHint());
+		m_shell->resizeNeovim(m_shell->size());
 	}
 }
 
