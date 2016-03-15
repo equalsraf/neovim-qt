@@ -17,7 +17,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
-	m_resizing(false), m_logo(QPixmap(":/neovim.png")),
+	m_resizing(false),
 	m_neovimBusy(false)
 {
 	setAttribute(Qt::WA_KeyCompression, false);
@@ -479,26 +479,11 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 	}
 }
 
-/**
- * Draws the Neovim logo at the center of the widget.
- * If the size is too small do nothing.
- */
-void Shell::paintLogo(QPainter& p)
-{
-	if (size().width() > m_logo.width() &&
-		size().height() > m_logo.height() ) {
-		int x = size().width()/2 - m_logo.width()/2;
-		int y = size().height()/2 - m_logo.height()/2;
-		p.drawPixmap(QPoint(x,y), m_logo);
-	}
-}
-
 void Shell::paintEvent(QPaintEvent *ev)
 {
 	if (!m_attached) {
 		QPainter painter(this);
-		painter.fillRect(rect(), Qt::white);
-		paintLogo(painter);
+		painter.fillRect(rect(), palette().window());
 		return;
 	}
 

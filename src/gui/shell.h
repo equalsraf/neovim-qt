@@ -110,7 +110,6 @@ private:
 	bool m_resizing;
 	QSize m_resize_neovim_pending;
 	QLabel *m_tooltip;
-        QPixmap m_logo;
 	QPoint m_mouse_pos;
 	// 2/3/4 mouse click tracking
 	QTimer m_mouseclick_timer;
