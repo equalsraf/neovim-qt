@@ -206,9 +206,8 @@ void Shell::neovimExited(int status)
 void Shell::handleResize(uint64_t n_cols, uint64_t n_rows)
 {
 	m_cursor_pos = QPoint(0,0);
-	m_scroll_region = QRect(QPoint(0,0), QPoint(columns(), rows()));
-
 	resizeShell(n_rows, n_cols);
+	m_scroll_region = QRect(QPoint(0,0), QPoint(n_cols, n_rows));
 	if (isWindow()) {
 		// Never call resize on a maximized window
 		// QTBUG-45806
