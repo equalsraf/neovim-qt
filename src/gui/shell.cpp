@@ -645,7 +645,7 @@ void Shell::resizeNeovim(const QSize& newSize)
 /// the previous one is finished.
 void Shell::resizeNeovim(uint64_t n_cols, uint64_t n_rows)
 {
-	if (!m_nvim || !m_attached || (n_cols == columns() && n_rows == rows())) {
+	if (!m_nvim || (n_cols == columns() && n_rows == rows())) {
 		return;
 	}
 	if (m_resizing) {
