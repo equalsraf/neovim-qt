@@ -659,12 +659,12 @@ void Shell::resizeNeovim(uint64_t n_cols, uint64_t n_rows)
 void Shell::resizeEvent(QResizeEvent *ev)
 {
 	if (!m_attached) {
-		ShellWidget::resizeEvent(ev);
+		QWidget::resizeEvent(ev);
 		return;
 	}
 
 	resizeNeovim(ev->size());
-	ShellWidget::resizeEvent(ev);
+	QWidget::resizeEvent(ev);
 }
 
 /**
