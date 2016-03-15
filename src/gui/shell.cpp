@@ -185,10 +185,7 @@ void Shell::init()
 
 void Shell::neovimError(NeovimConnector::NeovimError err)
 {
-	if (m_attached) {
-		setAttached(false);
-		update();
-	}
+	setAttached(false);
 }
 
 /** The Neovim process has exited */
