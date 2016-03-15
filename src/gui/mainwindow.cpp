@@ -86,8 +86,7 @@ void MainWindow::neovimSetTitle(const QString &title)
 void MainWindow::neovimWidgetResized()
 {
 	if (isMaximized() || isFullScreen()) {
-		// FIXME: for now do nothing, we may have to trigger
-		// a shell resize here
+		m_shell->resizeNeovim(geometry().size());
 	} else {
 		resize(sizeHint());
 	}
