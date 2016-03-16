@@ -17,23 +17,25 @@ void TestInput::specialKeys()
 		QCOMPARE(input.convertKey("", k, Qt::NoModifier),
 			QString("<%1>").arg(input.specialKeys.value(k)));
 
-		QCOMPARE(input.convertKey("", k, Qt::ControlModifier),
 #ifdef Q_OS_MAC
-			// On Mac Control is actually the Cmd key, which we
-			// don't support yet
+		// On Mac Control is actually the Cmd key, which we
+		// don't support yet
+		QCOMPARE(input.convertKey("", k, Qt::ControlModifier),
 			QString("<D-%1>").arg(input.specialKeys.value(k)));
 #else
+		QCOMPARE(input.convertKey("", k, Qt::ControlModifier),
 			QString("<C-%1>").arg(input.specialKeys.value(k)));
 #endif
 
 		QCOMPARE(input.convertKey("", k, Qt::AltModifier),
 			QString("<A-%1>").arg(input.specialKeys.value(k)));
 
-		QCOMPARE(input.convertKey("", k, Qt::MetaModifier),
 #ifdef Q_OS_MAC
+		QCOMPARE(input.convertKey("", k, Qt::MetaModifier),
 			// On Mac Meta is actually the Control key
 			QString("<C-%1>").arg(input.specialKeys.value(k)));
 #else
+		QCOMPARE(input.convertKey("", k, Qt::MetaModifier),
 			// Meta is not handled right now
 			QString("<%1>").arg(input.specialKeys.value(k)));
 #endif
