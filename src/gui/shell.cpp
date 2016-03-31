@@ -279,14 +279,16 @@ void Shell::handleScroll(const QVariantList& args)
 
 	// Keep track of the cursor position, repaint
 	// over its old position after the scroll
-	QPoint old_cursor_pos = m_cursor_pos;
-	old_cursor_pos.setY(old_cursor_pos.y()-count);
-	QRect cr = neovimCursorRect(old_cursor_pos);
+	if (m_scroll_region.contains(m_cursor_pos)) {
+		QPoint old_cursor_pos = m_cursor_pos;
+		old_cursor_pos.setY(old_cursor_pos.y()-count);
+		QRect cr = neovimCursorRect(old_cursor_pos);
+		update(cr);
+	}
 
 	scrollShellRegion(m_scroll_region.top(), m_scroll_region.bottom(),
 			m_scroll_region.left(), m_scroll_region.right(),
 			count);
-	update(cr);
 }
 
 void Shell::handleSetScrollRegion(const QVariantList& opargs)
