@@ -621,8 +621,8 @@ void Shell::wheelEvent(QWheelEvent *ev)
 /// row/column count.
 void Shell::resizeNeovim(const QSize& newSize)
 {
-	uint64_t n_cols = newSize.width()/cellSize().width();
-	uint64_t n_rows = newSize.height()/cellSize().height();
+	int n_cols = newSize.width()/cellSize().width();
+	int n_rows = newSize.height()/cellSize().height();
 	resizeNeovim(n_cols, n_rows);
 }
 
@@ -631,7 +631,7 @@ void Shell::resizeNeovim(const QSize& newSize)
 /// Neovim ignores concurrent resizes. If you call this method while
 /// a resize is already in progress, the later call is delayed until
 /// the previous one is finished.
-void Shell::resizeNeovim(uint64_t n_cols, uint64_t n_rows)
+void Shell::resizeNeovim(int n_cols, int n_rows)
 {
 	if (!m_nvim || (n_cols == columns() && n_rows == rows())) {
 		return;
