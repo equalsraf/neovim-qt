@@ -123,6 +123,10 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 						p.fillRect(r, m_bgColor);
 					}
 
+					if (cell.c == ' ') {
+						continue;
+					}
+
 					if (cell.foregroundColor.isValid()) {
 						p.setPen(cell.foregroundColor);
 					} else {
@@ -141,7 +145,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 
 					// Draw chars at the baseline
 					QPoint pos(r.left(), r.top()+m_ascent);
-					p.drawText(pos, QString::fromRawData(&cell.c, 1));
+					p.drawText(pos, QString(cell.c));
 				}
 
 				// Draw "undercurl" at the bottom of the cell
