@@ -155,6 +155,13 @@ void MsgpackIODevice::dataAvailableStdin(const QByteArray& data)
  */
 void MsgpackIODevice::dataAvailableFd(int fd)
 {
+	if ( msgpack_unpacker_buffer_capacity(&m_uk) == 0 ) {
+		if ( !msgpack_unpacker_reserve_buffer(&m_uk, 8192 ) ) {
+			qFatal("Could not allocate memory in unpack buffer");
+			return;
+		}
+	}
+
 	qint64 bytes = read(fd, msgpack_unpacker_buffer(&m_uk),
 			msgpack_unpacker_buffer_capacity(&m_uk));
 	if (bytes > 0) {
@@ -180,8 +187,7 @@ void MsgpackIODevice::dataAvailable()
 	while (read > 0) {
 		if ( msgpack_unpacker_buffer_capacity(&m_uk) == 0 ) {
 			if ( !msgpack_unpacker_reserve_buffer(&m_uk, 8192 ) ) {
-				// FIXME: error out
-				qWarning() << "Could not allocate memory in unpack buffer";
+				qFatal("Could not allocate memory in unpack buffer");
 				return;
 			}
 		}
