@@ -278,7 +278,7 @@ void Shell::handleScroll(const QVariantList& args)
 	qint64 count = args.at(0).toULongLong();
 
 	// Keep track of the cursor position, repaint
-	// over its hold position after the scroll
+	// over its old position after the scroll
 	QPoint old_cursor_pos = m_cursor_pos;
 	old_cursor_pos.setY(old_cursor_pos.y()-count);
 	QRect cr = neovimCursorRect(old_cursor_pos);
