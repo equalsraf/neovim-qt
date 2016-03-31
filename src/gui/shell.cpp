@@ -254,7 +254,7 @@ void Shell::handlePut(const QVariantList& args)
 				m_font_underline, m_font_undercurl);
 		// Move cursor ahead
 		update(neovimCursorRect());
-		m_cursor_pos.setX(m_cursor_pos.x() + cols);
+		setNeovimCursor(m_cursor_pos.y(), m_cursor_pos.x()+cols);
 		update(neovimCursorRect());
 	}
 
