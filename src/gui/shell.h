@@ -46,8 +46,6 @@ public slots:
 	bool setGuiFont(const QString& fdesc);
 
 protected slots:
-	void neovimIsReady();
-        void neovimFontVarOk(quint32, Function::FunctionId, const QVariant&);
 	void neovimError(NeovimConnector::NeovimError);
 	void neovimExited(int);
 	void neovimResizeFinished();

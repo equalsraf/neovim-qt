@@ -42,7 +42,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	}
 
 	connect(m_nvim, &NeovimConnector::ready,
-			this, &Shell::neovimIsReady);
+			this, &Shell::init);
 	connect(m_nvim, &NeovimConnector::error,
 			this, &Shell::neovimError);
 	connect(m_nvim, &NeovimConnector::processExited,
@@ -51,7 +51,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 			this, &Shell::fontError);
 
 	if (m_nvim->isReady()) {
-		neovimIsReady();
+		init();
 	}
 }
 
@@ -118,6 +118,9 @@ void Shell::setAttached(bool attached)
 {
 	m_attached = attached;
 	emit neovimAttached(attached);
+	if (attached) {
+		m_nvim->neovimObject()->vim_command("runtime! ginit.vim");
+	}
 	update();
 }
 
@@ -147,32 +150,12 @@ QRect Shell::neovimCursorRect(QPoint at) const
 	return r;
 }
 
-void Shell::neovimIsReady()
+void Shell::init()
 {
 	if (!m_nvim || !m_nvim->neovimObject()) {
 		return;
 	}
 
-	// Check g:Guifont for a font from user settings
-	MsgpackRequest *r = m_nvim->neovimObject()->vim_get_var("Guifont");
-	connect(r, &MsgpackRequest::finished,
-			this, &Shell::neovimFontVarOk);
-	connect(r, &MsgpackRequest::error,
-			this, &Shell::init);
-}
-
-void Shell::neovimFontVarOk(quint32, Function::FunctionId, const QVariant& ret)
-{
-	setGuiFont(m_nvim->decode(ret.toByteArray()));
-	init();
-}
-
-/**
- * Attach to Neovim UI and connect the necessary signals. This is called
- * after we know the font metrics
- */
-void Shell::init()
-{
 	connect(m_nvim->neovimObject(), &Neovim::neovimNotification,
 			this, &Shell::handleNeovimNotification);
 	connect(m_nvim->neovimObject(), &Neovim::on_ui_try_resize,
