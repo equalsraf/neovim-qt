@@ -81,6 +81,8 @@ bool Shell::setGuiFont(const QString& fdesc)
 	}
 
 	int pointSize = font().pointSize();
+	int weight = -1;
+	bool italic = false;
 	foreach(QString attr, attrs) {
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok = false;
@@ -90,9 +92,13 @@ bool Shell::setGuiFont(const QString& fdesc)
 				return false;
 			}
 			pointSize = height;
+		} else if (attr == "b") {
+			weight = QFont::Bold;
+		} else if (attr == "i") {
+			italic = true;
 		}
 	}
-	setShellFont(attrs.at(0), pointSize);
+	setShellFont(attrs.at(0), pointSize, weight, italic);
 
 	if (m_attached) {
 		resizeNeovim(size());

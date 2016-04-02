@@ -17,7 +17,7 @@ class ShellWidget: public QWidget
 	Q_PROPERTY(QSize cellSize READ cellSize)
 public:
 	ShellWidget(QWidget *parent=0);
-	bool setShellFont(const QString& family, int ptSize);
+	bool setShellFont(const QString& family, int ptSize, int weight = -1, bool italic = false);
 
 	QColor background() const;
 	QColor foreground() const;
