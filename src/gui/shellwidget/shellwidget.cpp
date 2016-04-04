@@ -34,14 +34,12 @@ void ShellWidget::setDefaultFont()
 #endif
 }
 
-bool ShellWidget::setShellFont(const QString& family, int ptSize)
+bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bool italic)
 {
-	QFont f;
+	QFont f(family, ptSize, weight, italic);
 	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
-	f.setFamily(family);
 	f.setFixedPitch(true);
 	f.setKerning(false);
-	f.setPointSize(ptSize);
 
 	QFontInfo fi(f);
 	if (fi.family().compare(f.family(), Qt::CaseInsensitive) != 0 &&
