@@ -425,6 +425,9 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		if (guiEvName == "SetFont" && args.size() == 2) {
 			QString fdesc = m_nvim->decode(args.at(1).toByteArray());
 			setGuiFont(fdesc);
+		} else if (guiEvName == "Foreground" && args.size() == 1) {
+			activateWindow();
+			raise();
 		}
 		return;
 	} else if (name != "redraw") {
