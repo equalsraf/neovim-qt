@@ -33,6 +33,10 @@ void MainWindow::init(NeovimConnector *c)
 			this, SLOT(neovimSetTitle(const QString &)));
 	connect(m_shell, &Shell::neovimResized,
 			this, &MainWindow::neovimWidgetResized);
+	connect(m_shell, &Shell::neovimMaximized,
+			this, &MainWindow::neovimMaximized);
+	connect(m_shell, &Shell::neovimFullScreen,
+			this, &MainWindow::neovimFullScreen);
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &MainWindow::neovimExited);
 	connect(m_nvim, &NeovimConnector::error,
@@ -92,6 +96,24 @@ void MainWindow::neovimWidgetResized()
 	}
 }
 
+void MainWindow::neovimMaximized(bool set)
+{
+	if (set) {
+		setWindowState(windowState() | Qt::WindowMaximized);
+	} else {
+		setWindowState(windowState() & ~Qt::WindowMaximized);
+	}
+}
+
+void MainWindow::neovimFullScreen(bool set)
+{
+	if (set) {
+		setWindowState(windowState() | Qt::WindowFullScreen);
+	} else {
+		setWindowState(windowState() & ~Qt::WindowFullScreen);
+	}
+}
+
 void MainWindow::reconnectNeovim()
 {
 	if (m_nvim->canReconnect()) {
@@ -108,6 +130,13 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 	} else {
 		ev->ignore();
 	}
+}
+void MainWindow::changeEvent( QEvent *ev)
+{
+	if (ev->type() == QEvent::WindowStateChange && isWindow()) {
+		m_shell->updateGuiWindowState(windowState());
+	}
+	QWidget::changeEvent(ev);
 }
 
 /// Call show() after a 1s delay or when Neovim attachment

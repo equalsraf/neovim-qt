@@ -25,9 +25,12 @@ public slots:
 	void delayedShow(DelayedShow type=DelayedShow::Normal);
 protected:
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
+	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;
 private slots:
 	void neovimSetTitle(const QString &title);
 	void neovimWidgetResized();
+	void neovimMaximized(bool);
+	void neovimFullScreen(bool);
 	void neovimExited(int status);
 	void neovimError(NeovimConnector::NeovimError);
 	void reconnectNeovim();

@@ -9,6 +9,7 @@
 #include "msgpackrequest.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
+#include "util.h"
 
 namespace NeovimQt {
 
@@ -428,6 +429,22 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		} else if (guiEvName == "Foreground" && args.size() == 1) {
 			activateWindow();
 			raise();
+		} else if (guiEvName == "WindowMaximized" && args.size() == 2) {
+			if (isWindow()) {
+				setWindowState(variant_not_zero(args.at(1)) ?
+					windowState() | Qt::WindowMaximized :
+					windowState() & ~Qt::WindowMaximized);
+			} else {
+				emit neovimMaximized(variant_not_zero(args.at(1)));
+			}
+		} else if (guiEvName == "WindowFullScreen" && args.size() == 2) {
+			if (isWindow()) {
+				setWindowState(variant_not_zero(args.at(1)) ?
+					windowState() | Qt::WindowFullScreen :
+					windowState() & ~Qt::WindowFullScreen);
+			} else {
+				emit neovimFullScreen(variant_not_zero(args.at(1)));
+			}
 		}
 		return;
 	} else if (name != "redraw") {
@@ -664,14 +681,29 @@ void Shell::neovimResizeFinished()
 
 void Shell::changeEvent( QEvent *ev)
 {
-//	if (ev->type() == QEvent::WindowStateChange && isWindow()) {
-//		if ( windowState() & Qt::WindowFullScreen ) {
-//			// TODO: implement fullscreen support - center QImage in widget
-//			// update();
-//		} else {
-//		}
-//	}
+	if (ev->type() == QEvent::WindowStateChange && isWindow()) {
+		updateGuiWindowState(windowState());
+	}
 	QWidget::changeEvent(ev);
+}
+
+/// Call this when the GUI window state has changed. The relevant
+/// g:Gui* variables will be set in Neovim
+void Shell::updateGuiWindowState(Qt::WindowStates state)
+{
+	if (!m_attached) {
+		return;
+	}
+	if (state & Qt::WindowMaximized) {
+		m_nvim->neovimObject()->vim_command("let g:GuiWindowMaximized=1");
+	} else {
+		m_nvim->neovimObject()->vim_command("let g:GuiWindowMaximized=0");
+	}
+	if (state & Qt::WindowFullScreen) {
+		m_nvim->neovimObject()->vim_command("let g:GuiWindowFullScreen=1");
+	} else {
+		m_nvim->neovimObject()->vim_command("let g:GuiWindowFullScreen=0");
+	}
 }
 
 void Shell::closeEvent(QCloseEvent *ev)

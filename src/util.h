@@ -40,6 +40,15 @@ bool decode(const QVariant& in, T& out) {
 	return false;
 }
 
+/// Return false if the variant is an integer with
+/// value (0), all other values return true
+inline bool variant_not_zero(const QVariant& v)
+{
+	bool ok=false;
+	int int_val = v.toInt(&ok);
+	return !ok || int_val != 0;
+}
+
 }
 
 #endif

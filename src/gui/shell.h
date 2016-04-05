@@ -38,12 +38,15 @@ signals:
 	void neovimBusy(bool);
 	void neovimResized(int rows, int cols);
 	void neovimAttached(bool);
+	void neovimMaximized(bool);
+	void neovimFullScreen(bool);
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
 	void resizeNeovim(int n_cols, int n_rows);
 	bool setGuiFont(const QString& fdesc);
+	void updateGuiWindowState(Qt::WindowStates state);
 
 protected slots:
 	void neovimError(NeovimConnector::NeovimError);
