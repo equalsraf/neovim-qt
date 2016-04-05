@@ -65,9 +65,15 @@ void Shell::fontError(const QString& msg)
 
 void Shell::showGuiFont()
 {
-	QByteArray desc = m_nvim->encode(QString("%1:h%2\n")
-			.arg(fontFamily())
-			.arg(fontSize()));
+	QString fdesc = QString("%1:h%2").arg(fontFamily()).arg(fontSize());
+	if (font().bold()) {
+		fdesc += ":b";
+	}
+	if (font().italic()) {
+		fdesc += ":b";
+	}
+	fdesc += "\n";
+	QByteArray desc = m_nvim->encode(fdesc);
 	m_nvim->neovimObject()->vim_out_write(desc);
 }
 
