@@ -47,6 +47,7 @@ public slots:
 	void resizeNeovim(int n_cols, int n_rows);
 	bool setGuiFont(const QString& fdesc);
 	void updateGuiWindowState(Qt::WindowStates state);
+	void showGuiFont();
 
 protected slots:
 	void neovimError(NeovimConnector::NeovimError);

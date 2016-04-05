@@ -63,18 +63,19 @@ void Shell::fontError(const QString& msg)
 	}
 }
 
+void Shell::showGuiFont()
+{
+	QByteArray desc = m_nvim->encode(QString("%1:h%2\n")
+			.arg(fontFamily())
+			.arg(fontSize()));
+	m_nvim->neovimObject()->vim_out_write(desc);
+}
+
 /**
  * Set the GUI font, or display the current font
  */
 bool Shell::setGuiFont(const QString& fdesc)
 {
-	if (fdesc.isEmpty()) {
-		QByteArray desc = m_nvim->encode(QString("%1:h%2\n")
-					.arg(fontFamily())
-					.arg(fontSize()));
-		m_nvim->neovimObject()->vim_out_write(desc);
-		return true;
-	}
 	QStringList attrs = fdesc.split(':');
 	if (attrs.size() < 1) {
 		m_nvim->neovimObject()->vim_report_error("Invalid font");
@@ -99,12 +100,14 @@ bool Shell::setGuiFont(const QString& fdesc)
 			italic = true;
 		}
 	}
-	setShellFont(attrs.at(0), pointSize, weight, italic);
-
-	if (m_attached) {
+	bool ok = setShellFont(attrs.at(0), pointSize, weight, italic);
+	if (ok && m_attached) {
 		resizeNeovim(size());
+		QString cmd = QString("let g:GuiFont=\"%1\"").arg(fdesc);
+		m_nvim->neovimObject()->vim_command(m_nvim->encode(cmd));
 	}
-	return true;
+
+	return ok;
 }
 
 
@@ -423,7 +426,7 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 {
 	if (name == "Gui" && args.size() > 0) {
 		QString guiEvName = m_nvim->decode(args.at(0).toByteArray());
-		if (guiEvName == "SetFont" && args.size() == 2) {
+		if (guiEvName == "Font" && args.size() == 2) {
 			QString fdesc = m_nvim->decode(args.at(1).toByteArray());
 			setGuiFont(fdesc);
 		} else if (guiEvName == "Foreground" && args.size() == 1) {
