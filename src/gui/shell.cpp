@@ -129,6 +129,7 @@ void Shell::setAttached(bool attached)
 	m_attached = attached;
 	emit neovimAttached(attached);
 	if (attached) {
+		updateWindowId();
 		m_nvim->neovimObject()->vim_command("runtime! ginit.vim");
 	}
 	update();
@@ -633,6 +634,24 @@ void Shell::wheelEvent(QWheelEvent *ev)
 			.arg(pos.x()).arg(pos.y());
 	}
 	m_nvim->neovimObject()->vim_input(inp.toLatin1());
+}
+
+void Shell::updateWindowId()
+{
+	if (m_attached &&
+		m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
+		WId window_id = effectiveWinId();
+		QString cmd = QString("let g:GuiWindowId=%1").arg(window_id);
+		m_nvim->neovimObject()->vim_command(m_nvim->encode(cmd));
+	}
+}
+
+bool Shell::event(QEvent *event)
+{
+	if (event->type() == QEvent::WinIdChange){
+		updateWindowId();
+	}
+	return QWidget::event(event);
 }
 
 /// Resize remote Neovim (pixel coordinates)
