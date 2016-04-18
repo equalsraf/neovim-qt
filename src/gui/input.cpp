@@ -58,7 +58,7 @@ InputConv::InputConv() {
 QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 {
 	QString modprefix;
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) || defined(Q_OS_UNIX)
 	if ( mod & CmdModifier ) {
 		modprefix += "D-"; // like MacVim does
 	}
