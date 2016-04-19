@@ -1,5 +1,5 @@
-*nvim_gui_shim.txt* A helper plugin for Neovim GUIs
-*nvim_gui_shim*
+*neovim_gui_shim.txt* A helper plugin for Neovim GUIs
+*neovim-gui-shim*
 
 In Neovim the GUI is an external process that communicates with the Neovim
 process using the |msgpack-rpc-api|. This separation means the GUI is just a
@@ -46,7 +46,7 @@ the shim has loaded. For example to set the GUI font on startup >
 
 The GUI is expected to set certain variables about its current state, however
 you are encouraged to be defensive about using the following variables.
-Settings the values of these variables has no effect on the GUI (i.e. only the
+Setting the values of these variables has no effect on the GUI (i.e. only the
 GUI should set them).
 
 							*g:GuiWindowMaximized*
