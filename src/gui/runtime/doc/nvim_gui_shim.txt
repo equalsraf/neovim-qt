@@ -1,0 +1,110 @@
+*nvim_gui_shim.txt* A helper plugin for Neovim GUIs
+*nvim_gui_shim*
+
+In Neovim the GUI is an external process that communicates with the Neovim
+process using the |msgpack-rpc-api|. This separation means the GUI is just a
+particular type of plugin, as a consequence some functionality that was
+available in Vim is a NOOP in Neovim, or is still in the process of being
+specified.
+
+This plugin provides replacements for some missing GUI bits in Neovim. These
+can be used in |ginit.vim| provided that
+
+1. The user's GUI loaded the |ginit.vim| file
+2. The user's GUI supports the rpc events used by this plugin
+
+==============================================================================
+1. Commands
+
+								*Guifont* *GuiFont*
+GuiFont		When called with no arguments this command display the
+		current font used by the GUI. 
+
+		If an argument is provided it is treated as the font
+		description. The format for the font is a subset of the font
+		name used by Vim's 'guifont' in OS X. For example to set the
+		GUI font family to Monaco with height 13: >
+
+		    :GuiFont Monaco:h13
+<
+		The following attributes are available
+
+			hXX - height is XX in points
+			b   - bold
+			i   - italic
+
+==============================================================================
+2. GUI variables
+
+							*g:GuiLoaded*
+g:GuiLoaded is set when this plugin loads. Use it in |ginit.vim| to make sure
+the shim has loaded. For example to set the GUI font on startup >
+
+    if !exists('g:GuiLoaded')
+	Guifont DejaVu Sans Mono:h15
+    endif
+
+The GUI is expected to set certain variables about its current state, however
+you are encouraged to be defensive about using the following variables.
+Settings the values of these variables has no effect on the GUI (i.e. only the
+GUI should set them).
+
+							*g:GuiWindowMaximized*
+g:GuiWindowMaximized indicates whether the GUI window is maximized. In some system
+(X11) this not a reliable indicator, since the window manager can override the
+window behaviour.
+
+							*g:GuiWindowFullScreen*
+g:GuiWindowFullScreen indicates whether the GUI window is maximized. In some
+system (X11) this not a reliable indicator, since the window manager can
+override the window behaviour.
+
+							*g:GuiWindowId*
+g:GuiWindowId holds the window id (X11) or the window handle (Windows).
+
+							*g:GuiFont*
+g:GuiWindowId holds the current GUI font name, the same value used by
+|GuiFont|.
+
+==============================================================================
+3. Functions
+
+							*GuiForeground()*
+GuiForeground()	moves the GUI window to the foreground. In some systems this
+might not work due to window manager policy (X11) or focus stealing prevention
+(Windows). Replaces |foreground()|.
+
+							*GuiWindowMaximized()* 
+GuiWindowMaximized(enabled) sets the window maximized state, 1 means
+enabled and 0 disabled. In some systems (X11) this function is not guaranteed
+to work.
+
+							*GuiWindowFullScreen()* 
+GuiWindowFullScreen(enabled) sets the window fullscreen state, 1 means
+enabled and 0 disabled.
+
+							*GuiFont()* 
+GuiFont(fname) Sets the GUI font, see |GuiFont| for details on the font name
+format. Replaces |'guifont'|.
+
+==============================================================================
+4. Internals
+
+This section is not very interesting unless you are implementing a GUI and
+want to reuse this. Internally the plugin uses the |msgpack-rpc-api| to
+broadcast notifications to attached GUIs, for example: >
+
+	call rpcnotify(0, 'Gui', 'Foreground')
+
+All notifications use the 'Gui' event name followed by a name and optionally
+more parameters. Use the Neovim API (vim_subscribe) to subscribe to these
+events. By convention all the functions listed in the previous section are
+named as GuiEventName, and mapped as
+ >
+	call rpcnotify(0, 'Gui', 'EventName', ...)
+
+The GUI is expected to load the user's |ginit.vim|, it should also make sure
+this plugin is loaded before loading |ginit.vim|, for example setting
+the runtimepath.
+
+ vim:tw=78:ts=8:ft=help:norl:
