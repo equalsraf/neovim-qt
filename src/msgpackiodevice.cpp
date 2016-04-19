@@ -735,6 +735,18 @@ void MsgpackIODevice::send(const QVariant& var)
 	case QMetaType::UInt:
 		msgpack_pack_unsigned_int(&m_pk, var.toUInt());
 		break;
+	case QMetaType::Long:
+		msgpack_pack_long_long(&m_pk, var.toLongLong());
+		break;
+	case QMetaType::LongLong:
+		msgpack_pack_long_long(&m_pk, var.toLongLong());
+		break;
+	case QMetaType::ULong:
+		msgpack_pack_unsigned_long_long(&m_pk, var.toULongLong());
+		break;
+	case QMetaType::ULongLong:
+		msgpack_pack_unsigned_long_long(&m_pk, var.toULongLong());
+		break;
 	case QMetaType::Float:
 		msgpack_pack_float(&m_pk, var.toFloat());
 		break;
@@ -846,6 +858,14 @@ bool MsgpackIODevice::checkVariant(const QVariant& var)
 	case QMetaType::Int:
 		break;
 	case QMetaType::UInt:
+		break;
+	case QMetaType::Long:
+		break;
+	case QMetaType::LongLong:
+		break;
+	case QMetaType::ULong:
+		break;
+	case QMetaType::ULongLong:
 		break;
 	case QMetaType::Float:
 		break;
