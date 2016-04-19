@@ -1,6 +1,6 @@
 #include <QtTest/QtTest>
 #include <QLocalSocket>
-#include <gui/shell.h>
+#include <gui/mainwindow.h>
 #include "common.h"
 
 namespace NeovimQt {
@@ -44,6 +44,17 @@ private slots:
 		QStringList args = {"-u", "NONE"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c);
+		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QVERIFY(onAttached.isValid());
+		QVERIFY(SPYWAIT(onAttached));
+		QVERIFY(s->neovimAttached());
+		checkStartVars(c);
+	}
+
+	void startVarsMainWindow() {
+		QStringList args = {"-u", "NONE"};
+		NeovimConnector *c = NeovimConnector::spawn(args);
+		MainWindow *s = new MainWindow(c);
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));

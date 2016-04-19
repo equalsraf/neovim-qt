@@ -21,8 +21,11 @@ public:
 	};
 
 	MainWindow(NeovimConnector *, QWidget *parent=0);
+	bool neovimAttached() const;
 public slots:
 	void delayedShow(DelayedShow type=DelayedShow::Normal);
+signals:
+	void neovimAttached(bool);
 protected:
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;
@@ -35,6 +38,7 @@ private slots:
 	void neovimError(NeovimConnector::NeovimError);
 	void reconnectNeovim();
 	void showIfDelayed();
+	void neovimAttachmentChanged(bool);
 private:
 	void init(NeovimConnector *);
         NeovimConnector *m_nvim;

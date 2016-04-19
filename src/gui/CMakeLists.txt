@@ -11,13 +11,17 @@ add_subdirectory(shellwidget)
 
 include(GNUInstallDirs)
 set(RUNTIME_PATH )
+add_library(neovim-qt-gui shell.cpp input.cpp errorwidget.cpp mainwindow.cpp
+	${CMAKE_SOURCE_DIR}/third-party/konsole_wcwidth.cpp
+	${NEOVIM_RCC_SOURCES})
+target_link_libraries(neovim-qt-gui qshellwidget neovim-qt)
+
 set_property(SOURCE main.cpp PROPERTY COMPILE_DEFINITIONS
 	NVIM_QT_RUNTIME="${CMAKE_INSTALL_FULL_DATADIR}/nvim-qt/runtime")
-add_executable(nvim-qt WIN32 main.cpp shell.cpp input.cpp errorwidget.cpp mainwindow.cpp
+add_executable(nvim-qt WIN32 main.cpp
 	${NEOVIM_RCC_SOURCES}
-	${CMAKE_SOURCE_DIR}/third-party/konsole_wcwidth.cpp
 	${RES_FILE})
-target_link_libraries(nvim-qt ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt qshellwidget)
+target_link_libraries(nvim-qt ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt-gui)
 
 if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
 	include(WinDeployQt)

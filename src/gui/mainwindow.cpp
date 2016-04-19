@@ -29,6 +29,8 @@ void MainWindow::init(NeovimConnector *c)
 	m_shell = new Shell(c);
 	m_stack.insertWidget(1, m_shell);
 	m_stack.setCurrentIndex(1);
+	connect(m_shell, SIGNAL(neovimAttached(bool)),
+			this, SLOT(neovimAttachmentChanged(bool)));
 	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)),
 			this, SLOT(neovimSetTitle(const QString &)));
 	connect(m_shell, &Shell::neovimResized,
@@ -48,6 +50,11 @@ void MainWindow::init(NeovimConnector *c)
 	if (m_nvim->errorCause()) {
 		neovimError(m_nvim->errorCause());
 	}
+}
+
+bool MainWindow::neovimAttached() const
+{
+	return (m_shell != NULL && m_shell->neovimAttached());
 }
 
 /** The Neovim process has exited */
@@ -171,6 +178,14 @@ void MainWindow::showIfDelayed()
 		}
 	}
 	m_delayedShow = DelayedShow::Disabled;
+}
+
+void MainWindow::neovimAttachmentChanged(bool attached)
+{
+	emit neovimAttached(attached);
+	if (isWindow() && m_shell != NULL) {
+		m_shell->updateGuiWindowState(windowState());
+	}
 }
 
 } // Namespace
