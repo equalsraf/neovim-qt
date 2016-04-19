@@ -63,7 +63,7 @@ void Shell::fontError(const QString& msg)
 	}
 }
 
-void Shell::showGuiFont()
+QString Shell::fontDesc()
 {
 	QString fdesc = QString("%1:h%2").arg(fontFamily()).arg(fontSize());
 	if (font().bold()) {
@@ -73,8 +73,7 @@ void Shell::showGuiFont()
 		fdesc += ":b";
 	}
 	fdesc += "\n";
-	QByteArray desc = m_nvim->encode(fdesc);
-	m_nvim->neovimObject()->vim_out_write(desc);
+	return fdesc;
 }
 
 /**
@@ -129,6 +128,7 @@ void Shell::setAttached(bool attached)
 	emit neovimAttached(attached);
 	if (attached) {
 		updateWindowId();
+		m_nvim->neovimObject()->vim_set_var("GuiFont", fontDesc());
 		if (isWindow()) {
 			updateGuiWindowState(windowState());
 		}

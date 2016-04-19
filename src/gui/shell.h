@@ -32,6 +32,7 @@ public:
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
 	bool neovimAttached() const;
+	QString fontDesc();
 
 signals:
 	void neovimTitleChanged(const QString &title);
@@ -47,7 +48,6 @@ public slots:
 	void resizeNeovim(int n_cols, int n_rows);
 	bool setGuiFont(const QString& fdesc);
 	void updateGuiWindowState(Qt::WindowStates state);
-	void showGuiFont();
 
 protected slots:
 	void neovimError(NeovimConnector::NeovimError);
