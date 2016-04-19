@@ -3,6 +3,7 @@
 #include <QtGlobal>
 #include <QFile>
 #include <QCommandLineParser>
+#include <QFileInfo>
 #include "neovimconnector.h"
 #include "mainwindow.h"
 
@@ -70,6 +71,13 @@ int main(int argc, char **argv)
 			QString server = parser.value("server");
 			c = NeovimQt::NeovimConnector::connectToNeovim(server);
 		} else {
+#ifdef NVIM_QT_RUNTIME
+			if (QFileInfo(NVIM_QT_RUNTIME).isDir()) {
+				neovimArgs.insert(0, "--cmd");
+				neovimArgs.insert(1, QString("set rtp+=%1")
+						.arg(NVIM_QT_RUNTIME));
+			}
+#endif
 			c = NeovimQt::NeovimConnector::spawn(neovimArgs);
 		}
 	}

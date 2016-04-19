@@ -9,6 +9,10 @@ endif()
 
 add_subdirectory(shellwidget)
 
+include(GNUInstallDirs)
+set(RUNTIME_PATH )
+set_property(SOURCE main.cpp PROPERTY COMPILE_DEFINITIONS
+	NVIM_QT_RUNTIME="${CMAKE_INSTALL_FULL_DATADIR}/nvim-qt/runtime")
 add_executable(nvim-qt WIN32 main.cpp shell.cpp input.cpp errorwidget.cpp mainwindow.cpp
 	${NEOVIM_RCC_SOURCES}
 	${CMAKE_SOURCE_DIR}/third-party/konsole_wcwidth.cpp
@@ -20,9 +24,10 @@ if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
 	WinDeployQt(TARGET nvim-qt COMPILER_RUNTIME INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
 endif()
 
-include(GNUInstallDirs)
 install(TARGETS nvim-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 install(FILES ${CMAKE_SOURCE_DIR}/third-party/neovim.png
         RENAME nvim-qt.png
         DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps/)
+install(DIRECTORY runtime
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt/)
