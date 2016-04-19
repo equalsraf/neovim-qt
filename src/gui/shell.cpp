@@ -130,6 +130,9 @@ void Shell::setAttached(bool attached)
 	emit neovimAttached(attached);
 	if (attached) {
 		updateWindowId();
+		if (isWindow()) {
+			updateGuiWindowState(windowState());
+		}
 		m_nvim->neovimObject()->vim_command("runtime! ginit.vim");
 	}
 	update();
