@@ -16,7 +16,7 @@ namespace NeovimQt {
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 :ShellWidget(parent), m_attached(false), m_nvim(nvim),
 	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false),
-	m_hg_foreground(Qt::black), m_hg_background(Qt::white),
+	m_hg_foreground(Qt::black), m_hg_background(Qt::white), m_hg_special(QColor()),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
 	m_resizing(false),
 	m_neovimBusy(false)
@@ -231,12 +231,16 @@ void Shell::handleHighlightSet(const QVariantMap& attrs)
 		m_hg_background = background();
 	}
 
-	// TODO: undercurl
+	if (attrs.contains(("special"))) {
+		m_hg_special = color(attrs.value("special").toLongLong(), special());
+	} else {
+		m_hg_special = special();
+	}
+
 	m_font_bold = attrs.value("bold").toBool();
 	m_font_italic = attrs.value("italic").toBool();
 	m_font_undercurl = attrs.value("undercurl").toBool();
-	// enable underline ONLY if undercurl is not on
-	m_font_underline = attrs.value("underline").toBool() && !m_font_undercurl;
+	m_font_underline = attrs.value("underline").toBool();
 }
 
 /// Paint a character and advance the cursor
@@ -251,7 +255,7 @@ void Shell::handlePut(const QVariantList& args)
 
 	if (!text.isEmpty()) {
 		int cols = put(text, m_cursor_pos.y(), m_cursor_pos.x(),
-				m_hg_foreground, m_hg_background,
+				m_hg_foreground, m_hg_background, m_hg_special,
 				m_font_bold, m_font_italic,
 				m_font_underline, m_font_undercurl);
 		// Move cursor ahead
@@ -333,6 +337,16 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		}
 		m_hg_background = background();
 		update();
+	} else if (name == "update_sp") {
+		if (opargs.size() != 1 || !opargs.at(0).canConvert<quint64>()) {
+			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
+			return;
+		}
+		qint64 val = opargs.at(0).toLongLong();
+		if (val != -1) {
+			setSpecial(QRgb(val));
+		}
+		m_hg_special = special();
 	} else if (name == "resize") {
 		if (opargs.size() != 2 || !opargs.at(0).canConvert<quint64>() ||
 				!opargs.at(1).canConvert<quint64>()) {

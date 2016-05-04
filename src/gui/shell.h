@@ -107,7 +107,7 @@ private:
 
 	// highlight fg/bg - from redraw:highlightset - by default we
 	// use the values from above
-	QColor m_hg_foreground, m_hg_background;
+	QColor m_hg_foreground, m_hg_background, m_hg_special;
 	QColor m_cursor_color;
 
 	/// Cursor position in shell coordinates

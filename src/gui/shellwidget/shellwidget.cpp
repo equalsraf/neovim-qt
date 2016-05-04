@@ -6,7 +6,7 @@
 
 ShellWidget::ShellWidget(QWidget *parent)
 :QWidget(parent), m_contents(0,0), m_bgColor(Qt::white),
-	m_fgColor(Qt::black)
+	m_fgColor(Qt::black), m_spColor(QColor())
 {
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_KeyCompression, false);
@@ -131,11 +131,10 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 						p.setPen(m_fgColor);
 					}
 
-					if (cell.bold || cell.italic || cell.underline) {
+					if (cell.bold || cell.italic) {
 						QFont f = p.font();
 						f.setBold(cell.bold);
 						f.setItalic(cell.italic);
-						f.setUnderline(cell.underline);
 						p.setFont(f);
 					} else {
 						p.setFont(font());
@@ -147,10 +146,24 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 				}
 
 				// Draw "undercurl" at the bottom of the cell
-				if (cell.undercurl) {
-					// FIXME: use correct highlight color instead of red
+				if (cell.underline || cell.undercurl) {
+					QPen pen = QPen();
+					// Use specail color if it is set, otherwise use foreground color
+					if (cell.specialColor.isValid()) {
+						pen.setColor(cell.specialColor);
+					} else if (m_spColor.isValid()) {
+						pen.setColor(m_spColor);
+					} else if (cell.foregroundColor.isValid()) {
+						pen.setColor(cell.foregroundColor);
+					} else {
+						pen.setColor(m_fgColor);
+					}
+					if (cell.undercurl) {
+						pen.setStyle(Qt::DashDotDotLine);
+					}
+
 					// TODO: draw a proper undercurl
-					p.setPen(QPen(Qt::red, 1, Qt::DashDotDotLine));
+					p.setPen(pen);
 					QPoint start = r.bottomLeft();
 					QPoint end = r.bottomRight();
 					start.ry()--; end.ry()--;
@@ -202,6 +215,16 @@ void ShellWidget::resizeShell(int n_rows, int n_columns)
 	}
 }
 
+void ShellWidget::setSpecial(const QColor& color)
+{
+	m_spColor = color;
+}
+
+QColor ShellWidget::special() const
+{
+	return m_spColor;
+}
+
 void ShellWidget::setBackground(const QColor& color)
 {
 	m_bgColor = color;
@@ -229,7 +252,7 @@ const ShellContents& ShellWidget::contents() const
 
 /// Put text in position, returns the amount of colums used
 int ShellWidget::put(const QString& text, int row, int column,
-		QColor fg, QColor bg, bool bold, bool italic,
+		QColor fg, QColor bg, QColor sp, bool bold, bool italic,
 		bool underline, bool undercurl)
 {
 	if (!fg.isValid()) {
@@ -238,7 +261,10 @@ int ShellWidget::put(const QString& text, int row, int column,
 	if (!bg.isValid()) {
 		bg = m_bgColor;
 	}
-	int cols_changed = m_contents.put(text, row, column, fg, bg,
+	if (!sp.isValid()) {
+		sp = m_spColor;
+	}
+	int cols_changed = m_contents.put(text, row, column, fg, bg, sp,
 				bold, italic, underline, undercurl);
 	if (cols_changed > 0) {
 		QRect rect = absoluteShellRect(row, column, 1, cols_changed);
