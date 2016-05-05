@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(neovim-qt)
 
+INCLUDE(CPack)
+
 if(NOT EXISTS ${NEOVIM_EXEC})
 	set(NEOVIM_EXEC nvim)
 endif()
