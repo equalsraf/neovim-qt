@@ -19,7 +19,7 @@ matrix:
 build_script:
 - cmd: '%SCRIPT%'
 artifacts:
-- path: build/bin
+- path: INSTALL
   name: neovim-qt
 deploy:
   - provider: GitHub

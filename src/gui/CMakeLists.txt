@@ -35,3 +35,7 @@ install(FILES ${CMAKE_SOURCE_DIR}/third-party/neovim.png
         DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps/)
 install(DIRECTORY runtime
         DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt/)
+if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
+	install(DIRECTORY ${PROJECT_BINARY_DIR}/windeployqt/
+		DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()

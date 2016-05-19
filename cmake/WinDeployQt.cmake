@@ -1,6 +1,8 @@
 #
 # CMake wrapper to call windeployqt in Windows
 #
+# The files are placed in windeployqt folder in the toplevel
+# build directory
 
 function(WinDeployQt)
 	cmake_parse_arguments(_deploy
@@ -50,9 +52,10 @@ function(WinDeployQt)
 		message(STATUS "not set, the VC++ redistributable installer will NOT be bundled")
 	endif()
 
-	add_custom_target(windeployqt ${_deploy_PROGRAM} ${_ARGS}
+	add_custom_target(windeployqt ALL ${_deploy_PROGRAM} --dir ${PROJECT_BINARY_DIR}/windeployqt ${_ARGS}
 		$<TARGET_FILE:${_deploy_TARGET}>
-		DEPENDS ${_deploy_TARGET})
+		DEPENDS ${_deploy_TARGET}
+		COMMENT "Preparing Qt runtime dependencies")
 endfunction()
 
 
