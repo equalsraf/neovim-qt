@@ -222,7 +222,7 @@ const Cell& ShellContents::constValue(int row, int column) const
 
 /// Writes content to the shell, returns the number of columns written
 int ShellContents::put(const QString& str, int row, int column,
-		QColor fg, QColor bg, bool bold, bool italic,
+		QColor fg, QColor bg, QColor sp, bool bold, bool italic,
 		bool underline, bool undercurl)
 {
 	if (row < 0 || row >= _rows || column < 0 || column >= _columns) {
@@ -232,7 +232,7 @@ int ShellContents::put(const QString& str, int row, int column,
 	int pos = column;
 	foreach(const QChar chr, str) {
 		Cell& c = value(row, pos);
-		c = Cell(chr, fg, bg, bold, italic, underline, undercurl);
+		c = Cell(chr, fg, bg, sp, bold, italic, underline, undercurl);
 		if (c.doubleWidth) {
 			value(row, pos+1) = Cell();
 			pos += 2;

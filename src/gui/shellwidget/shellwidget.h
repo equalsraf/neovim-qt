@@ -21,6 +21,7 @@ public:
 
 	QColor background() const;
 	QColor foreground() const;
+	QColor special() const;
 	QString fontFamily() const;
 	int fontSize() const;
 	static ShellWidget* fromFile(const QString& path);
@@ -35,11 +36,12 @@ signals:
 	void fontError(const QString& msg);
 public slots:
 	void resizeShell(int rows, int columns);
+	void setSpecial(const QColor& color);
 	void setBackground(const QColor& color);
 	void setForeground(const QColor& color);
 	void setDefaultFont();
 	int put(const QString&, int row, int column,
-			QColor fg=QColor(), QColor bg=QColor(),
+			QColor fg=QColor(), QColor bg=QColor(), QColor sp=QColor(),
 			bool bold=false, bool italic=false,
 			bool underline=false, bool undercurl=false);
 	void clearRow(int row);
@@ -61,7 +63,7 @@ private:
 	ShellContents m_contents;
 	QSize m_cellSize;
 	int m_ascent;
-	QColor m_bgColor, m_fgColor;
+	QColor m_bgColor, m_fgColor, m_spColor;
 };
 
 #endif

@@ -11,8 +11,10 @@ private slots:
 		// Default colors are invalid
 		QCOMPARE(c.foregroundColor, QColor());
 		QCOMPARE(c.backgroundColor, QColor());
+		QCOMPARE(c.specialColor, QColor());
 		QVERIFY(!c.foregroundColor.isValid());
 		QVERIFY(!c.backgroundColor.isValid());
+		QVERIFY(!c.specialColor.isValid());
 
 		QBENCHMARK {
 			Cell c;
@@ -21,13 +23,13 @@ private slots:
 
 	void cellValue() {
 		QBENCHMARK {
-			Cell c('z', Qt::black, Qt::white,
+			Cell c('z', Qt::black, Qt::white, QColor(),
 					false, false, false, false);
 		}
 	}
 	void cellValueRgb() {
 		QBENCHMARK {
-			Cell c('z', QRgb(33), QRgb(66),
+			Cell c('z', QRgb(33), QRgb(66), QColor(),
 					false, false, false, false);
 		}
 	}

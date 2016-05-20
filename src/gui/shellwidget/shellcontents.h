@@ -26,7 +26,7 @@ public:
 	Cell& value(int row, int column);
 	const Cell& constValue(int row, int column) const;
 	int put(const QString&, int row, int column,
-			QColor fg=Qt::black, QColor bg=Qt::white,
+			QColor fg=Qt::black, QColor bg=Qt::white, QColor sp=QColor(),
 			bool bold=false, bool italic=false,
 			bool underline=false, bool undercurl=false);
 
