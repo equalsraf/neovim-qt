@@ -63,7 +63,7 @@ override the window behaviour.
 g:GuiWindowId holds the window id (X11) or the window handle (Windows).
 
 							*g:GuiFont*
-g:GuiWindowId holds the current GUI font name, the same value used by
+g:GuiFont holds the current GUI font name, the same value used by
 |GuiFont|.
 
 ==============================================================================
