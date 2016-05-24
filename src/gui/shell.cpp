@@ -477,6 +477,11 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			} else {
 				emit neovimFullScreen(variant_not_zero(args.at(1)));
 			}
+		} else if (guiEvName == "Linespace" && args.size() == 2) {
+			auto val = args.at(1).toUInt();
+			setLineSpace(val);
+			m_nvim->neovimObject()->vim_set_var("GuiLinespace", val);
+			resizeNeovim(size());
 		}
 		return;
 	} else if (name != "redraw") {

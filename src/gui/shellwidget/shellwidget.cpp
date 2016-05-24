@@ -6,7 +6,7 @@
 
 ShellWidget::ShellWidget(QWidget *parent)
 :QWidget(parent), m_contents(0,0), m_bgColor(Qt::white),
-	m_fgColor(Qt::black), m_spColor(QColor())
+	m_fgColor(Qt::black), m_spColor(QColor()), m_lineSpace(0)
 {
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_KeyCompression, false);
@@ -56,8 +56,8 @@ bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bo
 		emit fontError(QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family()));
 	}
 
-	setCellSize(f);
 	setFont(f);
+	setCellSize();
 	emit shellFontChanged();
 	return true;
 }
@@ -68,17 +68,26 @@ void ShellWidget::setFont(const QFont& f)
 	QWidget::setFont(f);
 }
 
+void ShellWidget::setLineSpace(int height)
+{
+	if (height != m_lineSpace) {
+		m_lineSpace = height;
+		setCellSize();
+		emit shellFontChanged();
+	}
+}
+
 /// Changed the cell size based on font metrics:
 /// - Height is either the line spacing or the font
 ///   height, the leading may be negative and we want the
 ///   larger value
 /// - Width is the width of the "W" character
-void ShellWidget::setCellSize(const QFont& f)
+void ShellWidget::setCellSize()
 {
-	QFontMetrics fm(f);
+	QFontMetrics fm(font());
 	m_ascent = fm.ascent();
 	m_cellSize = QSize(fm.width('W'),
-			qMax(fm.lineSpacing(), fm.height()));
+			qMax(fm.lineSpacing(), fm.height()) + m_lineSpace);
 	setSizeIncrement(m_cellSize);
 }
 QSize ShellWidget::cellSize() const

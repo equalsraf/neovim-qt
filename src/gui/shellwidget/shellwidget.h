@@ -50,11 +50,12 @@ public slots:
 	void scrollShell(int rows);
 	void scrollShellRegion(int row0, int row1, int col0,
 			int col1, int rows);
+        void setLineSpace(int height);
 protected:
 	virtual void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
 
-	void setCellSize(const QFont& f);
+	void setCellSize();
 	QRect absoluteShellRect(int row0, int col0, int rowcount, int colcount);
 
 private:
@@ -64,6 +65,7 @@ private:
 	QSize m_cellSize;
 	int m_ascent;
 	QColor m_bgColor, m_fgColor, m_spColor;
+        unsigned int m_lineSpace;
 };
 
 #endif
