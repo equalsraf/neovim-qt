@@ -33,6 +33,11 @@ GuiFont		When called with no arguments this command display the
 			b   - bold
 			i   - italic
 
+								*GuiLinespace*
+GuiLinespace	When called with no arguments this command displays the
+		linespace, the number of extra pixels each line will have.
+                A single argument is accepted as the new linespace height.
+
 ==============================================================================
 2. GUI variables
 
@@ -66,6 +71,10 @@ g:GuiWindowId holds the window id (X11) or the window handle (Windows).
 g:GuiFont holds the current GUI font name, the same value used by
 |GuiFont|.
 
+							*g:GuiLinespace*
+g:GuiLinespace holds the extra vertical space (in pixels) added to
+each line.
+
 ==============================================================================
 3. Functions
 
@@ -86,6 +95,10 @@ enabled and 0 disabled.
 							*GuiFont()* 
 GuiFont(fname) Sets the GUI font, see |GuiFont| for details on the font name
 format. Replaces |'guifont'|.
+
+							*GuiLinespace()*
+GuiLinespace(height) sets the number of vertical pixels added to each line.
+Replaces |'linespace'|.
 
 ==============================================================================
 4. Internals

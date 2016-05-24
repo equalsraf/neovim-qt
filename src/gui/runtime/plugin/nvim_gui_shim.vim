@@ -24,6 +24,11 @@ function! GuiFont(fname)
 	call rpcnotify(0, 'Gui', 'Font', a:fname)
 endfunction
 
+" Set additional linespace
+function! GuiLinespace(height)
+	call rpcnotify(0, 'Gui', 'Linespace', a:height)
+endfunction
+
 " The GuiFont command. For compatibility there is also Guifont
 function s:GuiFontCommand(fname)
 	if a:fname == ""
@@ -38,3 +43,16 @@ function s:GuiFontCommand(fname)
 endfunction
 command! -nargs=? Guifont call s:GuiFontCommand("<args>")
 command! -nargs=? GuiFont call s:GuiFontCommand("<args>")
+
+function s:GuiLinespaceCommand(height)
+	if a:height == ""
+		if exists('g:GuiLinespace')
+			echo g:GuiLinespace
+		else
+			echo 'No GuiLinespace is set'
+		endif
+	else
+		call GuiLinespace(a:height)
+	endif
+endfunction
+command! -nargs=? GuiLinespace call s:GuiLinespaceCommand("<args>")
