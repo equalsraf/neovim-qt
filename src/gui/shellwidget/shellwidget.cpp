@@ -150,7 +150,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					}
 
 					// Draw chars at the baseline
-					QPoint pos(r.left(), r.top()+m_ascent);
+					QPoint pos(r.left(), r.top()+m_ascent+m_lineSpace);
 					p.drawText(pos, QString(cell.c));
 				}
 
