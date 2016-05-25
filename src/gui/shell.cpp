@@ -237,6 +237,12 @@ void Shell::handleHighlightSet(const QVariantMap& attrs)
 		m_hg_special = special();
 	}
 
+	if (attrs.contains("reverse")) {
+		auto tmp = m_hg_background;
+		m_hg_background = m_hg_foreground;
+		m_hg_foreground = tmp;
+	}
+
 	m_font_bold = attrs.value("bold").toBool();
 	m_font_italic = attrs.value("italic").toBool();
 	m_font_undercurl = attrs.value("undercurl").toBool();
