@@ -148,18 +148,23 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 				// Draw "undercurl" at the bottom of the cell
 				if (cell.underline || cell.undercurl) {
 					QPen pen = QPen();
-					// Use specail color if it is set, otherwise use foreground color
-					if (cell.specialColor.isValid()) {
-						pen.setColor(cell.specialColor);
-					} else if (m_spColor.isValid()) {
-						pen.setColor(m_spColor);
-					} else if (cell.foregroundColor.isValid()) {
-						pen.setColor(cell.foregroundColor);
-					} else {
-						pen.setColor(m_fgColor);
-					}
 					if (cell.undercurl) {
+						if (cell.specialColor.isValid()) {
+							pen.setColor(cell.specialColor);
+						} else if (m_spColor.isValid()) {
+							pen.setColor(m_spColor);
+						} else if (cell.foregroundColor.isValid()) {
+							pen.setColor(cell.foregroundColor);
+						} else {
+							pen.setColor(m_fgColor);
+						}
 						pen.setStyle(Qt::DashDotDotLine);
+					} else if (cell.underline) {
+						if (cell.foregroundColor.isValid()) {
+							pen.setColor(cell.foregroundColor);
+						} else {
+							pen.setColor(m_fgColor);
+						}
 					}
 
 					// TODO: draw a proper undercurl
