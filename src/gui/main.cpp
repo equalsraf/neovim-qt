@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QCommandLineParser>
 #include <QFileInfo>
+#include <QDir>
 #include "neovimconnector.h"
 #include "mainwindow.h"
 
@@ -71,11 +72,22 @@ int main(int argc, char **argv)
 			QString server = parser.value("server");
 			c = NeovimQt::NeovimConnector::connectToNeovim(server);
 		} else {
-#ifdef NVIM_QT_RUNTIME
-			if (QFileInfo(NVIM_QT_RUNTIME).isDir()) {
+#ifdef NVIM_QT_RUNTIME_PATH
+			if (QFileInfo(NVIM_QT_RUNTIME_PATH).isDir()) {
 				neovimArgs.insert(0, "--cmd");
 				neovimArgs.insert(1, QString("set rtp+=%1")
-						.arg(NVIM_QT_RUNTIME));
+						.arg(NVIM_QT_RUNTIME_PATH));
+			} else {
+				QDir d = QFileInfo(QCoreApplication::applicationDirPath()).dir();
+				d.cd("share");
+				d.cd("nvim-qt");
+				d.cd("runtime");
+
+				if (d.exists()) {
+					neovimArgs.insert(0, "--cmd");
+					neovimArgs.insert(1, QString("set rtp+=%1")
+							.arg(d.path()));
+				}
 			}
 #endif
 			c = NeovimQt::NeovimConnector::spawn(neovimArgs);

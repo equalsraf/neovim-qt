@@ -17,7 +17,7 @@ add_library(neovim-qt-gui shell.cpp input.cpp errorwidget.cpp mainwindow.cpp
 target_link_libraries(neovim-qt-gui qshellwidget neovim-qt)
 
 set_property(SOURCE main.cpp PROPERTY COMPILE_DEFINITIONS
-	NVIM_QT_RUNTIME="${CMAKE_INSTALL_FULL_DATADIR}/nvim-qt/runtime")
+	NVIM_QT_RUNTIME_PATH="${CMAKE_INSTALL_FULL_DATADIR}/nvim-qt/runtime")
 add_executable(nvim-qt WIN32 main.cpp
 	${NEOVIM_RCC_SOURCES}
 	${RES_FILE})
