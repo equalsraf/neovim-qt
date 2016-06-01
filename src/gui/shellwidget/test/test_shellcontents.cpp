@@ -35,7 +35,6 @@ public:
 			for (int j=0; j<s.columns(); j++) {
 				QChar c = s.constValue(i, j).c;
 				if (c != QChar(' ')) {
-					qDebug() << __func__ << i << j << c;
 					return false;
 				}
 			}
@@ -60,7 +59,6 @@ public:
 			for (int j=0; j<s.columns(); j++) {
 				QChar c = s.constValue(i, j).c;
 				if (c != QChar('a'+i)) {
-					qDebug() << __func__ << i << j << c;
 					return false;
 				}
 			}
