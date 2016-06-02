@@ -77,7 +77,9 @@ int main(int argc, char **argv)
 				neovimArgs.insert(0, "--cmd");
 				neovimArgs.insert(1, QString("set rtp+=%1")
 						.arg(NVIM_QT_RUNTIME_PATH));
-			} else {
+			} else
+#endif
+			{
 				QDir d = QFileInfo(QCoreApplication::applicationDirPath()).dir();
 				d.cd("share");
 				d.cd("nvim-qt");
@@ -89,7 +91,6 @@ int main(int argc, char **argv)
 							.arg(d.path()));
 				}
 			}
-#endif
 			c = NeovimQt::NeovimConnector::spawn(neovimArgs);
 		}
 	}
