@@ -72,8 +72,14 @@ int main(int argc, char **argv)
 			QString server = parser.value("server");
 			c = NeovimQt::NeovimConnector::connectToNeovim(server);
 		} else {
+			auto path = qgetenv("NVIM_QT_RUNTIME_PATH");
+			if (QFileInfo(path).isDir()) {
+				neovimArgs.insert(0, "--cmd");
+				neovimArgs.insert(1, QString("set rtp+=%1")
+						.arg(QString::fromLocal8Bit(path)));
+			}
 #ifdef NVIM_QT_RUNTIME_PATH
-			if (QFileInfo(NVIM_QT_RUNTIME_PATH).isDir()) {
+			else if (QFileInfo(NVIM_QT_RUNTIME_PATH).isDir()) {
 				neovimArgs.insert(0, "--cmd");
 				neovimArgs.insert(1, QString("set rtp+=%1")
 						.arg(NVIM_QT_RUNTIME_PATH));
