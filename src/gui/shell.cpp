@@ -68,6 +68,8 @@ QString Shell::fontDesc()
 	QString fdesc = QString("%1:h%2").arg(fontFamily()).arg(fontSize());
 	if (font().bold()) {
 		fdesc += ":b";
+	} else if (font().weight() == QFont::Light) {
+		fdesc += ":l";
 	}
 	if (font().italic()) {
 		fdesc += ":i";
@@ -101,6 +103,8 @@ bool Shell::setGuiFont(const QString& fdesc)
 			pointSize = height;
 		} else if (attr == "b") {
 			weight = QFont::Bold;
+		} else if (attr == "l") {
+			weight = QFont::Light;
 		} else if (attr == "i") {
 			italic = true;
 		}
