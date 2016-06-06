@@ -9,6 +9,7 @@
 #include <QFont>
 #include <QFontInfo>
 #include <QFontMetrics>
+#include <QFontDatabase>
 
 QTextStream& qStdOut()
 {
@@ -73,13 +74,30 @@ void printFontMetrics(const QFont& f)
 	qStdOut() << " Width(MM): " << fm_boldit.width("MM") << endl;
 }
 
+void printFontList()
+{
+	QFontDatabase db;
+    foreach (const QString &family, db.families()) {
+		qStdOut() << family << "\n";
+        foreach (const QString &style, db.styles(family)) {
+			qStdOut() << "\t" << style << "\n";
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
 	QGuiApplication app(argc, argv);
 
 	if (app.arguments().size() < 2) {
-		qStdOut() << "Usage: testfont <family>";
+		qStdOut() << "Usage: fontinfo <family>\n";
+		qStdOut() << "       fontinfo -list";
 		return -1;
+	}
+
+	if (app.arguments().at(1) == "-list") {
+		printFontList();
+		return 0;
 	}
 
 	QFont f;
