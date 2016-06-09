@@ -125,7 +125,6 @@ Shell::~Shell()
 void Shell::setAttached(bool attached)
 {
 	m_attached = attached;
-	emit neovimAttached(attached);
 	if (attached) {
 		updateWindowId();
 		m_nvim->neovimObject()->vim_set_var("GuiFont", fontDesc());
@@ -135,6 +134,7 @@ void Shell::setAttached(bool attached)
 		m_nvim->neovimObject()->vim_command("runtime plugin/nvim_gui_shim.vim");
 		m_nvim->neovimObject()->vim_command("runtime! ginit.vim");
 	}
+	emit neovimAttached(attached);
 	update();
 }
 
