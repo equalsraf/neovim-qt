@@ -132,6 +132,7 @@ void Shell::setAttached(bool attached)
 		if (isWindow()) {
 			updateGuiWindowState(windowState());
 		}
+		m_nvim->neovimObject()->vim_command("runtime plugin/nvim_gui_shim.vim");
 		m_nvim->neovimObject()->vim_command("runtime! ginit.vim");
 	}
 	update();
