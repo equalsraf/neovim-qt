@@ -333,6 +333,18 @@ private slots:
 		QCOMPARE(s0.value(5, 9).c, QChar('o'));
 	}
 
+	void putSurrogate() {
+		int rows = 10;
+		int cols = 10;
+
+		ShellContents s0(rows, cols);
+		s0.put("🎐", 0, 0);
+		QCOMPARE(s0.value(0, 0).text(), QString("🎐"));
+
+		s0.put("🎐", 0, 9);
+		QCOMPARE(s0.value(0, 9).text(), QString("🎐"));
+	}
+
 	// Grab test cases from ../test/shellcontents
 	void cases() {
 		QDir dir("../test/shellcontents/");

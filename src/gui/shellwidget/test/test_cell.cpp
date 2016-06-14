@@ -49,6 +49,18 @@ private slots:
 		Cell c2 = Cell::bg(Qt::red);
 		QCOMPARE(c2.backgroundColor, QColor(Qt::red));
 	}
+
+	void cellSurrogate() {
+		Cell c0;
+		QCOMPARE(c0.lowSurrogate, QChar());
+		QCOMPARE(c0.lowSurrogate.isLowSurrogate(), false);
+
+		Cell c1;
+		c1.c = QChar(55356);
+		c1.setLowSurrogate(QChar(57232));
+		QCOMPARE(c1.text(), QString("🎐"));
+		QCOMPARE(c1.doubleWidth, true);
+	}
 };
 
 QTEST_MAIN(Test)
