@@ -230,9 +230,18 @@ int ShellContents::put(const QString& str, int row, int column,
 	}
 	
 	int pos = column;
-	foreach(const QChar chr, str) {
+	for (int i=0; i<str.size(); i++) {
 		Cell& c = value(row, pos);
-		c = Cell(chr, fg, bg, sp, bold, italic, underline, undercurl);
+		QChar cell_chr = str.at(i);
+		c = Cell(cell_chr, fg, bg, sp, bold, italic, underline, undercurl);
+
+		if (cell_chr.isHighSurrogate()) {
+			if (i<str.size()-1 && str.at(i+1).isLowSurrogate()) {
+				c.setLowSurrogate(str.at(i+1));
+			}
+			i++;
+		}
+
 		if (c.doubleWidth) {
 			value(row, pos+1) = Cell();
 			pos += 2;
