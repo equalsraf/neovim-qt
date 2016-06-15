@@ -5,7 +5,12 @@ qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
 if(WIN32)
 	set(RES_FILE "data.rc")
 	enable_language(RC)
+elseif(APPLE)
+	set(ICON_PATH ${PROJECT_SOURCE_DIR}/third-party/neovim.png)
+	set_source_files_properties(${ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
+
+set(MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in)
 
 add_subdirectory(shellwidget)
 
@@ -18,9 +23,10 @@ target_link_libraries(neovim-qt-gui qshellwidget neovim-qt)
 
 set_property(SOURCE main.cpp PROPERTY COMPILE_DEFINITIONS
 	NVIM_QT_RUNTIME_PATH="${CMAKE_INSTALL_FULL_DATADIR}/nvim-qt/runtime")
-add_executable(nvim-qt WIN32 main.cpp
+add_executable(nvim-qt WIN32 MACOSX_BUNDLE main.cpp
 	${NEOVIM_RCC_SOURCES}
-	${RES_FILE})
+	${RES_FILE}
+	${ICON_PATH})
 target_link_libraries(nvim-qt ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt-gui)
 
 if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
@@ -29,12 +35,16 @@ if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
 endif()
 
 install(TARGETS nvim-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
-install(FILES ${CMAKE_SOURCE_DIR}/third-party/neovim.png
-        RENAME nvim-qt.png
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps/)
 install(DIRECTORY runtime
         DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt/)
+
+if(NOT APPLE)
+	install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+	install(FILES ${CMAKE_SOURCE_DIR}/third-party/neovim.png
+			RENAME nvim-qt.png
+			DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps/)
+endif()
+
 if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
 	install(DIRECTORY ${PROJECT_BINARY_DIR}/windeployqt/
 		DESTINATION ${CMAKE_INSTALL_BINDIR})
