@@ -117,10 +117,18 @@ int main(int argc, char **argv)
 			} else
 #endif
 			{
+				// Look for the runtime relative to the nvim-qt binary
 				QDir d = QFileInfo(QCoreApplication::applicationDirPath()).dir();
+#ifdef Q_OS_MAC
+				// within the bundle at ../Resources/runtime
+				d.cd("Resources");
+				d.cd("runtime");
+#else
+				// ../share/nvim-qt/runtime
 				d.cd("share");
 				d.cd("nvim-qt");
 				d.cd("runtime");
+#endif
 
 				if (d.exists()) {
 					neovimArgs.insert(0, "--cmd");
