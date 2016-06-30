@@ -75,7 +75,7 @@ protected:
 			"GuiWindowFullScreen", "GuiFont"};
 		foreach(const QString& var, vars) {
 			qDebug() << "Checking Neovim for Gui var" << var;
-			QSignalSpy onVar(nvim, &NeovimQt::Neovim::on_vim_get_var);
+			QSignalSpy onVar(nvim, SIGNAL(on_vim_get_var(QVariant)));
 			QVERIFY(onVar.isValid());
 			nvim->vim_get_var(conn->encode(var));
 			QVERIFY(SPYWAIT(onVar));

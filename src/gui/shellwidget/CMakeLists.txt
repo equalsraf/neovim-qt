@@ -21,6 +21,3 @@ target_link_libraries(example3 qshellwidget )
 
 add_executable(fontinfo EXCLUDE_FROM_ALL fontinfo.cpp)
 target_link_libraries(fontinfo Qt5::Widgets )
-
-enable_testing()
-add_subdirectory(test)

@@ -64,10 +64,15 @@ if(MSVC)
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
 endif()
 
-enable_testing()
 add_subdirectory(src)
 add_subdirectory(doc)
-add_subdirectory(test)
+
+option(ENABLE_TESTS "Build tests" ON)
+if(ENABLE_TESTS)
+	enable_testing()
+	add_subdirectory(test)
+	add_subdirectory(src/gui/shellwidget/test)
+endif()
 
 # Bindings
 find_package(PythonInterp)
