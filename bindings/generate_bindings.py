@@ -54,6 +54,7 @@ class NeovimTypeVal:
             'String': 'QByteArray',
             'Object': 'QVariant',
             'Array': 'QVariantList',
+            'Dictionary': 'QVariantMap',
         }
     # msgpack extension types
     EXTTYPES = {
