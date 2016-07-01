@@ -53,6 +53,7 @@ class NeovimTypeVal:
             'Boolean': 'bool',
             'String': 'QByteArray',
             'Object': 'QVariant',
+            'Array': 'QVariantList',
         }
     # msgpack extension types
     EXTTYPES = {

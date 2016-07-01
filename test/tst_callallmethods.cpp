@@ -22,6 +22,7 @@ private slots:
 	void initTestCase();
 	void vim_get_current_buffer();
 	void vim_list_runtime_paths();
+	void vim_call_function();
 	void callAll();
 
 private:
@@ -88,6 +89,23 @@ void TestCallAllMethods::callAll()
 		}
 	}
 	QVERIFY2(!SPYWAIT(neovimErrors), "Fatal errors");
+}
+
+/// vim_call_functions() was the first API function
+/// to use the Array type
+void TestCallAllMethods::vim_call_function()
+{
+	QVERIFY(m_c->neovimObject());
+	NeovimQt::Neovim *obj = m_c->neovimObject();
+
+	QSignalSpy result(obj, SIGNAL(on_vim_call_function(QVariant)));
+	QVERIFY(result.isValid());
+
+	QVariantList args;
+	args << -2;
+	obj->vim_call_function("abs", args);
+	QVERIFY(SPYWAIT(result));
+	QCOMPARE(result.at(0).at(0), QVariant(2));
 }
 
 QTEST_MAIN(TestCallAllMethods)
