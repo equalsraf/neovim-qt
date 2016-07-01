@@ -32,6 +32,12 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	connect(&m_mouseclick_timer, &QTimer::timeout,
 			this, &Shell::mouseClickReset);
 
+	// Popup menu
+	m_pum.setParent(this);
+	m_pum.setContentsMargins(1, 1, 1, 1);
+	m_pum.hide();
+	m_pum.setFocusPolicy(Qt::NoFocus);
+
 	// IM Tooltip
 	setAttribute(Qt::WA_InputMethodEnabled, true);
 	m_tooltip = new QLabel(this);
@@ -423,6 +429,28 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "busy_stop"){
 		handleBusy(false);
 	} else if (name == "set_icon") {
+	} else if (name == "popupmenu_select") {
+		if (opargs.size() != 1 || !opargs.at(0).canConvert<qint64>()) {
+			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
+			return;
+		}
+		// Neovim uses -1 for 'no selection' and so does Qt
+		handlePopupMenuSelect(opargs.at(0).toLongLong());
+	} else if (name == "popupmenu_show") {
+		if (opargs.size() != 4
+				|| !opargs.at(1).canConvert<qint64>()
+				|| !opargs.at(2).canConvert<qint64>()
+				|| !opargs.at(3).canConvert<qint64>()) {
+			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
+			return;
+		}
+
+		handlePopupMenuShow(opargs.at(0).toList(),
+				opargs.at(1).toLongLong(),
+				opargs.at(2).toLongLong(),
+				opargs.at(3).toLongLong());
+	} else if (name == "popupmenu_hide") {
+		m_pum.hide();
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
@@ -538,6 +566,78 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			const QVariantList& opargs = opargs_var.toList();
 			handleRedraw(name, opargs);
 		}
+	}
+}
+
+void Shell::handlePopupMenuShow(const QVariantList& items,
+			int64_t selected, int64_t row, int64_t col)
+{
+	m_pum.clear();
+	foreach(const QVariant& v, items) {
+		QVariantList item = v.toList();
+		/// Item is (text, kind, extra, info)
+		QString text = item.value(0).toString();
+		if (item.isEmpty() || item.value(0).toString().isEmpty() 
+				|| item.size() != 4) {
+			qWarning() << "Unexpected popupmenu item" << item;
+			m_pum.clear();
+			return;
+		}
+		m_pum.addNeovimItem(item.value(0).toString(),
+				item.value(1).toString(),
+				item.value(2).toString(), item.value(3).toString());
+	}
+
+	handlePopupMenuSelect(selected);
+
+	// By default the menu is as large as needed to fit all entries
+	int pum_width = m_pum.sizeHint().width();
+	int anchor_x = col*cellSize().width();
+
+	// If the menu width is larger than half the shell, make it half width
+	if (pum_width >= width()/2) {
+		pum_width = columns()/2*cellSize().width();
+		anchor_x = (columns()-1)/2*cellSize().width();
+	}
+
+	// If the menu still does not fit move the anchor to the left
+	if (pum_width > (columns()*cellSize().width()-anchor_x)) {
+		anchor_x = columns()*cellSize().width() - pum_width;
+	}
+
+	int pum_height = m_pum.sizeHint().height();
+	// By default the menu goes bellow the row
+	int anchor_y = (row+1)*cellSize().height();
+	if (row > rows() / 2) {
+		// TODO: leave a couple lines above/below?
+		if (pum_height > row*cellSize().height()) {
+			// The pum height is too large, move it to the top
+			anchor_y = 0;
+			pum_height = row*cellSize().height()-1;
+		} else {
+			// Display menu above the anchor row
+			anchor_y = row*cellSize().height()-pum_height-1;
+		}
+	} else {
+		// Display menu below anchor
+		if (pum_height > (rows()-row-1)*cellSize().height()) {
+			// Resize popupmenu to fit
+			pum_height = height() - anchor_y;
+		}
+	}
+
+	m_pum.setGeometry(anchor_x, anchor_y, pum_width, pum_height);
+	m_pum.updateGeometry();
+	m_pum.show();
+}
+
+void Shell::handlePopupMenuSelect(int64_t selected)
+{
+	m_pum.setCurrentRow(selected);
+	if (selected == -1) {
+		m_pum.scrollToItem(m_pum.item(0));
+	} else {
+		m_pum.scrollToItem(m_pum.item(selected));
 	}
 }
 
