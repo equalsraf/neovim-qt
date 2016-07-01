@@ -81,35 +81,6 @@ QString NeovimConnector::errorString()
 }
 
 /**
- * Inform Neovim we are a GUI with the given width/height and want
- * to receive UI events. With/Height are expressed in cells.
- * \warning This method might be moved to class Neovim
- */
-MsgpackRequest* NeovimConnector::attachUi(int64_t width, int64_t height)
-{
-	// FIXME: this should be in class Neovim
-	MsgpackRequest *r = m_dev->startRequestUnchecked("ui_attach", 3);
-	connect(r, &MsgpackRequest::timeout,
-			this, &NeovimConnector::fatalTimeout);
-	r->setTimeout(5000);
-
-	m_dev->send(width);
-	m_dev->send(height);
-	m_dev->send(true);
-	return r;
-}
-
-/**
- * Stop receiving UI updates
- * \warning This method might be moved to class Neovim
- */
-void NeovimConnector::detachUi()
-{
-	// FIXME: this should be in class Neovim
-	m_dev->startRequestUnchecked("ui_detach", 0);
-}
-
-/**
  * Returns the channel id used by Neovim to identify this connection
  */
 uint64_t NeovimConnector::channel()

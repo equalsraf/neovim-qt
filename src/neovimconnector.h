@@ -61,10 +61,6 @@ public:
 	NeovimError errorCause();
 	QString errorString();
 
-	// FIXME: remove this
-	MsgpackRequest* attachUi(int64_t width, int64_t height);
-	void detachUi();
-
 	bool isReady();
 	Neovim* neovimObject();
 	uint64_t channel();
