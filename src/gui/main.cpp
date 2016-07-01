@@ -85,6 +85,8 @@ int main(int argc, char **argv)
 
 	int sep = app.arguments().indexOf("--");
 	QStringList neovimArgs;
+	neovimArgs << "--cmd";
+	neovimArgs << "set termguicolors";
 	if (sep != -1) {
 		QStringList args = app.arguments().mid(0, sep);
 		neovimArgs += app.arguments().mid(sep+1);
