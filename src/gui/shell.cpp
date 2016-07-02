@@ -125,15 +125,16 @@ Shell::~Shell()
 void Shell::setAttached(bool attached)
 {
 	m_attached = attached;
-	emit neovimAttached(attached);
 	if (attached) {
 		updateWindowId();
 		m_nvim->neovimObject()->vim_set_var("GuiFont", fontDesc());
 		if (isWindow()) {
 			updateGuiWindowState(windowState());
 		}
+		m_nvim->neovimObject()->vim_command("runtime plugin/nvim_gui_shim.vim");
 		m_nvim->neovimObject()->vim_command("runtime! ginit.vim");
 	}
+	emit neovimAttached(attached);
 	update();
 }
 
@@ -477,6 +478,11 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			} else {
 				emit neovimFullScreen(variant_not_zero(args.at(1)));
 			}
+		} else if (guiEvName == "Linespace" && args.size() == 2) {
+			auto val = args.at(1).toUInt();
+			setLineSpace(val);
+			m_nvim->neovimObject()->vim_set_var("GuiLinespace", val);
+			resizeNeovim(size());
 		}
 		return;
 	} else if (name != "redraw") {

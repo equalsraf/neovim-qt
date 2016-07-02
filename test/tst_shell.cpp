@@ -1,6 +1,7 @@
 #include <QtTest/QtTest>
 #include <QLocalSocket>
 #include <gui/mainwindow.h>
+#include <msgpackrequest.h>
 #include "common.h"
 
 namespace NeovimQt {
@@ -62,7 +63,42 @@ private slots:
 		checkStartVars(c);
 	}
 
+	void guiShimCommands() {
+		// This function needs to be able to find the GUI runtime
+		// plugin or this test WILL FAIL
+		QFileInfo fi = QFileInfo("src/gui/runtime");
+		QVERIFY2(fi.exists(), "Unable to find GUI runtime");
+		QStringList args = {"-u", "NONE",
+			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
+		NeovimConnector *c = NeovimConnector::spawn(args);
+		MainWindow *s = new MainWindow(c);
+		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QVERIFY(onAttached.isValid());
+		QVERIFY(SPYWAIT(onAttached));
+		QVERIFY(s->neovimAttached());
+
+		checkCommand(c, "GuiFont");
+		checkCommand(c, "GuiLinespace");
+	}
+
 protected:
+
+	void checkCommand(NeovimConnector *c, const QString& cmd) {
+		auto req = c->neovimObject()->vim_command_output(c->encode(cmd));
+		QSignalSpy cmdOk(req, SIGNAL(finished(quint32, Function::FunctionId, QVariant)));
+		QVERIFY(cmdOk.isValid());
+		QObject::connect(c->neovimObject(), &Neovim::err_vim_command_output, [cmd](QString msg, const QVariant& err) {
+				qDebug() << cmd << msg;
+			});
+		qDebug() << cmd;
+		// Force the Neovim event loop to advance with async vim_input()
+		c->neovimObject()->vim_input("<cr>");
+		QVERIFY(SPYWAIT(cmdOk));
+		qDebug() << cmdOk << cmdOk.size();
+		// Make sure the command output is not empty
+		QVERIFY(!cmdOk.at(0).at(2).toByteArray().isEmpty());
+	}
+
 	/// Check for the presence of the GUI variables in Neovim
 	void checkStartVars(NeovimQt::NeovimConnector *conn) {
 		NeovimQt::Neovim *nvim = conn->neovimObject();
