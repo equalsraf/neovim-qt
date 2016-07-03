@@ -111,7 +111,7 @@ bool Shell::setGuiFont(const QString& fdesc)
 	bool ok = setShellFont(attrs.at(0), pointSize, weight, italic);
 	if (ok && m_attached) {
 		resizeNeovim(size());
-		m_nvim->neovimObject()->vim_set_var("GuiFont", fdesc);
+		m_nvim->neovimObject()->vim_set_var("GuiFont", fontDesc());
 	}
 
 	return ok;
