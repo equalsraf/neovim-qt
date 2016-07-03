@@ -30,7 +30,8 @@ GuiFont		When called with no arguments this command display the
 		The following attributes are available
 
 			hXX - height is XX in points
-			b   - bold
+			b   - bold weight
+			l   - light weight
 			i   - italic
 
 								*GuiLinespace*
