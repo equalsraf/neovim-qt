@@ -70,7 +70,7 @@ QString Shell::fontDesc()
 		fdesc += ":b";
 	}
 	if (font().italic()) {
-		fdesc += ":b";
+		fdesc += ":i";
 	}
 	fdesc += "\n";
 	return fdesc;
