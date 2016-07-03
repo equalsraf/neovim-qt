@@ -78,6 +78,8 @@ protected:
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void focusInEvent(QFocusEvent *ev) Q_DECL_OVERRIDE;
 	virtual void focusOutEvent(QFocusEvent *ev) Q_DECL_OVERRIDE;
+	virtual void dragEnterEvent(QDragEnterEvent *) Q_DECL_OVERRIDE;
+	virtual void dropEvent(QDropEvent *) Q_DECL_OVERRIDE;
 
 	virtual void handleResize(uint64_t cols, uint64_t rows);
 	virtual void handlePut(const QVariantList& args);

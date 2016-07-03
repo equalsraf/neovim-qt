@@ -6,6 +6,7 @@
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QKeyEvent>
+#include <QMimeData>
 #include "msgpackrequest.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
@@ -23,6 +24,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 {
 	setAttribute(Qt::WA_KeyCompression, false);
 
+	setAcceptDrops(true);
 	setMouseTracking(true);
 	m_mouseclick_timer.setInterval(QApplication::doubleClickInterval());
 	m_mouseclick_timer.setSingleShot(true);
@@ -926,6 +928,43 @@ bool Shell::isBadMonospace(const QFont& f)
 	}
 
 	return false;
+}
+
+void Shell::dragEnterEvent(QDragEnterEvent *ev)
+{
+	if (!m_attached) {
+		return;
+	}
+
+	if (ev->mimeData()->hasFormat("text/uri-list")) {
+		ev->acceptProposedAction();
+	}
+}
+
+void Shell::dropEvent(QDropEvent *ev)
+{
+	if (!m_attached) {
+		return;
+	}
+
+	if ( ev->mimeData()->hasFormat("text/uri-list") ) {
+		QList<QUrl> urls = ev->mimeData()->urls();
+		if ( urls.size() == 0 ) {
+			return;
+		}
+
+		QVariantList args;
+		foreach(QUrl u, urls) {
+			if ( u.scheme() == "file" ) {
+				args.append(u.toLocalFile());
+			} else {
+				args.append(u.toString());
+			}
+		}
+
+		m_nvim->neovimObject()->vim_call_function("GuiDrop", args);
+	}
+	ev->acceptProposedAction();
 }
 
 } // Namespace
