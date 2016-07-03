@@ -1,5 +1,6 @@
 #include <QtTest/QtTest>
 #include <QLocalSocket>
+#include <QFontDatabase>
 #include <gui/mainwindow.h>
 #include <msgpackrequest.h>
 #include "common.h"
@@ -10,6 +11,16 @@ class Test: public QObject
 {
 	Q_OBJECT
 private slots:
+	void initTestCase() {
+		QStringList fonts;
+		fonts << "third-party/DejaVuSansMono.ttf"
+			<< "third-party/DejaVuSansMono-Bold.ttf"
+			<< "third-party/DejaVuSansMono-BoldOblique.ttf";
+		foreach(QString path, fonts) {
+			QFontDatabase::addApplicationFont(path);
+		}
+	}
+
 	void benchStart() {
 		QBENCHMARK {
 			NeovimConnector *c = NeovimConnector::spawn();
