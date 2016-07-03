@@ -1,28 +1,5 @@
-// Auto generated 2015-07-06 14:02:18.175840
+// Auto generated 2016-07-03 02:23:03.002477
 const QList<Function> Function::knownFunctions = QList<Function>()
-<< Function("ArrayOf(Window)", "tabpage_get_windows",
-	QList<QString>()
-			<< QString("Tabpage")
-		, true)
-<< Function("Object", "tabpage_get_var",
-	QList<QString>()
-			<< QString("Tabpage")
-			<< QString("String")
-		, true)
-<< Function("Object", "tabpage_set_var",
-	QList<QString>()
-			<< QString("Tabpage")
-			<< QString("String")
-			<< QString("Object")
-		, true)
-<< Function("Window", "tabpage_get_window",
-	QList<QString>()
-			<< QString("Tabpage")
-		, true)
-<< Function("Boolean", "tabpage_is_valid",
-	QList<QString>()
-			<< QString("Tabpage")
-		, false)
 << Function("Integer", "buffer_line_count",
 	QList<QString>()
 			<< QString("Buffer")
@@ -51,12 +28,27 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 			<< QString("Boolean")
 			<< QString("Boolean")
 		, true)
+<< Function("ArrayOf(String)", "buffer_get_lines",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("Integer")
+			<< QString("Integer")
+			<< QString("Boolean")
+		, true)
 << Function("void", "buffer_set_line_slice",
 	QList<QString>()
 			<< QString("Buffer")
 			<< QString("Integer")
 			<< QString("Integer")
 			<< QString("Boolean")
+			<< QString("Boolean")
+			<< QString("ArrayOf(String)")
+		, true)
+<< Function("void", "buffer_set_lines",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("Integer")
+			<< QString("Integer")
 			<< QString("Boolean")
 			<< QString("ArrayOf(String)")
 		, true)
@@ -70,6 +62,11 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 			<< QString("Buffer")
 			<< QString("String")
 			<< QString("Object")
+		, true)
+<< Function("Object", "buffer_del_var",
+	QList<QString>()
+			<< QString("Buffer")
+			<< QString("String")
 		, true)
 << Function("Object", "buffer_get_option",
 	QList<QString>()
@@ -110,70 +107,49 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 			<< QString("Buffer")
 			<< QString("String")
 		, true)
-<< Function("Buffer", "window_get_buffer",
+<< Function("Integer", "buffer_add_highlight",
 	QList<QString>()
-			<< QString("Window")
-		, true)
-<< Function("ArrayOf(Integer, 2)", "window_get_cursor",
-	QList<QString>()
-			<< QString("Window")
-		, true)
-<< Function("void", "window_set_cursor",
-	QList<QString>()
-			<< QString("Window")
-			<< QString("ArrayOf(Integer, 2)")
-		, true)
-<< Function("Integer", "window_get_height",
-	QList<QString>()
-			<< QString("Window")
-		, true)
-<< Function("void", "window_set_height",
-	QList<QString>()
-			<< QString("Window")
+			<< QString("Buffer")
+			<< QString("Integer")
+			<< QString("String")
+			<< QString("Integer")
+			<< QString("Integer")
 			<< QString("Integer")
 		, true)
-<< Function("Integer", "window_get_width",
+<< Function("void", "buffer_clear_highlight",
 	QList<QString>()
-			<< QString("Window")
-		, true)
-<< Function("void", "window_set_width",
-	QList<QString>()
-			<< QString("Window")
+			<< QString("Buffer")
+			<< QString("Integer")
+			<< QString("Integer")
 			<< QString("Integer")
 		, true)
-<< Function("Object", "window_get_var",
+<< Function("ArrayOf(Window)", "tabpage_get_windows",
 	QList<QString>()
-			<< QString("Window")
+			<< QString("Tabpage")
+		, true)
+<< Function("Object", "tabpage_get_var",
+	QList<QString>()
+			<< QString("Tabpage")
 			<< QString("String")
 		, true)
-<< Function("Object", "window_set_var",
+<< Function("Object", "tabpage_set_var",
 	QList<QString>()
-			<< QString("Window")
+			<< QString("Tabpage")
 			<< QString("String")
 			<< QString("Object")
 		, true)
-<< Function("Object", "window_get_option",
+<< Function("Object", "tabpage_del_var",
 	QList<QString>()
-			<< QString("Window")
+			<< QString("Tabpage")
 			<< QString("String")
 		, true)
-<< Function("void", "window_set_option",
+<< Function("Window", "tabpage_get_window",
 	QList<QString>()
-			<< QString("Window")
-			<< QString("String")
-			<< QString("Object")
+			<< QString("Tabpage")
 		, true)
-<< Function("ArrayOf(Integer, 2)", "window_get_position",
+<< Function("Boolean", "tabpage_is_valid",
 	QList<QString>()
-			<< QString("Window")
-		, true)
-<< Function("Tabpage", "window_get_tabpage",
-	QList<QString>()
-			<< QString("Window")
-		, true)
-<< Function("Boolean", "window_is_valid",
-	QList<QString>()
-			<< QString("Window")
+			<< QString("Tabpage")
 		, false)
 << Function("void", "vim_command",
 	QList<QString>()
@@ -204,6 +180,11 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 	QList<QString>()
 			<< QString("String")
 		, true)
+<< Function("Object", "vim_call_function",
+	QList<QString>()
+			<< QString("String")
+			<< QString("Array")
+		, true)
 << Function("Integer", "vim_strwidth",
 	QList<QString>()
 			<< QString("String")
@@ -233,6 +214,10 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 	QList<QString>()
 			<< QString("String")
 			<< QString("Object")
+		, true)
+<< Function("Object", "vim_del_var",
+	QList<QString>()
+			<< QString("String")
 		, true)
 << Function("Object", "vim_get_vvar",
 	QList<QString>()
@@ -300,5 +285,75 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 << Function("Integer", "vim_name_to_color",
 	QList<QString>()
 			<< QString("String")
+		, false)
+<< Function("Buffer", "window_get_buffer",
+	QList<QString>()
+			<< QString("Window")
+		, true)
+<< Function("ArrayOf(Integer, 2)", "window_get_cursor",
+	QList<QString>()
+			<< QString("Window")
+		, true)
+<< Function("void", "window_set_cursor",
+	QList<QString>()
+			<< QString("Window")
+			<< QString("ArrayOf(Integer, 2)")
+		, true)
+<< Function("Integer", "window_get_height",
+	QList<QString>()
+			<< QString("Window")
+		, true)
+<< Function("void", "window_set_height",
+	QList<QString>()
+			<< QString("Window")
+			<< QString("Integer")
+		, true)
+<< Function("Integer", "window_get_width",
+	QList<QString>()
+			<< QString("Window")
+		, true)
+<< Function("void", "window_set_width",
+	QList<QString>()
+			<< QString("Window")
+			<< QString("Integer")
+		, true)
+<< Function("Object", "window_get_var",
+	QList<QString>()
+			<< QString("Window")
+			<< QString("String")
+		, true)
+<< Function("Object", "window_set_var",
+	QList<QString>()
+			<< QString("Window")
+			<< QString("String")
+			<< QString("Object")
+		, true)
+<< Function("Object", "window_del_var",
+	QList<QString>()
+			<< QString("Window")
+			<< QString("String")
+		, true)
+<< Function("Object", "window_get_option",
+	QList<QString>()
+			<< QString("Window")
+			<< QString("String")
+		, true)
+<< Function("void", "window_set_option",
+	QList<QString>()
+			<< QString("Window")
+			<< QString("String")
+			<< QString("Object")
+		, true)
+<< Function("ArrayOf(Integer, 2)", "window_get_position",
+	QList<QString>()
+			<< QString("Window")
+		, true)
+<< Function("Tabpage", "window_get_tabpage",
+	QList<QString>()
+			<< QString("Window")
+		, true)
+<< Function("Boolean", "window_is_valid",
+	QList<QString>()
+			<< QString("Window")
 		, false)
 	;

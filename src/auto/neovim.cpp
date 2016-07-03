@@ -1,4 +1,4 @@
-// Auto generated 2015-07-06 14:02:18.187121
+// Auto generated 2016-07-03 02:23:03.024523
 #include "neovim.h"
 #include "neovimconnector.h"
 #include "msgpackrequest.h"
@@ -47,54 +47,6 @@ void Neovim::ui_try_resize(int64_t width, int64_t height)
 
 
 // Slots
-MsgpackRequest* Neovim::tabpage_get_windows(int64_t tabpage)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_windows", 1);
-	r->setFunction(Function::NEOVIM_FN_TABPAGE_GET_WINDOWS);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(tabpage);
-	return r;
-}
-MsgpackRequest* Neovim::tabpage_get_var(int64_t tabpage, QByteArray name)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_var", 2);
-	r->setFunction(Function::NEOVIM_FN_TABPAGE_GET_VAR);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(tabpage);
-	m_c->m_dev->send(name);
-	return r;
-}
-MsgpackRequest* Neovim::tabpage_set_var(int64_t tabpage, QByteArray name, QVariant value)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_set_var", 3);
-	r->setFunction(Function::NEOVIM_FN_TABPAGE_SET_VAR);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(tabpage);
-	m_c->m_dev->send(name);
-	m_c->m_dev->send(value);
-	return r;
-}
-MsgpackRequest* Neovim::tabpage_get_window(int64_t tabpage)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_window", 1);
-	r->setFunction(Function::NEOVIM_FN_TABPAGE_GET_WINDOW);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(tabpage);
-	return r;
-}
-MsgpackRequest* Neovim::tabpage_is_valid(int64_t tabpage)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_is_valid", 1);
-	r->setFunction(Function::NEOVIM_FN_TABPAGE_IS_VALID);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(tabpage);
-	return r;
-}
 MsgpackRequest* Neovim::buffer_line_count(int64_t buffer)
 {
 	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_line_count", 1);
@@ -148,6 +100,18 @@ MsgpackRequest* Neovim::buffer_get_line_slice(int64_t buffer, int64_t start, int
 	m_c->m_dev->send(include_end);
 	return r;
 }
+MsgpackRequest* Neovim::buffer_get_lines(int64_t buffer, int64_t start, int64_t end, bool strict_indexing)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_get_lines", 4);
+	r->setFunction(Function::NEOVIM_FN_BUFFER_GET_LINES);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(buffer);
+	m_c->m_dev->send(start);
+	m_c->m_dev->send(end);
+	m_c->m_dev->send(strict_indexing);
+	return r;
+}
 MsgpackRequest* Neovim::buffer_set_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end, QList<QByteArray> replacement)
 {
 	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_line_slice", 6);
@@ -159,6 +123,19 @@ MsgpackRequest* Neovim::buffer_set_line_slice(int64_t buffer, int64_t start, int
 	m_c->m_dev->send(end);
 	m_c->m_dev->send(include_start);
 	m_c->m_dev->send(include_end);
+	m_c->m_dev->sendArrayOf(replacement);
+	return r;
+}
+MsgpackRequest* Neovim::buffer_set_lines(int64_t buffer, int64_t start, int64_t end, bool strict_indexing, QList<QByteArray> replacement)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_set_lines", 5);
+	r->setFunction(Function::NEOVIM_FN_BUFFER_SET_LINES);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(buffer);
+	m_c->m_dev->send(start);
+	m_c->m_dev->send(end);
+	m_c->m_dev->send(strict_indexing);
 	m_c->m_dev->sendArrayOf(replacement);
 	return r;
 }
@@ -181,6 +158,16 @@ MsgpackRequest* Neovim::buffer_set_var(int64_t buffer, QByteArray name, QVariant
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(name);
 	m_c->m_dev->send(value);
+	return r;
+}
+MsgpackRequest* Neovim::buffer_del_var(int64_t buffer, QByteArray name)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_del_var", 2);
+	r->setFunction(Function::NEOVIM_FN_BUFFER_DEL_VAR);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(buffer);
+	m_c->m_dev->send(name);
 	return r;
 }
 MsgpackRequest* Neovim::buffer_get_option(int64_t buffer, QByteArray name)
@@ -262,139 +249,88 @@ MsgpackRequest* Neovim::buffer_get_mark(int64_t buffer, QByteArray name)
 	m_c->m_dev->send(name);
 	return r;
 }
-MsgpackRequest* Neovim::window_get_buffer(int64_t window)
+MsgpackRequest* Neovim::buffer_add_highlight(int64_t buffer, int64_t src_id, QByteArray hl_group, int64_t line, int64_t col_start, int64_t col_end)
 {
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_buffer", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_BUFFER);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_add_highlight", 6);
+	r->setFunction(Function::NEOVIM_FN_BUFFER_ADD_HIGHLIGHT);
 	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
+	m_c->m_dev->send(buffer);
+	m_c->m_dev->send(src_id);
+	m_c->m_dev->send(hl_group);
+	m_c->m_dev->send(line);
+	m_c->m_dev->send(col_start);
+	m_c->m_dev->send(col_end);
 	return r;
 }
-MsgpackRequest* Neovim::window_get_cursor(int64_t window)
+MsgpackRequest* Neovim::buffer_clear_highlight(int64_t buffer, int64_t src_id, int64_t line_start, int64_t line_end)
 {
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_cursor", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_CURSOR);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("buffer_clear_highlight", 4);
+	r->setFunction(Function::NEOVIM_FN_BUFFER_CLEAR_HIGHLIGHT);
 	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
+	m_c->m_dev->send(buffer);
+	m_c->m_dev->send(src_id);
+	m_c->m_dev->send(line_start);
+	m_c->m_dev->send(line_end);
 	return r;
 }
-MsgpackRequest* Neovim::window_set_cursor(int64_t window, QPoint pos)
+MsgpackRequest* Neovim::tabpage_get_windows(int64_t tabpage)
 {
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_cursor", 2);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_CURSOR);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_windows", 1);
+	r->setFunction(Function::NEOVIM_FN_TABPAGE_GET_WINDOWS);
 	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
-	m_c->m_dev->send(pos);
+	m_c->m_dev->send(tabpage);
 	return r;
 }
-MsgpackRequest* Neovim::window_get_height(int64_t window)
+MsgpackRequest* Neovim::tabpage_get_var(int64_t tabpage, QByteArray name)
 {
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_height", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_HEIGHT);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_var", 2);
+	r->setFunction(Function::NEOVIM_FN_TABPAGE_GET_VAR);
 	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
-	return r;
-}
-MsgpackRequest* Neovim::window_set_height(int64_t window, int64_t height)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_height", 2);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_HEIGHT);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
-	m_c->m_dev->send(height);
-	return r;
-}
-MsgpackRequest* Neovim::window_get_width(int64_t window)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_width", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_WIDTH);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
-	return r;
-}
-MsgpackRequest* Neovim::window_set_width(int64_t window, int64_t width)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_width", 2);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_WIDTH);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
-	m_c->m_dev->send(width);
-	return r;
-}
-MsgpackRequest* Neovim::window_get_var(int64_t window, QByteArray name)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_var", 2);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_VAR);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
+	m_c->m_dev->send(tabpage);
 	m_c->m_dev->send(name);
 	return r;
 }
-MsgpackRequest* Neovim::window_set_var(int64_t window, QByteArray name, QVariant value)
+MsgpackRequest* Neovim::tabpage_set_var(int64_t tabpage, QByteArray name, QVariant value)
 {
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_var", 3);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_VAR);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_set_var", 3);
+	r->setFunction(Function::NEOVIM_FN_TABPAGE_SET_VAR);
 	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
+	m_c->m_dev->send(tabpage);
 	m_c->m_dev->send(name);
 	m_c->m_dev->send(value);
 	return r;
 }
-MsgpackRequest* Neovim::window_get_option(int64_t window, QByteArray name)
+MsgpackRequest* Neovim::tabpage_del_var(int64_t tabpage, QByteArray name)
 {
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_option", 2);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_OPTION);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_del_var", 2);
+	r->setFunction(Function::NEOVIM_FN_TABPAGE_DEL_VAR);
 	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
+	m_c->m_dev->send(tabpage);
 	m_c->m_dev->send(name);
 	return r;
 }
-MsgpackRequest* Neovim::window_set_option(int64_t window, QByteArray name, QVariant value)
+MsgpackRequest* Neovim::tabpage_get_window(int64_t tabpage)
 {
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_option", 3);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_OPTION);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_get_window", 1);
+	r->setFunction(Function::NEOVIM_FN_TABPAGE_GET_WINDOW);
 	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
-	m_c->m_dev->send(name);
-	m_c->m_dev->send(value);
+	m_c->m_dev->send(tabpage);
 	return r;
 }
-MsgpackRequest* Neovim::window_get_position(int64_t window)
+MsgpackRequest* Neovim::tabpage_is_valid(int64_t tabpage)
 {
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_position", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_POSITION);
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("tabpage_is_valid", 1);
+	r->setFunction(Function::NEOVIM_FN_TABPAGE_IS_VALID);
 	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
-	return r;
-}
-MsgpackRequest* Neovim::window_get_tabpage(int64_t window)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_tabpage", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_TABPAGE);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
-	return r;
-}
-MsgpackRequest* Neovim::window_is_valid(int64_t window)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_is_valid", 1);
-	r->setFunction(Function::NEOVIM_FN_WINDOW_IS_VALID);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
-	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
-	m_c->m_dev->send(window);
+	m_c->m_dev->send(tabpage);
 	return r;
 }
 MsgpackRequest* Neovim::vim_command(QByteArray str)
@@ -454,6 +390,16 @@ MsgpackRequest* Neovim::vim_eval(QByteArray str)
 	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(str);
+	return r;
+}
+MsgpackRequest* Neovim::vim_call_function(QByteArray fname, QVariantList args)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_call_function", 2);
+	r->setFunction(Function::NEOVIM_FN_VIM_CALL_FUNCTION);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(fname);
+	m_c->m_dev->send(args);
 	return r;
 }
 MsgpackRequest* Neovim::vim_strwidth(QByteArray str)
@@ -524,6 +470,15 @@ MsgpackRequest* Neovim::vim_set_var(QByteArray name, QVariant value)
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(name);
 	m_c->m_dev->send(value);
+	return r;
+}
+MsgpackRequest* Neovim::vim_del_var(QByteArray name)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_del_var", 1);
+	r->setFunction(Function::NEOVIM_FN_VIM_DEL_VAR);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(name);
 	return r;
 }
 MsgpackRequest* Neovim::vim_get_vvar(QByteArray name)
@@ -683,6 +638,151 @@ MsgpackRequest* Neovim::vim_name_to_color(QByteArray name)
 	m_c->m_dev->send(name);
 	return r;
 }
+MsgpackRequest* Neovim::window_get_buffer(int64_t window)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_buffer", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_BUFFER);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	return r;
+}
+MsgpackRequest* Neovim::window_get_cursor(int64_t window)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_cursor", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_CURSOR);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	return r;
+}
+MsgpackRequest* Neovim::window_set_cursor(int64_t window, QPoint pos)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_cursor", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_CURSOR);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	m_c->m_dev->send(pos);
+	return r;
+}
+MsgpackRequest* Neovim::window_get_height(int64_t window)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_height", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_HEIGHT);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	return r;
+}
+MsgpackRequest* Neovim::window_set_height(int64_t window, int64_t height)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_height", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_HEIGHT);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	m_c->m_dev->send(height);
+	return r;
+}
+MsgpackRequest* Neovim::window_get_width(int64_t window)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_width", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_WIDTH);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	return r;
+}
+MsgpackRequest* Neovim::window_set_width(int64_t window, int64_t width)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_width", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_WIDTH);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	m_c->m_dev->send(width);
+	return r;
+}
+MsgpackRequest* Neovim::window_get_var(int64_t window, QByteArray name)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_var", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_VAR);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	m_c->m_dev->send(name);
+	return r;
+}
+MsgpackRequest* Neovim::window_set_var(int64_t window, QByteArray name, QVariant value)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_var", 3);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_VAR);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	m_c->m_dev->send(name);
+	m_c->m_dev->send(value);
+	return r;
+}
+MsgpackRequest* Neovim::window_del_var(int64_t window, QByteArray name)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_del_var", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_DEL_VAR);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	m_c->m_dev->send(name);
+	return r;
+}
+MsgpackRequest* Neovim::window_get_option(int64_t window, QByteArray name)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_option", 2);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_OPTION);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	m_c->m_dev->send(name);
+	return r;
+}
+MsgpackRequest* Neovim::window_set_option(int64_t window, QByteArray name, QVariant value)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_set_option", 3);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_SET_OPTION);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	m_c->m_dev->send(name);
+	m_c->m_dev->send(value);
+	return r;
+}
+MsgpackRequest* Neovim::window_get_position(int64_t window)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_position", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_POSITION);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	return r;
+}
+MsgpackRequest* Neovim::window_get_tabpage(int64_t window)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_tabpage", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_GET_TABPAGE);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	return r;
+}
+MsgpackRequest* Neovim::window_is_valid(int64_t window)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_is_valid", 1);
+	r->setFunction(Function::NEOVIM_FN_WINDOW_IS_VALID);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(window);
+	return r;
+}
 
 // Handlers
 
@@ -701,18 +801,6 @@ void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const 
 	}
 
 	switch(fun) {
-	case Function::NEOVIM_FN_TABPAGE_GET_WINDOWS:
-		emit err_tabpage_get_windows(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_TABPAGE_GET_VAR:
-		emit err_tabpage_get_var(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_TABPAGE_SET_VAR:
-		emit err_tabpage_set_var(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW:
-		emit err_tabpage_get_window(errMsg, res);
-		break;
 	case Function::NEOVIM_FN_BUFFER_LINE_COUNT:
 		emit err_buffer_line_count(errMsg, res);
 		break;
@@ -728,14 +816,23 @@ void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const 
 	case Function::NEOVIM_FN_BUFFER_GET_LINE_SLICE:
 		emit err_buffer_get_line_slice(errMsg, res);
 		break;
+	case Function::NEOVIM_FN_BUFFER_GET_LINES:
+		emit err_buffer_get_lines(errMsg, res);
+		break;
 	case Function::NEOVIM_FN_BUFFER_SET_LINE_SLICE:
 		emit err_buffer_set_line_slice(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_SET_LINES:
+		emit err_buffer_set_lines(errMsg, res);
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_VAR:
 		emit err_buffer_get_var(errMsg, res);
 		break;
 	case Function::NEOVIM_FN_BUFFER_SET_VAR:
 		emit err_buffer_set_var(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_DEL_VAR:
+		emit err_buffer_del_var(errMsg, res);
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_OPTION:
 		emit err_buffer_get_option(errMsg, res);
@@ -757,6 +854,81 @@ void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const 
 		break;
 	case Function::NEOVIM_FN_BUFFER_GET_MARK:
 		emit err_buffer_get_mark(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_ADD_HIGHLIGHT:
+		emit err_buffer_add_highlight(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_BUFFER_CLEAR_HIGHLIGHT:
+		emit err_buffer_clear_highlight(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_TABPAGE_GET_WINDOWS:
+		emit err_tabpage_get_windows(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_TABPAGE_GET_VAR:
+		emit err_tabpage_get_var(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_TABPAGE_SET_VAR:
+		emit err_tabpage_set_var(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_TABPAGE_DEL_VAR:
+		emit err_tabpage_del_var(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW:
+		emit err_tabpage_get_window(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_COMMAND:
+		emit err_vim_command(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_COMMAND_OUTPUT:
+		emit err_vim_command_output(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_EVAL:
+		emit err_vim_eval(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_CALL_FUNCTION:
+		emit err_vim_call_function(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_STRWIDTH:
+		emit err_vim_strwidth(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_CHANGE_DIRECTORY:
+		emit err_vim_change_directory(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_GET_CURRENT_LINE:
+		emit err_vim_get_current_line(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_CURRENT_LINE:
+		emit err_vim_set_current_line(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_DEL_CURRENT_LINE:
+		emit err_vim_del_current_line(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_GET_VAR:
+		emit err_vim_get_var(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_VAR:
+		emit err_vim_set_var(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_DEL_VAR:
+		emit err_vim_del_var(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_GET_VVAR:
+		emit err_vim_get_vvar(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_GET_OPTION:
+		emit err_vim_get_option(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_OPTION:
+		emit err_vim_set_option(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_CURRENT_BUFFER:
+		emit err_vim_set_current_buffer(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_CURRENT_WINDOW:
+		emit err_vim_set_current_window(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_VIM_SET_CURRENT_TABPAGE:
+		emit err_vim_set_current_tabpage(errMsg, res);
 		break;
 	case Function::NEOVIM_FN_WINDOW_GET_BUFFER:
 		emit err_window_get_buffer(errMsg, res);
@@ -785,6 +957,9 @@ void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const 
 	case Function::NEOVIM_FN_WINDOW_SET_VAR:
 		emit err_window_set_var(errMsg, res);
 		break;
+	case Function::NEOVIM_FN_WINDOW_DEL_VAR:
+		emit err_window_del_var(errMsg, res);
+		break;
 	case Function::NEOVIM_FN_WINDOW_GET_OPTION:
 		emit err_window_get_option(errMsg, res);
 		break;
@@ -797,54 +972,6 @@ void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const 
 	case Function::NEOVIM_FN_WINDOW_GET_TABPAGE:
 		emit err_window_get_tabpage(errMsg, res);
 		break;
-	case Function::NEOVIM_FN_VIM_COMMAND:
-		emit err_vim_command(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_COMMAND_OUTPUT:
-		emit err_vim_command_output(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_EVAL:
-		emit err_vim_eval(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_STRWIDTH:
-		emit err_vim_strwidth(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_CHANGE_DIRECTORY:
-		emit err_vim_change_directory(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_GET_CURRENT_LINE:
-		emit err_vim_get_current_line(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_SET_CURRENT_LINE:
-		emit err_vim_set_current_line(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_DEL_CURRENT_LINE:
-		emit err_vim_del_current_line(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_GET_VAR:
-		emit err_vim_get_var(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_SET_VAR:
-		emit err_vim_set_var(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_GET_VVAR:
-		emit err_vim_get_vvar(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_GET_OPTION:
-		emit err_vim_get_option(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_SET_OPTION:
-		emit err_vim_set_option(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_SET_CURRENT_BUFFER:
-		emit err_vim_set_current_buffer(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_SET_CURRENT_WINDOW:
-		emit err_vim_set_current_window(errMsg, res);
-		break;
-	case Function::NEOVIM_FN_VIM_SET_CURRENT_TABPAGE:
-		emit err_vim_set_current_tabpage(errMsg, res);
-		break;
 	default:
 		m_c->setError(NeovimConnector::RuntimeMsgpackError, QString("Received error for function that should not fail: %s").arg(fun));
 	}
@@ -853,66 +980,6 @@ void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const 
 void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const QVariant& res)
 {
 	switch(fun) {
-	case Function::NEOVIM_FN_TABPAGE_GET_WINDOWS:
-		{
-			QList<int64_t> data;
-			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_get_windows");
-				return;
-			} else {
-				emit on_tabpage_get_windows(data);
-			}
-
-		}
-		break;
-	case Function::NEOVIM_FN_TABPAGE_GET_VAR:
-		{
-			QVariant data;
-			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_get_var");
-				return;
-			} else {
-				emit on_tabpage_get_var(data);
-			}
-
-		}
-		break;
-	case Function::NEOVIM_FN_TABPAGE_SET_VAR:
-		{
-			QVariant data;
-			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_set_var");
-				return;
-			} else {
-				emit on_tabpage_set_var(data);
-			}
-
-		}
-		break;
-	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW:
-		{
-			int64_t data;
-			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_get_window");
-				return;
-			} else {
-				emit on_tabpage_get_window(data);
-			}
-
-		}
-		break;
-	case Function::NEOVIM_FN_TABPAGE_IS_VALID:
-		{
-			bool data;
-			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_is_valid");
-				return;
-			} else {
-				emit on_tabpage_is_valid(data);
-			}
-
-		}
-		break;
 	case Function::NEOVIM_FN_BUFFER_LINE_COUNT:
 		{
 			int64_t data;
@@ -961,9 +1028,27 @@ void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const QVari
 
 		}
 		break;
+	case Function::NEOVIM_FN_BUFFER_GET_LINES:
+		{
+			QList<QByteArray> data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for buffer_get_lines");
+				return;
+			} else {
+				emit on_buffer_get_lines(data);
+			}
+
+		}
+		break;
 	case Function::NEOVIM_FN_BUFFER_SET_LINE_SLICE:
 		{
 			emit on_buffer_set_line_slice();
+
+		}
+		break;
+	case Function::NEOVIM_FN_BUFFER_SET_LINES:
+		{
+			emit on_buffer_set_lines();
 
 		}
 		break;
@@ -987,6 +1072,18 @@ void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const QVari
 				return;
 			} else {
 				emit on_buffer_set_var(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_BUFFER_DEL_VAR:
+		{
+			QVariant data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for buffer_del_var");
+				return;
+			} else {
+				emit on_buffer_del_var(data);
 			}
 
 		}
@@ -1069,146 +1166,92 @@ void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const QVari
 
 		}
 		break;
-	case Function::NEOVIM_FN_WINDOW_GET_BUFFER:
+	case Function::NEOVIM_FN_BUFFER_ADD_HIGHLIGHT:
 		{
 			int64_t data;
 			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_buffer");
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for buffer_add_highlight");
 				return;
 			} else {
-				emit on_window_get_buffer(data);
+				emit on_buffer_add_highlight(data);
 			}
 
 		}
 		break;
-	case Function::NEOVIM_FN_WINDOW_GET_CURSOR:
+	case Function::NEOVIM_FN_BUFFER_CLEAR_HIGHLIGHT:
 		{
-			QPoint data;
+			emit on_buffer_clear_highlight();
+
+		}
+		break;
+	case Function::NEOVIM_FN_TABPAGE_GET_WINDOWS:
+		{
+			QList<int64_t> data;
 			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_cursor");
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_get_windows");
 				return;
 			} else {
-				emit on_window_get_cursor(data);
+				emit on_tabpage_get_windows(data);
 			}
 
 		}
 		break;
-	case Function::NEOVIM_FN_WINDOW_SET_CURSOR:
-		{
-			emit on_window_set_cursor();
-
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_HEIGHT:
-		{
-			int64_t data;
-			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_height");
-				return;
-			} else {
-				emit on_window_get_height(data);
-			}
-
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_SET_HEIGHT:
-		{
-			emit on_window_set_height();
-
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_WIDTH:
-		{
-			int64_t data;
-			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_width");
-				return;
-			} else {
-				emit on_window_get_width(data);
-			}
-
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_SET_WIDTH:
-		{
-			emit on_window_set_width();
-
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_VAR:
+	case Function::NEOVIM_FN_TABPAGE_GET_VAR:
 		{
 			QVariant data;
 			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_var");
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_get_var");
 				return;
 			} else {
-				emit on_window_get_var(data);
+				emit on_tabpage_get_var(data);
 			}
 
 		}
 		break;
-	case Function::NEOVIM_FN_WINDOW_SET_VAR:
+	case Function::NEOVIM_FN_TABPAGE_SET_VAR:
 		{
 			QVariant data;
 			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_set_var");
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_set_var");
 				return;
 			} else {
-				emit on_window_set_var(data);
+				emit on_tabpage_set_var(data);
 			}
 
 		}
 		break;
-	case Function::NEOVIM_FN_WINDOW_GET_OPTION:
+	case Function::NEOVIM_FN_TABPAGE_DEL_VAR:
 		{
 			QVariant data;
 			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_option");
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_del_var");
 				return;
 			} else {
-				emit on_window_get_option(data);
+				emit on_tabpage_del_var(data);
 			}
 
 		}
 		break;
-	case Function::NEOVIM_FN_WINDOW_SET_OPTION:
-		{
-			emit on_window_set_option();
-
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_POSITION:
-		{
-			QPoint data;
-			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_position");
-				return;
-			} else {
-				emit on_window_get_position(data);
-			}
-
-		}
-		break;
-	case Function::NEOVIM_FN_WINDOW_GET_TABPAGE:
+	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW:
 		{
 			int64_t data;
 			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_tabpage");
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_get_window");
 				return;
 			} else {
-				emit on_window_get_tabpage(data);
+				emit on_tabpage_get_window(data);
 			}
 
 		}
 		break;
-	case Function::NEOVIM_FN_WINDOW_IS_VALID:
+	case Function::NEOVIM_FN_TABPAGE_IS_VALID:
 		{
 			bool data;
 			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_is_valid");
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for tabpage_is_valid");
 				return;
 			} else {
-				emit on_window_is_valid(data);
+				emit on_tabpage_is_valid(data);
 			}
 
 		}
@@ -1269,6 +1312,18 @@ void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const QVari
 				return;
 			} else {
 				emit on_vim_eval(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_VIM_CALL_FUNCTION:
+		{
+			QVariant data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for vim_call_function");
+				return;
+			} else {
+				emit on_vim_call_function(data);
 			}
 
 		}
@@ -1347,6 +1402,18 @@ void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const QVari
 				return;
 			} else {
 				emit on_vim_set_var(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_VIM_DEL_VAR:
+		{
+			QVariant data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for vim_del_var");
+				return;
+			} else {
+				emit on_vim_del_var(data);
 			}
 
 		}
@@ -1509,6 +1576,162 @@ void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const QVari
 				return;
 			} else {
 				emit on_vim_name_to_color(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_BUFFER:
+		{
+			int64_t data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_buffer");
+				return;
+			} else {
+				emit on_window_get_buffer(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_CURSOR:
+		{
+			QPoint data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_cursor");
+				return;
+			} else {
+				emit on_window_get_cursor(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_CURSOR:
+		{
+			emit on_window_set_cursor();
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_HEIGHT:
+		{
+			int64_t data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_height");
+				return;
+			} else {
+				emit on_window_get_height(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_HEIGHT:
+		{
+			emit on_window_set_height();
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_WIDTH:
+		{
+			int64_t data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_width");
+				return;
+			} else {
+				emit on_window_get_width(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_WIDTH:
+		{
+			emit on_window_set_width();
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_VAR:
+		{
+			QVariant data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_var");
+				return;
+			} else {
+				emit on_window_get_var(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_VAR:
+		{
+			QVariant data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_set_var");
+				return;
+			} else {
+				emit on_window_set_var(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_DEL_VAR:
+		{
+			QVariant data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_del_var");
+				return;
+			} else {
+				emit on_window_del_var(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_OPTION:
+		{
+			QVariant data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_option");
+				return;
+			} else {
+				emit on_window_get_option(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_SET_OPTION:
+		{
+			emit on_window_set_option();
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_POSITION:
+		{
+			QPoint data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_position");
+				return;
+			} else {
+				emit on_window_get_position(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_GET_TABPAGE:
+		{
+			int64_t data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_get_tabpage");
+				return;
+			} else {
+				emit on_window_get_tabpage(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_WINDOW_IS_VALID:
+		{
+			bool data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for window_is_valid");
+				return;
+			} else {
+				emit on_window_is_valid(data);
 			}
 
 		}

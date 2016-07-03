@@ -1,4 +1,4 @@
-// Auto generated 2015-07-06 14:02:18.160348
+// Auto generated 2016-07-03 02:23:03.078220
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
@@ -24,16 +24,6 @@ private:
 public slots:
 	void ui_try_resize(int64_t width, int64_t height);
 
-	// ArrayOf(Window) tabpage_get_windows(Tabpage tabpage, ) !fails
-	MsgpackRequest* tabpage_get_windows(int64_t tabpage);
-	// Object tabpage_get_var(Tabpage tabpage, String name, ) !fails
-	MsgpackRequest* tabpage_get_var(int64_t tabpage, QByteArray name);
-	// Object tabpage_set_var(Tabpage tabpage, String name, Object value, ) !fails
-	MsgpackRequest* tabpage_set_var(int64_t tabpage, QByteArray name, QVariant value);
-	// Window tabpage_get_window(Tabpage tabpage, ) !fails
-	MsgpackRequest* tabpage_get_window(int64_t tabpage);
-	// Boolean tabpage_is_valid(Tabpage tabpage, ) 
-	MsgpackRequest* tabpage_is_valid(int64_t tabpage);
 	// Integer buffer_line_count(Buffer buffer, ) !fails
 	MsgpackRequest* buffer_line_count(int64_t buffer);
 	// String buffer_get_line(Buffer buffer, Integer index, ) !fails
@@ -44,12 +34,18 @@ public slots:
 	MsgpackRequest* buffer_del_line(int64_t buffer, int64_t index);
 	// ArrayOf(String) buffer_get_line_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end, ) !fails
 	MsgpackRequest* buffer_get_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end);
+	// ArrayOf(String) buffer_get_lines(Buffer buffer, Integer start, Integer end, Boolean strict_indexing, ) !fails
+	MsgpackRequest* buffer_get_lines(int64_t buffer, int64_t start, int64_t end, bool strict_indexing);
 	// void buffer_set_line_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end, ArrayOf(String) replacement, ) !fails
 	MsgpackRequest* buffer_set_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end, QList<QByteArray> replacement);
+	// void buffer_set_lines(Buffer buffer, Integer start, Integer end, Boolean strict_indexing, ArrayOf(String) replacement, ) !fails
+	MsgpackRequest* buffer_set_lines(int64_t buffer, int64_t start, int64_t end, bool strict_indexing, QList<QByteArray> replacement);
 	// Object buffer_get_var(Buffer buffer, String name, ) !fails
 	MsgpackRequest* buffer_get_var(int64_t buffer, QByteArray name);
 	// Object buffer_set_var(Buffer buffer, String name, Object value, ) !fails
 	MsgpackRequest* buffer_set_var(int64_t buffer, QByteArray name, QVariant value);
+	// Object buffer_del_var(Buffer buffer, String name, ) !fails
+	MsgpackRequest* buffer_del_var(int64_t buffer, QByteArray name);
 	// Object buffer_get_option(Buffer buffer, String name, ) !fails
 	MsgpackRequest* buffer_get_option(int64_t buffer, QByteArray name);
 	// void buffer_set_option(Buffer buffer, String name, Object value, ) !fails
@@ -66,34 +62,22 @@ public slots:
 	MsgpackRequest* buffer_insert(int64_t buffer, int64_t lnum, QList<QByteArray> lines);
 	// ArrayOf(Integer, 2) buffer_get_mark(Buffer buffer, String name, ) !fails
 	MsgpackRequest* buffer_get_mark(int64_t buffer, QByteArray name);
-	// Buffer window_get_buffer(Window window, ) !fails
-	MsgpackRequest* window_get_buffer(int64_t window);
-	// ArrayOf(Integer, 2) window_get_cursor(Window window, ) !fails
-	MsgpackRequest* window_get_cursor(int64_t window);
-	// void window_set_cursor(Window window, ArrayOf(Integer, 2) pos, ) !fails
-	MsgpackRequest* window_set_cursor(int64_t window, QPoint pos);
-	// Integer window_get_height(Window window, ) !fails
-	MsgpackRequest* window_get_height(int64_t window);
-	// void window_set_height(Window window, Integer height, ) !fails
-	MsgpackRequest* window_set_height(int64_t window, int64_t height);
-	// Integer window_get_width(Window window, ) !fails
-	MsgpackRequest* window_get_width(int64_t window);
-	// void window_set_width(Window window, Integer width, ) !fails
-	MsgpackRequest* window_set_width(int64_t window, int64_t width);
-	// Object window_get_var(Window window, String name, ) !fails
-	MsgpackRequest* window_get_var(int64_t window, QByteArray name);
-	// Object window_set_var(Window window, String name, Object value, ) !fails
-	MsgpackRequest* window_set_var(int64_t window, QByteArray name, QVariant value);
-	// Object window_get_option(Window window, String name, ) !fails
-	MsgpackRequest* window_get_option(int64_t window, QByteArray name);
-	// void window_set_option(Window window, String name, Object value, ) !fails
-	MsgpackRequest* window_set_option(int64_t window, QByteArray name, QVariant value);
-	// ArrayOf(Integer, 2) window_get_position(Window window, ) !fails
-	MsgpackRequest* window_get_position(int64_t window);
-	// Tabpage window_get_tabpage(Window window, ) !fails
-	MsgpackRequest* window_get_tabpage(int64_t window);
-	// Boolean window_is_valid(Window window, ) 
-	MsgpackRequest* window_is_valid(int64_t window);
+	// Integer buffer_add_highlight(Buffer buffer, Integer src_id, String hl_group, Integer line, Integer col_start, Integer col_end, ) !fails
+	MsgpackRequest* buffer_add_highlight(int64_t buffer, int64_t src_id, QByteArray hl_group, int64_t line, int64_t col_start, int64_t col_end);
+	// void buffer_clear_highlight(Buffer buffer, Integer src_id, Integer line_start, Integer line_end, ) !fails
+	MsgpackRequest* buffer_clear_highlight(int64_t buffer, int64_t src_id, int64_t line_start, int64_t line_end);
+	// ArrayOf(Window) tabpage_get_windows(Tabpage tabpage, ) !fails
+	MsgpackRequest* tabpage_get_windows(int64_t tabpage);
+	// Object tabpage_get_var(Tabpage tabpage, String name, ) !fails
+	MsgpackRequest* tabpage_get_var(int64_t tabpage, QByteArray name);
+	// Object tabpage_set_var(Tabpage tabpage, String name, Object value, ) !fails
+	MsgpackRequest* tabpage_set_var(int64_t tabpage, QByteArray name, QVariant value);
+	// Object tabpage_del_var(Tabpage tabpage, String name, ) !fails
+	MsgpackRequest* tabpage_del_var(int64_t tabpage, QByteArray name);
+	// Window tabpage_get_window(Tabpage tabpage, ) !fails
+	MsgpackRequest* tabpage_get_window(int64_t tabpage);
+	// Boolean tabpage_is_valid(Tabpage tabpage, ) 
+	MsgpackRequest* tabpage_is_valid(int64_t tabpage);
 	// void vim_command(String str, ) !fails
 	MsgpackRequest* vim_command(QByteArray str);
 	// void vim_feedkeys(String keys, String mode, Boolean escape_csi, ) 
@@ -106,6 +90,8 @@ public slots:
 	MsgpackRequest* vim_command_output(QByteArray str);
 	// Object vim_eval(String str, ) !fails
 	MsgpackRequest* vim_eval(QByteArray str);
+	// Object vim_call_function(String fname, Array args, ) !fails
+	MsgpackRequest* vim_call_function(QByteArray fname, QVariantList args);
 	// Integer vim_strwidth(String str, ) !fails
 	MsgpackRequest* vim_strwidth(QByteArray str);
 	// ArrayOf(String) vim_list_runtime_paths() 
@@ -122,6 +108,8 @@ public slots:
 	MsgpackRequest* vim_get_var(QByteArray name);
 	// Object vim_set_var(String name, Object value, ) !fails
 	MsgpackRequest* vim_set_var(QByteArray name, QVariant value);
+	// Object vim_del_var(String name, ) !fails
+	MsgpackRequest* vim_del_var(QByteArray name);
 	// Object vim_get_vvar(String name, ) !fails
 	MsgpackRequest* vim_get_vvar(QByteArray name);
 	// Object vim_get_option(String name, ) !fails
@@ -158,23 +146,39 @@ public slots:
 	MsgpackRequest* vim_unsubscribe(QByteArray event);
 	// Integer vim_name_to_color(String name, ) 
 	MsgpackRequest* vim_name_to_color(QByteArray name);
+	// Buffer window_get_buffer(Window window, ) !fails
+	MsgpackRequest* window_get_buffer(int64_t window);
+	// ArrayOf(Integer, 2) window_get_cursor(Window window, ) !fails
+	MsgpackRequest* window_get_cursor(int64_t window);
+	// void window_set_cursor(Window window, ArrayOf(Integer, 2) pos, ) !fails
+	MsgpackRequest* window_set_cursor(int64_t window, QPoint pos);
+	// Integer window_get_height(Window window, ) !fails
+	MsgpackRequest* window_get_height(int64_t window);
+	// void window_set_height(Window window, Integer height, ) !fails
+	MsgpackRequest* window_set_height(int64_t window, int64_t height);
+	// Integer window_get_width(Window window, ) !fails
+	MsgpackRequest* window_get_width(int64_t window);
+	// void window_set_width(Window window, Integer width, ) !fails
+	MsgpackRequest* window_set_width(int64_t window, int64_t width);
+	// Object window_get_var(Window window, String name, ) !fails
+	MsgpackRequest* window_get_var(int64_t window, QByteArray name);
+	// Object window_set_var(Window window, String name, Object value, ) !fails
+	MsgpackRequest* window_set_var(int64_t window, QByteArray name, QVariant value);
+	// Object window_del_var(Window window, String name, ) !fails
+	MsgpackRequest* window_del_var(int64_t window, QByteArray name);
+	// Object window_get_option(Window window, String name, ) !fails
+	MsgpackRequest* window_get_option(int64_t window, QByteArray name);
+	// void window_set_option(Window window, String name, Object value, ) !fails
+	MsgpackRequest* window_set_option(int64_t window, QByteArray name, QVariant value);
+	// ArrayOf(Integer, 2) window_get_position(Window window, ) !fails
+	MsgpackRequest* window_get_position(int64_t window);
+	// Tabpage window_get_tabpage(Window window, ) !fails
+	MsgpackRequest* window_get_tabpage(int64_t window);
+	// Boolean window_is_valid(Window window, ) 
+	MsgpackRequest* window_is_valid(int64_t window);
 
 signals:
 	void on_ui_try_resize();
-
-	void on_tabpage_get_windows(QList<int64_t>);
-	void err_tabpage_get_windows(const QString&, const QVariant&);
-
-	void on_tabpage_get_var(QVariant);
-	void err_tabpage_get_var(const QString&, const QVariant&);
-
-	void on_tabpage_set_var(QVariant);
-	void err_tabpage_set_var(const QString&, const QVariant&);
-
-	void on_tabpage_get_window(int64_t);
-	void err_tabpage_get_window(const QString&, const QVariant&);
-
-	void on_tabpage_is_valid(bool);
 
 	void on_buffer_line_count(int64_t);
 	void err_buffer_line_count(const QString&, const QVariant&);
@@ -191,14 +195,23 @@ signals:
 	void on_buffer_get_line_slice(QList<QByteArray>);
 	void err_buffer_get_line_slice(const QString&, const QVariant&);
 
+	void on_buffer_get_lines(QList<QByteArray>);
+	void err_buffer_get_lines(const QString&, const QVariant&);
+
 	void on_buffer_set_line_slice(void);
 	void err_buffer_set_line_slice(const QString&, const QVariant&);
+
+	void on_buffer_set_lines(void);
+	void err_buffer_set_lines(const QString&, const QVariant&);
 
 	void on_buffer_get_var(QVariant);
 	void err_buffer_get_var(const QString&, const QVariant&);
 
 	void on_buffer_set_var(QVariant);
 	void err_buffer_set_var(const QString&, const QVariant&);
+
+	void on_buffer_del_var(QVariant);
+	void err_buffer_del_var(const QString&, const QVariant&);
 
 	void on_buffer_get_option(QVariant);
 	void err_buffer_get_option(const QString&, const QVariant&);
@@ -223,46 +236,28 @@ signals:
 	void on_buffer_get_mark(QPoint);
 	void err_buffer_get_mark(const QString&, const QVariant&);
 
-	void on_window_get_buffer(int64_t);
-	void err_window_get_buffer(const QString&, const QVariant&);
+	void on_buffer_add_highlight(int64_t);
+	void err_buffer_add_highlight(const QString&, const QVariant&);
 
-	void on_window_get_cursor(QPoint);
-	void err_window_get_cursor(const QString&, const QVariant&);
+	void on_buffer_clear_highlight(void);
+	void err_buffer_clear_highlight(const QString&, const QVariant&);
 
-	void on_window_set_cursor(void);
-	void err_window_set_cursor(const QString&, const QVariant&);
+	void on_tabpage_get_windows(QList<int64_t>);
+	void err_tabpage_get_windows(const QString&, const QVariant&);
 
-	void on_window_get_height(int64_t);
-	void err_window_get_height(const QString&, const QVariant&);
+	void on_tabpage_get_var(QVariant);
+	void err_tabpage_get_var(const QString&, const QVariant&);
 
-	void on_window_set_height(void);
-	void err_window_set_height(const QString&, const QVariant&);
+	void on_tabpage_set_var(QVariant);
+	void err_tabpage_set_var(const QString&, const QVariant&);
 
-	void on_window_get_width(int64_t);
-	void err_window_get_width(const QString&, const QVariant&);
+	void on_tabpage_del_var(QVariant);
+	void err_tabpage_del_var(const QString&, const QVariant&);
 
-	void on_window_set_width(void);
-	void err_window_set_width(const QString&, const QVariant&);
+	void on_tabpage_get_window(int64_t);
+	void err_tabpage_get_window(const QString&, const QVariant&);
 
-	void on_window_get_var(QVariant);
-	void err_window_get_var(const QString&, const QVariant&);
-
-	void on_window_set_var(QVariant);
-	void err_window_set_var(const QString&, const QVariant&);
-
-	void on_window_get_option(QVariant);
-	void err_window_get_option(const QString&, const QVariant&);
-
-	void on_window_set_option(void);
-	void err_window_set_option(const QString&, const QVariant&);
-
-	void on_window_get_position(QPoint);
-	void err_window_get_position(const QString&, const QVariant&);
-
-	void on_window_get_tabpage(int64_t);
-	void err_window_get_tabpage(const QString&, const QVariant&);
-
-	void on_window_is_valid(bool);
+	void on_tabpage_is_valid(bool);
 
 	void on_vim_command(void);
 	void err_vim_command(const QString&, const QVariant&);
@@ -278,6 +273,9 @@ signals:
 
 	void on_vim_eval(QVariant);
 	void err_vim_eval(const QString&, const QVariant&);
+
+	void on_vim_call_function(QVariant);
+	void err_vim_call_function(const QString&, const QVariant&);
 
 	void on_vim_strwidth(int64_t);
 	void err_vim_strwidth(const QString&, const QVariant&);
@@ -301,6 +299,9 @@ signals:
 
 	void on_vim_set_var(QVariant);
 	void err_vim_set_var(const QString&, const QVariant&);
+
+	void on_vim_del_var(QVariant);
+	void err_vim_del_var(const QString&, const QVariant&);
 
 	void on_vim_get_vvar(QVariant);
 	void err_vim_get_vvar(const QString&, const QVariant&);
@@ -343,6 +344,50 @@ signals:
 	void on_vim_unsubscribe(void);
 
 	void on_vim_name_to_color(int64_t);
+
+	void on_window_get_buffer(int64_t);
+	void err_window_get_buffer(const QString&, const QVariant&);
+
+	void on_window_get_cursor(QPoint);
+	void err_window_get_cursor(const QString&, const QVariant&);
+
+	void on_window_set_cursor(void);
+	void err_window_set_cursor(const QString&, const QVariant&);
+
+	void on_window_get_height(int64_t);
+	void err_window_get_height(const QString&, const QVariant&);
+
+	void on_window_set_height(void);
+	void err_window_set_height(const QString&, const QVariant&);
+
+	void on_window_get_width(int64_t);
+	void err_window_get_width(const QString&, const QVariant&);
+
+	void on_window_set_width(void);
+	void err_window_set_width(const QString&, const QVariant&);
+
+	void on_window_get_var(QVariant);
+	void err_window_get_var(const QString&, const QVariant&);
+
+	void on_window_set_var(QVariant);
+	void err_window_set_var(const QString&, const QVariant&);
+
+	void on_window_del_var(QVariant);
+	void err_window_del_var(const QString&, const QVariant&);
+
+	void on_window_get_option(QVariant);
+	void err_window_get_option(const QString&, const QVariant&);
+
+	void on_window_set_option(void);
+	void err_window_set_option(const QString&, const QVariant&);
+
+	void on_window_get_position(QPoint);
+	void err_window_get_position(const QString&, const QVariant&);
+
+	void on_window_get_tabpage(int64_t);
+	void err_window_get_tabpage(const QString&, const QVariant&);
+
+	void on_window_is_valid(bool);
 
 };
 } // namespace
