@@ -74,7 +74,6 @@ QString Shell::fontDesc()
 	if (font().italic()) {
 		fdesc += ":i";
 	}
-	fdesc += "\n";
 	return fdesc;
 }
 
