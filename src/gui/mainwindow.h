@@ -22,6 +22,7 @@ public:
 
 	MainWindow(NeovimConnector *, QWidget *parent=0);
 	bool neovimAttached() const;
+	Shell* shell();
 public slots:
 	void delayedShow(DelayedShow type=DelayedShow::Normal);
 signals:

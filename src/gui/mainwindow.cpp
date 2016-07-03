@@ -188,5 +188,10 @@ void MainWindow::neovimAttachmentChanged(bool attached)
 	}
 }
 
+Shell* MainWindow::shell()
+{
+	return m_shell;
+}
+
 } // Namespace
 

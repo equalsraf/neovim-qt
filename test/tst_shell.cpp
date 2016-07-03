@@ -79,11 +79,21 @@ private slots:
 
 		checkCommand(c, "GuiFont");
 		checkCommand(c, "GuiLinespace");
+
+		// Test font attributes
+		checkCommand(c, "GuiFont DejaVu Sans Mono:h14", false);
+		QCOMPARE(s->shell()->fontDesc(), QString("DejaVu Sans Mono:h14"));
+
+		// Normalization removes the :b attribute
+		checkCommand(c, "GuiFont DejaVu Sans Mono:h14:b:l", false);
+		QCOMPARE(s->shell()->fontDesc(),
+				QString("DejaVu Sans Mono:h14:l"));
 	}
 
 protected:
 
-	void checkCommand(NeovimConnector *c, const QString& cmd) {
+	void checkCommand(NeovimConnector *c, const QString& cmd,
+			bool output=false) {
 		auto req = c->neovimObject()->vim_command_output(c->encode(cmd));
 		QSignalSpy cmdOk(req, SIGNAL(finished(quint32, Function::FunctionId, QVariant)));
 		QVERIFY(cmdOk.isValid());
@@ -95,8 +105,11 @@ protected:
 		c->neovimObject()->vim_input("<cr>");
 		QVERIFY(SPYWAIT(cmdOk));
 		qDebug() << cmdOk << cmdOk.size();
-		// Make sure the command output is not empty
-		QVERIFY(!cmdOk.at(0).at(2).toByteArray().isEmpty());
+
+		if (output) {
+			// Make sure the command output is not empty
+			QVERIFY(!cmdOk.at(0).at(2).toByteArray().isEmpty());
+		}
 	}
 
 	/// Check for the presence of the GUI variables in Neovim
