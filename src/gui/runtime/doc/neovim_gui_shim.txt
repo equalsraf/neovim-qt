@@ -109,6 +109,10 @@ format. Replaces |'guifont'|.
 GuiLinespace(height) sets the number of vertical pixels added to each line.
 Replaces |'linespace'|.
 
+							*GuiDrop()*
+GuiDrop(...) is a wrapper around |:drop| it escapes all given arguments
+using |fnameescape()| and then passes them to :drop. This is useful if
+the GUI is requesting Neovim to open additional files.
 
 ==============================================================================
 4. Internals

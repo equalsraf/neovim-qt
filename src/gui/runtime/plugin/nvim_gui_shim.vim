@@ -57,3 +57,11 @@ function s:GuiLinespaceCommand(height) abort
   endif
 endfunction
 command! -nargs=? GuiLinespace call s:GuiLinespaceCommand("<args>")
+
+" GuiDrop('file1', 'file2', ...) is similar to :drop file1 file2 ...
+" but it calls fnameescape() over all arguments
+function GuiDrop(...)
+	let l:fnames = deepcopy(a:000)
+	let l:args = map(l:fnames, 'fnameescape(v:val)')
+	exec 'drop '.join(l:args, ' ')
+endfunction
