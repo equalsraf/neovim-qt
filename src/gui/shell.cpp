@@ -135,8 +135,8 @@ void Shell::setAttached(bool attached)
 		if (isWindow()) {
 			updateGuiWindowState(windowState());
 		}
-		m_nvim->neovimObject()->vim_command("runtime plugin/nvim_gui_shim.vim");
 		m_nvim->neovimObject()->vim_command("runtime! ginit.vim");
+		m_nvim->neovimObject()->vim_command(QByteArrayLiteral("doautocmd User NeovimGuiAttached"));
 
 		// Noevim was not able to open urls till now. Check if we have any to open.
 		if(!m_deferredOpen.isEmpty()){
