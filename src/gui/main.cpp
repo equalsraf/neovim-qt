@@ -97,6 +97,8 @@ int main(int argc, char **argv)
 							.arg(d.path()));
 				}
 			}
+			neovimArgs.insert(2, QStringLiteral("--cmd"));
+			neovimArgs.insert(3, QStringLiteral("runtime plugin/nvim_gui_shim.vim"));
 			c = NeovimQt::NeovimConnector::spawn(neovimArgs);
 		}
 	}
