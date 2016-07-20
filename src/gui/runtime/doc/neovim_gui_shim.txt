@@ -13,6 +13,7 @@ can be used in |ginit.vim| provided that
 1. The user's GUI loaded the |ginit.vim| file
 2. The user's GUI supports the rpc events used by this plugin
 
+
 ==============================================================================
 1. Commands
 
@@ -44,6 +45,7 @@ GuiLinespace	When called with no arguments this command displays the
 		linespace, the number of extra pixels each line will have.
                 A single argument is accepted as the new linespace height.
 
+
 ==============================================================================
 2. GUI variables
 
@@ -61,9 +63,9 @@ Setting the values of these variables has no effect on the GUI (i.e. only the
 GUI should set them).
 
 							*g:GuiWindowMaximized*
-g:GuiWindowMaximized indicates whether the GUI window is maximized. In some system
-(X11) this not a reliable indicator, since the window manager can override the
-window behaviour.
+g:GuiWindowMaximized indicates whether the GUI window is maximized. In some
+system (X11) this not a reliable indicator, since the window manager can
+override the window behaviour.
 
 							*g:GuiWindowFullScreen*
 g:GuiWindowFullScreen indicates whether the GUI window is maximized. In some
@@ -81,6 +83,7 @@ g:GuiFont holds the current GUI font name, the same value used by
 g:GuiLinespace holds the extra vertical space (in pixels) added to
 each line.
 
+
 ==============================================================================
 3. Functions
 
@@ -89,12 +92,12 @@ GuiForeground()	moves the GUI window to the foreground. In some systems this
 might not work due to window manager policy (X11) or focus stealing prevention
 (Windows). Replaces |foreground()|.
 
-							*GuiWindowMaximized()* 
+							*GuiWindowMaximized()*
 GuiWindowMaximized(enabled) sets the window maximized state, 1 means
 enabled and 0 disabled. In some systems (X11) this function is not guaranteed
 to work.
 
-							*GuiWindowFullScreen()* 
+							*GuiWindowFullScreen()*
 GuiWindowFullScreen(enabled) sets the window fullscreen state, 1 means
 enabled and 0 disabled.
 
@@ -105,6 +108,7 @@ format. Replaces |'guifont'|.
 							*GuiLinespace()*
 GuiLinespace(height) sets the number of vertical pixels added to each line.
 Replaces |'linespace'|.
+
 
 ==============================================================================
 4. Internals
@@ -126,4 +130,6 @@ The GUI is expected to load the user's |ginit.vim|, it should also make sure
 this plugin is loaded before loading |ginit.vim|, for example setting
 the runtimepath.
 
+
+==============================================================================
  vim:tw=78:ts=8:ft=help:norl:
