@@ -150,15 +150,24 @@ QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::Keybo
  */
 QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers mod)
 {
+	QChar c;
 	if (specialKeys.contains(k)) {
-		return QString("<%1%2>").arg(modPrefix(mod)).arg(specialKeys.value(k));
+		c = text.at(0);
+		if (text.isEmpty() || c.isSpace() || !c.isPrint()) {
+			return QString("<%1%2>").arg(modPrefix(mod)).arg(specialKeys.value(k));
+		} else {
+			// 'k' include the information about SHIFT so do not check 'mod'
+			// See #134
+			return QString("<%1>").arg(specialKeys.value(k));
+		}
 	}
 
-	QChar c;
 	// Escape < and backslash
 	if (text == "<") {
+		// XXX: Never be called
 		return QString("<%1%2>").arg(modPrefix(mod)).arg("lt");
 	} else if (text == "\\") {
+		// XXX: Never be called?
 		return QString("<%1%2>").arg(modPrefix(mod)).arg("Bslash");
 	} else if (text.isEmpty()) {
 		// on macs, text is empty for ctrl+key and cmd+key combos (with or without alt)
