@@ -34,7 +34,7 @@ void ShellWidget::setDefaultFont()
 #endif
 }
 
-bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bool italic)
+bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bool italic, bool force)
 {
 	QFont f(family, ptSize, weight, italic);
 	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
@@ -47,13 +47,15 @@ bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bo
 		emit fontError(QString("Unknown font: %1").arg(f.family()));
 		return false;
 	}
-	if ( !fi.fixedPitch() ) {
-		emit fontError(QString("%1 is not a fixed pitch font").arg(f.family()));
-		return false;
-	}
+	if ( !force ) {
+		if ( !fi.fixedPitch() ) {
+			emit fontError(QString("%1 is not a fixed pitch font").arg(f.family()));
+			return false;
+		}
 
-	if (isBadMonospace(f)) {
-		emit fontError(QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family()));
+		if (isBadMonospace(f)) {
+			emit fontError(QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family()));
+		}
 	}
 
 	setFont(f);

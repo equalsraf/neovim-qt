@@ -46,7 +46,7 @@ public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
 	void resizeNeovim(int n_cols, int n_rows);
-	bool setGuiFont(const QString& fdesc);
+	bool setGuiFont(const QString& fdesc, bool force = false);
 	void updateGuiWindowState(Qt::WindowStates state);
 
 protected slots:
