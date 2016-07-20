@@ -27,7 +27,7 @@ deploy:
     release: $(appveyor_repo_tag_name)
     auth_token:
       secure: Hx2tU6GZPZNB6qGjHcIqa1tEm8fVGXZUVfXyjboVrPcmA9OWMTXhLxayDzMMl3kD
-    artifact: build\neovim-qt.zip
+    artifact: neovim-qt.zip
     prerelease: false
     on:
       appveyor_repo_tag: true
