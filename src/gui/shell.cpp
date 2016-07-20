@@ -80,7 +80,7 @@ QString Shell::fontDesc()
 /**
  * Set the GUI font, or display the current font
  */
-bool Shell::setGuiFont(const QString& fdesc)
+bool Shell::setGuiFont(const QString& fdesc, bool force)
 {
 	QStringList attrs = fdesc.split(':');
 	if (attrs.size() < 1) {
@@ -108,7 +108,7 @@ bool Shell::setGuiFont(const QString& fdesc)
 			italic = true;
 		}
 	}
-	bool ok = setShellFont(attrs.at(0), pointSize, weight, italic);
+	bool ok = setShellFont(attrs.at(0), pointSize, weight, italic, force);
 	if (ok && m_attached) {
 		resizeNeovim(size());
 		m_nvim->neovimObject()->vim_set_var("GuiFont", fontDesc());
@@ -459,9 +459,14 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 {
 	if (name == "Gui" && args.size() > 0) {
 		QString guiEvName = m_nvim->decode(args.at(0).toByteArray());
-		if (guiEvName == "Font" && args.size() == 2) {
-			QString fdesc = m_nvim->decode(args.at(1).toByteArray());
-			setGuiFont(fdesc);
+		if (guiEvName == "Font") {
+			if (args.size() == 2) {
+				QString fdesc = m_nvim->decode(args.at(1).toByteArray());
+				setGuiFont(fdesc);
+			} else if (args.size() == 3) {
+				QString fdesc = m_nvim->decode(args.at(1).toByteArray());
+				setGuiFont(fdesc, args.at(2) == 1);
+			}
 		} else if (guiEvName == "Foreground" && args.size() == 1) {
 			activateWindow();
 			raise();
