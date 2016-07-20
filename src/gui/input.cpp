@@ -162,14 +162,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 		}
 	}
 
-	// Escape < and backslash
-	if (text == "<") {
-		// XXX: Never be called
-		return QString("<%1%2>").arg(modPrefix(mod)).arg("lt");
-	} else if (text == "\\") {
-		// XXX: Never be called?
-		return QString("<%1%2>").arg(modPrefix(mod)).arg("Bslash");
-	} else if (text.isEmpty()) {
+	if (text.isEmpty()) {
 		// on macs, text is empty for ctrl+key and cmd+key combos (with or without alt)
 		if (mod & ControlModifier || mod & CmdModifier) {
 			// ignore ctrl, alt and cmd key combos by themselves
