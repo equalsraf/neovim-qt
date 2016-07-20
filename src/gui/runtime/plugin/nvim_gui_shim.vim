@@ -20,8 +20,9 @@ function! GuiWindowFullScreen(enabled)
 endfunction
 
 " Set GUI font
-function! GuiFont(fname)
-	call rpcnotify(0, 'Gui', 'Font', a:fname)
+function! GuiFont(fname, ...)
+	let force = get(a:000, 0, 0)
+	call rpcnotify(0, 'Gui', 'Font', a:fname, force)
 endfunction
 
 " Set additional linespace
@@ -30,7 +31,7 @@ function! GuiLinespace(height)
 endfunction
 
 " The GuiFont command. For compatibility there is also Guifont
-function s:GuiFontCommand(fname)
+function s:GuiFontCommand(fname, bang)
 	if a:fname == ""
 		if exists('g:GuiFont')
 			echo g:GuiFont
@@ -38,11 +39,11 @@ function s:GuiFontCommand(fname)
 			echo 'No GuiFont is set'
 		endif
 	else
-		call GuiFont(a:fname)
+		call GuiFont(a:fname, a:bang == 1)
 	endif
 endfunction
-command! -nargs=? Guifont call s:GuiFontCommand("<args>")
-command! -nargs=? GuiFont call s:GuiFontCommand("<args>")
+command! -nargs=? -bang Guifont call s:GuiFontCommand("<args>", "<bang>")
+command! -nargs=? -bang GuiFont call s:GuiFontCommand("<args>", "<bang>")
 
 function s:GuiLinespaceCommand(height)
 	if a:height == ""

@@ -34,6 +34,11 @@ GuiFont		When called with no arguments this command display the
 			l   - light weight
 			i   - italic
 
+		It warns and fails when an invalid font has specified.
+		Use a |bang| (!) to forcedly assign an invalid font like:
+>
+		    :GuiFont! <An invalid font>
+<
 								*GuiLinespace*
 GuiLinespace	When called with no arguments this command displays the
 		linespace, the number of extra pixels each line will have.
