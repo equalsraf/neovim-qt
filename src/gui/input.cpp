@@ -151,16 +151,12 @@ QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::Keybo
 QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers mod)
 {
 	if (specialKeys.contains(k)) {
-		return QString("<%1%2>").arg(modPrefix(mod)).arg(specialKeys.value(k));
+		return QString("<%1>").arg(specialKeys.value(k));
 	}
 
 	QChar c;
 	// Escape < and backslash
-	if (text == "<") {
-		return QString("<%1%2>").arg(modPrefix(mod)).arg("lt");
-	} else if (text == "\\") {
-		return QString("<%1%2>").arg(modPrefix(mod)).arg("Bslash");
-	} else if (text.isEmpty()) {
+	if (text.isEmpty()) {
 		// on macs, text is empty for ctrl+key and cmd+key combos (with or without alt)
 		if (mod & ControlModifier || mod & CmdModifier) {
 			// ignore ctrl, alt and cmd key combos by themselves
