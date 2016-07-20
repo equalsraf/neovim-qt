@@ -39,7 +39,7 @@ function s:GuiFontCommand(fname, bang) abort
       echo 'No GuiFont is set'
     endif
   else
-    call GuiFont(a:fname, a:bang == 1)
+    call GuiFont(a:fname, a:bang ==# '!')
   endif
 endfunction
 command! -nargs=? -bang Guifont call s:GuiFontCommand("<args>", "<bang>")
