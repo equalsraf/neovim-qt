@@ -47,6 +47,8 @@ int main(int argc, char **argv)
 		QCoreApplication::translate("main", "Maximize the window on startup")));
 	parser.addOption(QCommandLineOption("fullscreen",
 		QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
+	parser.addPositionalArgument("file",
+		QCoreApplication::translate("main", "Edit specified file(s)"), "[file...]");
 	parser.addPositionalArgument("...", "Additional arguments are fowarded to Neovim", "[-- ...]");
 	parser.addHelpOption();
 
@@ -97,6 +99,9 @@ int main(int argc, char **argv)
 							.arg(d.path()));
 				}
 			}
+
+			// Pass positional file arguments to Neovim
+			neovimArgs.append(parser.positionalArguments());
 			c = NeovimQt::NeovimConnector::spawn(neovimArgs);
 		}
 	}
