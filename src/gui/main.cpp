@@ -24,6 +24,36 @@ void logger(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 	}
 }
 
+#ifdef Q_OS_MAC
+bool getLoginEnvironment(const QString& path)
+{
+	QProcess proc;
+	proc.start(path, {"-l", "-c", "env", "-i"});
+	if (!proc.waitForFinished()) {
+		qDebug() << "Failed to execute shell to get environemnt" << path;
+		return false;
+	}
+
+	QByteArray out = proc.readAllStandardOutput();
+	foreach(const QByteArray& item, out.split('\n')) {
+		int index = item.indexOf('=');
+		if (index > 0) {
+			qputenv(item.mid(0, index), item.mid(index+1));
+			qDebug() << item.mid(0, index) << item.mid(index+1);
+		}
+	}
+	return true;
+}
+
+void loadLoginEnvironmen()
+{
+	QByteArray shellPath = qgetenv("SHELL");
+	if (!getLoginEnvironment(shellPath)) {
+		getLoginEnvironment("/bin/bash");
+	}
+}
+#endif
+
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
@@ -66,6 +96,13 @@ int main(int argc, char **argv)
 		parser.showHelp();
 	}
 
+
+#ifdef Q_OS_MAC
+	// In Mac OS X we can be running off a bundle in which case the user
+	// shell environment variabls ($PATH, etc) are not set - try to load them
+	loadLoginEnvironmen();
+#endif
+
 	NeovimQt::NeovimConnector *c;
 	if (parser.isSet("embed")) {
 		c = NeovimQt::NeovimConnector::fromStdinOut();
@@ -88,10 +125,18 @@ int main(int argc, char **argv)
 			} else
 #endif
 			{
+				// Look for the runtime relative to the nvim-qt binary
 				QDir d = QFileInfo(QCoreApplication::applicationDirPath()).dir();
+#ifdef Q_OS_MAC
+				// within the bundle at ../Resources/runtime
+				d.cd("Resources");
+				d.cd("runtime");
+#else
+				// ../share/nvim-qt/runtime
 				d.cd("share");
 				d.cd("nvim-qt");
 				d.cd("runtime");
+#endif
 
 				if (d.exists()) {
 					neovimArgs.insert(0, "--cmd");
