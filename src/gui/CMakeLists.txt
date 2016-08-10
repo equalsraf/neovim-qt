@@ -6,7 +6,7 @@ if(WIN32)
 	set(RES_FILE "data.rc")
 	enable_language(RC)
 elseif(APPLE)
-	set(ICON_PATH ${PROJECT_SOURCE_DIR}/third-party/neovim.png)
+	set(ICON_PATH ${PROJECT_SOURCE_DIR}/third-party/neovim.icns)
 	set_source_files_properties(${ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
 	set(MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in)
