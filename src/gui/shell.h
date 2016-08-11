@@ -7,6 +7,8 @@
 #include <QBackingStore>
 #include <QLabel>
 #include <QTimer>
+#include <QUrl>
+#include <QList>
 #include "neovimconnector.h"
 #include "shellwidget/shellwidget.h"
 
@@ -48,6 +50,7 @@ public slots:
 	void resizeNeovim(int n_cols, int n_rows);
 	bool setGuiFont(const QString& fdesc, bool force = false);
 	void updateGuiWindowState(Qt::WindowStates state);
+	void openFiles(const QList<QUrl> url);
 
 protected slots:
 	void neovimError(NeovimConnector::NeovimError);

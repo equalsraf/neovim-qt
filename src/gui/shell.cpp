@@ -953,6 +953,15 @@ void Shell::dropEvent(QDropEvent *ev)
 			return;
 		}
 
+		openFiles(urls);
+	}
+	ev->acceptProposedAction();
+}
+
+/// Open multiple URLs in Neovim
+void Shell::openFiles(QList<QUrl> urls)
+{
+	if (m_nvim && m_attached) {
 		QVariantList args;
 		foreach(QUrl u, urls) {
 			if ( u.scheme() == "file" ) {
@@ -961,10 +970,8 @@ void Shell::dropEvent(QDropEvent *ev)
 				args.append(u.toString());
 			}
 		}
-
 		m_nvim->neovimObject()->vim_call_function("GuiDrop", args);
 	}
-	ev->acceptProposedAction();
 }
 
 } // Namespace
