@@ -119,6 +119,11 @@ bool Shell::setGuiFont(const QString& fdesc, bool force)
 	return ok;
 }
 
+void Shell::neovimOpenFile(const QString &file)
+{
+  m_nvim->neovimObject()->vim_command(QByteArray::fromStdString("e " + file.toStdString()));
+}
+
 
 Shell::~Shell()
 {
@@ -688,6 +693,7 @@ bool Shell::event(QEvent *event)
 	if (event->type() == QEvent::WinIdChange){
 		updateWindowId();
 	}
+
 	return QWidget::event(event);
 }
 

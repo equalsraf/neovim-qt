@@ -7,6 +7,7 @@
 #include <QDir>
 #include "neovimconnector.h"
 #include "mainwindow.h"
+#include "app.h"
 
 
 /// A log handler for Qt messages, all messages are dumped into the file
@@ -56,7 +57,7 @@ void loadLoginEnvironmen()
 
 int main(int argc, char **argv)
 {
-	QApplication app(argc, argv);
+	NeovimQt::App app(argc, argv);
 	app.setApplicationDisplayName("Neovim");
 	app.setWindowIcon(QIcon(":/neovim.png"));
 
@@ -163,6 +164,10 @@ int main(int argc, char **argv)
 	}
 #else
 	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c);
+
+	QObject::connect(&app, SIGNAL(neovimOpenFileTriggered(const QString &)),
+      win->shell(), SLOT(neovimOpenFile(const QString &)));
+
 	if (parser.isSet("fullscreen")) {
 		win->delayedShow(NeovimQt::MainWindow::DelayedShow::FullScreen);
 	} else if (parser.isSet("maximized")) {
