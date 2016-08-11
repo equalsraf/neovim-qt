@@ -121,6 +121,9 @@ bool Shell::setGuiFont(const QString& fdesc, bool force)
 
 void Shell::neovimOpenFile(const QString &file)
 {
+  if (!m_nvim || !m_nvim->neovimObject()) {
+    return;
+  }
   m_nvim->neovimObject()->vim_command(QByteArray::fromStdString("e " + file.toStdString()));
 }
 
