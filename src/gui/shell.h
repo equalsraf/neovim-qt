@@ -107,7 +107,7 @@ private:
 
 	NeovimConnector *m_nvim;
 
-	QList<QUrl> m_urls;
+	QList<QUrl> m_deferredOpen;
 
 	QRect m_scroll_region;
 	bool m_font_bold, m_font_italic, m_font_underline, m_font_undercurl;
