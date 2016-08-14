@@ -166,7 +166,7 @@ int main(int argc, char **argv)
 	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c);
 
 	QObject::connect(&app, SIGNAL(openFilesTriggered(const QList<QUrl>)),
-      win->shell(), SLOT(openFiles(const QList<QUrl>)));
+		win->shell(), SLOT(openFiles(const QList<QUrl>)));
 
 	if (parser.isSet("fullscreen")) {
 		win->delayedShow(NeovimQt::MainWindow::DelayedShow::FullScreen);

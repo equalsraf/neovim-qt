@@ -138,11 +138,11 @@ void Shell::setAttached(bool attached)
 		m_nvim->neovimObject()->vim_command("runtime plugin/nvim_gui_shim.vim");
 		m_nvim->neovimObject()->vim_command("runtime! ginit.vim");
 
-    // Noevim was not able to open urls till now. Check if we have any to open.
-    if(!m_urls.isEmpty()){
-      openFiles(m_urls);
-      m_urls.clear();    //Neovim may change state. Clear to prevent reopening.
-    }
+		// Noevim was not able to open urls till now. Check if we have any to open.
+		if(!m_urls.isEmpty()){
+			openFiles(m_urls);
+			m_urls.clear();    //Neovim may change state. Clear to prevent reopening.
+		}
 
 	}
 	emit neovimAttached(attached);
@@ -979,11 +979,11 @@ void Shell::openFiles(QList<QUrl> urls)
 		}
 		m_nvim->neovimObject()->vim_call_function("GuiDrop", args);
 	} else {
-    // Neovim cannot open urls now. Store them to open later.
+		// Neovim cannot open urls now. Store them to open later.
 		foreach(QUrl u, urls) {
-      m_urls.append(u);
-    }
-  }
+			m_urls.append(u);
+		}
+	}
 }
 
 } // Namespace
