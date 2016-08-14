@@ -3,6 +3,8 @@
 
 #include <QApplication>
 #include <QEvent>
+#include <QUrl>
+#include <QList>
 
 namespace NeovimQt {
 
@@ -13,7 +15,7 @@ public:
   App(int &argc, char ** argv);
   bool event(QEvent *event);
 signals:
-  void neovimOpenFileTriggered(const QString &file);
+  void openFilesTriggered(const QList<QUrl>);
 };
 
 } // Namespace

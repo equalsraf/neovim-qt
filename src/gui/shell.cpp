@@ -119,15 +119,6 @@ bool Shell::setGuiFont(const QString& fdesc, bool force)
 	return ok;
 }
 
-void Shell::neovimOpenFile(const QString &file)
-{
-  if (!m_nvim || !m_nvim->neovimObject()) {
-    return;
-  }
-  m_nvim->neovimObject()->vim_command(QByteArray::fromStdString("e " + file.toStdString()));
-}
-
-
 Shell::~Shell()
 {
 	if (m_nvim && m_attached) {
@@ -146,6 +137,13 @@ void Shell::setAttached(bool attached)
 		}
 		m_nvim->neovimObject()->vim_command("runtime plugin/nvim_gui_shim.vim");
 		m_nvim->neovimObject()->vim_command("runtime! ginit.vim");
+
+    // Noevim was not able to open urls till now. Check if we have any to open.
+    if(!m_urls.isEmpty()){
+      openFiles(m_urls);
+      m_urls.clear();    //Neovim may change state. Clear to prevent reopening.
+    }
+
 	}
 	emit neovimAttached(attached);
 	update();
@@ -980,7 +978,12 @@ void Shell::openFiles(QList<QUrl> urls)
 			}
 		}
 		m_nvim->neovimObject()->vim_call_function("GuiDrop", args);
-	}
+	} else {
+    // Neovim cannot open urls now. Store them to open later.
+		foreach(QUrl u, urls) {
+      m_urls.append(u);
+    }
+  }
 }
 
 } // Namespace

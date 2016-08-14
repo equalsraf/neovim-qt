@@ -49,7 +49,6 @@ public slots:
 	void resizeNeovim(const QSize&);
 	void resizeNeovim(int n_cols, int n_rows);
 	bool setGuiFont(const QString& fdesc, bool force = false);
-	void neovimOpenFile(const QString &file);
 	void updateGuiWindowState(Qt::WindowStates state);
 	void openFiles(const QList<QUrl> url);
 
@@ -107,6 +106,8 @@ private:
 	bool m_attached;
 
 	NeovimConnector *m_nvim;
+
+  QList<QUrl> m_urls;
 
 	QRect m_scroll_region;
 	bool m_font_bold, m_font_italic, m_font_underline, m_font_undercurl;
