@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 	if (sep != -1) {
 		QStringList args = app.arguments().mid(0, sep);
 		neovimArgs += app.arguments().mid(sep+1);
-		parser.process(app.arguments());
+		parser.process(args);
 	} else {
 		parser.process(app.arguments());
 	}
