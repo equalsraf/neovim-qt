@@ -36,16 +36,6 @@ Neovim::Neovim(NeovimConnector *c)
 			this, &Neovim::neovimNotification);
 }
 
-
-void Neovim::ui_try_resize(int64_t width, int64_t height)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("ui_try_resize", 2);
-	m_c->m_dev->send(width);
-	m_c->m_dev->send(height);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::on_ui_try_resize);
-}
-
-
 // Slots
 {% for f in functions %}
 MsgpackRequest* Neovim::{{f.name}}({{f.argstring}})

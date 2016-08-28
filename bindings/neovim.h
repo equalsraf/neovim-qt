@@ -22,16 +22,12 @@ signals:
 private:
 	NeovimConnector *m_c;
 public slots:
-	void ui_try_resize(int64_t width, int64_t height);
-
 {% for f in functions %}
 	// {{f.signature()}}
 	MsgpackRequest* {{f.name}}({{f.argstring}});
 {% endfor %}
 
 signals:
-	void on_ui_try_resize();
-
 {% for f in functions %}
 	void on_{{f.name}}({{f.return_type.native_type}});
 {% if f.can_fail %}
