@@ -5,12 +5,6 @@
 #include <QCommandLineParser>
 #include <QFileInfo>
 #include <QDir>
-#ifdef Q_OS_UNIX
-# include <signal.h>
-# include <unistd.h>
-# include <sys/ioctl.h>
-# include <fcntl.h>
-#endif
 #include "neovimconnector.h"
 #include "mainwindow.h"
 #include "app.h"
@@ -105,18 +99,6 @@ int main(int argc, char **argv)
 		parser.showHelp();
 	}
 
-#ifdef Q_OS_UNIX
-	if (isatty(0)) {
-//		raise(19);
-//		pid_t pid = fork();
-//		if (pid == -1) {
-//			qWarning() << "Unable to fork";
-//			return -1;
-//		} else if (pid != 0) {
-//			return 0;
-//		}
-	}
-#endif
 
 #ifdef Q_OS_MAC
 	// In Mac OS X we can be running off a bundle in which case the user
@@ -196,7 +178,6 @@ int main(int argc, char **argv)
 		win->delayedShow();
 	}
 #endif
-	qDebug() << "Ready to roll!";
 	return app.exec();
 }
 
