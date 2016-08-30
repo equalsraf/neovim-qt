@@ -567,7 +567,8 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 		return;
 	}
 
-	// FIXME mousehide - conceal mouse pointer when typing
+	// conceal mouse pointer when typing
+	this->setCursor(Qt::BlankCursor);
 
 	QString inp = Input.convertKey(ev->text(), ev->key(), ev->modifiers());
 	if (inp.isEmpty()) {
@@ -643,6 +644,7 @@ void Shell::mouseReleaseEvent(QMouseEvent *ev)
 }
 void Shell::mouseMoveEvent(QMouseEvent *ev)
 {
+	unsetCursor();
 	QPoint pos(ev->x()/cellSize().width(),
 			ev->y()/cellSize().height());
 	if (pos != m_mouse_pos) {
