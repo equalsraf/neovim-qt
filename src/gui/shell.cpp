@@ -399,9 +399,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "set_scroll_region"){
 		handleSetScrollRegion(opargs);
 	} else if (name == "mouse_on"){
-		this->unsetCursor();
+		// See :h mouse
 	} else if (name == "mouse_off"){
-		this->setCursor(Qt::ForbiddenCursor);
+		// See :h mouse
 	} else if (name == "mode_change"){
 		if (opargs.size() != 1) {
 			qWarning() << "Unexpected argument for change_mode:" << opargs;
