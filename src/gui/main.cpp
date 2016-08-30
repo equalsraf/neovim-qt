@@ -148,9 +148,6 @@ int main(int argc, char **argv)
 				}
 			}
 
-			neovimArgs.insert(2, QStringLiteral("--cmd"));
-			neovimArgs.insert(3, QStringLiteral("runtime plugin/nvim_gui_shim.vim"));
-
 			// Pass positional file arguments to Neovim
 			neovimArgs.append(parser.positionalArguments());
 			c = NeovimQt::NeovimConnector::spawn(neovimArgs);
