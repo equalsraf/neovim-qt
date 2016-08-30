@@ -1,17 +1,11 @@
 version: '{build}'
 skip_tags: false
-os: MinGW
 shallow_clone: true
 environment:
   matrix:
-  - CMAKE_GENERATOR: MinGW Makefiles
-    QTDIR: C:\Qt\5.5\mingw492_32
-    MINGW: C:\Qt\Tools\mingw492_32
-    SCRIPT: contrib\appveyor-mingw.bat
+  - SCRIPT: contrib\appveyor-mingw.bat
     RELEASE_ARTIFACT: true
-  - VCINSTALLDIR: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\
-    QTDIR: C:\Qt\5.5\msvc2013
-    SCRIPT: contrib\appveyor-msvc.bat
+  - SCRIPT: contrib\appveyor-msvc.bat
 configuration:
 - RelWithDebInfo
 matrix:
