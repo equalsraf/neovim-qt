@@ -399,7 +399,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "set_scroll_region"){
 		handleSetScrollRegion(opargs);
 	} else if (name == "mouse_on"){
-		this->unsetCursor();
+		if (cursor().shape() != Qt::BlankCursor) {
+			this->unsetCursor();
+		}
 	} else if (name == "mouse_off"){
 		this->setCursor(Qt::ForbiddenCursor);
 	} else if (name == "mode_change"){
@@ -436,6 +438,7 @@ void Shell::handleModeChange(const QString& mode)
 	// TODO: Implement visual aids for other modes
 	if (mode == "insert") {
 		m_insertMode = true;
+		this->setCursor(Qt::BlankCursor);
 	} else {
 		m_insertMode = false;
 	}
@@ -649,6 +652,9 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 		m_mouse_pos = pos;
 		mouseClickReset();
 		neovimMouseEvent(ev);
+	}
+	if (cursor().shape() == Qt::BlankCursor) {
+		unsetCursor();
 	}
 }
 
