@@ -83,6 +83,8 @@ int main(int argc, char **argv)
 	parser.addOption(QCommandLineOption("server",
 		QCoreApplication::translate("main", "Connect to existing Neovim instance"),
 		QCoreApplication::translate("main", "addr")));
+	parser.addOption(QCommandLineOption("spawn",
+		QCoreApplication::translate("main", "Call nvim using the given positional arguments")));
 
 	parser.addPositionalArgument("file",
 		QCoreApplication::translate("main", "Edit specified file(s)"), "[file...]");
@@ -90,9 +92,17 @@ int main(int argc, char **argv)
 
 	int positionalMarker = app.arguments().indexOf("--");
 	QStringList neovimArgs;
+	QStringList spawnArgs;
 	neovimArgs << "--cmd";
 	neovimArgs << "set termguicolors";
-	if (positionalMarker != -1) {
+
+	int spawn_idx = app.arguments().indexOf("--spawn");
+	if (spawn_idx != -1 && (spawn_idx < positionalMarker
+				|| positionalMarker == -1)) {
+		QStringList args = app.arguments().mid(0, spawn_idx+1);
+		spawnArgs = app.arguments().mid(spawn_idx+1);
+		parser.process(args);
+	} else if (positionalMarker != -1) {
 		QStringList args = app.arguments().mid(0, positionalMarker);
 		neovimArgs += app.arguments().mid(positionalMarker+1);
 		parser.process(args);
@@ -104,8 +114,9 @@ int main(int argc, char **argv)
 		parser.showHelp();
 	}
 
-	if (parser.isSet("server") && parser.isSet("embed")) {
-		qWarning() << "Options --server and --embed are mutually exclusive\n";
+	int exclusive = parser.isSet("server") + parser.isSet("embed") + parser.isSet("spawn");
+	if (exclusive > 1) {
+		qWarning() << "Options --server, --spawn and --embed are mutually exclusive\n";
 		parser.showHelp();
 	}
 
@@ -132,6 +143,13 @@ int main(int argc, char **argv)
 		}
 		QString server = parser.value("server");
 		c = NeovimQt::NeovimConnector::connectToNeovim(server);
+	} else if (parser.isSet("spawn")) {
+		if (spawnArgs.isEmpty()) {
+			qWarning() << "--spawn requires at least one positional argument";
+			parser.showHelp();
+		}
+		QString exe = spawnArgs.at(0);
+		c = NeovimQt::NeovimConnector::spawn(spawnArgs.mid(1), exe);
 	} else {
 		auto path = qgetenv("NVIM_QT_RUNTIME_PATH");
 		if (QFileInfo(path).isDir()) {
