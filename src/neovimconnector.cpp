@@ -176,7 +176,7 @@ Neovim* NeovimConnector::neovimObject()
  * Launch an embedded Neovim process
  * @see processExited
  */
-NeovimConnector* NeovimConnector::spawn(const QStringList& params)
+NeovimConnector* NeovimConnector::spawn(const QStringList& params, const QString& exe)
 {
 	QProcess *p = new QProcess();
 	QStringList args;
@@ -202,7 +202,7 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 			c, SIGNAL(processExited(int)));
 	connect(p, &QProcess::started,
 			c, &NeovimConnector::discoverMetadata);
-	p->start("nvim", args);
+	p->start(exe, args);
 	return c;
 }
 

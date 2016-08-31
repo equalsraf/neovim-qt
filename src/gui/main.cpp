@@ -68,6 +68,10 @@ int main(int argc, char **argv)
 	QCommandLineParser parser;
 	parser.addOption(QCommandLineOption("embed",
 		QCoreApplication::translate("main", "Communicate with Neovim over stdin/out")));
+	parser.addOption(QCommandLineOption("nvim",
+		QCoreApplication::translate("main", "nvim executable path"),
+		QCoreApplication::translate("main", "nvim_path"),
+		"nvim"));
 	parser.addOption(QCommandLineOption("server",
 		QCoreApplication::translate("main", "Connect to existing Neovim instance"),
 		QCoreApplication::translate("main", "addr")));
@@ -150,7 +154,7 @@ int main(int argc, char **argv)
 
 			// Pass positional file arguments to Neovim
 			neovimArgs.append(parser.positionalArguments());
-			c = NeovimQt::NeovimConnector::spawn(neovimArgs);
+			c = NeovimQt::NeovimConnector::spawn(neovimArgs, parser.value("nvim"));
 		}
 	}
 
