@@ -6,6 +6,7 @@ environment:
   - SCRIPT: contrib\appveyor-mingw.bat
     RELEASE_ARTIFACT: true
   - SCRIPT: contrib\appveyor-msvc.bat
+  - SCRIPT: contrib\appveyor-mingw-qt53.bat
 configuration:
 - RelWithDebInfo
 matrix:
