@@ -176,7 +176,7 @@ Neovim* NeovimConnector::neovimObject()
  * Launch an embedded Neovim process
  * @see processExited
  */
-NeovimConnector* NeovimConnector::spawn(const QStringList& params)
+NeovimConnector* NeovimConnector::spawn(const QStringList& params, const QString& exe)
 {
 	QProcess *p = new QProcess();
 	QStringList args;
@@ -194,7 +194,8 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 
 	NeovimConnector *c = new NeovimConnector(p);
 	c->m_ctype = SpawnedConnection;
-	c->m_connParams = params;
+	c->m_spawnArgs = params;
+	c->m_spawnExe = exe;
 
 	connect(p, SIGNAL(error(QProcess::ProcessError)),
 			c, SLOT(processError(QProcess::ProcessError)));
@@ -202,7 +203,7 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params)
 			c, SIGNAL(processExited(int)));
 	connect(p, &QProcess::started,
 			c, &NeovimConnector::discoverMetadata);
-	p->start("nvim", args);
+	p->start(exe, args);
 	return c;
 }
 
@@ -359,7 +360,7 @@ NeovimConnector* NeovimConnector::reconnect()
 {
 	switch(m_ctype) {
 	case SpawnedConnection:
-		return NeovimConnector::spawn(m_connParams);
+		return NeovimConnector::spawn(m_spawnArgs, m_spawnExe);
 	case HostConnection:
 		return NeovimConnector::connectToHost(m_connHost, m_connPort);
 	case SocketConnection:

@@ -48,7 +48,8 @@ public:
 
 	NeovimConnector(QIODevice* s);
 	NeovimConnector(MsgpackIODevice* s);
-	static NeovimConnector* spawn(const QStringList& params=QStringList());
+	static NeovimConnector* spawn(const QStringList& params=QStringList(),
+									const QString& exe="nvim");
 	static NeovimConnector* connectToSocket(const QString&);
 	static NeovimConnector* connectToHost(const QString& host, int port);
 	static NeovimConnector* connectToNeovim(const QString& server=QString());
@@ -101,7 +102,8 @@ private:
 
 	// Store connection arguments for reconnect()
 	NeovimConnectionType m_ctype;
-	QStringList m_connParams;
+	QStringList m_spawnArgs;
+	QString m_spawnExe;
 	QString m_connSocket, m_connHost;
 	int m_connPort;
 	bool m_ready;

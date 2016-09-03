@@ -66,11 +66,10 @@ int main(int argc, char **argv)
 	}
 
 	QCommandLineParser parser;
-	parser.addOption(QCommandLineOption("embed",
-		QCoreApplication::translate("main", "Communicate with Neovim over stdin/out")));
-	parser.addOption(QCommandLineOption("server",
-		QCoreApplication::translate("main", "Connect to existing Neovim instance"),
-		QCoreApplication::translate("main", "addr")));
+	parser.addOption(QCommandLineOption("nvim",
+		QCoreApplication::translate("main", "nvim executable path"),
+		QCoreApplication::translate("main", "nvim_path"),
+		"nvim"));
 	parser.addOption(QCommandLineOption("geometry",
 		QCoreApplication::translate("main", "Initial window geometry"),
 		QCoreApplication::translate("main", "geometry")));
@@ -78,24 +77,46 @@ int main(int argc, char **argv)
 		QCoreApplication::translate("main", "Maximize the window on startup")));
 	parser.addOption(QCommandLineOption("fullscreen",
 		QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
+	parser.addHelpOption();
+	parser.addOption(QCommandLineOption("embed",
+		QCoreApplication::translate("main", "Communicate with Neovim over stdin/out")));
+	parser.addOption(QCommandLineOption("server",
+		QCoreApplication::translate("main", "Connect to existing Neovim instance"),
+		QCoreApplication::translate("main", "addr")));
+	parser.addOption(QCommandLineOption("spawn",
+		QCoreApplication::translate("main", "Call nvim using the given positional arguments")));
+
 	parser.addPositionalArgument("file",
 		QCoreApplication::translate("main", "Edit specified file(s)"), "[file...]");
 	parser.addPositionalArgument("...", "Additional arguments are fowarded to Neovim", "[-- ...]");
-	parser.addHelpOption();
 
-	int sep = app.arguments().indexOf("--");
+	int positionalMarker = app.arguments().indexOf("--");
 	QStringList neovimArgs;
+	QStringList spawnArgs;
 	neovimArgs << "--cmd";
 	neovimArgs << "set termguicolors";
-	if (sep != -1) {
-		QStringList args = app.arguments().mid(0, sep);
-		neovimArgs += app.arguments().mid(sep+1);
+
+	int spawn_idx = app.arguments().indexOf("--spawn");
+	if (spawn_idx != -1 && (spawn_idx < positionalMarker
+				|| positionalMarker == -1)) {
+		QStringList args = app.arguments().mid(0, spawn_idx+1);
+		spawnArgs = app.arguments().mid(spawn_idx+1);
+		parser.process(args);
+	} else if (positionalMarker != -1) {
+		QStringList args = app.arguments().mid(0, positionalMarker);
+		neovimArgs += app.arguments().mid(positionalMarker+1);
 		parser.process(args);
 	} else {
 		parser.process(app.arguments());
 	}
 
 	if (parser.isSet("help")) {
+		parser.showHelp();
+	}
+
+	int exclusive = parser.isSet("server") + parser.isSet("embed") + parser.isSet("spawn");
+	if (exclusive > 1) {
+		qWarning() << "Options --server, --spawn and --embed are mutually exclusive\n";
 		parser.showHelp();
 	}
 
@@ -108,50 +129,65 @@ int main(int argc, char **argv)
 
 	NeovimQt::NeovimConnector *c;
 	if (parser.isSet("embed")) {
-		c = NeovimQt::NeovimConnector::fromStdinOut();
-	} else {
-		if (parser.isSet("server")) {
-			QString server = parser.value("server");
-			c = NeovimQt::NeovimConnector::connectToNeovim(server);
-		} else {
-			auto path = qgetenv("NVIM_QT_RUNTIME_PATH");
-			if (QFileInfo(path).isDir()) {
-				neovimArgs.insert(0, "--cmd");
-				neovimArgs.insert(1, QString("set rtp+=%1")
-						.arg(QString::fromLocal8Bit(path)));
-			}
-#ifdef NVIM_QT_RUNTIME_PATH
-			else if (QFileInfo(NVIM_QT_RUNTIME_PATH).isDir()) {
-				neovimArgs.insert(0, "--cmd");
-				neovimArgs.insert(1, QString("set rtp+=%1")
-						.arg(NVIM_QT_RUNTIME_PATH));
-			} else
-#endif
-			{
-				// Look for the runtime relative to the nvim-qt binary
-				QDir d = QFileInfo(QCoreApplication::applicationDirPath()).dir();
-#ifdef Q_OS_MAC
-				// within the bundle at ../Resources/runtime
-				d.cd("Resources");
-				d.cd("runtime");
-#else
-				// ../share/nvim-qt/runtime
-				d.cd("share");
-				d.cd("nvim-qt");
-				d.cd("runtime");
-#endif
-
-				if (d.exists()) {
-					neovimArgs.insert(0, "--cmd");
-					neovimArgs.insert(1, QString("set rtp+=%1")
-							.arg(d.path()));
-				}
-			}
-
-			// Pass positional file arguments to Neovim
-			neovimArgs.append(parser.positionalArguments());
-			c = NeovimQt::NeovimConnector::spawn(neovimArgs);
+		if (!parser.positionalArguments().isEmpty()
+				|| positionalMarker != -1) {
+			qWarning() << "--embed does not accept positional arguments\n";
+			parser.showHelp();
 		}
+		c = NeovimQt::NeovimConnector::fromStdinOut();
+	} else if (parser.isSet("server")) {
+		if (!parser.positionalArguments().isEmpty()
+				|| positionalMarker != -1) {
+			qWarning() << "--server does not accept positional arguments\n";
+			parser.showHelp();
+		}
+		QString server = parser.value("server");
+		c = NeovimQt::NeovimConnector::connectToNeovim(server);
+	} else if (parser.isSet("spawn")) {
+		if (spawnArgs.isEmpty()) {
+			qWarning() << "--spawn requires at least one positional argument";
+			parser.showHelp();
+		}
+		QString exe = spawnArgs.at(0);
+		c = NeovimQt::NeovimConnector::spawn(spawnArgs.mid(1), exe);
+	} else {
+		auto path = qgetenv("NVIM_QT_RUNTIME_PATH");
+		if (QFileInfo(path).isDir()) {
+			neovimArgs.insert(0, "--cmd");
+			neovimArgs.insert(1, QString("set rtp+=%1")
+					.arg(QString::fromLocal8Bit(path)));
+		}
+#ifdef NVIM_QT_RUNTIME_PATH
+		else if (QFileInfo(NVIM_QT_RUNTIME_PATH).isDir()) {
+			neovimArgs.insert(0, "--cmd");
+			neovimArgs.insert(1, QString("set rtp+=%1")
+					.arg(NVIM_QT_RUNTIME_PATH));
+		} else
+#endif
+		{
+			// Look for the runtime relative to the nvim-qt binary
+			QDir d = QFileInfo(QCoreApplication::applicationDirPath()).dir();
+#ifdef Q_OS_MAC
+			// within the bundle at ../Resources/runtime
+			d.cd("Resources");
+			d.cd("runtime");
+#else
+			// ../share/nvim-qt/runtime
+			d.cd("share");
+			d.cd("nvim-qt");
+			d.cd("runtime");
+#endif
+
+			if (d.exists()) {
+				neovimArgs.insert(0, "--cmd");
+				neovimArgs.insert(1, QString("set rtp+=%1")
+						.arg(d.path()));
+			}
+		}
+
+		// Pass positional file arguments to Neovim
+		neovimArgs.append(parser.positionalArguments());
+		c = NeovimQt::NeovimConnector::spawn(neovimArgs, parser.value("nvim"));
 	}
 
 #ifdef NEOVIMQT_GUI_WIDGET
