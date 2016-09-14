@@ -144,7 +144,7 @@ Function Function::fromVariant(const QVariant& fun)
 		} else if ( it.key() == "deprecated_since" ) {
 			// This function is deprecated
 		} else {
-			qWarning() << "Unsupported function attribute"<< it.key() << it.value();
+			qDebug() << "Unsupported function attribute"<< it.key() << it.value();
 		}
 	}
 
