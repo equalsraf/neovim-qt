@@ -109,6 +109,9 @@ class Function:
     """
     Representation for a Neovim API Function
     """
+
+    # Attributes names that we support, see src/function.c for details
+    __KNOWN_ATTRIBUTES = set(['name', 'return_type', 'parameters', 'return_type', 'can_fail', 'deprecated_since', 'method', 'async', 'impl_name', 'noeval', 'receives_channel_id'])
     def __init__(self, nvim_fun):
         self.valid = False
         self.fun = nvim_fun
@@ -121,12 +124,28 @@ class Function:
         except UnsupportedType as ex:
             print('Found unsupported type(%s) when adding function %s(), skipping' % (ex,self.name))
             return
+
+        u_attrs = self.unknown_attributes()
+        if u_attrs:
+            print('Found unknown attributes for function %s: %s' % (self.name, u_attrs))
+
         self.argcount = len(self.parameters)
         self.can_fail = self.fun.get('can_fail', False)
 
         # Build the argument string - makes it easier for the templates
         self.argstring = ', '.join(['%s %s' % (tv.native_type, tv.name) for tv in self.parameters])
         self.valid = True
+
+    def is_method(self):
+        return self.fun.get('method', False)
+    def is_async(self):
+        return self.fun.get('async', False)
+    def deprecated(self):
+        return self.fun.get('deprecated_since', None)
+
+    def unknown_attributes(self):
+        attrs = set(self.fun.keys()) - Function.__KNOWN_ATTRIBUTES
+        return attrs
 
     def real_signature(self):
         params = ''
@@ -160,8 +179,12 @@ def print_api(api):
                 sig = fundef.signature()
                 realsig = fundef.real_signature()
                 print('\t%s'% sig)
+                deprecated = fundef.deprecated()
+                if deprecated:
+                    print('\t- Deprecated: %d' % deprecated)
                 if sig != realsig:
-                    print('\t[aka %s]\n' % realsig)
+                    print('\t- Native: %s\n' % realsig)
+
             print('')
         elif key == 'types':
             print('Data Types')
@@ -176,7 +199,7 @@ def print_api(api):
         elif key == 'features':
             pass
         else:
-            print('Unknown API info attribute: %s', key)
+            print('Unknown API info attribute: %s' % key)
 
 if __name__ == '__main__':
 
