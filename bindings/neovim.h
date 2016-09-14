@@ -23,6 +23,9 @@ private:
 	NeovimConnector *m_c;
 public slots:
 {% for f in functions %}
+{% if f.deprecated() %}
+	// DEPRECATED
+{% endif %}
 	// {{f.signature()}}
 	MsgpackRequest* {{f.name}}({{f.argstring}});
 {% endfor %}
