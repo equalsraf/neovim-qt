@@ -152,7 +152,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 {
 	QChar c;
 	if (specialKeys.contains(k)) {
-		c = text.at(0);
+		c = text.isEmpty() ? QChar() : text.at(0);
 		if (text.isEmpty() || c.isSpace() || !c.isPrint()) {
 			return QString("<%1%2>").arg(modPrefix(mod)).arg(specialKeys.value(k));
 		} else {
