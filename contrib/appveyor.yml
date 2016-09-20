@@ -11,6 +11,11 @@ configuration:
 - RelWithDebInfo
 matrix:
   fast_finish: true
+install:
+- ps: appveyor DownloadFile -FileName Neovim.zip "https://ci.appveyor.com/api/projects/neovim/neovim/artifacts/build/Neovim.zip?branch=master&job=Configuration%3A%20MINGW_64"
+- 7z x Neovim.zip
+- set PATH=%PATH%;%CD%\Neovim\bin;
+- nvim --version
 build_script:
 - cmd: '%SCRIPT%'
 artifacts:
