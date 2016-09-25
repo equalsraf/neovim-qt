@@ -17,6 +17,7 @@ namespace NeovimQt {
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 :ShellWidget(parent), m_attached(false), m_nvim(nvim),
 	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false),
+	m_mouseHide(true),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white), m_hg_special(QColor()),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
 	m_resizing(false),
@@ -399,9 +400,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "set_scroll_region"){
 		handleSetScrollRegion(opargs);
 	} else if (name == "mouse_on"){
-		this->unsetCursor();
+		// See :h mouse
 	} else if (name == "mouse_off"){
-		this->setCursor(Qt::ForbiddenCursor);
+		// See :h mouse
 	} else if (name == "mode_change"){
 		if (opargs.size() != 1) {
 			qWarning() << "Unexpected argument for change_mode:" << opargs;
@@ -499,6 +500,10 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			setLineSpace(val);
 			m_nvim->neovimObject()->vim_set_var("GuiLinespace", val);
 			resizeNeovim(size());
+		} else if (guiEvName == "Mousehide" && args.size() == 2) {
+			m_mouseHide = variant_not_zero(args.at(1));
+			int val = m_mouseHide ? 1 : 0;
+			m_nvim->neovimObject()->vim_set_var("GuiMousehide", val);
 		}
 		return;
 	} else if (name != "redraw") {
@@ -567,7 +572,10 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 		return;
 	}
 
-	// FIXME mousehide - conceal mouse pointer when typing
+	// conceal mouse pointer when typing
+	if (m_mouseHide) {
+		this->setCursor(Qt::BlankCursor);
+	}
 
 	QString inp = Input.convertKey(ev->text(), ev->key(), ev->modifiers());
 	if (inp.isEmpty()) {
@@ -643,6 +651,7 @@ void Shell::mouseReleaseEvent(QMouseEvent *ev)
 }
 void Shell::mouseMoveEvent(QMouseEvent *ev)
 {
+	unsetCursor();
 	QPoint pos(ev->x()/cellSize().width(),
 			ev->y()/cellSize().height());
 	if (pos != m_mouse_pos) {

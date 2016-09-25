@@ -30,6 +30,11 @@ function! GuiLinespace(height) abort
   call rpcnotify(0, 'Gui', 'Linespace', a:height)
 endfunction
 
+" Configure mouse hide behaviour (1 is enabled, 0 disabled)
+function! GuiMousehide(enabled) abort
+  call rpcnotify(0, 'Gui', 'Mousehide', a:enabled)
+endfunction
+
 " The GuiFont command. For compatibility there is also Guifont
 function s:GuiFontCommand(fname, bang) abort
   if a:fname ==# ''
