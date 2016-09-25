@@ -23,6 +23,8 @@ endif()
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# to generate a compile_commands.json usable by ycm and other tooling
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # konsole_wcwidth.h
 include_directories(third-party)
 
