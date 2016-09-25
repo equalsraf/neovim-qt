@@ -83,6 +83,8 @@ g:GuiFont holds the current GUI font name, the same value used by
 g:GuiLinespace holds the extra vertical space (in pixels) added to
 each line.
 
+							*g:GuiMousehide*
+g:GuiMousehide is 1 if mouse hiding is in effect, 0 otherwise.
 
 ==============================================================================
 3. Functions
@@ -113,6 +115,11 @@ Replaces |'linespace'|.
 GuiDrop(...) is a wrapper around |:drop| it escapes all given arguments
 using |fnameescape()| and then passes them to :drop. This is useful if
 the GUI is requesting Neovim to open additional files.
+
+							*GuiMousehide()*
+GuiMousehide(enabled) enables mouse hiding while typing. If enabled is
+1, as soon as the user types the mouse cursor is concealed. When the
+user moves the mouse, the cursor becomes visible. Replaces |'mousehide'|.
 
 ==============================================================================
 4. Internals
