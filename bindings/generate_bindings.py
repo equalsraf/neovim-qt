@@ -212,5 +212,5 @@ if __name__ == '__main__':
             generate_file(name, outpath, **env)
 
     else:
-        print('Neovim api info:')
+        print('API info for %s:' % nvim)
         print_api(api)
