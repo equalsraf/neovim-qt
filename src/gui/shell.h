@@ -111,6 +111,7 @@ private:
 
 	QRect m_scroll_region;
 	bool m_font_bold, m_font_italic, m_font_underline, m_font_undercurl;
+	bool m_mouseHide;
 
 	// highlight fg/bg - from redraw:highlightset - by default we
 	// use the values from above

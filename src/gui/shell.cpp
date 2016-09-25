@@ -17,6 +17,7 @@ namespace NeovimQt {
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 :ShellWidget(parent), m_attached(false), m_nvim(nvim),
 	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false),
+	m_mouseHide(true),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white), m_hg_special(QColor()),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
 	m_resizing(false),
@@ -499,6 +500,10 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			setLineSpace(val);
 			m_nvim->neovimObject()->vim_set_var("GuiLinespace", val);
 			resizeNeovim(size());
+		} else if (guiEvName == "Mousehide" && args.size() == 2) {
+			m_mouseHide = variant_not_zero(args.at(1));
+			int val = m_mouseHide ? 1 : 0;
+			m_nvim->neovimObject()->vim_set_var("GuiMousehide", val);
 		}
 		return;
 	} else if (name != "redraw") {
@@ -568,7 +573,9 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 	}
 
 	// conceal mouse pointer when typing
-	this->setCursor(Qt::BlankCursor);
+	if (m_mouseHide) {
+		this->setCursor(Qt::BlankCursor);
+	}
 
 	QString inp = Input.convertKey(ev->text(), ev->key(), ev->modifiers());
 	if (inp.isEmpty()) {
