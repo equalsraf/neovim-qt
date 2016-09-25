@@ -85,6 +85,10 @@ if (PYTHONINTERP_FOUND)
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 		COMMENT "Generating bindings"
 		)
+
+	add_custom_target(bindings-preview
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/generate_bindings.py ${NVIM}
+		)
 endif()
 
 
