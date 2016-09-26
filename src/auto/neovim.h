@@ -1,4 +1,4 @@
-// Auto generated 2016-07-03 02:23:03.078220
+// Auto generated 2016-09-26 13:47:46.574957
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
@@ -9,7 +9,7 @@ class NeovimConnector;
 class MsgpackRequest;
 class Neovim: public QObject
 {
-
+	friend class Neovim015;
 	Q_OBJECT
 public:
 	Neovim(NeovimConnector *);
@@ -22,8 +22,6 @@ signals:
 private:
 	NeovimConnector *m_c;
 public slots:
-	void ui_try_resize(int64_t width, int64_t height);
-
 	// Integer buffer_line_count(Buffer buffer, ) !fails
 	MsgpackRequest* buffer_line_count(int64_t buffer);
 	// String buffer_get_line(Buffer buffer, Integer index, ) !fails
@@ -78,6 +76,12 @@ public slots:
 	MsgpackRequest* tabpage_get_window(int64_t tabpage);
 	// Boolean tabpage_is_valid(Tabpage tabpage, ) 
 	MsgpackRequest* tabpage_is_valid(int64_t tabpage);
+	// void ui_attach(Integer width, Integer height, Boolean enable_rgb, ) !fails
+	MsgpackRequest* ui_attach(int64_t width, int64_t height, bool enable_rgb);
+	// void ui_detach() !fails
+	MsgpackRequest* ui_detach();
+	// Object ui_try_resize(Integer width, Integer height, ) !fails
+	MsgpackRequest* ui_try_resize(int64_t width, int64_t height);
 	// void vim_command(String str, ) !fails
 	MsgpackRequest* vim_command(QByteArray str);
 	// void vim_feedkeys(String keys, String mode, Boolean escape_csi, ) 
@@ -146,6 +150,8 @@ public slots:
 	MsgpackRequest* vim_unsubscribe(QByteArray event);
 	// Integer vim_name_to_color(String name, ) 
 	MsgpackRequest* vim_name_to_color(QByteArray name);
+	// Dictionary vim_get_color_map() 
+	MsgpackRequest* vim_get_color_map();
 	// Buffer window_get_buffer(Window window, ) !fails
 	MsgpackRequest* window_get_buffer(int64_t window);
 	// ArrayOf(Integer, 2) window_get_cursor(Window window, ) !fails
@@ -178,8 +184,6 @@ public slots:
 	MsgpackRequest* window_is_valid(int64_t window);
 
 signals:
-	void on_ui_try_resize();
-
 	void on_buffer_line_count(int64_t);
 	void err_buffer_line_count(const QString&, const QVariant&);
 
@@ -258,6 +262,15 @@ signals:
 	void err_tabpage_get_window(const QString&, const QVariant&);
 
 	void on_tabpage_is_valid(bool);
+
+	void on_ui_attach(void);
+	void err_ui_attach(const QString&, const QVariant&);
+
+	void on_ui_detach(void);
+	void err_ui_detach(const QString&, const QVariant&);
+
+	void on_ui_try_resize(QVariant);
+	void err_ui_try_resize(const QString&, const QVariant&);
 
 	void on_vim_command(void);
 	void err_vim_command(const QString&, const QVariant&);
@@ -344,6 +357,8 @@ signals:
 	void on_vim_unsubscribe(void);
 
 	void on_vim_name_to_color(int64_t);
+
+	void on_vim_get_color_map(QVariantMap);
 
 	void on_window_get_buffer(int64_t);
 	void err_window_get_buffer(const QString&, const QVariant&);
