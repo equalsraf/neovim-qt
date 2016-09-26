@@ -357,6 +357,11 @@ NeovimConnector* NeovimConnector::reconnect()
  * is emitted when the process exits.
  */
 
+bool NeovimConnector::hasFunction(const QString& name)
+{
+	return m_helper->hasFunction(name);
+}
+
 } // namespace NeovimQt
 
 #include "moc_neovimconnector.cpp"

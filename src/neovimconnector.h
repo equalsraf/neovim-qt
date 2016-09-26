@@ -68,6 +68,8 @@ public:
 	QByteArray encode(const QString&);
 	NeovimConnectionType connectionType();
 
+	bool hasFunction(const QString& name);
+
 signals:
 	/** Emitted when Neovim is ready @see ready */
 	void ready();

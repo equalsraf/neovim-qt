@@ -100,7 +100,9 @@ bool NeovimConnectorHelper::checkFunctions(const QVariantList& ftable)
 {
 	QList<Function::FunctionId> supported;
 	foreach(const QVariant& val, ftable) {
-		Function::FunctionId fid = Function::functionId(Function::fromVariant(val));
+		Function func = Function::fromVariant(val);
+		m_function_names.insert(func.name);
+		Function::FunctionId fid = Function::functionId(func);
 		if (fid != Function::NEOVIM_FN_NULL) {
 			supported.append(fid);
 		}
@@ -108,5 +110,11 @@ bool NeovimConnectorHelper::checkFunctions(const QVariantList& ftable)
 	// true if all the generated functions are supported
 	return Function::knownFunctions.size() == supported.size();
 }
+
+bool NeovimConnectorHelper::hasFunction(const QString& name)
+{
+	return m_function_names.contains(name);
+}
+
 
 } // Namespace NeovimQt

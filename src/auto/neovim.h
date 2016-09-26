@@ -1,4 +1,4 @@
-// Auto generated 2016-09-26 13:47:46.574957
+// Auto generated 2016-09-26 13:51:26.082452
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"
@@ -9,7 +9,6 @@ class NeovimConnector;
 class MsgpackRequest;
 class Neovim: public QObject
 {
-	friend class Neovim015;
 	Q_OBJECT
 public:
 	Neovim(NeovimConnector *);
