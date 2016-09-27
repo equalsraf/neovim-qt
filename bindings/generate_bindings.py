@@ -131,7 +131,6 @@ class Function:
             print('Found unknown attributes for function %s: %s' % (self.name, u_attrs))
 
         self.argcount = len(self.parameters)
-        self.can_fail = self.fun.get('can_fail', False)
 
         # Build the argument string - makes it easier for the templates
         self.argstring = ', '.join(['%s %s' % (tv.native_type, tv.name) for tv in self.parameters])
@@ -154,8 +153,6 @@ class Function:
             params += '%s %s' % (p.native_type, p.name)
             params += ', '
         notes = ''
-        if self.can_fail:
-            notes += '!fails'
         return '%s %s(%s) %s' % (self.return_type.native_type,self.name,params, notes)
     def signature(self):
         params = ''
@@ -163,8 +160,6 @@ class Function:
             params += '%s %s' % (p.neovim_type, p.name)
             params += ', '
         notes = ''
-        if self.can_fail:
-            notes += '!fails'
         return '%s %s(%s) %s' % (self.return_type.neovim_type,self.name,params, notes)
 
 

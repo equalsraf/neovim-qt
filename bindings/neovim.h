@@ -33,9 +33,7 @@ public slots:
 signals:
 {% for f in functions %}
 	void on_{{f.name}}({{f.return_type.native_type}});
-{% if f.can_fail %}
 	void err_{{f.name}}(const QString&, const QVariant&);
-{% endif%}
 
 {% endfor %}
 };
