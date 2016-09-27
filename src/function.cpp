@@ -75,10 +75,6 @@ bool Function::operator==(const Function& other)
 		return false;
 	}
 
-	if ( this->can_fail != other.can_fail ) {
-		return false;
-	}
-
 	if ( this->return_type != other.return_type ) {
 		return false;
 	}
