@@ -1,4 +1,4 @@
-// Auto generated 2016-07-03 02:23:03.002477
+// Auto generated 2016-09-26 13:51:26.036654
 const QList<Function> Function::knownFunctions = QList<Function>()
 << Function("Integer", "buffer_line_count",
 	QList<QString>()
@@ -151,6 +151,20 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 	QList<QString>()
 			<< QString("Tabpage")
 		, false)
+<< Function("void", "ui_attach",
+	QList<QString>()
+			<< QString("Integer")
+			<< QString("Integer")
+			<< QString("Boolean")
+		, true)
+<< Function("void", "ui_detach",
+	QList<QString>()
+		, true)
+<< Function("Object", "ui_try_resize",
+	QList<QString>()
+			<< QString("Integer")
+			<< QString("Integer")
+		, true)
 << Function("void", "vim_command",
 	QList<QString>()
 			<< QString("String")
@@ -285,6 +299,9 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 << Function("Integer", "vim_name_to_color",
 	QList<QString>()
 			<< QString("String")
+		, false)
+<< Function("Dictionary", "vim_get_color_map",
+	QList<QString>()
 		, false)
 << Function("Buffer", "window_get_buffer",
 	QList<QString>()

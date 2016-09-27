@@ -1,4 +1,4 @@
-// Auto generated 2016-07-03 02:23:03.024523
+// Auto generated 2016-09-26 13:51:26.050026
 #include "neovim.h"
 #include "neovimconnector.h"
 #include "msgpackrequest.h"
@@ -35,16 +35,6 @@ Neovim::Neovim(NeovimConnector *c)
 		connect(m_c->m_dev, &MsgpackIODevice::notification,
 			this, &Neovim::neovimNotification);
 }
-
-
-void Neovim::ui_try_resize(int64_t width, int64_t height)
-{
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("ui_try_resize", 2);
-	m_c->m_dev->send(width);
-	m_c->m_dev->send(height);
-	connect(r, &MsgpackRequest::finished, this, &Neovim::on_ui_try_resize);
-}
-
 
 // Slots
 MsgpackRequest* Neovim::buffer_line_count(int64_t buffer)
@@ -331,6 +321,35 @@ MsgpackRequest* Neovim::tabpage_is_valid(int64_t tabpage)
 	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
 	m_c->m_dev->send(tabpage);
+	return r;
+}
+MsgpackRequest* Neovim::ui_attach(int64_t width, int64_t height, bool enable_rgb)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("ui_attach", 3);
+	r->setFunction(Function::NEOVIM_FN_UI_ATTACH);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(width);
+	m_c->m_dev->send(height);
+	m_c->m_dev->send(enable_rgb);
+	return r;
+}
+MsgpackRequest* Neovim::ui_detach()
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("ui_detach", 0);
+	r->setFunction(Function::NEOVIM_FN_UI_DETACH);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	return r;
+}
+MsgpackRequest* Neovim::ui_try_resize(int64_t width, int64_t height)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("ui_try_resize", 2);
+	r->setFunction(Function::NEOVIM_FN_UI_TRY_RESIZE);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	m_c->m_dev->send(width);
+	m_c->m_dev->send(height);
 	return r;
 }
 MsgpackRequest* Neovim::vim_command(QByteArray str)
@@ -638,6 +657,14 @@ MsgpackRequest* Neovim::vim_name_to_color(QByteArray name)
 	m_c->m_dev->send(name);
 	return r;
 }
+MsgpackRequest* Neovim::vim_get_color_map()
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("vim_get_color_map", 0);
+	r->setFunction(Function::NEOVIM_FN_VIM_GET_COLOR_MAP);
+	connect(r, &MsgpackRequest::finished, this, &Neovim::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &Neovim::handleResponseError);
+	return r;
+}
 MsgpackRequest* Neovim::window_get_buffer(int64_t window)
 {
 	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("window_get_buffer", 1);
@@ -875,6 +902,15 @@ void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const 
 		break;
 	case Function::NEOVIM_FN_TABPAGE_GET_WINDOW:
 		emit err_tabpage_get_window(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_UI_ATTACH:
+		emit err_ui_attach(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_UI_DETACH:
+		emit err_ui_detach(errMsg, res);
+		break;
+	case Function::NEOVIM_FN_UI_TRY_RESIZE:
+		emit err_ui_try_resize(errMsg, res);
 		break;
 	case Function::NEOVIM_FN_VIM_COMMAND:
 		emit err_vim_command(errMsg, res);
@@ -1256,6 +1292,30 @@ void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const QVari
 
 		}
 		break;
+	case Function::NEOVIM_FN_UI_ATTACH:
+		{
+			emit on_ui_attach();
+
+		}
+		break;
+	case Function::NEOVIM_FN_UI_DETACH:
+		{
+			emit on_ui_detach();
+
+		}
+		break;
+	case Function::NEOVIM_FN_UI_TRY_RESIZE:
+		{
+			QVariant data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for ui_try_resize");
+				return;
+			} else {
+				emit on_ui_try_resize(data);
+			}
+
+		}
+		break;
 	case Function::NEOVIM_FN_VIM_COMMAND:
 		{
 			emit on_vim_command();
@@ -1576,6 +1636,18 @@ void Neovim::handleResponse(quint32 msgid, Function::FunctionId fun, const QVari
 				return;
 			} else {
 				emit on_vim_name_to_color(data);
+			}
+
+		}
+		break;
+	case Function::NEOVIM_FN_VIM_GET_COLOR_MAP:
+		{
+			QVariantMap data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for vim_get_color_map");
+				return;
+			} else {
+				emit on_vim_get_color_map(data);
 			}
 
 		}

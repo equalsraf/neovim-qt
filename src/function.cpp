@@ -134,8 +134,16 @@ Function Function::fromVariant(const QVariant& fun)
 			// Deprecated
 		} else if ( it.key() == "receives_channel_id" ) {
 			// Internal
+		} else if ( it.key() == "impl_name" ) {
+			// Internal
+		} else if ( it.key() == "method" ) {
+			// Internal
+		} else if ( it.key() == "noeval" ) {
+			// API only function
 		} else if ( it.key() == "deferred" || it.key() == "async" ) {
 			// Internal, "deferred" renamed "async" in neovim/ccdeb91
+		} else if ( it.key() == "deprecated_since" ) {
+			// This function is deprecated
 		} else {
 			qWarning() << "Unsupported function attribute"<< it.key() << it.value();
 		}

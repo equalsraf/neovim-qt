@@ -10,6 +10,7 @@ class NeovimConnectorHelper: public QObject
 	Q_OBJECT
 public:
 	NeovimConnectorHelper(NeovimConnector *);
+	bool hasFunction(const QString& name);
 
 public slots:
 	void handleMetadata(quint32, Function::FunctionId, const QVariant& result);
@@ -20,7 +21,7 @@ protected:
 	bool checkFunctions(const QVariantList& ftable);
 private:
 	NeovimConnector *m_c;
-
+	QSet<QString> m_function_names;
 };
 
 } // Namespace NeovimQt

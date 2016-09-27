@@ -23,6 +23,7 @@ private slots:
 	void vim_get_current_buffer();
 	void vim_list_runtime_paths();
 	void vim_call_function();
+	void vim_get_color_map();
 	void callAll();
 
 private:
@@ -106,6 +107,20 @@ void TestCallAllMethods::vim_call_function()
 	obj->vim_call_function("abs", args);
 	QVERIFY(SPYWAIT(result));
 	QCOMPARE(result.at(0).at(0), QVariant(2));
+}
+
+/// A quick test for Dictionary support
+void TestCallAllMethods::vim_get_color_map()
+{
+	QVERIFY(m_c->neovimObject());
+	NeovimQt::Neovim *obj = m_c->neovimObject();
+
+	QSignalSpy result(obj, SIGNAL(on_vim_get_color_map(QVariantMap)));
+	QVERIFY(result.isValid());
+
+	obj->vim_get_color_map();
+	QVERIFY(SPYWAIT(result));
+	QVERIFY(!result.at(0).isEmpty());
 }
 
 QTEST_MAIN(TestCallAllMethods)

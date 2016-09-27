@@ -61,16 +61,14 @@ public:
 	NeovimError errorCause();
 	QString errorString();
 
-	// FIXME: remove this
-	MsgpackRequest* attachUi(int64_t width, int64_t height);
-	void detachUi();
-
 	bool isReady();
 	Neovim* neovimObject();
 	uint64_t channel();
 	QString decode(const QByteArray&);
 	QByteArray encode(const QString&);
 	NeovimConnectionType connectionType();
+
+	bool hasFunction(const QString& name);
 
 signals:
 	/** Emitted when Neovim is ready @see ready */
