@@ -75,10 +75,6 @@ bool Function::operator==(const Function& other)
 		return false;
 	}
 
-	if ( this->can_fail != other.can_fail ) {
-		return false;
-	}
-
 	if ( this->return_type != other.return_type ) {
 		return false;
 	}
@@ -134,10 +130,18 @@ Function Function::fromVariant(const QVariant& fun)
 			// Deprecated
 		} else if ( it.key() == "receives_channel_id" ) {
 			// Internal
+		} else if ( it.key() == "impl_name" ) {
+			// Internal
+		} else if ( it.key() == "method" ) {
+			// Internal
+		} else if ( it.key() == "noeval" ) {
+			// API only function
 		} else if ( it.key() == "deferred" || it.key() == "async" ) {
 			// Internal, "deferred" renamed "async" in neovim/ccdeb91
+		} else if ( it.key() == "deprecated_since" || it.key() == "since" ) {
+			// Creation/Deprecation
 		} else {
-			qWarning() << "Unsupported function attribute"<< it.key() << it.value();
+			qDebug() << "Unsupported function attribute"<< it.key() << it.value();
 		}
 	}
 

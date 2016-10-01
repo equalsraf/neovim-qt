@@ -23,6 +23,9 @@ private:
 	NeovimConnector *m_c;
 public slots:
 {% for f in functions %}
+{% if f.deprecated() %}
+	// DEPRECATED
+{% endif %}
 	// {{f.signature()}}
 	MsgpackRequest* {{f.name}}({{f.argstring}});
 {% endfor %}
@@ -30,9 +33,7 @@ public slots:
 signals:
 {% for f in functions %}
 	void on_{{f.name}}({{f.return_type.native_type}});
-{% if f.can_fail %}
 	void err_{{f.name}}(const QString&, const QVariant&);
-{% endif%}
 
 {% endfor %}
 };

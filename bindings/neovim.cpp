@@ -69,11 +69,9 @@ void Neovim::handleResponseError(quint32 msgid, Function::FunctionId fun, const 
 
 	switch(fun) {
 {% for f in functions %}
-{% if f.can_fail %}
 	case Function::NEOVIM_FN_{{f.name.upper()}}:
 		emit err_{{f.name}}(errMsg, res);
 		break;
-{% endif %}
 {% endfor %}
 	default:
 		m_c->setError(NeovimConnector::RuntimeMsgpackError, QString("Received error for function that should not fail: %s").arg(fun));

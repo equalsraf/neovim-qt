@@ -6,6 +6,6 @@ const QList<Function> Function::knownFunctions = QList<Function>()
 	{% for param in f.parameters %}
 		<< QString("{{param.neovim_type}}")
 	{% endfor %}
-	, {% if f.can_fail%}true{%else%}false{%endif%})
+	, false)
 {% endfor %}
 	;

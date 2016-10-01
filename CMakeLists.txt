@@ -79,10 +79,15 @@ endif()
 # Bindings
 find_package(PythonInterp)
 if (PYTHONINTERP_FOUND)
+	set(NVIM "nvim" CACHE STRING "Path to nvim executable")
 	add_custom_target(bindings
-		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/generate_bindings.py nvim ${CMAKE_SOURCE_DIR}/src/auto
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/generate_bindings.py ${NVIM} ${CMAKE_SOURCE_DIR}/src/auto
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 		COMMENT "Generating bindings"
+		)
+
+	add_custom_target(bindings-preview
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/generate_bindings.py ${NVIM}
 		)
 endif()
 
