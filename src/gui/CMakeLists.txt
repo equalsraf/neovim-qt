@@ -64,3 +64,13 @@ if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
 			DESTINATION ${CMAKE_INSTALL_BINDIR})
 	endif()
 endif()
+
+# Generate help tags
+add_custom_command(
+	OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/runtime/doc/tags"
+	COMMAND ${NEOVIM_EXEC} -i NONE -u NONE -e --headless
+	-c "helptags ${CMAKE_CURRENT_SOURCE_DIR}/runtime/doc" -c "quit"
+	COMMENT "Generating helptags")
+
+add_custom_target(helptags ALL
+	DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/runtime/doc/tags")
