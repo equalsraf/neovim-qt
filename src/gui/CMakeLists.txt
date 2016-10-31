@@ -22,7 +22,7 @@ add_library(neovim-qt-gui shell.cpp input.cpp errorwidget.cpp mainwindow.cpp app
 target_link_libraries(neovim-qt-gui qshellwidget neovim-qt)
 
 if(NOT APPLE)
-	set_property(SOURCE main.cpp PROPERTY COMPILE_DEFINITIONS
+	set_property(SOURCE app.cpp PROPERTY COMPILE_DEFINITIONS
 		NVIM_QT_RUNTIME_PATH="${CMAKE_INSTALL_FULL_DATADIR}/nvim-qt/runtime")
 endif()
 
