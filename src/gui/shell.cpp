@@ -758,6 +758,8 @@ void Shell::neovimResizeFinished()
 				m_resize_neovim_pending.height());
 		m_resize_neovim_pending = QSize();
 	}
+
+	emit neovimResized(rows(), columns());
 }
 
 void Shell::changeEvent( QEvent *ev)
