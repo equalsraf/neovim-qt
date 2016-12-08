@@ -139,7 +139,7 @@ void Shell::setAttached(bool attached)
 		m_nvim->neovimObject()->vim_command("runtime plugin/nvim_gui_shim.vim");
 		m_nvim->neovimObject()->vim_command("runtime! ginit.vim");
 
-		// Noevim was not able to open urls till now. Check if we have any to open.
+		// Neovim was not able to open urls till now. Check if we have any to open.
 		if(!m_deferredOpen.isEmpty()){
 			openFiles(m_deferredOpen);
 			m_deferredOpen.clear();    //Neovim may change state. Clear to prevent reopening.
