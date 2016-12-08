@@ -876,6 +876,11 @@ bool Shell::neovimBusy() const
 	return m_neovimBusy;
 }
 
+bool Shell::neovimResizing() const
+{
+	return m_resizing;
+}
+
 bool Shell::neovimAttached() const
 {
 	return m_attached;
