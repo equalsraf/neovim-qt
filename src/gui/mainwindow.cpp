@@ -52,6 +52,11 @@ void MainWindow::init(NeovimConnector *c)
 	}
 }
 
+bool MainWindow::neovimResizing() const
+{
+	return (m_shell != NULL && m_shell->neovimResizing());
+}
+
 bool MainWindow::neovimAttached() const
 {
 	return (m_shell != NULL && m_shell->neovimAttached());
@@ -168,6 +173,9 @@ void MainWindow::delayedShow(DelayedShow type)
 
 void MainWindow::showIfDelayed()
 {
+	if(neovimResizing())
+		return;
+
 	if (!isVisible()) {
 		if (m_delayedShow == DelayedShow::Normal) {
 			show();
