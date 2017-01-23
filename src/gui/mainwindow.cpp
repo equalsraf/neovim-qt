@@ -28,8 +28,23 @@ void MainWindow::init(NeovimConnector *c)
 	}
 
 	m_nvim = c;
+
+	m_tree = new TreeView(c);
+	m_tree->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+
 	m_shell = new Shell(c);
-	m_stack.insertWidget(1, m_shell);
+
+	m_layout = new QHBoxLayout();
+	m_layout->setSpacing(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
+	m_layout->addWidget(m_tree);
+	m_layout->addWidget(m_shell);
+
+	m_window = new QWidget();
+	m_window->setLayout(m_layout);
+
+	m_stack.insertWidget(1, m_window);
+
 	m_stack.setCurrentIndex(1);
 	connect(m_shell, SIGNAL(neovimAttached(bool)),
 			this, SLOT(neovimAttachmentChanged(bool)));
@@ -99,7 +114,11 @@ void MainWindow::neovimSetTitle(const QString &title)
 void MainWindow::neovimWidgetResized()
 {
 	if (isMaximized() || isFullScreen()) {
-		m_shell->resizeNeovim(geometry().size());
+		QSize size = geometry().size();
+		if (m_tree->isVisible()) {
+			size.scale(size.width() - m_tree->geometry().size().width(), size.height(), Qt::IgnoreAspectRatio);
+		}
+		m_shell->resizeNeovim(size);
 	} else {
 		m_shell->resizeNeovim(m_shell->size());
 	}
