@@ -27,6 +27,10 @@ for Windows both MSVC and Mingw are supported. Use the following
 
 The binaries will be under build/bin/. The GUI binary is called nvim-qt.
 
+## Configuration
+Commands for interacting with the GUI (e.g. to change the font) can be found by
+running [:help neovim-gui-shim](./src/gui/runtime/doc/neovim_gui_shim.txt).
+
 ## Design
 
 The *NeovimConnector* class is used to setup the connection to Neovim. It also
