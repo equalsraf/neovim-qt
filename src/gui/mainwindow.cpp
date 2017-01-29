@@ -10,6 +10,8 @@ MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
 {
 	m_errorWidget = new ErrorWidget();
 	m_stack.addWidget(m_errorWidget);
+	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
+			this, &MainWindow::reconnectNeovim);
 	setCentralWidget(&m_stack);
 
 	init(c);
@@ -43,8 +45,6 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimExited);
 	connect(m_nvim, &NeovimConnector::error,
 			this, &MainWindow::neovimError);
-	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
-			this, &MainWindow::reconnectNeovim);
 	m_shell->setFocus(Qt::OtherFocusReason);
 
 	if (m_nvim->errorCause()) {
