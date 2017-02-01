@@ -15,14 +15,14 @@ For Unix call
 
     $ mkdir build
     $ cd build
-    $ cmake ..
+    $ cmake -DCMAKE_BUILD_TYPE=Release ..
     $ make
 
 for Windows both MSVC and Mingw are supported. Use the following
 
     $ mkdir build
     $ cd build
-    $ cmake ..
+    $ cmake -DCMAKE_BUILD_TYPE=Release ..
     $ cmake --build .
 
 The binaries will be under build/bin/. The GUI binary is called nvim-qt.
