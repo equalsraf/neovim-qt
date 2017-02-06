@@ -22,8 +22,6 @@ public slots:
 protected:
 	QFileSystemModel *model;
 	NeovimConnector *m_nvim;
-
-	virtual void keyPressEvent(QKeyEvent *ev) Q_DECL_OVERRIDE;
 };
 
 }

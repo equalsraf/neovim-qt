@@ -59,13 +59,6 @@ void TreeView::setDirectory(const QString &dir, bool notify)
 	}
 }
 
-void TreeView::keyPressEvent(QKeyEvent *ev)
-{
-	if (ev->key() == Qt::Key_Backspace) {
-		setParentDirectory();
-	}
-}
-
 void TreeView::setParentDirectory()
 {
 	QDir dir = QDir::current();
