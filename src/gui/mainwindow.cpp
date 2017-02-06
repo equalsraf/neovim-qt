@@ -30,18 +30,12 @@ void MainWindow::init(NeovimConnector *c)
 	m_nvim = c;
 
 	m_tree = new TreeView(c);
-	m_tree->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 
 	m_shell = new Shell(c);
 
-	m_layout = new QHBoxLayout();
-	m_layout->setSpacing(0);
-	m_layout->setContentsMargins(0, 0, 0, 0);
-	m_layout->addWidget(m_tree);
-	m_layout->addWidget(m_shell);
-
-	m_window = new QWidget();
-	m_window->setLayout(m_layout);
+	m_window = new QSplitter();
+	m_window->addWidget(m_tree);
+	m_window->addWidget(m_shell);
 
 	m_stack.insertWidget(1, m_window);
 

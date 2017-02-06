@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
-#include <QHBoxLayout>
+#include <QSplitter>
 #include "treeview.h"
 #include "neovimconnector.h"
 #include "errorwidget.h"
@@ -47,8 +47,7 @@ private:
 	void init(NeovimConnector *);
         NeovimConnector *m_nvim;
 	ErrorWidget *m_errorWidget;
-	QWidget *m_window;
-	QHBoxLayout *m_layout;
+	QSplitter *m_window;
 	TreeView *m_tree;
 	Shell *m_shell;
 	DelayedShow m_delayedShow;
