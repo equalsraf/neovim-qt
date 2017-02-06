@@ -44,6 +44,7 @@ void TreeView::open(const QModelIndex &index)
 	else if (info.isDir()) {
 		setDirectory(info.absoluteFilePath());
 	}
+	focusNextChild();
 }
 
 void TreeView::setDirectory(const QString &dir, bool notify)
