@@ -1,6 +1,8 @@
 
 Neovim client library and GUI, in Qt5.
 
+[![Downloads](https://img.shields.io/github/downloads/equalsraf/neovim-qt/total.svg?maxAge=2592000)](https://github.com/equalsraf/neovim-qt/releases)
+
 ## Requirements
 
 * Qt5
