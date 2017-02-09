@@ -14,6 +14,8 @@
 
 #if defined(Q_OS_MAC)
 #  define DEFAULT_FONT "Courier New"
+#elif defined(Q_OS_WIN32)
+#  define DEFAULT_FONT "Consolas"
 #else
 #  define DEFAULT_FONT "Monospace"
 #endif
