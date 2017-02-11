@@ -37,7 +37,7 @@ int cli_main(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-#ifdef Q_OS_UNIX
+#if defined (Q_OS_UNIX) && ! defined (Q_OS_MAC)
 	// Do an early check for --nofork. We need to do this here, before
 	// creating a QApplication, since QCommandLineParser requires one
 	bool nofork = false;
