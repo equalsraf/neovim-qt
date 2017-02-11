@@ -79,6 +79,10 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 	   ) {
 		modprefix += "A-";
 	}
+    if ( mod & Qt::KeypadModifier ) {
+        modprefix += "k";
+    } 
+
 	return modprefix;
 }
 
