@@ -77,5 +77,7 @@ function GuiDrop(...)
 	let l:fnames = deepcopy(a:000)
 	let l:args = map(l:fnames, 'fnameescape(v:val)')
 	exec 'drop '.join(l:args, ' ')
-	doautocmd BufEnter
+	if !has('nvim-0.2')
+		doautocmd BufEnter
+	endif
 endfunction
