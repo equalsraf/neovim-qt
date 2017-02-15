@@ -179,13 +179,13 @@ NeovimConnector* App::createConnector(const QCommandLineParser& parser)
 		auto path = qgetenv("NVIM_QT_RUNTIME_PATH");
 		if (QFileInfo(path).isDir()) {
 			neovimArgs.insert(0, "--cmd");
-			neovimArgs.insert(1, QString("set rtp+=%1")
+			neovimArgs.insert(1, QString("let &rtp.=',%1'")
 					.arg(QString::fromLocal8Bit(path)));
 		}
 #ifdef NVIM_QT_RUNTIME_PATH
 		else if (QFileInfo(NVIM_QT_RUNTIME_PATH).isDir()) {
 			neovimArgs.insert(0, "--cmd");
-			neovimArgs.insert(1, QString("set rtp+=%1")
+			neovimArgs.insert(1, QString("let &rtp.=',%1'")
 					.arg(NVIM_QT_RUNTIME_PATH));
 		} else
 #endif
@@ -205,7 +205,7 @@ NeovimConnector* App::createConnector(const QCommandLineParser& parser)
 
 			if (d.exists()) {
 				neovimArgs.insert(0, "--cmd");
-				neovimArgs.insert(1, QString("set rtp+=%1")
+				neovimArgs.insert(1, QString("let &rtp.=',%1'")
 						.arg(d.path()));
 			}
 		}
