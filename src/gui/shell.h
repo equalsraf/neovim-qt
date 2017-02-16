@@ -12,12 +12,6 @@
 #include "neovimconnector.h"
 #include "shellwidget/shellwidget.h"
 
-#if defined(Q_OS_MAC)
-#  define DEFAULT_FONT "Courier New"
-#else
-#  define DEFAULT_FONT "Monospace"
-#endif
-
 namespace NeovimQt {
 
 class Shell: public ShellWidget
