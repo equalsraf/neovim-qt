@@ -1,13 +1,25 @@
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QDebug>
 #include "shellwidget.h"
 #include "helpers.h"
 
+namespace {
+        QPixmap* bkgnd;
+}
+
 ShellWidget::ShellWidget(QWidget *parent)
 :QWidget(parent), m_contents(0,0), m_bgColor(Qt::white),
 	m_fgColor(Qt::black), m_spColor(QColor()), m_lineSpace(0)
 {
+        bkgnd = new QPixmap("/home/lharding/Downloads/space-bridge-desktop-background.jpg");
+        QRect rec = QApplication::desktop()->screenGeometry();
+        bkgnd = new QPixmap(bkgnd->scaled(rec.width(), rec.height(), Qt::IgnoreAspectRatio));
+        QPainter p(bkgnd);
+        p.fillRect(rec, QColor(0, 0, 0, 128));
+
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_KeyCompression, false);
 	setFocusPolicy(Qt::StrongFocus);
@@ -129,10 +141,11 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 				if (j <= 0 || !contents().constValue(i, j-1).doubleWidth) {
 					// Only paint bg/fg if this is not the second cell
 					// of a wide char
-					if (cell.backgroundColor.isValid()) {
+					if (cell.backgroundColor.isValid() && cell.backgroundColor != m_bgColor) {
 						p.fillRect(r, cell.backgroundColor);
-					} else {
-						p.fillRect(r, m_bgColor);
+                                        } else {
+//						p.fillRect(r, m_bgColor);
+                                                p.drawPixmap(r, *bkgnd, r.translated(mapToGlobal(QPoint(0, 0))));
 					}
 
 					if (cell.c == ' ') {
