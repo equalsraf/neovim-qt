@@ -1,7 +1,7 @@
-*neovim_gui_shim.txt* A helper plugin for Neovim GUIs
-*neovim-gui-shim*
+*nvim_gui_shim.txt* A helper plugin for Neovim GUIs
+*nvim-gui-shim*
 
-In Neovim the GUI is an external process that communicates with the Neovim
+In Neovim the GUI is an external process that communicates with the `nvim`
 process using the |msgpack-rpc-api|. This separation means the GUI is just a
 particular type of plugin, as a consequence some functionality that was
 available in Vim is a NOOP in Neovim, or is still in the process of being
