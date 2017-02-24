@@ -6,20 +6,10 @@
 #include "shellwidget.h"
 #include "helpers.h"
 
-namespace {
-        QPixmap* bkgnd;
-}
-
 ShellWidget::ShellWidget(QWidget *parent)
 :QWidget(parent), m_contents(0,0), m_bgColor(Qt::white),
 	m_fgColor(Qt::black), m_spColor(QColor()), m_lineSpace(0)
 {
-        bkgnd = new QPixmap("/home/lharding/Downloads/space-bridge-desktop-background.jpg");
-        QRect rec = QApplication::desktop()->screenGeometry();
-        bkgnd = new QPixmap(bkgnd->scaled(rec.width(), rec.height(), Qt::IgnoreAspectRatio));
-        QPainter p(bkgnd);
-        p.fillRect(rec, QColor(0, 0, 0, 128));
-
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_KeyCompression, false);
 	setFocusPolicy(Qt::StrongFocus);
@@ -114,6 +104,7 @@ QSize ShellWidget::cellSize() const
 
 void ShellWidget::paintEvent(QPaintEvent *ev)
 {
+        QPoint screenOrigin = mapToGlobal(QPoint(0, 0));
 	QPainter p(this);
 	foreach(QRect rect, ev->region().rects()) {
 		int start_row = rect.top() / m_cellSize.height();
@@ -137,6 +128,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 				const Cell& cell = m_contents.constValue(i,j);
 				int chars = cell.doubleWidth ? 2 : 1;
 				QRect r = absoluteShellRect(i, j, 1, chars);
+                                QRect sr = r.translated(screenOrigin);
 
 				if (j <= 0 || !contents().constValue(i, j-1).doubleWidth) {
 					// Only paint bg/fg if this is not the second cell
@@ -144,8 +136,12 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					if (cell.backgroundColor.isValid() && cell.backgroundColor != m_bgColor) {
 						p.fillRect(r, cell.backgroundColor);
                                         } else {
-//						p.fillRect(r, m_bgColor);
-                                                p.drawPixmap(r, *bkgnd, r.translated(mapToGlobal(QPoint(0, 0))));
+                                                if (m_bgPixmap != NULL) {
+                                                        p.drawPixmap(r, *m_bgPixmap, sr);
+                                                }
+                                                else {
+                                                        p.fillRect(r, m_bgColor);
+                                                }
 					}
 
 					if (cell.c == ' ') {
@@ -273,6 +269,16 @@ void ShellWidget::setBackground(const QColor& color)
 QColor ShellWidget::background() const
 {
 	return m_bgColor;
+}
+
+void ShellWidget::setBackgroundPixmap(QPixmap* pm)
+{
+	m_bgPixmap = pm;
+}
+
+QPixmap* ShellWidget::backgroundPixmap() const
+{
+	return m_bgPixmap;
 }
 
 void ShellWidget::setForeground(const QColor& color)

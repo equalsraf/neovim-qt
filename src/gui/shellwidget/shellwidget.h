@@ -19,6 +19,7 @@ public:
 	ShellWidget(QWidget *parent=0);
 	bool setShellFont(const QString& family, int ptSize, int weight = -1, bool italic = false, bool force = false);
 
+        QPixmap* backgroundPixmap() const;
 	QColor background() const;
 	QColor foreground() const;
 	QColor special() const;
@@ -37,6 +38,7 @@ signals:
 public slots:
 	void resizeShell(int rows, int columns);
 	void setSpecial(const QColor& color);
+        void setBackgroundPixmap(QPixmap* pm);
 	void setBackground(const QColor& color);
 	void setForeground(const QColor& color);
 	void setDefaultFont();
@@ -65,6 +67,7 @@ private:
 	QSize m_cellSize;
 	int m_ascent;
 	QColor m_bgColor, m_fgColor, m_spColor;
+        QPixmap* m_bgPixmap;
         unsigned int m_lineSpace;
 };
 

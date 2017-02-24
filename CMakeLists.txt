@@ -38,6 +38,9 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Test REQUIRED)
 
+# X11
+find_package(X11 REQUIRED)
+
 # msgpack
 option(USE_SYSTEM_MSGPACK "Use system msgpack libraries " OFF)
 if(USE_SYSTEM_MSGPACK)

@@ -10,6 +10,7 @@ MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
 :QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
 	m_delayedShow(DelayedShow::Disabled), m_tabline(0), m_tabline_bar(0)
 {
+        
 	m_errorWidget = new ErrorWidget();
 	m_stack.addWidget(m_errorWidget);
 	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
@@ -129,7 +130,7 @@ void MainWindow::neovimSetTitle(const QString &title)
 	this->setWindowTitle(title);
 }
 
-void MainWindow::neovimWidgetResized()
+void MaijnWindow::neovimWidgetResized()
 {
 	// Neovim finished resizing, resize it back to the actual
 	// widget size - this avoids situations when neovim wants a size that

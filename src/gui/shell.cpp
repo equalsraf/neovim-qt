@@ -7,12 +7,48 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <QMimeData>
+#include <X11/Intrinsic.h>
 #include "msgpackrequest.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
 #include "util.h"
 
 namespace NeovimQt {
+        QImage* bgInit() {
+            Display *dsp = XOpenDisplay(0);
+            Window root;
+            unsigned long bg = 0x1200001;
+            int xo, yo;
+            unsigned int width, height, border_width, depth;
+            unsigned char* bgData;
+
+            XGetGeometry(dsp, 0x1200001, &root, &xo, &yo, &width, &height, &border_width, &depth); 
+            fprintf(stderr, "%d,%d %dx%d %dbpp", xo, yo, width, height, depth);
+
+            int pixelSize = depth/8;
+            
+            XImage *img = XGetImage(dsp, 0x1200001, 0, 0, width, height, 0xFFFFFF, XYPixmap);
+
+            bgData = (unsigned char*)malloc(width*height*pixelSize);
+
+            for(int y=0; y<height; y++) {
+                for(int x=0; x<width; x++) {
+                    unsigned long px = XGetPixel(img, x, y);
+                    unsigned char* data = (unsigned char*)&px;
+                    unsigned char* base = &bgData[y*width*pixelSize+x*pixelSize];
+                    base[0] = data[2];
+                    base[1] = data[1];
+                    base[2] = data[0];
+                }
+            }
+
+            return new QImage(bgData, width, height, QImage::Format_RGB888);
+        }
+
+        //QRect rec = QApplication::desktop()->screenGeometry();
+        //bkgnd = new QPixmap(bkgnd->scaled(rec.width(), rec.height(), Qt::IgnoreAspectRatio));
+        //QPainter p(&bkgnd);
+        //p.fillRect(QRect(0,0,width,height), QColor(0, 0, 0, 128));
 
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 :ShellWidget(parent), m_attached(false), m_nvim(nvim),
@@ -26,6 +62,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 {
 	setAttribute(Qt::WA_KeyCompression, false);
 
+        QPixmap* bkgnd = new QPixmap(QPixmap::fromImage(*bgInit()));
+        setBackgroundPixmap(bkgnd);
 	setAcceptDrops(true);
 	setMouseTracking(true);
 	m_mouseclick_timer.setInterval(QApplication::doubleClickInterval());
