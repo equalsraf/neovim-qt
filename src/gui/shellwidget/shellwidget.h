@@ -62,6 +62,7 @@ protected:
 
 private:
 	void setFont(const QFont&);
+        void paintCellBg(QPoint& screenOrigin, QPainter& p, QRect& r);
 
 	ShellContents m_contents;
 	QSize m_cellSize;

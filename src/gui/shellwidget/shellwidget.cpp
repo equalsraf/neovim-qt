@@ -102,6 +102,16 @@ QSize ShellWidget::cellSize() const
 	return m_cellSize;
 }
 
+void ShellWidget::paintCellBg(QPoint& screenOrigin, QPainter& p, QRect& r) {
+        if (m_bgPixmap != NULL) {
+                QRect sr = r.translated(screenOrigin);
+                p.drawPixmap(r, *m_bgPixmap, sr);
+        }
+        else {
+                p.fillRect(r, m_bgColor);
+        }
+}
+
 void ShellWidget::paintEvent(QPaintEvent *ev)
 {
         QPoint screenOrigin = mapToGlobal(QPoint(0, 0));
@@ -128,7 +138,6 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 				const Cell& cell = m_contents.constValue(i,j);
 				int chars = cell.doubleWidth ? 2 : 1;
 				QRect r = absoluteShellRect(i, j, 1, chars);
-                                QRect sr = r.translated(screenOrigin);
 
 				if (j <= 0 || !contents().constValue(i, j-1).doubleWidth) {
 					// Only paint bg/fg if this is not the second cell
@@ -136,12 +145,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					if (cell.backgroundColor.isValid() && cell.backgroundColor != m_bgColor) {
 						p.fillRect(r, cell.backgroundColor);
                                         } else {
-                                                if (m_bgPixmap != NULL) {
-                                                        p.drawPixmap(r, *m_bgPixmap, sr);
-                                                }
-                                                else {
-                                                        p.fillRect(r, m_bgColor);
-                                                }
+                                                paintCellBg(screenOrigin, p, r);
 					}
 
 					if (cell.c == ' ') {
@@ -209,12 +213,12 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 		}
 	}
 
-	QRect shellArea = absoluteShellRect(0, 0,
-				m_contents.rows(), m_contents.columns());
-	QRegion margins = QRegion(rect()).subtracted(shellArea);
-	foreach(QRect margin, margins.intersected(ev->region()).rects()) {
-		p.fillRect(margin, m_bgColor);
-	}
+        QRect shellArea = absoluteShellRect(0, 0,
+                                m_contents.rows(), m_contents.columns());
+        QRegion margins = QRegion(rect()).subtracted(shellArea);
+        foreach(QRect margin, margins.intersected(ev->region()).rects()) {
+                paintCellBg(screenOrigin, p, margin);
+        }
 
 #if 0
 	// Draw DEBUG rulers
@@ -345,7 +349,12 @@ void ShellWidget::scrollShell(int rows)
 	if (rows != 0) {
 		m_contents.scroll(rows);
 		// Qt's delta uses positive numbers to move down
-		scroll(0, -rows*m_cellSize.height());
+                if(m_bgPixmap == NULL) {
+                    scroll(0, -rows*m_cellSize.height());
+                }
+                else {
+                    update();
+                }
 	}
 }
 /// Scroll an area, count rows (positive numbers move content up)
@@ -356,7 +365,12 @@ void ShellWidget::scrollShellRegion(int row0, int row1, int col0,
 		m_contents.scrollRegion(row0, row1, col0, col1, rows);
 		// Qt's delta uses positive numbers to move down
 		QRect r = absoluteShellRect(row0, col0, row1-row0, col1-col0);
-		scroll(0, -rows*m_cellSize.height(), r);
+                if(m_bgPixmap == NULL) {
+                    scroll(0, -rows*m_cellSize.height(), r);
+                }
+                else {
+                    update(r);
+                }
 	}
 }
 
