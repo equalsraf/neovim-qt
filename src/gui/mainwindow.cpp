@@ -39,21 +39,22 @@ namespace NeovimQt {
                         Display *dsp = XOpenDisplay(0);
 
                         unsigned char* bgData;
-                        const int pixelSize = 3;
                         XWindowAttributes attrs;
 
                         int screen = DefaultScreen(dsp);
                         Window root = RootWindow(dsp, DefaultScreen(dsp));
                         XGetWindowAttributes(dsp, root, &attrs);
                         Pixmap bg = GetRootPixmap(dsp, &root);
-                        XImage* img = XGetImage(dsp, bg, 0, 0, attrs.width, attrs.height, ~0, XYPixmap);
+                        XImage* img = XGetImage(dsp, bg, 0, 0, attrs.width, attrs.height, ~0, ZPixmap);
+                        const int pixelSize = img->bits_per_pixel/8;
                         XFreePixmap(dsp, bg);
 
                         bgData = (unsigned char*)malloc(attrs.width*attrs.height*4);
 
                         for(int y=0; y<attrs.height; y++) {
                                 for(int x=0; x<attrs.width; x++) {
-                                        unsigned long px = XGetPixel(img, x, y);
+                                        //unsigned long px = XGetPixel(img, x, y);
+                                        unsigned char* px<D-Space> = &img->data[y*img->bytes_per_line+x*pixelSize]
                                         unsigned char* data = (unsigned char*)&px;
                                         unsigned char* base = &bgData[y*attrs.width*4+x*4];
                                         base[3] = 0xff;
