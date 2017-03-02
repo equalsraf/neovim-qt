@@ -8,7 +8,7 @@
 
 ShellWidget::ShellWidget(QWidget *parent)
 :QWidget(parent), m_contents(0,0), m_bgColor(Qt::white),
-	m_fgColor(Qt::black), m_spColor(QColor()), m_lineSpace(0)
+	m_fgColor(Qt::black), m_spColor(QColor()), m_lineSpace(0), m_bgPixmap(NULL)
 {
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_KeyCompression, false);
@@ -142,7 +142,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 				if (j <= 0 || !contents().constValue(i, j-1).doubleWidth) {
 					// Only paint bg/fg if this is not the second cell
 					// of a wide char
-					if (cell.backgroundColor.isValid() && cell.backgroundColor != m_bgColor) {
+					if (cell.backgroundColor.isValid() && (m_bgPixmap == NULL || cell.backgroundColor != m_bgColor)) {
 						p.fillRect(r, cell.backgroundColor);
                                         } else {
                                                 paintCellBg(screenOrigin, p, r);

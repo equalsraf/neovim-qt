@@ -1,76 +1,10 @@
 #include "mainwindow.h"
-#include <X11/Intrinsic.h>
-#include <X11/Xatom.h>
-
 #include <QCloseEvent>
 #include <QToolBar>
 #include <QLayout>
 #include <QPainter>
 
 namespace NeovimQt {
-        QPixmap* bkgnd = NULL;
-
-        // Stolen from https://gist.github.com/ehamberg/767824/b4b4b0d1732d565d96b585723ebcc976cf6ca6a9
-        Pixmap GetRootPixmap(Display* dsp, Window *root)
-        {
-                Pixmap currentRootPixmap;
-                Atom act_type;
-                int act_format;
-                unsigned long nitems, bytes_after;
-                unsigned char *data = NULL;
-                Atom _XROOTPMAP_ID;
-
-                _XROOTPMAP_ID = XInternAtom(dsp, "_XROOTPMAP_ID", False);
-
-                if (XGetWindowProperty(dsp, *root, _XROOTPMAP_ID, 0, 1, False,
-                            XA_PIXMAP, &act_type, &act_format, &nitems, &bytes_after,
-                            &data) == Success) {
-                        if (data) {
-                                currentRootPixmap = *((Pixmap *) data);
-                                XFree(data);
-                        }
-                }
-
-                return currentRootPixmap;
-        }
-
-        QPixmap* bgInit() {
-                if(bkgnd == NULL) {
-                        Display *dsp = XOpenDisplay(0);
-
-                        unsigned char* bgData;
-                        XWindowAttributes attrs;
-
-                        int screen = DefaultScreen(dsp);
-                        Window root = RootWindow(dsp, DefaultScreen(dsp));
-                        XGetWindowAttributes(dsp, root, &attrs);
-                        Pixmap bg = GetRootPixmap(dsp, &root);
-                        XImage* img = XGetImage(dsp, bg, 0, 0, attrs.width, attrs.height, ~0, ZPixmap);
-                        const int pixelSize = img->bits_per_pixel/8;
-                        XFreePixmap(dsp, bg);
-
-                        bgData = (unsigned char*)malloc(attrs.width*attrs.height*4);
-
-                        for(int y=0; y<attrs.height; y++) {
-                                for(int x=0; x<attrs.width; x++) {
-                                        //unsigned long px = XGetPixel(img, x, y);
-                                        unsigned char* data = (unsigned char *)img->data + y*img->bytes_per_line+x*pixelSize;
-                                        unsigned char* base = bgData + y*attrs.width*4+x*4;
-                                        base[3] = 0xff;
-                                        base[0] = data[0];
-                                        base[1] = data[1];
-                                        base[2] = data[2];
-                                }
-                        }
-
-                        bkgnd = new QPixmap(QPixmap::fromImage(*new QImage(bgData, attrs.width, attrs.height, QImage::Format_RGB32)));
-                        QPainter p(bkgnd);
-                        p.fillRect(QRect(0,0,attrs.width,attrs.height), QColor(0, 0, 0, 200));
-                }
-
-                return bkgnd;
-        }
-
 MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
 :QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
 	m_delayedShow(DelayedShow::Disabled), m_tabline(0), m_tabline_bar(0)
@@ -138,17 +72,6 @@ void MainWindow::init(NeovimConnector *c)
 	connect(m_shell, &Shell::neovimTablineUpdate,
 			this, &MainWindow::neovimTablineUpdate);
 	m_shell->setFocus(Qt::OtherFocusReason);
-
-        if(bgInit() != NULL) {
-               m_shell->setBackgroundPixmap(bgInit());
-               // TODO: proper BG for main window as well - but right now it doesn't go screen-relative very well
-               // QPalette pal = palette();
-               // pal.setBrush(QPalette::Window, *bgInit());
-               // pal.setBrush(QPalette::Background, *bgInit());
-               // setAutoFillBackground(true);
-               // setPalette(pal);
-               // m_shell->setPalette(pal);
-        }
 
 	if (m_nvim->errorCause()) {
 		neovimError(m_nvim->errorCause());

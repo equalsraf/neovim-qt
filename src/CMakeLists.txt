@@ -5,6 +5,12 @@ if(WIN32)
 endif()
 
 add_library(neovim-qt STATIC ${NEOVIM_QT_SOURCES})
-target_link_libraries(neovim-qt X11 Qt5::Network ${MSGPACK_LIBRARIES})
+
+if(X11_FOUND)
+    set(X11_LIBRARIES X11)
+    add_definitions(-DWITH_X11)
+endif()
+
+target_link_libraries(neovim-qt ${X11_LIBRARIES} Qt5::Network ${MSGPACK_LIBRARIES})
 
 add_subdirectory(gui)

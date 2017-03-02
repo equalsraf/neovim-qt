@@ -13,6 +13,69 @@
 #include "util.h"
 
 namespace NeovimQt {
+        QPixmap* bkgnd = NULL;
+
+#ifdef WITH_X11
+        #include <X11/Intrinsic.h>
+        #include <X11/Xatom.h>
+
+        // Stolen from https://gist.github.com/ehamberg/767824/b4b4b0d1732d565d96b585723ebcc976cf6ca6a9
+        Pixmap GetRootPixmap(Display* dsp, Window *root)
+        {
+                Pixmap currentRootPixmap;
+                Atom act_type;
+                int act_format;
+                unsigned long nitems, bytes_after;
+                unsigned char *data = NULL;
+                Atom _XROOTPMAP_ID;
+
+                _XROOTPMAP_ID = XInternAtom(dsp, "_XROOTPMAP_ID", False);
+
+                if (XGetWindowProperty(dsp, *root, _XROOTPMAP_ID, 0, 1, False,
+                            XA_PIXMAP, &act_type, &act_format, &nitems, &bytes_after,
+                            &data) == Success) {
+                        if (data) {
+                                currentRootPixmap = *((Pixmap *) data);
+                                XFree(data);
+                        }
+                }
+
+                return currentRootPixmap;
+        }
+#endif
+
+        QPixmap* bgInit() {
+                if(bkgnd == NULL) {
+#ifdef WITH_X11
+                        Display *dsp = XOpenDisplay(0);
+                        if(!dsp) return NULL;
+
+                        XWindowAttributes attrs;
+
+                        Window root = RootWindow(dsp, DefaultScreen(dsp));
+                        if(!root) return NULL;
+
+                        Pixmap bg = GetRootPixmap(dsp, &root);
+                        if(!bg) return NULL;
+
+                        XGetWindowAttributes(dsp, root, &attrs);
+                        XImage* img = XGetImage(dsp, bg, 0, 0, attrs.width, attrs.height, ~0, ZPixmap);
+                        if(!img) return NULL;
+
+                        const int pixelSize = img->bits_per_pixel/8;
+
+                        // XXX might be fragile: Assumes result from XGetImage to be in RGB32 format (but almost always is on modern systems)
+                        bkgnd = new QPixmap(QPixmap::fromImage(*new QImage((uchar*)img->data, attrs.width, attrs.height, img->bytes_per_line, QImage::Format_RGB32)));
+                        QPainter p(bkgnd);
+                        p.fillRect(QRect(0,0,attrs.width,attrs.height), QColor(0, 0, 0, 200));
+
+                        XCloseDisplay(dsp);
+#endif
+                }
+
+                return bkgnd;
+        }
+
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 :ShellWidget(parent), m_attached(false), m_nvim(nvim),
 	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false),
@@ -536,6 +599,15 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			setLineSpace(val);
 			m_nvim->api0()->vim_set_var("GuiLinespace", val);
 			resizeNeovim(size());
+		} else if (guiEvName == "BgImage" && args.size() == 2) {
+			QString imgDesc = m_nvim->decode(args.at(1).toByteArray());
+                        if(!imgDesc.compare("desktop")) {
+                                setBackgroundPixmap(bgInit());
+                        }
+                        else {
+                                setBackgroundPixmap(NULL);
+                        }
+                        update();
 		} else if (guiEvName == "Mousehide" && args.size() == 2) {
 			m_mouseHide = variant_not_zero(args.at(1));
 			int val = m_mouseHide ? 1 : 0;
