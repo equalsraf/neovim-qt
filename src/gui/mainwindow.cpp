@@ -54,9 +54,8 @@ namespace NeovimQt {
                         for(int y=0; y<attrs.height; y++) {
                                 for(int x=0; x<attrs.width; x++) {
                                         //unsigned long px = XGetPixel(img, x, y);
-                                        unsigned char* px<D-Space> = &img->data[y*img->bytes_per_line+x*pixelSize]
-                                        unsigned char* data = (unsigned char*)&px;
-                                        unsigned char* base = &bgData[y*attrs.width*4+x*4];
+                                        unsigned char* data = (unsigned char *)img->data + y*img->bytes_per_line+x*pixelSize;
+                                        unsigned char* base = bgData + y*attrs.width*4+x*4;
                                         base[3] = 0xff;
                                         base[0] = data[0];
                                         base[1] = data[1];
