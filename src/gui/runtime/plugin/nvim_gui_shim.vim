@@ -4,6 +4,9 @@ if !has('nvim') || exists('g:GuiLoaded')
 endif
 let g:GuiLoaded = 1
 
+" Notify the GUI when exiting Neovim
+autocmd VimLeave * call rpcnotify(0, 'Gui', 'Close')"
+
 " A replacement for foreground()
 function! GuiForeground() abort
   call rpcnotify(0, 'Gui', 'Foreground')
