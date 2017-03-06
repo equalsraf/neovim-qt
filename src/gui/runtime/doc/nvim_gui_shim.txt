@@ -121,6 +121,11 @@ GuiMousehide(enabled) enables mouse hiding while typing. If enabled is
 1, as soon as the user types the mouse cursor is concealed. When the
 user moves the mouse, the cursor becomes visible. Replaces |'mousehide'|.
 
+							*GuiClose()*
+GuiClose() notifies the GUI that it should close. The GUI may or may not
+respect this request. The shim setups an autocommand to call this function
+when the |'VimLeave'| event occurs.
+
 ==============================================================================
 4. Internals
 
