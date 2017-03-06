@@ -37,6 +37,7 @@ signals:
 	void neovimAttached(bool);
 	void neovimMaximized(bool);
 	void neovimFullScreen(bool);
+	void neovimGuiCloseRequest();
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
