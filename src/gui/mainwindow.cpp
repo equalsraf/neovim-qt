@@ -41,6 +41,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimMaximized);
 	connect(m_shell, &Shell::neovimFullScreen,
 			this, &MainWindow::neovimFullScreen);
+	connect(m_shell, &Shell::neovimGuiCloseRequest,
+			this, &MainWindow::neovimGuiCloseRequest);
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &MainWindow::neovimExited);
 	connect(m_nvim, &NeovimConnector::error,
@@ -119,6 +121,11 @@ void MainWindow::neovimFullScreen(bool set)
 	} else {
 		setWindowState(windowState() & ~Qt::WindowFullScreen);
 	}
+}
+
+void MainWindow::neovimGuiCloseRequest()
+{
+	QMainWindow::close();
 }
 
 void MainWindow::reconnectNeovim()

@@ -504,6 +504,9 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			m_mouseHide = variant_not_zero(args.at(1));
 			int val = m_mouseHide ? 1 : 0;
 			m_nvim->neovimObject()->vim_set_var("GuiMousehide", val);
+		} else if (guiEvName == "Close" && args.size() == 1) {
+			qDebug() << "Neovim requested a GUI close";
+			emit neovimGuiCloseRequest();
 		}
 		return;
 	} else if (name != "redraw") {
