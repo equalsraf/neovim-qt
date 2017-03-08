@@ -22,7 +22,7 @@ namespace NeovimQt {
 	// Stolen from https://gist.github.com/ehamberg/767824/b4b4b0d1732d565d96b585723ebcc976cf6ca6a9
 	Pixmap GetRootPixmap(Display* dsp, Window *root)
 	{
-		Pixmap currentRootPixmap;
+		Pixmap currentRootPixmap = 0;
 		Atom act_type;
 		int act_format;
 		unsigned long nitems, bytes_after;
