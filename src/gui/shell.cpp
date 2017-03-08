@@ -13,66 +13,66 @@
 #include "util.h"
 
 namespace NeovimQt {
-        QPixmap* bkgnd = NULL;
+	QPixmap* bkgnd = NULL;
 
 #ifdef WITH_X11
-        #include <X11/Intrinsic.h>
-        #include <X11/Xatom.h>
+	#include <X11/Intrinsic.h>
+	#include <X11/Xatom.h>
 
-        // Stolen from https://gist.github.com/ehamberg/767824/b4b4b0d1732d565d96b585723ebcc976cf6ca6a9
-        Pixmap GetRootPixmap(Display* dsp, Window *root)
-        {
-                Pixmap currentRootPixmap;
-                Atom act_type;
-                int act_format;
-                unsigned long nitems, bytes_after;
-                unsigned char *data = NULL;
-                Atom _XROOTPMAP_ID;
+	// Stolen from https://gist.github.com/ehamberg/767824/b4b4b0d1732d565d96b585723ebcc976cf6ca6a9
+	Pixmap GetRootPixmap(Display* dsp, Window *root)
+	{
+		Pixmap currentRootPixmap;
+		Atom act_type;
+		int act_format;
+		unsigned long nitems, bytes_after;
+		unsigned char *data = NULL;
+		Atom _XROOTPMAP_ID;
 
-                _XROOTPMAP_ID = XInternAtom(dsp, "_XROOTPMAP_ID", False);
+		_XROOTPMAP_ID = XInternAtom(dsp, "_XROOTPMAP_ID", False);
 
-                if (XGetWindowProperty(dsp, *root, _XROOTPMAP_ID, 0, 1, False,
-                            XA_PIXMAP, &act_type, &act_format, &nitems, &bytes_after,
-                            &data) == Success) {
-                        if (data) {
-                                currentRootPixmap = *((Pixmap *) data);
-                                XFree(data);
-                        }
-                }
+		if (XGetWindowProperty(dsp, *root, _XROOTPMAP_ID, 0, 1, False,
+			    XA_PIXMAP, &act_type, &act_format, &nitems, &bytes_after,
+			    &data) == Success) {
+			if (data) {
+				currentRootPixmap = *((Pixmap *) data);
+				XFree(data);
+			}
+		}
 
-                return currentRootPixmap;
-        }
+		return currentRootPixmap;
+	}
 #endif
 
-        QPixmap* bgInit() {
-                if(bkgnd == NULL) {
+	QPixmap* bgInit() {
+		if(bkgnd == NULL) {
 #ifdef WITH_X11
-                        Display *dsp = XOpenDisplay(0);
-                        if(!dsp) return NULL;
+			Display *dsp = XOpenDisplay(0);
+			if(!dsp) return NULL;
 
-                        XWindowAttributes attrs;
+			XWindowAttributes attrs;
 
-                        Window root = RootWindow(dsp, DefaultScreen(dsp));
-                        if(!root) return NULL;
+			Window root = RootWindow(dsp, DefaultScreen(dsp));
+			if(!root) return NULL;
 
-                        Pixmap bg = GetRootPixmap(dsp, &root);
-                        if(!bg) return NULL;
+			Pixmap bg = GetRootPixmap(dsp, &root);
+			if(!bg) return NULL;
 
-                        XGetWindowAttributes(dsp, root, &attrs);
-                        XImage* img = XGetImage(dsp, bg, 0, 0, attrs.width, attrs.height, ~0, ZPixmap);
-                        if(!img) return NULL;
+			XGetWindowAttributes(dsp, root, &attrs);
+			XImage* img = XGetImage(dsp, bg, 0, 0, attrs.width, attrs.height, ~0, ZPixmap);
+			if(!img) return NULL;
 
-                        // XXX might be fragile: Assumes result from XGetImage to be in RGB32 format (but almost always is on modern systems)
-                        bkgnd = new QPixmap(QPixmap::fromImage(*new QImage((uchar*)img->data, attrs.width, attrs.height, img->bytes_per_line, QImage::Format_RGB32)));
-                        QPainter p(bkgnd);
-                        p.fillRect(QRect(0,0,attrs.width,attrs.height), QColor(0, 0, 0, 200));
+			// XXX might be fragile: Assumes result from XGetImage to be in RGB32 format (but almost always is on modern systems)
+			bkgnd = new QPixmap(QPixmap::fromImage(*new QImage((uchar*)img->data, attrs.width, attrs.height, img->bytes_per_line, QImage::Format_RGB32)));
+			QPainter p(bkgnd);
+			p.fillRect(QRect(0,0,attrs.width,attrs.height), QColor(0, 0, 0, 200));
 
-                        XCloseDisplay(dsp);
+			XCloseDisplay(dsp);
 #endif
-                }
+		}
 
-                return bkgnd;
-        }
+		return bkgnd;
+	}
 
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 :ShellWidget(parent), m_attached(false), m_nvim(nvim),
@@ -599,12 +599,12 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			resizeNeovim(size());
 		} else if (guiEvName == "BgImage" && args.size() == 2) {
 			QString imgDesc = m_nvim->decode(args.at(1).toByteArray());
-                        if(imgDesc == "desktop") {
-                                setBackgroundPixmap(bgInit());
-                        } else {
-                                setBackgroundPixmap(NULL);
-                        }
-                        update();
+			if(imgDesc == "desktop") {
+				setBackgroundPixmap(bgInit());
+			} else {
+				setBackgroundPixmap(NULL);
+			}
+			update();
 		} else if (guiEvName == "Mousehide" && args.size() == 2) {
 			m_mouseHide = variant_not_zero(args.at(1));
 			int val = m_mouseHide ? 1 : 0;
@@ -669,8 +669,8 @@ void Shell::paintEvent(QPaintEvent *ev)
 		}
 
 		QPainter painter(this);
-                // white outline to show us where the cursor is even if colors would make this ambiguous:
-                painter.drawRect(cursorRect.adjusted(0,0,-1,-1));
+		// white outline to show us where the cursor is even if colors would make this ambiguous:
+		painter.drawRect(cursorRect.adjusted(0,0,-1,-1));
 		painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
 		painter.fillRect(cursorRect, m_cursor_color);
 	}
