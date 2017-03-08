@@ -44,23 +44,25 @@ namespace NeovimQt {
 	}
 #endif
 
+        #define nullRetAssert(test, msg) if(!(test)) { qDebug() << "Initializing background image:" << (msg); return NULL; }
+
 	QPixmap* bgInit() {
 		if(bkgnd == NULL) {
 #ifdef WITH_X11
 			Display *dsp = XOpenDisplay(0);
-			if(!dsp) return NULL;
+			nullRetAssert(dsp, "Could not open X display.");
 
 			XWindowAttributes attrs;
 
 			Window root = RootWindow(dsp, DefaultScreen(dsp));
-			if(!root) return NULL;
+			nullRetAssert(root, "Could not get root window pointer.");
 
 			Pixmap bg = GetRootPixmap(dsp, &root);
-			if(!bg) return NULL;
+			nullRetAssert(bg, "Could not get root pixmap ID");
 
 			XGetWindowAttributes(dsp, root, &attrs);
 			XImage* img = XGetImage(dsp, bg, 0, 0, attrs.width, attrs.height, ~0, ZPixmap);
-			if(!img) return NULL;
+			nullRetAssert(img, "Could not get root pixmap image.");
 
 			// XXX might be fragile: Assumes result from XGetImage to be in RGB32 format (but almost always is on modern systems)
 			bkgnd = new QPixmap(QPixmap::fromImage(*new QImage((uchar*)img->data, attrs.width, attrs.height, img->bytes_per_line, QImage::Format_RGB32)));
