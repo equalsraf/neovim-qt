@@ -62,8 +62,6 @@ namespace NeovimQt {
                         XImage* img = XGetImage(dsp, bg, 0, 0, attrs.width, attrs.height, ~0, ZPixmap);
                         if(!img) return NULL;
 
-                        const int pixelSize = img->bits_per_pixel/8;
-
                         // XXX might be fragile: Assumes result from XGetImage to be in RGB32 format (but almost always is on modern systems)
                         bkgnd = new QPixmap(QPixmap::fromImage(*new QImage((uchar*)img->data, attrs.width, attrs.height, img->bytes_per_line, QImage::Format_RGB32)));
                         QPainter p(bkgnd);
@@ -601,10 +599,9 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			resizeNeovim(size());
 		} else if (guiEvName == "BgImage" && args.size() == 2) {
 			QString imgDesc = m_nvim->decode(args.at(1).toByteArray());
-                        if(!imgDesc.compare("desktop")) {
+                        if(imgDesc == "desktop") {
                                 setBackgroundPixmap(bgInit());
-                        }
-                        else {
+                        } else {
                                 setBackgroundPixmap(NULL);
                         }
                         update();
