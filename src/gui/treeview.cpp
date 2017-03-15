@@ -41,9 +41,6 @@ void TreeView::open(const QModelIndex &index)
 		args << info.filePath();
 		m_nvim->neovimObject()->vim_call_function("GuiDrop", args);
 	}
-	else if (info.isDir()) {
-		setDirectory(info.absoluteFilePath());
-	}
 	focusNextChild();
 }
 
@@ -56,14 +53,6 @@ void TreeView::setDirectory(const QString &dir, bool notify)
 		if (notify) {
 			m_nvim->neovimObject()->vim_change_directory(QByteArray::fromStdString(dir.toStdString()));
 		}
-	}
-}
-
-void TreeView::setParentDirectory()
-{
-	QDir dir = QDir::current();
-	if (dir.cdUp()) {
-		setDirectory(dir.absolutePath());
 	}
 }
 

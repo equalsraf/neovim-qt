@@ -16,7 +16,6 @@ public:
 public slots:
 	void open(const QModelIndex &);
 	void setDirectory(const QString &, bool notify = true);
-	void setParentDirectory();
 	void handleNeovimNotification(const QByteArray &, const QVariantList&);
 
 protected:
