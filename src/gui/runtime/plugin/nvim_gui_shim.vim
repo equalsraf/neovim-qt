@@ -81,3 +81,13 @@ function GuiDrop(...)
 		doautocmd BufEnter
 	endif
 endfunction
+
+augroup guiau
+    autocmd!
+    autocmd DirChanged * call rpcnotify(0, 'Dir', getcwd())
+    autocmd WinEnter * call rpcnotify(0, 'Dir', getcwd())
+augroup END
+
+command! TreeViewShow call rpcnotify(0, 'TreeView', 'ShowHide', 1)
+command! TreeViewHide call rpcnotify(0, 'TreeView', 'ShowHide', 0)
+command! TreeViewToggle call rpcnotify(0, 'TreeView', 'Toggle')
