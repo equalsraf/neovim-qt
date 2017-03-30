@@ -43,7 +43,6 @@ InputConv::InputConv() {
 	specialKeys.insert(Qt::Key_Escape, "Esc");
 
 	specialKeys.insert(Qt::Key_Backslash, "Bslash");
-	specialKeys.insert(Qt::Key_Less, "lt");
 	specialKeys.insert(Qt::Key_Space, "Space");
 }
 
@@ -157,7 +156,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 	QChar c;
 	// Escape < and backslash
 	if (text == "<") {
-		return QString("<%1%2>").arg(modPrefix(mod)).arg("lt");
+		return QString("<lt>");
 	} else if (text == "\\") {
 		return QString("<%1%2>").arg(modPrefix(mod)).arg("Bslash");
 	} else if (text.isEmpty()) {
