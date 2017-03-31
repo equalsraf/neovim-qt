@@ -1,4 +1,3 @@
-
 #include "input.h"
 #include <QDebug>
 
@@ -159,6 +158,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 
 	QChar c;
 	// Escape < and backslash
+
 	if (text == "<") {
 		return QString("<lt>");
 	} else if (text == "\\") {
@@ -199,6 +199,20 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 	// Format with prefix if necessary
 	QString prefix = modPrefix(mod);
 	if (!prefix.isEmpty()) {
+		if (prefix == "k"){
+			switch(c.toLatin1()) {
+				case '/':
+					return QString("<kDivide>");
+				case '*':
+					return QString("<kMultiply>");
+				case '-':
+					return QString("<kMinus>");
+				case '+':
+					return QString("<kPlus>");
+				case '.':
+					return QString("<kPoint>");
+			}
+		}
 		return QString("<%1%2>").arg(prefix).arg(c);
 	}
 
