@@ -318,7 +318,7 @@ void Shell::handleScroll(const QVariantList& args)
 
 void Shell::handleSetScrollRegion(const QVariantList& opargs)
 {
-	if (opargs.size() != 4) {
+	if (opargs.size() < 4) {
 		qWarning() << "Unexpected arguments for redraw:set_scroll_region" << opargs;
 		return;
 	}
@@ -336,7 +336,7 @@ void Shell::handleSetScrollRegion(const QVariantList& opargs)
 void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 {
 	if (name == "update_fg") {
-		if (opargs.size() != 1 || !opargs.at(0).canConvert<quint64>()) {
+		if (opargs.size() < 1 || !opargs.at(0).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
@@ -346,7 +346,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		}
 		m_hg_foreground = foreground();
 	} else if (name == "update_bg") {
-		if (opargs.size() != 1 || !opargs.at(0).canConvert<quint64>()) {
+		if (opargs.size() < 1 || !opargs.at(0).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
@@ -357,7 +357,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		m_hg_background = background();
 		update();
 	} else if (name == "update_sp") {
-		if (opargs.size() != 1 || !opargs.at(0).canConvert<quint64>()) {
+		if (opargs.size() < 1 || !opargs.at(0).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
@@ -367,7 +367,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		}
 		m_hg_special = special();
 	} else if (name == "resize") {
-		if (opargs.size() != 2 || !opargs.at(0).canConvert<quint64>() ||
+		if (opargs.size() < 2 || !opargs.at(0).canConvert<quint64>() ||
 				!opargs.at(1).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
@@ -381,14 +381,14 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		clearRegion(m_cursor_pos.y(), m_cursor_pos.x(),
 				m_cursor_pos.y()+1, columns());
 	} else if (name == "cursor_goto"){
-		if (opargs.size() != 2 || !opargs.at(0).canConvert<quint64>() ||
+		if (opargs.size() < 2 || !opargs.at(0).canConvert<quint64>() ||
 				!opargs.at(1).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
 		setNeovimCursor(opargs.at(0).toULongLong(), opargs.at(1).toULongLong());
 	} else if (name == "highlight_set") {
-		if (opargs.size() != 1 && (QMetaType::Type)opargs.at(0).type() != QMetaType::QVariantMap) {
+		if (opargs.size() < 1 && (QMetaType::Type)opargs.at(0).type() != QMetaType::QVariantMap) {
 			qWarning() << "Unexpected argument for redraw:" << name << opargs;
 			return;
 		}
@@ -404,7 +404,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "mouse_off"){
 		// See :h mouse
 	} else if (name == "mode_change"){
-		if (opargs.size() != 1) {
+		if (opargs.size() < 1 || !opargs.at(0).canConvert<QByteArray>()) {
 			qWarning() << "Unexpected argument for change_mode:" << opargs;
 			return;
 		}
@@ -444,7 +444,7 @@ void Shell::handleModeChange(const QString& mode)
 
 void Shell::handleSetTitle(const QVariantList& opargs)
 {
-	if (opargs.size() != 1 || !opargs.at(0).canConvert<QByteArray>()) {
+	if (opargs.size() < 1 || !opargs.at(0).canConvert<QByteArray>()) {
 		qWarning() << "Unexpected arguments for set_title:" << opargs;
 		return;
 	}
