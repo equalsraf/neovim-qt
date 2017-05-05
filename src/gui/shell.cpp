@@ -21,6 +21,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white), m_hg_special(QColor()),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
 	m_resizing(false),
+	m_mouse_wheel_delta_fraction(0, 0),
 	m_neovimBusy(false)
 {
 	setAttribute(Qt::WA_KeyCompression, false);
@@ -666,9 +667,23 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 
 void Shell::wheelEvent(QWheelEvent *ev)
 {
-	int horiz, vert;
-	horiz = ev->angleDelta().x();
-	vert = ev->angleDelta().y();
+	// For some reason <ScrollWheel*> scrolls multiple lines at once
+	// we have to account for it, to make sure that pixelDelta() is used correctly.
+	const int scroll_columns = 6;
+	const int scroll_rows = 3;
+	// Minimal scroll step
+	int scroll_step_x = cellSize().width() * scroll_columns;
+	int scroll_step_y = cellSize().height() * scroll_rows;
+	// Total scroll delta considering previous events
+	QPoint total_delta = m_mouse_wheel_delta_fraction + ev->pixelDelta();
+	// Delta rounded to a minimal scroll step
+	QPoint cell_delta(total_delta.x() / scroll_step_x, total_delta.y() / scroll_step_y);
+	// Save remainder for future events
+	m_mouse_wheel_delta_fraction = total_delta - QPoint(cell_delta.x() * scroll_step_x, cell_delta.y() * scroll_step_y);
+
+	int horiz = cell_delta.x();
+	int vert = cell_delta.y();
+
 	if (horiz == 0 && vert == 0) {
 		return;
 	}
