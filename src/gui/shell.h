@@ -125,6 +125,8 @@ private:
 	QTimer m_mouseclick_timer;
 	short m_mouseclick_count;
 	Qt::MouseButton m_mouseclick_pending;
+	// Accumulates remainder of steppy scroll
+	QPoint m_mouse_wheel_delta_fraction;
 
 	// Properties
 	bool m_neovimBusy;
