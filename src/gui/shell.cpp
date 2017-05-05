@@ -701,7 +701,7 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	if (horiz != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
 			.arg(Input.modPrefix(ev->modifiers()))
-			.arg(horiz > 0 ? "Right" : "Left")
+			.arg(horiz > 0 ? "Left" : "Right")
 			.arg(pos.x()).arg(pos.y());
 	}
 	m_nvim->neovimObject()->vim_input(inp.toLatin1());
