@@ -667,6 +667,7 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 
 void Shell::wheelEvent(QWheelEvent *ev)
 {
+#ifdef Q_OS_MAC
 	// For some reason <ScrollWheel*> scrolls multiple lines at once
 	// we have to account for it, to make sure that pixelDelta() is used correctly.
 	const int scroll_columns = 6;
@@ -683,6 +684,11 @@ void Shell::wheelEvent(QWheelEvent *ev)
 
 	int horiz = cell_delta.x();
 	int vert = cell_delta.y();
+#else
+	int horiz, vert;
+	horiz = ev->angleDelta().x();
+	vert = ev->angleDelta().y();
+#endif
 
 	if (horiz == 0 && vert == 0) {
 		return;
