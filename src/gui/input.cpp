@@ -79,9 +79,6 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 	   ) {
 		modprefix += "A-";
 	}
-    if ( mod & Qt::KeypadModifier ) {
-        modprefix += "k";
-    } 
 
 	return modprefix;
 }
@@ -153,6 +150,51 @@ QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::Keybo
  */
 QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers mod)
 {
+    if ( mod & Qt::KeypadModifier ) {
+		switch (k) {
+		case Qt::Key_Home:
+			return QString("<%1kHome>").arg(modPrefix(mod));
+		case Qt::Key_End:
+			return QString("<%1kEnd>").arg(modPrefix(mod));
+		case Qt::Key_PageUp:
+			return QString("<%1kPageUp>").arg(modPrefix(mod));
+		case Qt::Key_PageDown:
+			return QString("<%1kPageDown>").arg(modPrefix(mod));
+		case Qt::Key_Plus:
+			return QString("<%1kPlus>").arg(modPrefix(mod));
+		case Qt::Key_Minus:
+			return QString("<%1kMinus>").arg(modPrefix(mod));
+		case Qt::Key_multiply:
+			return QString("<%1kMultiply>").arg(modPrefix(mod));
+		case Qt::Key_division:
+			return QString("<%1kDivide>").arg(modPrefix(mod));
+		case Qt::Key_Enter:
+			return QString("<%1kEnter>").arg(modPrefix(mod));
+		case Qt::Key_Period:
+			return QString("<%1kPoint>").arg(modPrefix(mod));
+		case Qt::Key_0:
+			return QString("<%1k0>").arg(modPrefix(mod));
+		case Qt::Key_1:
+			return QString("<%1k1>").arg(modPrefix(mod));
+		case Qt::Key_2:
+			return QString("<%1k2>").arg(modPrefix(mod));
+		case Qt::Key_3:
+			return QString("<%1k3>").arg(modPrefix(mod));
+		case Qt::Key_4:
+			return QString("<%1k4>").arg(modPrefix(mod));
+		case Qt::Key_5:
+			return QString("<%1k5>").arg(modPrefix(mod));
+		case Qt::Key_6:
+			return QString("<%1k6>").arg(modPrefix(mod));
+		case Qt::Key_7:
+			return QString("<%1k7>").arg(modPrefix(mod));
+		case Qt::Key_8:
+			return QString("<%1k8>").arg(modPrefix(mod));
+		case Qt::Key_9:
+			return QString("<%1k9>").arg(modPrefix(mod));
+		}
+    }
+
 	if (specialKeys.contains(k)) {
 		return QString("<%1%2>").arg(modPrefix(mod)).arg(specialKeys.value(k));
 	}
