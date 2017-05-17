@@ -9,8 +9,9 @@ Neovim client library and GUI, in Qt5.
 
 ## Requirements
 
-* Qt5
-* Neovim
+* Qt5 (Ubuntu users can run```sudo apt-get install qtbase5-dev```)
+* Neovim ([Ubuntu](https://github.com/neovim/neovim/wiki/Installing-Neovim#ubuntu), [OSX](https://github.com/neovim/neovim/wiki/Installing-Neovim#os-x--homebrew) installation instructions [here](https://github.com/neovim/neovim/wiki/Installing-Neovim))
+* CMake for building from source (Ubuntu users can run```sudo apt-get install cmake```)
 
 ## Building
 
@@ -82,4 +83,3 @@ To generate the bindings yourself you need
 - jinja2
 
 Just run `make bindings` in Unix or the equivalent build command in Windows.
-
