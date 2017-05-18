@@ -127,6 +127,10 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 				QRect r = absoluteShellRect(i, j, 1, chars);
 
 				if (j <= 0 || !contents().constValue(i, j-1).doubleWidth) {
+
+					// If parts of previous character were drawn in our rect, keep it.
+					p.setCompositionMode(QPainter::CompositionMode_DestinationOver);
+
 					// Only paint bg/fg if this is not the second cell
 					// of a wide char
 					if (cell.backgroundColor.isValid()) {
@@ -134,6 +138,9 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					} else {
 						p.fillRect(r, m_bgColor);
 					}
+
+					// Put new char over the bg ( possible previous chars parts )
+					p.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
 					if (cell.c == ' ') {
 						continue;
