@@ -126,7 +126,9 @@ private:
 	short m_mouseclick_count;
 	Qt::MouseButton m_mouseclick_pending;
 	// Accumulates remainder of steppy scroll
-	QPoint m_mouse_wheel_delta_fraction;
+	QPointF m_scroll_remainder;
+	// Used to track when scroll direction changes to reset remainder
+	QPoint m_scroll_last_direction;
 
 	// Properties
 	bool m_neovimBusy;

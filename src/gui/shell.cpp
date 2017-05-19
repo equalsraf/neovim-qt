@@ -21,7 +21,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white), m_hg_special(QColor()),
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
 	m_resizing(false),
-	m_mouse_wheel_delta_fraction(0, 0),
+	m_scroll_remainder(0.0f, 0.0f),
+	m_scroll_last_direction(0, 0),
 	m_neovimBusy(false)
 {
 	setAttribute(Qt::WA_KeyCompression, false);
@@ -667,28 +668,37 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 
 void Shell::wheelEvent(QWheelEvent *ev)
 {
-#ifdef Q_OS_MAC
-	// For some reason <ScrollWheel*> scrolls multiple lines at once
-	// we have to account for it, to make sure that pixelDelta() is used correctly.
-	const int scroll_columns = 6;
-	const int scroll_rows = 3;
-	// Minimal scroll step
-	int scroll_step_x = cellSize().width() * scroll_columns;
-	int scroll_step_y = cellSize().height() * scroll_rows;
-	// Total scroll delta considering previous events
-	QPoint total_delta = m_mouse_wheel_delta_fraction + ev->pixelDelta();
-	// Delta rounded to a minimal scroll step
-	QPoint cell_delta(total_delta.x() / scroll_step_x, total_delta.y() / scroll_step_y);
-	// Save remainder for future events
-	m_mouse_wheel_delta_fraction = total_delta - QPoint(cell_delta.x() * scroll_step_x, cell_delta.y() * scroll_step_y);
+	// QApplication::wheelScrollLines() is ignored here, its default value (3)
+	// matches amount of lines that nvim scrolls when receiving single scroll command.
+	QPointF scroll_delta_f(float(ev->angleDelta().x()) / QWheelEvent::DefaultDeltasPerStep,
+						   float(ev->angleDelta().y()) / QWheelEvent::DefaultDeltasPerStep);
+	if (ev->inverted()) {
+		scroll_delta_f = -scroll_delta_f;
+	}
 
-	int horiz = cell_delta.x();
-	int vert = cell_delta.y();
-#else
-	int horiz, vert;
-	horiz = ev->angleDelta().x();
-	vert = ev->angleDelta().y();
-#endif
+	// Reset scroll remainder if we change scroll direction;
+	int direction_x = int(scroll_delta_f.x() < 0.0f ? -1 :
+						  scroll_delta_f.x() > 0.0f ? 1 : m_scroll_last_direction.x());
+	int direction_y = int(scroll_delta_f.y() < 0.0f ? -1 :
+						  scroll_delta_f.y() > 0.0f ? 1 : m_scroll_last_direction.y());
+	if (direction_x != m_scroll_last_direction.x()) {
+		m_scroll_remainder.setX(0.0f);
+		m_scroll_last_direction.setX(direction_x);
+	}
+	if (direction_y != m_scroll_last_direction.y()) {
+		m_scroll_remainder.setY(0.0f);
+		m_scroll_last_direction.setY(direction_y);
+	}
+
+	// Scroll distance considering previous events
+	QPointF total_delta = scroll_delta_f + m_scroll_remainder;
+	QPoint scroll_delta = QPoint(int(total_delta.x()), int(total_delta.y()));
+
+	// Store remainder so we can accumulate fine scroll events
+	m_scroll_remainder = total_delta - QPointF(scroll_delta);
+
+	int horiz = scroll_delta.x();
+	int vert = scroll_delta.y();
 
 	if (horiz == 0 && vert == 0) {
 		return;
