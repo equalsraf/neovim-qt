@@ -22,7 +22,6 @@ class NeovimConnector: public QObject
 	 * @see neovimObject
 	 */
 	Q_PROPERTY(bool ready READ isReady NOTIFY ready)
-	Q_ENUMS(NeovimError)
 public:
 	enum NeovimError {
 		NoError=0,
@@ -37,6 +36,11 @@ public:
 		MsgpackError,
 		RuntimeMsgpackError,
 	};
+#ifdef Q_ENUM
+	Q_ENUM(NeovimError)
+#else
+	Q_ENUMS(NeovimError)
+#endif
 
 	/** Underlying connection used to read Neovim */
         enum NeovimConnectionType {
