@@ -1,4 +1,3 @@
-
 #include "input.h"
 #include <QDebug>
 
@@ -201,6 +200,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 
 	QChar c;
 	// Escape < and backslash
+
 	if (text == "<") {
 		return QString("<lt>");
 	} else if (text == "\\") {
@@ -211,6 +211,9 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 			// ignore ctrl, alt and cmd key combos by themselves
 			QList<Qt::Key> keys = { Key_Control, Key_Alt, Key_Cmd };
 			if (keys.contains((Qt::Key)k)) {
+				return QString();
+			} else if (k == Qt::Key_Shift && mod&ControlModifier) {
+				// Ignore Ctrl+Shift combo
 				return QString();
 			} else {
 				// key code will be the value of the char (hopefully)
@@ -226,7 +229,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 	}
 
 	// Remove SHIFT
-	if (c.unicode() < 0x100 && !c.isLetterOrNumber() && c.isPrint()) {
+	if (c.unicode() < 0x100 && c.isPrint()) {
 		mod &= ~ShiftModifier;
 	}
 
@@ -238,6 +241,20 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 	// Format with prefix if necessary
 	QString prefix = modPrefix(mod);
 	if (!prefix.isEmpty()) {
+		if (prefix == "k"){
+			switch(c.toLatin1()) {
+				case '/':
+					return QString("<kDivide>");
+				case '*':
+					return QString("<kMultiply>");
+				case '-':
+					return QString("<kMinus>");
+				case '+':
+					return QString("<kPlus>");
+				case '.':
+					return QString("<kPoint>");
+			}
+		}
 		return QString("<%1%2>").arg(prefix).arg(c);
 	}
 
