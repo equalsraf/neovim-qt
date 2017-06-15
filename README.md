@@ -44,7 +44,7 @@ The binaries will be under build/bin/. The GUI binary is called nvim-qt.
 
 Run **nvim-qt**, the **nvim** binary must be in your $PATH. Check `nvim-qt --help` for additional options.
 
-Commands for interacting with the GUI are regular commands, available in the documentation [:help neovim-gui-shim](./src/gui/runtime/doc/neovim_gui_shim.txt). For example to change the font call
+Commands for interacting with the GUI are regular commands, available in the documentation [:help neovim-gui-shim](./src/gui/runtime/doc/nvim_gui_shim.txt). For example to change the font call
 
 	:Guifont DejaVu Sans Mono:h13
 
