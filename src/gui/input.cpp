@@ -226,7 +226,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 	}
 
 	// Remove SHIFT
-	if (c.unicode() < 0x100 && !c.isLetterOrNumber() && c.isPrint()) {
+    if (c.unicode() >= 0x80 || (!c.isLetterOrNumber() && c.isPrint())) {
 		mod &= ~ShiftModifier;
 	}
 
