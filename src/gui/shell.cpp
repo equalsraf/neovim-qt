@@ -677,9 +677,12 @@ void Shell::wheelEvent(QWheelEvent *ev)
 #endif
 	QPointF scroll_delta_f(float(ev->angleDelta().x()) / defaultDeltasPerStep,
 						   float(ev->angleDelta().y()) / defaultDeltasPerStep);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
 	if (ev->inverted()) {
 		scroll_delta_f = -scroll_delta_f;
 	}
+#endif
 
 	// Reset scroll remainder if we change scroll direction;
 	int direction_x = int(scroll_delta_f.x() < 0.0f ? -1 :
