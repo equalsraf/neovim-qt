@@ -670,8 +670,13 @@ void Shell::wheelEvent(QWheelEvent *ev)
 {
 	// QApplication::wheelScrollLines() is ignored here, its default value (3)
 	// matches amount of lines that nvim scrolls when receiving single scroll command.
-	QPointF scroll_delta_f(float(ev->angleDelta().x()) / QWheelEvent::DefaultDeltasPerStep,
-						   float(ev->angleDelta().y()) / QWheelEvent::DefaultDeltasPerStep);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 5, 0))
+	int defaultDeltasPerStep = 120;
+#else
+	int defaultDeltasPerStep = QWheelEvent::DefaultDeltasPerStep;
+#endif
+	QPointF scroll_delta_f(float(ev->angleDelta().x()) / defaultDeltasPerStep,
+						   float(ev->angleDelta().y()) / defaultDeltasPerStep);
 	if (ev->inverted()) {
 		scroll_delta_f = -scroll_delta_f;
 	}
