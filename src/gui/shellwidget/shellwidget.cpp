@@ -172,7 +172,6 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 						} else {
 							pen.setColor(m_fgColor);
 						}
-						pen.setStyle(Qt::DashDotDotLine);
 					} else if (cell.underline) {
 						if (cell.foregroundColor.isValid()) {
 							pen.setColor(cell.foregroundColor);
@@ -181,12 +180,21 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 						}
 					}
 
-					// TODO: draw a proper undercurl
 					p.setPen(pen);
 					QPoint start = r.bottomLeft();
 					QPoint end = r.bottomRight();
 					start.ry()--; end.ry()--;
-					p.drawLine(start, end);
+					if (cell.underline) {
+						p.drawLine(start, end);
+					} else if (cell.undercurl) {
+						static const int val[8] = {1, 0, 0, 1, 1, 2, 2, 2};
+						QPainterPath path(start);
+						for (int i = start.x() + 1; i <= end.x(); i++) {
+							int offset = val[i % 8];
+							path.lineTo(QPoint(i, start.y() - offset));
+						}
+						p.drawPath(path);
+					}
 				}
 			}
 		}
