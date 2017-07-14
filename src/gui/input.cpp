@@ -27,6 +27,18 @@ InputConv::InputConv() {
 	specialKeys.insert(Qt::Key_F10, "F10");
 	specialKeys.insert(Qt::Key_F11, "F11");
 	specialKeys.insert(Qt::Key_F12, "F12");
+	specialKeys.insert(Qt::Key_F13, "F13");
+	specialKeys.insert(Qt::Key_F14, "F14");
+	specialKeys.insert(Qt::Key_F15, "F15");
+	specialKeys.insert(Qt::Key_F16, "F16");
+	specialKeys.insert(Qt::Key_F17, "F17");
+	specialKeys.insert(Qt::Key_F18, "F18");
+	specialKeys.insert(Qt::Key_F19, "F19");
+	specialKeys.insert(Qt::Key_F20, "F20");
+	specialKeys.insert(Qt::Key_F21, "F21");
+	specialKeys.insert(Qt::Key_F22, "F22");
+	specialKeys.insert(Qt::Key_F23, "F23");
+	specialKeys.insert(Qt::Key_F24, "F24");
 
 	specialKeys.insert(Qt::Key_Backspace, "BS");
 	specialKeys.insert(Qt::Key_Delete, "Del");
