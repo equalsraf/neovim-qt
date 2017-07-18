@@ -53,7 +53,7 @@ GuiLinespace	When called with no arguments this command displays the
 g:GuiLoaded is set when this plugin loads. Use it in |ginit.vim| to make sure
 the shim has loaded. For example to set the GUI font on startup >
 
-    if !exists('g:GuiLoaded')
+    if exists('g:GuiLoaded')
 	Guifont DejaVu Sans Mono:h15
     endif
 
