@@ -60,7 +60,7 @@ private slots:
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
 		QVERIFY(onError.isValid());
 		// The signal might be emited before we get to connect
-		SPYWAIT(onError);
+		SPYWAIT2(onError, 15000);
 
 		QCOMPARE(c->errorCause(), NeovimConnector::SocketError);
 		c->deleteLater();
