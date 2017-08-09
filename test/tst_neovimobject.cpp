@@ -68,7 +68,7 @@ void TestNeovimObject::eventTypes()
 
 void TestNeovimObject::initTestCase()
 {
-	m_c = NeovimQt::NeovimConnector::spawn();
+	m_c = NeovimQt::NeovimConnector::spawn({"-u", "NORC"});
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 			this, &TestNeovimObject::delayedSetup);
 	QTest::qWait(1500);
