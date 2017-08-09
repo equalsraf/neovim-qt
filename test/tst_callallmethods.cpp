@@ -31,7 +31,7 @@ private:
 
 void TestCallAllMethods::initTestCase()
 {
-	m_c = NeovimQt::NeovimConnector::spawn();
+	m_c = NeovimQt::NeovimConnector::spawn({"-u", "NORC"});
 	QSignalSpy onReady(m_c, SIGNAL(ready()));
 	QVERIFY(onReady.isValid());
 

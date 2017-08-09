@@ -23,7 +23,7 @@ private slots:
 
 	void benchStart() {
 		QBENCHMARK {
-			NeovimConnector *c = NeovimConnector::spawn();
+			NeovimConnector *c = NeovimConnector::spawn({"-u", "NORC"});
 			QSignalSpy onReady(c, SIGNAL(ready()));
 			QVERIFY(onReady.isValid());
 			QVERIFY(SPYWAIT(onReady));

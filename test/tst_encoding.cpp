@@ -76,7 +76,7 @@ void TestEncoding::stringsAreBinaryNotUtf8()
 void TestEncoding::initTestCase()
 {
 	bool ready = false;
-	m_c = NeovimQt::NeovimConnector::spawn();
+	m_c = NeovimQt::NeovimConnector::spawn({"-u", "NORC"});
 	QVERIFY(m_c->errorCause() == NeovimQt::NeovimConnector::NoError);
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 		[&ready](){
