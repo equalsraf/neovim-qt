@@ -92,13 +92,22 @@ private slots:
 		checkCommand(c, "GuiLinespace");
 
 		// Test font attributes
+#ifdef Q_OS_MAC
+		checkCommand(c, "GuiFont Monaco:h14", false);
+		QCOMPARE(s->shell()->fontDesc(), QString("Monaco:h14"));
+#else
 		checkCommand(c, "GuiFont DejaVu Sans Mono:h14", false);
 		QCOMPARE(s->shell()->fontDesc(), QString("DejaVu Sans Mono:h14"));
+#endif
 
 		// Normalization removes the :b attribute
+#ifdef Q_OS_MAC
+		checkCommand(c, "GuiFont Monaco:h14:b:l", false);
+		QCOMPARE(s->shell()->fontDesc(), QString("Monaco:h14:l"));
+#else
 		checkCommand(c, "GuiFont DejaVu Sans Mono:h14:b:l", false);
-		QCOMPARE(s->shell()->fontDesc(),
-				QString("DejaVu Sans Mono:h14:l"));
+		QCOMPARE(s->shell()->fontDesc(), QString("DejaVu Sans Mono:h14:l"));
+#endif
 	}
 
 protected:
