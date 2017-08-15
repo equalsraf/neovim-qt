@@ -26,7 +26,7 @@ NeovimConnector::NeovimConnector(QIODevice *dev)
 
 NeovimConnector::NeovimConnector(MsgpackIODevice *dev)
 :QObject(), m_dev(dev), m_helper(0), m_error(NoError), m_neovimobj(NULL),
-	m_channel(0), m_ctype(OtherConnection), m_ready(false)
+	m_channel(0), m_ctype(OtherConnection), m_ready(false), m_timeout(5000)
 {
 	m_helper = new NeovimConnectorHelper(this);
 	qRegisterMetaType<NeovimError>("NeovimError");
@@ -38,6 +38,11 @@ NeovimConnector::NeovimConnector(MsgpackIODevice *dev)
 		return;
 	}
 	discoverMetadata();
+}
+
+void NeovimConnector::setRequestTimeout(int ms)
+{
+	this->m_timeout = ms;
 }
 
 /**
@@ -91,7 +96,7 @@ MsgpackRequest* NeovimConnector::attachUi(int64_t width, int64_t height)
 	MsgpackRequest *r = m_dev->startRequestUnchecked("ui_attach", 3);
 	connect(r, &MsgpackRequest::timeout,
 			this, &NeovimConnector::fatalTimeout);
-	r->setTimeout(5000);
+	r->setTimeout(m_timeout);
 
 	m_dev->send(width);
 	m_dev->send(height);
@@ -129,7 +134,7 @@ void NeovimConnector::discoverMetadata()
 			m_helper, &NeovimConnectorHelper::handleMetadataError);
 	connect(r, &MsgpackRequest::timeout,
 			this, &NeovimConnector::fatalTimeout);
-	r->setTimeout(5000);
+	r->setTimeout(m_timeout);
 }
 
 /**
