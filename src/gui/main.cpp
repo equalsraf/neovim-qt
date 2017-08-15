@@ -13,7 +13,9 @@ int ui_main(int argc, char **argv)
 	QCommandLineParser parser;
 	NeovimQt::App::processCliOptions(parser, app.arguments());
 
+	int timeout = parser.value("timeout").toInt();
 	auto c = app.createConnector(parser);
+	c->setRequestTimeout(timeout);
 	app.showUi(c, parser);
 	return app.exec();
 }

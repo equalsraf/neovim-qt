@@ -113,6 +113,10 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 				QCoreApplication::translate("main", "nvim executable path"),
 				QCoreApplication::translate("main", "nvim_path"),
 				"nvim"));
+	parser.addOption(QCommandLineOption("timeout",
+				QCoreApplication::translate("main", "Error if nvim does not responde after count milliseconds"),
+				QCoreApplication::translate("main", "ms"),
+				"5000"));
 	parser.addOption(QCommandLineOption("geometry",
 				QCoreApplication::translate("main", "Initial window geometry"),
 				QCoreApplication::translate("main", "geometry")));
@@ -158,6 +162,13 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 
 	if (parser.positionalArguments().isEmpty() && parser.isSet("spawn")) {
 		qWarning() << "--spawn requires at least one positional argument\n";
+		::exit(-1);
+	}
+
+	bool valid_timeout;
+	int timeout_opt = parser.value("timeout").toInt(&valid_timeout);
+	if (!valid_timeout || timeout_opt <= 0) {
+		qWarning() << "Invalid argument for --timeout" << parser.value("timeout");
 		::exit(-1);
 	}
 }

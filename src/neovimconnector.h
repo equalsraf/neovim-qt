@@ -75,6 +75,8 @@ public:
 	QString decode(const QByteArray&);
 	QByteArray encode(const QString&);
 	NeovimConnectionType connectionType();
+	/** Some requests for metadata and ui attachment enforce a timeout in ms */
+	void setRequestTimeout(int);
 
 signals:
 	/** Emitted when Neovim is ready @see ready */
@@ -111,6 +113,7 @@ private:
 	QString m_connSocket, m_connHost;
 	int m_connPort;
 	bool m_ready;
+	int m_timeout;
 };
 } // namespace NeovimQt
 Q_DECLARE_METATYPE(NeovimQt::NeovimConnector::NeovimError)
