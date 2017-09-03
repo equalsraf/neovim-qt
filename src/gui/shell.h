@@ -56,6 +56,7 @@ protected slots:
         void init();
 	void fontError(const QString& msg);
 	void updateWindowId();
+	void updateMenu(quint32 msgid, Function::FunctionId fun, const QVariant& resp);
 
 protected:
 	void tooltip(const QString& text);

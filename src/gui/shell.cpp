@@ -420,10 +420,37 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "busy_stop"){
 		handleBusy(false);
 	} else if (name == "set_icon") {
+	} else if (name == "update_menu") {
+		auto req = m_nvim->neovimObject()->vim_command_output("silent menu");
+		connect(req, &MsgpackRequest::finished, this, &Shell::updateMenu);
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
 
+}
+
+void Shell::updateMenu(quint32 msgid, Function::FunctionId fun, const QVariant& resp)
+{
+	QString menu_spec = resp.toString();
+
+	foreach(QString line, menu_spec.split("\n")) {
+		qDebug() << line;
+		if (line.isEmpty() || line.startsWith("-")) {
+			continue;
+		}
+
+		int indent = 0;
+		const QChar *data = line.constData();
+		while (!data->isNull()) {
+			if (*data == ' ') {
+				indent += 1;
+			} else {
+				break;
+			}
+			++data;
+		}
+
+	}
 }
 
 void Shell::setNeovimCursor(quint64 row, quint64 col)

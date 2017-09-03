@@ -81,3 +81,6 @@ function GuiDrop(...)
 		doautocmd BufEnter
 	endif
 endfunction
+
+" Load menu.vim from nvim runtime
+runtime menu.vim
