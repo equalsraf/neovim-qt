@@ -826,13 +826,14 @@ void Shell::closeEvent(QCloseEvent *ev)
 
 void Shell::focusInEvent(QFocusEvent *ev)
 {
-	m_nvim->neovimObject()->vim_input("<FocusGained>");
+	// See neovim-qt/issues/329 the FocusGained key no longer exists, use autocmd instead
+	m_nvim->neovimObject()->vim_command("if exists('#FocusGained') | doautocmd FocusGained | endif");
 	QWidget::focusInEvent(ev);
 }
 
 void Shell::focusOutEvent(QFocusEvent *ev)
 {
-	m_nvim->neovimObject()->vim_input("<FocusLost>");
+	m_nvim->neovimObject()->vim_command("if exists('#FocusLost') | doautocmd FocusLost | endif");
 	QWidget::focusOutEvent(ev);
 }
 
