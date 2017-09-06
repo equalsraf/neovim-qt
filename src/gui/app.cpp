@@ -116,7 +116,7 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 	parser.addOption(QCommandLineOption("timeout",
 				QCoreApplication::translate("main", "Error if nvim does not responde after count milliseconds"),
 				QCoreApplication::translate("main", "ms"),
-				"5000"));
+				"10000"));
 	parser.addOption(QCommandLineOption("geometry",
 				QCoreApplication::translate("main", "Initial window geometry"),
 				QCoreApplication::translate("main", "geometry")));
