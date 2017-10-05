@@ -48,7 +48,6 @@ MsgpackIODevice::MsgpackIODevice(QIODevice *dev, QObject *parent)
 :QObject(parent), m_reqid(0), m_dev(dev), m_encoding(0), m_reqHandler(0), m_error(NoError)
 {
 	qRegisterMetaType<MsgpackError>("MsgpackError");
-	qRegisterMetaType<Function::FunctionId>("Function::FunctionId");
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
 
 	if (m_dev) {

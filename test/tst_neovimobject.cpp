@@ -24,12 +24,12 @@ private:
 
 void TestNeovimObject::delayedSetup()
 {
-	NeovimQt::Neovim *n = m_c->neovimObject();
+	auto *n = m_c->neovimObject();
 
 	m_test_event_string = false;
 	m_test_event_uint = false;
 	m_test_event_stringlist = false;
-	connect(n, &NeovimQt::Neovim::neovimNotification,
+	connect(n, &NeovimQt::NeovimApi1::neovimNotification,
 			this, &TestNeovimObject::test_event);
 
 	n->vim_command(QString("call rpcnotify(%1, \"test_event\", \"WAT\")").arg(m_c->channel()).toUtf8());

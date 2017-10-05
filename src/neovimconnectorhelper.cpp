@@ -22,8 +22,7 @@ NeovimConnectorHelper::NeovimConnectorHelper(NeovimConnector *c)
 }
 
 /** Handle Msgpack-rpc errors when fetching the API metadata */
-void NeovimConnectorHelper::handleMetadataError(quint32 msgid, Function::FunctionId,
-		const QVariant& errobj)
+void NeovimConnectorHelper::handleMetadataError(quint32 msgid, quint64, const QVariant& errobj)
 {
 	m_c->setError(NeovimConnector::NoMetadata,
 		tr("Unable to get Neovim api information"));
@@ -35,9 +34,8 @@ void NeovimConnectorHelper::handleMetadataError(quint32 msgid, Function::Functio
  * Process metadata object returned by Neovim
  *
  * - Set channel_id
- * - Check if all functions we need are available
  */
-void NeovimConnectorHelper::handleMetadata(quint32 msgid, Function::FunctionId, const QVariant& result)
+void NeovimConnectorHelper::handleMetadata(quint32 msgid, quint64, const QVariant& result)
 {
 	const QVariantList asList = result.toList();
 	if (asList.size() != 2 || 
@@ -49,64 +47,48 @@ void NeovimConnectorHelper::handleMetadata(quint32 msgid, Function::FunctionId, 
 
 	m_c->m_channel = asList.at(0).toUInt();
 	const QVariantMap metadata = asList.at(1).toMap();
-	QMapIterator<QString,QVariant> it(metadata);
 
+	int api_compat = metadata.value("version").toMap().value("api_compatible").toUInt();
+	int api_level = metadata.value("version").toMap().value("api_level").toUInt();
+	qDebug() << "Neovim API version compatible with" << api_compat << "supported" << api_level;
+	m_c->m_api_compat = api_compat;
+	m_c->m_api_supported = api_level;
+
+	if (m_c->api1() == NULL) {
+		m_c->setError(NeovimConnector::APIMisMatch,
+				tr("API methods mismatch: Cannot connect to this instance of Neovim, its version is likely too old, or the API has changed"));
+		return;
+	}
+
+#if 0
+	QMapIterator<QString,QVariant> it(metadata);
 	while (it.hasNext()) {
 		it.next();
 		if (it.key() == "functions") {
-			if (!checkFunctions(it.value().toList())) {
-				m_c->setError(NeovimConnector::APIMisMatch,
-						tr("API methods mismatch: Cannot connect to this instance of Neovim, its version is likely too old, or the API has changed"));
-				return;
+			auto api1 = m_c->api1();
+			if (api1 ) {
+				NeovimApi1::checkFunctions(it.value().toList());
+			}
+			auto api2 = m_c->api1();
+			if (api2 ) {
+				NeovimApi2::checkFunctions(it.value().toList());
 			}
 		}
 	}
+#endif
 
 	if (m_c->errorCause() == NeovimConnector::NoError) {
-		// Get &encoding before we signal readyness
-		connect(m_c->neovimObject(), &Neovim::on_vim_get_option,
-				this, &NeovimConnectorHelper::encodingChanged);
-		MsgpackRequest *r = m_c->neovimObject()->vim_get_option("encoding");
-		connect(r, &MsgpackRequest::timeout,
-				m_c, &NeovimConnector::fatalTimeout);
-		r->setTimeout(10000);
+		// Neovim is always utf8, but this was not the case in the early days of nvim
+		// these days it should always be utf8
+		if (m_c->m_dev->setEncoding("utf8")) {
+			m_c->m_ready = true;
+			emit m_c->ready();
+		} else {
+			qWarning() << "Unable to set encoding to utf8";
+		}
 	} else {
 		qWarning() << "Error retrieving metadata" << m_c->errorString();
 	}
-}
-
-/**
- * Called after metadata discovery, to get the &encoding
- */
-void NeovimConnectorHelper::encodingChanged(const QVariant&  obj)
-{
-	disconnect(m_c->neovimObject(), &Neovim::on_vim_get_option,
-			this, &NeovimConnectorHelper::encodingChanged);
-	m_c->m_dev->setEncoding(obj.toByteArray());
-	const QByteArray enc_name = obj.toByteArray();
-	if (m_c->m_dev->setEncoding(enc_name)) {
-		m_c->m_ready = true;
-		emit m_c->ready();
-	} else {
-		qWarning() << "Unable to set encoding" << obj;
-	}
-}
-
-/**
- * Check function table from api_metadata[1]
- * Returns false if there is an API mismatch
- */
-bool NeovimConnectorHelper::checkFunctions(const QVariantList& ftable)
-{
-	QList<Function::FunctionId> supported;
-	foreach(const QVariant& val, ftable) {
-		Function::FunctionId fid = Function::functionId(Function::fromVariant(val));
-		if (fid != Function::NEOVIM_FN_NULL) {
-			supported.append(fid);
-		}
-	}
-	// true if all the generated functions are supported
-	return Function::knownFunctions.size() == supported.size();
 }
 
 } // Namespace NeovimQt

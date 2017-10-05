@@ -1,5 +1,5 @@
 
-set(NEOVIM_QT_SOURCES util.cpp neovimconnector.cpp neovimconnectorhelper.cpp function.cpp msgpackrequest.cpp auto/0/neovim.cpp msgpackiodevice.cpp)
+set(NEOVIM_QT_SOURCES util.cpp neovimconnector.cpp neovimconnectorhelper.cpp function.cpp msgpackrequest.cpp msgpackiodevice.cpp auto/1/neovim.cpp auto/2/neovim.cpp)
 if(WIN32)
   list(APPEND NEOVIM_QT_SOURCES stdinreader.cpp)
 endif()

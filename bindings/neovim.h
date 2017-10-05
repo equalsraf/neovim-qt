@@ -1,21 +1,37 @@
 // Auto generated {{date}} from nvim API level:{{api_level}}
-#ifndef NEOVIM_QT_NEOVIMOBJ
-#define NEOVIM_QT_NEOVIMOBJ
-#include "function.h"
+#ifndef NEOVIM_QT_NEOVIMAPI{{api_level}}
+#define NEOVIM_QT_NEOVIMAPI{{api_level}}
 #include "msgpack.h"
+#include <QObject>
+#include <QVariant>
+#include <QPoint>
+#include "function.h"
 
 namespace NeovimQt {
 class NeovimConnector;
 class MsgpackRequest;
-class Neovim: public QObject
-{
 
+class NeovimApi{{api_level}}: public QObject
+{
 	Q_OBJECT
+	Q_ENUMS(FunctionId)
+
 public:
-	Neovim(NeovimConnector *);
+
+	enum FunctionId {
+		NEOVIM_FN_NULL=0,
+		{% for f in functions %}
+		NEOVIM_FN_{{ f.name.upper() }},
+		{% endfor %}
+	};
+
+	static bool checkFunctions(const QVariantList& ftable);
+	static FunctionId functionId(const Function& f);
+
+	NeovimApi{{api_level}}(NeovimConnector *);
 protected slots:
-	void handleResponse(quint32 id, Function::FunctionId fun, const QVariant&);
-	void handleResponseError(quint32 id, Function::FunctionId fun, const QVariant&);
+	void handleResponse(quint32 id, quint64 fun, const QVariant&);
+	void handleResponseError(quint32 id, quint64 fun, const QVariant&);
 signals:
 	void error(const QString& errmsg, const QVariant& errObj);
 	void neovimNotification(const QByteArray &name, const QVariantList& args);
