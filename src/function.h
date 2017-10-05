@@ -15,11 +15,6 @@ class Function {
 	Q_ENUMS(FunctionId)
 public:
 
-#ifndef NEOVIMQT_NO_AUTO
-// Bring in auto-generated enum
-#include "auto/0/function_enum.h"
-#endif
-
 	Function();
 	Function(const QString& ret, const QString& name, QList<QPair<QString,QString> > params, bool can_fail);
 	Function(const QString& ret, const QString& name, QList<QString> paramTypes, bool can_fail);
@@ -43,7 +38,6 @@ public:
 	 * signature. The list is populated at compile time from a code generator.
 	 */
 	const static QList<Function> knownFunctions;
-	static FunctionId functionId(const Function&);
 private:
 	bool m_valid;
 };

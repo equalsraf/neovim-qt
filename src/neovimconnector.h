@@ -6,7 +6,8 @@
 #include <QProcess>
 #include <QTextCodec>
 #include "function.h"
-#include "auto/0/neovim.h"
+#include "auto/1/neovim.h"
+#include "auto/2/neovim.h"
 
 namespace NeovimQt {
 
@@ -14,7 +15,8 @@ class MsgpackIODevice;
 class NeovimConnectorHelper;
 class NeovimConnector: public QObject
 {
-	friend class Neovim;
+	friend class NeovimApi1;
+	friend class NeovimApi2;
 	friend class NeovimConnectorHelper;
 	Q_OBJECT
 	/**
@@ -70,7 +72,9 @@ public:
 	void detachUi();
 
 	bool isReady();
-	Neovim* neovimObject();
+	NeovimApi1 * neovimObject();
+	NeovimApi1 * api1();
+	NeovimApi2 * api2();
 	uint64_t channel();
 	QString decode(const QByteArray&);
 	QByteArray encode(const QString&);
@@ -103,8 +107,11 @@ private:
 	QString m_errorString;
 	NeovimError m_error;
 
-	Neovim *m_neovimobj;
+	NeovimApi1 *m_api1;
+	NeovimApi2 *m_api2;
 	quint64 m_channel;
+	quint64 m_api_compat;
+	quint64 m_api_supported;
 
 	// Store connection arguments for reconnect()
 	NeovimConnectionType m_ctype;

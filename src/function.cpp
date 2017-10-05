@@ -13,17 +13,6 @@ typedef QPair<QString,QString> StringPair;
  */
 
 /**
- * \enum Function::FunctionId
- *
- * Neovim API function identifiers, the list NeovimQt::Function::knownFunctions
- * is indexed with this enum.
- */
-
-#ifndef NEOVIMQT_NO_AUTO
-#include "auto/0/function_static.cpp"
-#endif
-
-/**
  * Construct invalid function
  */
 Function::Function()
@@ -194,24 +183,6 @@ QString Function::signature() const
 	}
 	return  QString("%1 %2(%3)%4").arg(return_type).arg(name).arg(sigparams.join(", ")).arg(notes);
 }
-
-/**
- * return the FunctionId or NEOVIM_FN_NULL if the
- * function is uknown
- */
-Function::FunctionId Function::functionId(const Function& f)
-{
-	if ( !f.isValid() ) {
-		return Function::NEOVIM_FN_NULL;
-	}
-	int index = Function::knownFunctions.indexOf(f);
-	if ( index != -1 ) {
-		return Function::FunctionId(index);
-	}
-	qDebug() << "Unknown Neovim function" << f.signature();
-	return Function::NEOVIM_FN_NULL;
-}
-
 
 } // Namespace
 

@@ -22,7 +22,7 @@ void TestEncoding::encodeString()
 	QMetaObject::Connection conn;
 	m_c->neovimObject()->vim_set_var("testing-neovim-qt", QString("value"));
 	m_c->neovimObject()->vim_get_var("testing-neovim-qt");
-	conn = connect(m_c->neovimObject(), &NeovimQt::Neovim::on_vim_get_var,
+	conn = connect(m_c->neovimObject(), &NeovimQt::NeovimApi1::on_vim_get_var,
 			[&failed_to_set](const QVariant& v) {
 				QVERIFY(v == QByteArray("value"));
 			});
@@ -32,7 +32,7 @@ void TestEncoding::encodeString()
 	bool var_set = false;
 	m_c->neovimObject()->vim_set_var("testing-neovim-qt", QByteArray("value"));
 	m_c->neovimObject()->vim_get_var("testing-neovim-qt");
-	conn = connect(m_c->neovimObject(), &NeovimQt::Neovim::on_vim_get_var,
+	conn = connect(m_c->neovimObject(), &NeovimQt::NeovimApi1::on_vim_get_var,
 			[&var_set](const QVariant& v) {
 				var_set = true;
 				QVERIFY(v == QVariant(QByteArray("value")));
@@ -49,7 +49,7 @@ void TestEncoding::map()
 	map.insert("answer", 42);
 	m_c->neovimObject()->vim_set_var("test-map", map);
 	m_c->neovimObject()->vim_get_var("test-map");
-	conn = connect(m_c->neovimObject(), &NeovimQt::Neovim::on_vim_get_var,
+	conn = connect(m_c->neovimObject(), &NeovimQt::NeovimApi1::on_vim_get_var,
 			[map](const QVariant& v) {
 				QVERIFY(v == map);
 			});
@@ -65,7 +65,7 @@ void TestEncoding::stringsAreBinaryNotUtf8()
 	m_c->neovimObject()->vim_set_current_line(data);
 	m_c->neovimObject()->vim_get_current_line();
 	QMetaObject::Connection conn;
-	conn = connect(m_c->neovimObject(), &NeovimQt::Neovim::on_vim_get_current_line,
+	conn = connect(m_c->neovimObject(), &NeovimQt::NeovimApi1::on_vim_get_current_line,
 			[data](const QVariant& v) {
 				QCOMPARE(v.toByteArray(), data);
 			});

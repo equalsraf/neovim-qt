@@ -1,4 +1,4 @@
-// Auto generated 2017-10-05 15:14:51.239480
+// Auto generated 2017-10-05 20:54:40.489621
 enum FunctionId {
 	NEOVIM_FN_NVIM_BUF_LINE_COUNT,
 	NEOVIM_FN_BUFFER_GET_LINE,
