@@ -1,4 +1,4 @@
-// Auto generated {{date}}
+// Auto generated {{date}} from nvim API level:{{api_level}}
 #include "neovim.h"
 #include "neovimconnector.h"
 #include "msgpackrequest.h"

@@ -20,7 +20,7 @@ typedef QPair<QString,QString> StringPair;
  */
 
 #ifndef NEOVIMQT_NO_AUTO
-#include "auto/function_static.cpp"
+#include "auto/0/function_static.cpp"
 #endif
 
 /**
