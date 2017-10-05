@@ -1,4 +1,4 @@
-// Auto generated {{date}}
+// Auto generated {{date}} from nvim API level:{{api_level}}
 #ifndef NEOVIM_QT_NEOVIMOBJ
 #define NEOVIM_QT_NEOVIMOBJ
 #include "function.h"

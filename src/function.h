@@ -17,7 +17,7 @@ public:
 
 #ifndef NEOVIMQT_NO_AUTO
 // Bring in auto-generated enum
-#include "auto/function_enum.h"
+#include "auto/0/function_enum.h"
 #endif
 
 	Function();

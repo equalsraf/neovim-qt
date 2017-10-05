@@ -194,6 +194,8 @@ def print_api(api):
             print('')
         elif key == 'features':
             pass
+        elif key == 'version':
+            print('Version {major}.{minor} API {api_level}'.format(**api[key]))
         else:
             print('Unknown API info attribute: %s' % key)
 
@@ -214,6 +216,13 @@ if __name__ == '__main__':
         sys.exit(-1)
 
     if outpath:
+        if api.has_key('version'):
+            api_level = api['version']['api_level']
+        else:
+            api_level = 0
+
+        outpath = os.path.join(outpath, str(api_level))
+
         print('Writing auto generated bindings to %s' % outpath)
         if not os.path.exists(outpath):
             os.makedirs(outpath)
@@ -228,6 +237,7 @@ if __name__ == '__main__':
             env['functions'] = [f for f in functions if f.valid]
             exttypes = { typename:info['id'] for typename,info in api['types'].items()}
             env['exttypes'] = exttypes
+            env['api_level'] = api_level
             generate_file(name, outpath, **env)
 
     else:

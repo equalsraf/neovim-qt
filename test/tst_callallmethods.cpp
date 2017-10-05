@@ -2,7 +2,6 @@
 #include <QMetaMethod>
 #include <QtTest/QtTest>
 #include <neovimconnector.h>
-#include <auto/neovim.h>
 #include "common.h"
 
 /**
@@ -41,7 +40,7 @@ void TestCallAllMethods::initTestCase()
 void TestCallAllMethods::vim_get_current_buffer()
 {
 	QVERIFY(m_c->neovimObject());
-	NeovimQt::Neovim *obj = m_c->neovimObject();
+	auto *obj = m_c->neovimObject();
 
 	QSignalSpy result(obj, SIGNAL(on_vim_get_current_buffer(int64_t)));
 	QVERIFY(result.isValid());
@@ -53,7 +52,7 @@ void TestCallAllMethods::vim_get_current_buffer()
 void TestCallAllMethods::vim_list_runtime_paths()
 {
 	QVERIFY(m_c->neovimObject());
-	NeovimQt::Neovim *obj = m_c->neovimObject();
+	auto *obj = m_c->neovimObject();
 
 	QSignalSpy result(obj, SIGNAL(on_vim_list_runtime_paths(QList<QByteArray>)));
 	QVERIFY(result.isValid());
@@ -66,7 +65,7 @@ void TestCallAllMethods::callAll()
 {
 	QVERIFY(m_c->neovimObject());
 
-	NeovimQt::Neovim *obj = m_c->neovimObject();
+	auto *obj = m_c->neovimObject();
 	const QMetaObject *meta = obj->metaObject();
 	QSignalSpy neovimErrors(m_c, SIGNAL(error(NeovimError)));
 	QVERIFY(neovimErrors.isValid());
@@ -96,7 +95,7 @@ void TestCallAllMethods::callAll()
 void TestCallAllMethods::vim_call_function()
 {
 	QVERIFY(m_c->neovimObject());
-	NeovimQt::Neovim *obj = m_c->neovimObject();
+	auto *obj = m_c->neovimObject();
 
 	QSignalSpy result(obj, SIGNAL(on_vim_call_function(QVariant)));
 	QVERIFY(result.isValid());
