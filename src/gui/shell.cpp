@@ -594,6 +594,10 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 
 void Shell::neovimMouseEvent(QMouseEvent *ev)
 {
+	if (!m_attached) {
+		return;
+	}
+
 	QPoint pos(ev->x()/cellSize().width(),
 			ev->y()/cellSize().height());
 	QString inp;
@@ -668,6 +672,9 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 
 void Shell::wheelEvent(QWheelEvent *ev)
 {
+	if (!m_attached) {
+		return;
+	}
 #ifdef Q_OS_MAC
 	// For some reason <ScrollWheel*> scrolls multiple lines at once
 	// we have to account for it, to make sure that pixelDelta() is used correctly.
@@ -879,6 +886,9 @@ void Shell::tooltip(const QString& text)
 
 void Shell::inputMethodEvent(QInputMethodEvent *ev)
 {
+	if (!m_attached) {
+		return;
+	}
 	if ( !ev->commitString().isEmpty() ) {
 		QByteArray s = m_nvim->encode(ev->commitString());
 		m_nvim->api1()->vim_input(s);
