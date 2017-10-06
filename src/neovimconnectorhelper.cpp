@@ -54,12 +54,6 @@ void NeovimConnectorHelper::handleMetadata(quint32 msgid, quint64, const QVarian
 	m_c->m_api_compat = api_compat;
 	m_c->m_api_supported = api_level;
 
-//	if (m_c->api1() == NULL) {
-//		m_c->setError(NeovimConnector::APIMisMatch,
-//				tr("API methods mismatch: Cannot connect to this instance of Neovim, its version is likely too old, or the API has changed"));
-//		return;
-//	}
-
 #if 0
 	QMapIterator<QString,QVariant> it(metadata);
 	while (it.hasNext()) {

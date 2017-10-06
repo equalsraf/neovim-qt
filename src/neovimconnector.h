@@ -5,7 +5,6 @@
 #include <QAbstractSocket>
 #include <QProcess>
 #include <QTextCodec>
-#include "function.h"
 #include "auto/neovimapi1.h"
 #include "auto/neovimapi2.h"
 
