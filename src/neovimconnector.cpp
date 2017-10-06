@@ -406,6 +406,17 @@ NeovimConnector* NeovimConnector::reconnect()
 	return NULL;
 }
 
+/** The minimum API level supported by this instance */
+quint64 NeovimConnector::apiCompatibility()
+{
+	return m_api_compat;
+}
+/** The maximum API level supported by this instance */
+quint64 NeovimConnector::apiLevel()
+{
+	return m_api_supported;
+}
+
 /**
  * \fn NeovimQt::NeovimConnector::error(NeovimError)
  *

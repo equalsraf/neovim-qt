@@ -41,6 +41,7 @@ private slots:
 	void reconnectNeovim();
 	void showIfDelayed();
 	void neovimAttachmentChanged(bool);
+	void neovimIsUnsupported();
 private:
 	void init(NeovimConnector *);
         NeovimConnector *m_nvim;

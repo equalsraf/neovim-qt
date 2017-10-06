@@ -181,6 +181,7 @@ void Shell::init()
 {
 	// Make sure the connector provides us with an api object
 	if (!m_nvim || !m_nvim->api1()) {
+		emit neovimIsUnsupported();
 		return;
 	}
 
