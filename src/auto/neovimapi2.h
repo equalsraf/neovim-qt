@@ -1,6 +1,6 @@
-// Auto generated 2017-10-05 20:56:21.065983 from nvim API level:1
-#ifndef NEOVIM_QT_NEOVIMAPI1
-#define NEOVIM_QT_NEOVIMAPI1
+// Auto generated 2017-10-06 11:35:39.193405 from nvim API level:2
+#ifndef NEOVIM_QT_NEOVIMAPI2
+#define NEOVIM_QT_NEOVIMAPI2
 #include "msgpack.h"
 #include <QObject>
 #include <QVariant>
@@ -11,7 +11,7 @@ namespace NeovimQt {
 class NeovimConnector;
 class MsgpackRequest;
 
-class NeovimApi1: public QObject
+class NeovimApi2: public QObject
 {
 	Q_OBJECT
 	Q_ENUMS(FunctionId)
@@ -29,6 +29,7 @@ public:
 				NEOVIM_FN_BUFFER_SET_LINE_SLICE,
 				NEOVIM_FN_NVIM_BUF_SET_LINES,
 				NEOVIM_FN_NVIM_BUF_GET_VAR,
+				NEOVIM_FN_NVIM_BUF_GET_CHANGEDTICK,
 				NEOVIM_FN_NVIM_BUF_SET_VAR,
 				NEOVIM_FN_NVIM_BUF_DEL_VAR,
 				NEOVIM_FN_BUFFER_SET_VAR,
@@ -94,6 +95,7 @@ public:
 				NEOVIM_FN_NVIM_UNSUBSCRIBE,
 				NEOVIM_FN_NVIM_GET_COLOR_BY_NAME,
 				NEOVIM_FN_NVIM_GET_COLOR_MAP,
+				NEOVIM_FN_NVIM_GET_MODE,
 				NEOVIM_FN_NVIM_GET_API_INFO,
 				NEOVIM_FN_NVIM_CALL_ATOMIC,
 				NEOVIM_FN_NVIM_WIN_GET_BUF,
@@ -184,7 +186,7 @@ public:
 	static bool checkFunctions(const QVariantList& ftable);
 	static FunctionId functionId(const Function& f);
 
-	NeovimApi1(NeovimConnector *);
+	NeovimApi2(NeovimConnector *);
 protected slots:
 	void handleResponse(quint32 id, quint64 fun, const QVariant&);
 	void handleResponseError(quint32 id, quint64 fun, const QVariant&);
@@ -217,6 +219,8 @@ public slots:
 	MsgpackRequest* nvim_buf_set_lines(int64_t buffer, int64_t start, int64_t end, bool strict_indexing, QList<QByteArray> replacement);
 	// Object nvim_buf_get_var(Buffer buffer, String name, ) 
 	MsgpackRequest* nvim_buf_get_var(int64_t buffer, QByteArray name);
+	// Integer nvim_buf_get_changedtick(Buffer buffer, ) 
+	MsgpackRequest* nvim_buf_get_changedtick(int64_t buffer);
 	// void nvim_buf_set_var(Buffer buffer, String name, Object value, ) 
 	MsgpackRequest* nvim_buf_set_var(int64_t buffer, QByteArray name, QVariant value);
 	// void nvim_buf_del_var(Buffer buffer, String name, ) 
@@ -231,6 +235,7 @@ public slots:
 	MsgpackRequest* nvim_buf_get_option(int64_t buffer, QByteArray name);
 	// void nvim_buf_set_option(Buffer buffer, String name, Object value, ) 
 	MsgpackRequest* nvim_buf_set_option(int64_t buffer, QByteArray name, QVariant value);
+	// DEPRECATED
 	// Integer nvim_buf_get_number(Buffer buffer, ) 
 	MsgpackRequest* nvim_buf_get_number(int64_t buffer);
 	// String nvim_buf_get_name(Buffer buffer, ) 
@@ -355,6 +360,8 @@ public slots:
 	MsgpackRequest* nvim_get_color_by_name(QByteArray name);
 	// Dictionary nvim_get_color_map() 
 	MsgpackRequest* nvim_get_color_map();
+	// Dictionary nvim_get_mode() 
+	MsgpackRequest* nvim_get_mode();
 	// Array nvim_get_api_info() 
 	MsgpackRequest* nvim_get_api_info();
 	// Array nvim_call_atomic(Array calls, ) 
@@ -621,6 +628,9 @@ signals:
 	void on_nvim_buf_get_var(QVariant);
 	void err_nvim_buf_get_var(const QString&, const QVariant&);
 
+	void on_nvim_buf_get_changedtick(int64_t);
+	void err_nvim_buf_get_changedtick(const QString&, const QVariant&);
+
 	void on_nvim_buf_set_var(void);
 	void err_nvim_buf_set_var(const QString&, const QVariant&);
 
@@ -815,6 +825,9 @@ signals:
 
 	void on_nvim_get_color_map(QVariantMap);
 	void err_nvim_get_color_map(const QString&, const QVariant&);
+
+	void on_nvim_get_mode(QVariantMap);
+	void err_nvim_get_mode(const QString&, const QVariant&);
 
 	void on_nvim_get_api_info(QVariantList);
 	void err_nvim_get_api_info(const QString&, const QVariant&);

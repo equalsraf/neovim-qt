@@ -1,5 +1,5 @@
 // Auto generated {{date}} from nvim API level:{{api_level}}
-#include "auto/{{api_level}}/neovim.h"
+#include "auto/neovimapi{{api_level}}.h"
 #include "neovimconnector.h"
 #include "msgpackrequest.h"
 #include "msgpackiodevice.h"

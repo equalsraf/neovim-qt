@@ -33,11 +33,11 @@ def get_api_info(nvim):
     info = subprocess.check_output(args)
     return decutf8(msgpack.unpackb(info))
 
-def generate_file(name, outpath, **kw):
+def generate_file(name, outfile, **kw):
     from jinja2 import Environment, FileSystemLoader
     env=Environment(loader=FileSystemLoader('bindings'), trim_blocks=True)
     template = env.get_template(name)
-    with open(os.path.join(outpath, name), 'w') as fp:
+    with open(outfile, 'w') as fp:
         fp.write(template.render(kw))
 
 ARRAY_OF = re.compile('ArrayOf\(\s*(\w+)\s*\)')
@@ -221,9 +221,7 @@ if __name__ == '__main__':
         else:
             api_level = 0
 
-        outpath = os.path.join(outpath, str(api_level))
-
-        print('Writing auto generated bindings to %s' % outpath)
+        print('Writing auto generated bindings (api{}) to {}'.format(api_level, outpath))
         if not os.path.exists(outpath):
             os.makedirs(outpath)
         for name in os.listdir(INPUT):
@@ -238,7 +236,10 @@ if __name__ == '__main__':
             exttypes = { typename:info['id'] for typename,info in api['types'].items()}
             env['exttypes'] = exttypes
             env['api_level'] = api_level
-            generate_file(name, outpath, **env)
+            fname, fext = os.path.splitext(name)
+            fname = '{}{}{}'.format(fname, api_level, fext)
+            outfile = os.path.join(outpath, fname)
+            generate_file(name, outfile, **env)
 
     else:
         print('API info for %s:' % nvim)
