@@ -38,6 +38,8 @@ signals:
 	void neovimMaximized(bool);
 	void neovimFullScreen(bool);
 	void neovimGuiCloseRequest();
+	/// This signal is emmited if the running neovim version is unsupported by the GUI
+	void neovimIsUnsupported();
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);

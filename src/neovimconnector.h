@@ -82,6 +82,9 @@ public:
 	/** Some requests for metadata and ui attachment enforce a timeout in ms */
 	void setRequestTimeout(int);
 
+	quint64 apiCompatibility();
+	quint64 apiLevel();
+
 signals:
 	/** Emitted when Neovim is ready @see ready */
 	void ready();

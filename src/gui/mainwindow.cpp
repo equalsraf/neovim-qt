@@ -47,6 +47,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimExited);
 	connect(m_nvim, &NeovimConnector::error,
 			this, &MainWindow::neovimError);
+	connect(m_shell, &Shell::neovimIsUnsupported,
+			this, &MainWindow::neovimIsUnsupported);
 	m_shell->setFocus(Qt::OtherFocusReason);
 
 	if (m_nvim->errorCause()) {
@@ -87,6 +89,15 @@ void MainWindow::neovimError(NeovimConnector::NeovimError err)
 	default:
 		m_errorWidget->setText(m_nvim->errorString());
 	}
+	m_errorWidget->showReconnect(m_nvim->canReconnect());
+	m_stack.setCurrentIndex(0);
+}
+void MainWindow::neovimIsUnsupported()
+{
+	showIfDelayed();
+	m_errorWidget->setText(QString("Cannot connect to this Neovim, required API version 1, found [%1-%2]")
+			.arg(m_nvim->apiCompatibility())
+			.arg(m_nvim->apiLevel()));
 	m_errorWidget->showReconnect(m_nvim->canReconnect());
 	m_stack.setCurrentIndex(0);
 }
