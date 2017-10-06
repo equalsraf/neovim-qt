@@ -6,8 +6,8 @@
 #include <QProcess>
 #include <QTextCodec>
 #include "function.h"
-#include "auto/1/neovim.h"
-#include "auto/2/neovim.h"
+#include "auto/neovimapi1.h"
+#include "auto/neovimapi2.h"
 
 namespace NeovimQt {
 
