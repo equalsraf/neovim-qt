@@ -38,7 +38,7 @@ quint64 MsgpackRequest::function()
 /**
  * Associate a function id with this request
  *
- * NeovimQt has auto-generated call handlers (in NeovimQt::NeovimConnector::neovimObject)
+ * NeovimQt has auto-generated call handlers (e.g. in NeovimQt::NeovimConnector::api1)
  * that will be used to process the response
  */
 void MsgpackRequest::setFunction(quint64 f)
