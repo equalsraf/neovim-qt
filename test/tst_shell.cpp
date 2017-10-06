@@ -115,7 +115,7 @@ protected:
 	void checkCommand(NeovimConnector *c, const QString& cmd,
 			bool output=false) {
 		auto req = c->neovimObject()->vim_command_output(c->encode(cmd));
-		QSignalSpy cmdOk(req, SIGNAL(finished(quint32, Function::FunctionId, QVariant)));
+		QSignalSpy cmdOk(req, SIGNAL(finished(quint32, quint64, QVariant)));
 		QVERIFY(cmdOk.isValid());
 		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, [cmd](QString msg, const QVariant& err) {
 				qDebug() << cmd << msg;

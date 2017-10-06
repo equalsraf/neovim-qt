@@ -118,7 +118,7 @@ private slots:
 
 		// Just to finish
 		auto req = one->startRequestUnchecked("testRequest", 0);
-		QSignalSpy gotResp(req, SIGNAL(error(quint32, Function::FunctionId, QVariant)));
+		QSignalSpy gotResp(req, SIGNAL(error(quint32, quint64, QVariant)));
 		QVERIFY(gotResp.isValid());
 		QVERIFY2(SPYWAIT(gotResp), "By default all requests get an error");
 	}
@@ -145,7 +145,7 @@ private slots:
 	void request() {
 		auto req = one->startRequestUnchecked("testRequest", 0);
 		
-		QSignalSpy gotResp(req, SIGNAL(error(quint32, Function::FunctionId, QVariant)));
+		QSignalSpy gotResp(req, SIGNAL(error(quint32, quint64, QVariant)));
 		QVERIFY(gotResp.isValid());
 
 		QVERIFY2(SPYWAIT(gotResp), "By default all requests get an error");
@@ -168,7 +168,7 @@ private slots:
 		QCOMPARE(signal.at(1).toByteArray(), QByteArray("testRequest2"));
 		QCOMPARE(signal.at(2).toList().at(0).toByteArray(), QByteArray("hello"));
 
-		QSignalSpy gotResp2(req2, SIGNAL(finished(quint32, Function::FunctionId, QVariant)));
+		QSignalSpy gotResp2(req2, SIGNAL(finished(quint32, quint64, QVariant)));
 		QVERIFY(gotResp2.isValid());
 		QVERIFY2(SPYWAIT(gotResp2), "RequestHandler sends back a response");
 	}
