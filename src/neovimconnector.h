@@ -5,6 +5,7 @@
 #include <QAbstractSocket>
 #include <QProcess>
 #include <QTextCodec>
+#include "auto/neovimapi0.h"
 #include "auto/neovimapi1.h"
 #include "auto/neovimapi2.h"
 
@@ -14,6 +15,7 @@ class MsgpackIODevice;
 class NeovimConnectorHelper;
 class NeovimConnector: public QObject
 {
+	friend class NeovimApi0;
 	friend class NeovimApi1;
 	friend class NeovimApi2;
 	friend class NeovimConnectorHelper;
@@ -71,6 +73,7 @@ public:
 	void detachUi();
 
 	bool isReady();
+	NeovimApi0 * api0();
 	NeovimApi1 * neovimObject();
 	NeovimApi1 * api1();
 	NeovimApi2 * api2();
@@ -109,6 +112,7 @@ private:
 	QString m_errorString;
 	NeovimError m_error;
 
+	NeovimApi0 *m_api0;
 	NeovimApi1 *m_api1;
 	NeovimApi2 *m_api2;
 	quint64 m_channel;
