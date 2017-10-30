@@ -124,7 +124,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force)
 Shell::~Shell()
 {
 	if (m_nvim && m_attached) {
-		m_nvim->detachUi();
+		m_nvim->api0()->ui_detach();
 	}
 }
 
@@ -191,9 +191,23 @@ void Shell::init()
 			this, &Shell::neovimResizeFinished);
 
 	QRect screenRect = QApplication::desktop()->availableGeometry(this);
-	// FIXME: this API will change
-	MsgpackRequest *req = m_nvim->attachUi(screenRect.width()*0.66/cellSize().width(),
-			screenRect.height()*0.66/cellSize().height());
+	int64_t width = screenRect.width()*0.66/cellSize().width();
+	int64_t height = screenRect.height()*0.66/cellSize().height();
+	QVariantMap options;
+	options.insert("ext_tabline", true);
+	options.insert("rgb", true);
+
+	MsgpackRequest *req;
+	if (m_nvim->api1()) {
+		req = m_nvim->api1()->nvim_ui_attach(width, height, options);
+	} else {
+		req = m_nvim->api0()->ui_attach(width, height, true);
+	}
+	connect(req, &MsgpackRequest::timeout,
+			m_nvim, &NeovimConnector::fatalTimeout);
+	// FIXME grab timeout from connector
+	req->setTimeout(10000);
+
 	connect(req, &MsgpackRequest::finished,
 			this, &Shell::setAttached);
 
@@ -422,6 +436,26 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "busy_stop"){
 		handleBusy(false);
 	} else if (name == "set_icon") {
+	} else if (name == "tabline_update") {
+		if (opargs.size() < 2 || !opargs.at(0).canConvert<int64_t>()) {
+			qWarning() << "Unexpected argument for tabline_update:" << opargs;
+			return;
+		}
+		int64_t curtab = opargs.at(0).toInt();
+		QList<Tab> tabs;
+		foreach(const QVariant& tabv, opargs.at(1).toList()) {
+			QVariantMap tab = tabv.toMap();
+
+			if (!tab.contains("tab") || !tab.contains("name")) {
+				qWarning() << "Unexpected tab value in tabline_update:" << tab;
+			}
+
+			int64_t num = tab.value("tab").toInt();
+			QString name = tab.value("name").toString();
+			tabs.append(Tab(num, name));
+		}
+
+		emit neovimTablineUpdate(curtab, tabs);
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}

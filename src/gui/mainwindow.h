@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
+#include <QTabBar>
 #include "neovimconnector.h"
 #include "errorwidget.h"
 #include "shell.h"
@@ -42,6 +43,8 @@ private slots:
 	void showIfDelayed();
 	void neovimAttachmentChanged(bool);
 	void neovimIsUnsupported();
+	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
+	void changeTab(int index);
 private:
 	void init(NeovimConnector *);
         NeovimConnector *m_nvim;
@@ -49,6 +52,8 @@ private:
 	Shell *m_shell;
 	DelayedShow m_delayedShow;
 	QStackedWidget m_stack;
+	QTabBar *m_tabline;
+	QToolBar *m_tabline_bar;
 };
 
 } // Namespace

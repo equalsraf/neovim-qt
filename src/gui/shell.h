@@ -14,6 +14,17 @@
 
 namespace NeovimQt {
 
+class Tab {
+public:
+	Tab(int64_t id, QString name) {
+		this->tab = id;
+		this->name = name;
+	}
+	/// The tab handle, a unique tab identifier
+	int64_t tab;
+	QString name;
+};
+
 class Shell: public ShellWidget
 {
 	Q_OBJECT
@@ -40,6 +51,9 @@ signals:
 	void neovimGuiCloseRequest();
 	/// This signal is emmited if the running neovim version is unsupported by the GUI
 	void neovimIsUnsupported();
+	/// The tabline needs updating. curtab is the handle of the current tab (not its index)
+	/// as seen in Tab::tab.
+	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
@@ -55,7 +69,7 @@ protected slots:
 	void neovimResizeFinished();
 	void mouseClickReset();
 	void mouseClickIncrement(Qt::MouseButton bt);
-        void init();
+	void init();
 	void fontError(const QString& msg);
 	void updateWindowId();
 

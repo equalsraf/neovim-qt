@@ -1,12 +1,14 @@
 #include "mainwindow.h"
 
 #include <QCloseEvent>
+#include <QToolBar>
+#include <QLayout>
 
 namespace NeovimQt {
 
 MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
 :QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
-	m_delayedShow(DelayedShow::Disabled)
+	m_delayedShow(DelayedShow::Disabled), m_tabline(0), m_tabline_bar(0)
 {
 	m_errorWidget = new ErrorWidget();
 	m_stack.addWidget(m_errorWidget);
@@ -26,6 +28,24 @@ void MainWindow::init(NeovimConnector *c)
 	if (m_nvim) {
 		m_nvim->deleteLater();
 	}
+
+	m_tabline_bar = addToolBar("tabline");
+	m_tabline_bar->setObjectName("tabline");
+	m_tabline_bar->setAllowedAreas(Qt::TopToolBarArea);
+	m_tabline_bar->setMovable(false);
+	m_tabline_bar->setFloatable(false);
+	// Avoid margins around the tabbar
+	m_tabline_bar->layout()->setContentsMargins(0, 0, 0, 0);
+
+	m_tabline = new QTabBar(m_tabline_bar);
+	m_tabline->setDrawBase(false);
+	m_tabline->setExpanding(false);
+	m_tabline->setDocumentMode(true);
+	m_tabline->setFocusPolicy(Qt::NoFocus);
+	connect(m_tabline, &QTabBar::currentChanged,
+			this, &MainWindow::changeTab);
+
+	m_tabline_bar->addWidget(m_tabline);
 
 	m_nvim = c;
 	m_shell = new Shell(c);
@@ -49,6 +69,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimError);
 	connect(m_shell, &Shell::neovimIsUnsupported,
 			this, &MainWindow::neovimIsUnsupported);
+	connect(m_shell, &Shell::neovimTablineUpdate,
+			this, &MainWindow::neovimTablineUpdate);
 	m_shell->setFocus(Qt::OtherFocusReason);
 
 	if (m_nvim->errorCause()) {
@@ -211,5 +233,41 @@ Shell* MainWindow::shell()
 	return m_shell;
 }
 
+void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
+{
+	// remove extra tabs
+	for (int index=tabs.size(); index<m_tabline->count(); index++) {
+		m_tabline->removeTab(index);
+	}
+
+	for (int index=0; index<tabs.size(); index++) {
+		if (m_tabline->count() <= index) {
+			m_tabline->addTab(tabs[index].name);
+		} else {
+			m_tabline->setTabText(index, tabs[index].name);
+		}
+
+		m_tabline->setTabData(index, QVariant::fromValue(tabs[index].tab));
+
+		if (curtab == tabs[index].tab) {
+			m_tabline->setCurrentIndex(index);
+		}
+	}
+
+	// hide/show the tabbar toolbar
+	m_tabline_bar->setVisible(tabs.size() > 1);
+
+	Q_ASSERT(tabs.size() == m_tabline->count());
+}
+
+void MainWindow::changeTab(int index)
+{
+	if (m_nvim->api1() == NULL) {
+		return;
+	}
+
+	int64_t tab = m_tabline->tabData(index).toInt();
+	m_nvim->api1()->nvim_set_current_tabpage(tab);
+}
 } // Namespace
 
