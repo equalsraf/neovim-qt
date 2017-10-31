@@ -1,4 +1,4 @@
-// Auto generated 2017-10-06 11:35:39.210007 from nvim API level:2
+// Auto generated 2017-10-31 14:35:34.305529 from nvim API level:2
 #include "auto/neovimapi2.h"
 #include "neovimconnector.h"
 #include "msgpackrequest.h"
@@ -14,12 +14,25 @@ QVariant unpackBufferApi2(MsgpackIODevice *dev, const char* in, quint32 size)
 	msgpack_unpacked result;
 	msgpack_unpacked_init(&result);
 	msgpack_unpack_return ret = msgpack_unpack_next(&result, in, size, NULL);
-	msgpack_unpacked_destroy(&result);
 
-	if (ret != MSGPACK_UNPACK_SUCCESS) {
-		return QVariant();
+	QVariant variant;
+
+	if (ret == MSGPACK_UNPACK_SUCCESS) {
+		switch (result.data.type) {
+			case MSGPACK_OBJECT_NEGATIVE_INTEGER:
+				variant = (qint64)result.data.via.i64;
+				break;
+			case MSGPACK_OBJECT_POSITIVE_INTEGER:
+				variant = (quint64)result.data.via.u64;
+				break;
+			default:
+				// TODO it would be nice if we could call back MsgpackIoDevice method or primitive types here
+				qWarning() << "Unsupported type found for EXT type" << result.data.type << result.data;
+		}
 	}
-	return QVariant((quint64)result.data.via.u64);
+
+	msgpack_unpacked_destroy(&result);
+	return variant;
 }
 #define unpackWindowApi2 unpackBufferApi2
 #define unpackTabpageApi2 unpackBufferApi2
