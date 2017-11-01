@@ -120,6 +120,9 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 	parser.addOption(QCommandLineOption("geometry",
 				QCoreApplication::translate("main", "Initial window geometry"),
 				QCoreApplication::translate("main", "geometry")));
+	parser.addOption(QCommandLineOption("stylesheet",
+				QCoreApplication::translate("main", "Apply qss stylesheet from file"),
+				QCoreApplication::translate("main", "stylesheet")));
 	parser.addOption(QCommandLineOption("maximized",
 				QCoreApplication::translate("main", "Maximize the window on startup")));
 	parser.addOption(QCommandLineOption("fullscreen",
