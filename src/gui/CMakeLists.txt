@@ -22,6 +22,8 @@ add_subdirectory(shellwidget)
 include(GNUInstallDirs)
 set(RUNTIME_PATH )
 add_library(neovim-qt-gui shell.cpp input.cpp errorwidget.cpp mainwindow.cpp app.cpp
+	popupmenumodel.cpp
+	popupmenu.cpp
 	${CMAKE_SOURCE_DIR}/third-party/konsole_wcwidth.cpp
 	${NEOVIM_RCC_SOURCES})
 target_link_libraries(neovim-qt-gui qshellwidget neovim-qt)
