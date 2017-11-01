@@ -61,6 +61,16 @@ App::App(int &argc, char ** argv)
 	if (!qgetenv("NVIM_QT_LOG").isEmpty()) {
 		qInstallMessageHandler(logger);
 	}
+
+	QByteArray stylesheet_path = qgetenv("NVIM_QT_STYLESHEET");
+	if (!stylesheet_path.isEmpty()) {
+		QFile qssfile(stylesheet_path);
+		if (qssfile.open(QIODevice::ReadOnly)) {
+			setStyleSheet(qssfile.readAll());
+		} else {
+			qWarning("Unable to open stylesheet from $NVIM_QT_STYLESHEET");
+		}
+	}
 }
 
 bool App::event(QEvent *event)
