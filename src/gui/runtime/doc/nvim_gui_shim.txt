@@ -48,6 +48,9 @@ GuiLinespace	When called with no arguments this command displays the
 								*GuiTabline*
 GuiTabline	Enable or disable the external GUI tabline
 
+								*GuiPopupmenu*
+GuiPopupmenu	Enable or disable the external GUI popup menu
+
 
 ==============================================================================
 2. GUI variables

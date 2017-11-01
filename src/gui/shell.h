@@ -9,8 +9,11 @@
 #include <QTimer>
 #include <QUrl>
 #include <QList>
+#include <QMenu>
 #include "neovimconnector.h"
 #include "shellwidget/shellwidget.h"
+#include "popupmenu.h"
+#include "popupmenumodel.h"
 
 namespace NeovimQt {
 
@@ -29,10 +32,12 @@ class ShellOptions {
 public:
 	ShellOptions() {
 		enable_ext_tabline = true;
+		enable_ext_popupmenu = true;
 		nvim_show_tabline = 1;
 	}
 	bool enable_ext_tabline;
 	int nvim_show_tabline;
+	bool enable_ext_popupmenu;
 };
 
 class Shell: public ShellWidget
@@ -63,6 +68,7 @@ signals:
 	/// This signal is emmited if the running neovim version is unsupported by the GUI
 	void neovimIsUnsupported();
 	void neovimExtTablineSet(bool);
+	void neovimExtPopupmenuSet(bool);
 	/// The tabline needs updating. curtab is the handle of the current tab (not its index)
 	/// as seen in Tab::tab.
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
@@ -119,6 +125,9 @@ protected:
 	virtual void handleBusy(bool);
 	virtual void handleSetOption(const QString& name, const QVariant& value);
 	void handleExtGuiOption(const QString& name, const QVariant& value);
+	virtual void handlePopupMenuShow(const QVariantList& items, int64_t selected,
+			int64_t row, int64_t col);
+	void handlePopupMenuSelect(int64_t selected);
 
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
@@ -162,6 +171,7 @@ private:
 	// Properties
 	bool m_neovimBusy;
 	ShellOptions m_options;
+	PopupMenu m_pum;
 };
 
 } // Namespace
