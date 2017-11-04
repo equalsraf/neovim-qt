@@ -230,6 +230,9 @@ void Shell::init()
 	if (m_options.enable_ext_popupmenu) {
 		options.insert("ext_popupmenu", true);
 	}
+	if (m_options.enable_ext_cmdline) {
+		options.insert("ext_cmdline", true);
+	}
 	options.insert("rgb", true);
 
 	MsgpackRequest *req;
@@ -527,6 +530,98 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		// TODO
 	} else if (name == "default_colors_set") {
 		// TODO
+	} else if (name == "cmdline_show") {
+		if (opargs.size() < 6) {
+			qWarning() << "Unexpected argument for cmdline_show:" << opargs;
+			return;
+		}
+
+		QVariantList content = opargs.at(0).toList();
+
+		if (!opargs.at(1).canConvert<int64_t>()) {
+			qWarning() << "Invalid type for cmdline_show pos:" << opargs.at(1);
+			return;
+		}
+		int64_t pos = opargs.at(1).toInt();
+
+		if (!opargs.at(2).canConvert<QString>()) {
+			qWarning() << "Invalid type for cmdline_show firstc:" << opargs.at(2);
+			return;
+		}
+		QString firstc = opargs.at(2).toString();
+
+		if (!opargs.at(3).canConvert<QString>()) {
+			qWarning() << "Invalid type for cmdline_show prompt:" << opargs.at(3);
+			return;
+		}
+		QString prompt = opargs.at(3).toString();
+
+		if (!opargs.at(4).canConvert<int64_t>()) {
+			qWarning() << "Invalid type for cmdline_show indent:" << opargs.at(4);
+			return;
+		}
+		int64_t indent = opargs.at(4).toInt();
+
+		if (!opargs.at(5).canConvert<int64_t>()) {
+			qWarning() << "Invalid type for cmdline_show level:" << opargs.at(5);
+			return;
+		}
+		int64_t level = opargs.at(5).toInt();
+
+		handleCmdlineShow(content, pos, firstc, prompt, indent, level);
+	} else if (name == "cmdline_pos") {
+		if (opargs.size() < 2 || !opargs.at(0).canConvert<int64_t>()
+				|| !opargs.at(1).canConvert<int64_t>()) {
+			qWarning() << "Unexpected argument for cmdline_pos:" << opargs;
+			return;
+		}
+		int64_t pos = opargs.at(0).toInt();
+		int64_t level = opargs.at(1).toInt();
+		qDebug() << name << pos << level;
+	} else if (name == "cmdline_special_char") {
+		if (opargs.size() < 3) {
+			qWarning() << "Unexpected argument for cmdline_special_char:" << opargs;
+			return;
+		}
+
+		if (!opargs.at(0).canConvert<QString>()) {
+			qWarning() << "Invalid type for cmdline_special_char c:" << opargs.at(0);
+			return;
+		}
+		QString c = opargs.at(0).toString();
+
+		if (!opargs.at(1).canConvert<bool>()) {
+			qWarning() << "Invalid type for cmdline_special_char shift:" << opargs.at(1);
+			return;
+		}
+		bool shift = opargs.at(1).toBool();
+
+		if (!opargs.at(2).canConvert<int64_t>()) {
+			qWarning() << "Invalid type for cmdline_special_char level:" << opargs.at(2);
+			return;
+		}
+		int64_t level = opargs.at(2).toInt();
+		qDebug() << name << c << shift << level;
+	} else if (name == "cmdline_hide") {
+		qDebug() << name;
+		//handleCmdlineHide();
+	} else if (name == "cmdline_block_show") {
+		if (opargs.size() < 1) {
+			qWarning() << "Unexpected argument for cmdline_block_show:" << opargs;
+			return;
+		}
+		// - lines
+		qDebug() << "cmdline_block_show" << opargs;
+	} else if (name == "cmdline_block_append") {
+		if (opargs.size() < 1) {
+			qWarning() << "Unexpected argument for cmdline_block_append:" << opargs;
+			return;
+		}
+		qDebug() << "cmdline_block_append" << opargs;
+		// - line
+	} else if (name == "cmdline_block_hide") {
+		qDebug() << name;
+		//handleCmdlineBlockHide();
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
@@ -1436,6 +1531,15 @@ void Shell::handleGinitError(quint32 msgid, quint64 fun, const QVariant& err)
 void Shell::handleShimError(quint32 msgid, quint64 fun, const QVariant& err)
 {
 	qDebug() << "GUI shim error " << err;
+}
+
+void Shell::handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
+			QString prompt, int64_t indent, int64_t level)
+{
+	foreach(QVariant piece, content) {
+		qDebug() << piece.toList();
+	}
+	qDebug() << prompt << firstc;
 }
 
 } // Namespace

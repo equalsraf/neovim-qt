@@ -33,11 +33,13 @@ public:
 	ShellOptions() {
 		enable_ext_tabline = true;
 		enable_ext_popupmenu = true;
+		enable_ext_cmdline = true;
 		nvim_show_tabline = 1;
 	}
 	bool enable_ext_tabline;
 	int nvim_show_tabline;
 	bool enable_ext_popupmenu;
+	bool enable_ext_cmdline;
 };
 
 class Shell: public ShellWidget
@@ -133,6 +135,8 @@ protected:
 			int64_t row, int64_t col);
 	void handlePopupMenuSelect(int64_t selected);
 	virtual void handleMouse(bool);
+	virtual void handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
+			QString prompt, int64_t indent, int64_t level);
 
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
