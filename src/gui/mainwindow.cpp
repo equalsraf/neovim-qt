@@ -262,12 +262,12 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 
 void MainWindow::changeTab(int index)
 {
-	if (m_nvim->api1() == NULL) {
+	if (m_nvim->api2() == NULL) {
 		return;
 	}
 
 	int64_t tab = m_tabline->tabData(index).toInt();
-	m_nvim->api1()->nvim_set_current_tabpage(tab);
+	m_nvim->api2()->nvim_set_current_tabpage(tab);
 }
 } // Namespace
 
