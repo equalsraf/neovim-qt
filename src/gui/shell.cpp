@@ -198,8 +198,8 @@ void Shell::init()
 	options.insert("rgb", true);
 
 	MsgpackRequest *req;
-	if (m_nvim->api1()) {
-		req = m_nvim->api1()->nvim_ui_attach(width, height, options);
+	if (m_nvim->api2()) {
+		req = m_nvim->api2()->nvim_ui_attach(width, height, options);
 	} else {
 		req = m_nvim->api0()->ui_attach(width, height, true);
 	}
