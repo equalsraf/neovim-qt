@@ -131,11 +131,11 @@ void MainWindow::neovimSetTitle(const QString &title)
 
 void MainWindow::neovimWidgetResized()
 {
-	if (isMaximized() || isFullScreen()) {
-		m_shell->resizeNeovim(geometry().size());
-	} else {
-		m_shell->resizeNeovim(m_shell->size());
-	}
+	// Neovim finished resizing, resize it back to the actual
+	// widget size - this avoids situations when neovim wants a size that
+	// exceeds the available widget size i.e. the GUI tells neovim its
+	// size, not the other way around.
+	m_shell->resizeNeovim(m_shell->size());
 }
 
 void MainWindow::neovimMaximized(bool set)
@@ -254,7 +254,7 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 		}
 	}
 
-	// hide/show the tabbar toolbar
+	// hide/show the tabline toolbar
 	m_tabline_bar->setVisible(tabs.size() > 1);
 
 	Q_ASSERT(tabs.size() == m_tabline->count());
