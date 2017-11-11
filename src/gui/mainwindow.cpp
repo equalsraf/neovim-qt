@@ -240,11 +240,17 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 		m_tabline->removeTab(index);
 	}
 
+
 	for (int index=0; index<tabs.size(); index++) {
+		// Escape & in tab name otherwise it will be interpreted as
+		// a keyboard shortcut (#357) - escaping is done using &&
+		QString text = tabs[index].name;
+		text.replace("&", "&&");
+
 		if (m_tabline->count() <= index) {
-			m_tabline->addTab(tabs[index].name);
+			m_tabline->addTab(text);
 		} else {
-			m_tabline->setTabText(index, tabs[index].name);
+			m_tabline->setTabText(index, text);
 		}
 
 		m_tabline->setTabData(index, QVariant::fromValue(tabs[index].tab));
