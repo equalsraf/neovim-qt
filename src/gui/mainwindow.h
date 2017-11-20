@@ -30,6 +30,7 @@ signals:
 	void neovimAttached(bool);
 protected:
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
+        virtual void moveEvent( QMoveEvent *ev) Q_DECL_OVERRIDE;
 	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;
 private slots:
 	void neovimSetTitle(const QString &title);

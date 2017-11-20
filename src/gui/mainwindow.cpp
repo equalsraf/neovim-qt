@@ -1,15 +1,15 @@
 #include "mainwindow.h"
-
 #include <QCloseEvent>
 #include <QToolBar>
 #include <QLayout>
+#include <QPainter>
 
 namespace NeovimQt {
-
 MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
 :QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
 	m_delayedShow(DelayedShow::Disabled), m_tabline(0), m_tabline_bar(0)
 {
+        
 	m_errorWidget = new ErrorWidget();
 	m_stack.addWidget(m_errorWidget);
 	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
@@ -184,6 +184,12 @@ void MainWindow::changeEvent( QEvent *ev)
 		m_shell->updateGuiWindowState(windowState());
 	}
 	QWidget::changeEvent(ev);
+}
+void MainWindow::moveEvent( QMoveEvent *ev)
+{
+        m_shell->updateGuiWindowState(windowState());
+        m_shell->update();
+	QWidget::moveEvent(ev);
 }
 
 /// Call show() after a 1s delay or when Neovim attachment
