@@ -28,7 +28,7 @@ private slots:
 			QVERIFY(onReady.isValid());
 			QVERIFY(SPYWAIT(onReady));
 
-			Shell *s = new Shell(c);
+			Shell *s = new Shell(c, ShellOptions());
 			QSignalSpy onResize(s, SIGNAL(neovimResized(int, int)));
 			QVERIFY(onResize.isValid());
 			QVERIFY(SPYWAIT(onResize));
@@ -39,7 +39,7 @@ private slots:
 		QStringList args;
 		args << "-u" << "NONE";
 		NeovimConnector *c = NeovimConnector::spawn(args);
-		Shell *s = new Shell(c);
+		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
@@ -55,7 +55,7 @@ private slots:
 	void startVarsShellWidget() {
 		QStringList args = {"-u", "NONE"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
-		Shell *s = new Shell(c);
+		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
@@ -66,7 +66,7 @@ private slots:
 	void startVarsMainWindow() {
 		QStringList args = {"-u", "NONE"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
-		MainWindow *s = new MainWindow(c);
+		MainWindow *s = new MainWindow(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
@@ -82,7 +82,7 @@ private slots:
 		QStringList args = {"-u", "NONE",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
-		MainWindow *s = new MainWindow(c);
+		MainWindow *s = new MainWindow(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));

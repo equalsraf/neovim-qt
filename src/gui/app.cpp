@@ -86,6 +86,11 @@ bool App::event(QEvent *event)
 
 void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
 {
+	auto opts = ShellOptions();
+	if (parser.isSet("no-ext-tabline")) {
+		opts.enable_ext_tabline = false;
+	}
+
 #ifdef NEOVIMQT_GUI_WIDGET
 	NeovimQt::Shell *win = new NeovimQt::Shell(c);
 	win->show();
@@ -97,7 +102,7 @@ void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
 		win->show();
 	}
 #else
-	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c);
+	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c, opts);
 
 	QObject::connect(instance(), SIGNAL(openFilesTriggered(const QList<QUrl>)),
 		win->shell(), SLOT(openFiles(const QList<QUrl>)));
@@ -135,6 +140,8 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 				QCoreApplication::translate("main", "stylesheet")));
 	parser.addOption(QCommandLineOption("maximized",
 				QCoreApplication::translate("main", "Maximize the window on startup")));
+	parser.addOption(QCommandLineOption("no-ext-tabline",
+				QCoreApplication::translate("main", "Disable the external GUI tabline")));
 	parser.addOption(QCommandLineOption("fullscreen",
 				QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
 	parser.addOption(QCommandLineOption("embed",

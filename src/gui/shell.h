@@ -25,13 +25,21 @@ public:
 	QString name;
 };
 
+class ShellOptions {
+public:
+	ShellOptions() {
+		enable_ext_tabline = true;
+	}
+	bool enable_ext_tabline;
+};
+
 class Shell: public ShellWidget
 {
 	Q_OBJECT
 	Q_PROPERTY(bool neovimBusy READ neovimBusy() NOTIFY neovimBusy())
 	Q_PROPERTY(bool neovimAttached READ neovimAttached() NOTIFY neovimAttached())
 public:
-	Shell(NeovimConnector *nvim, QWidget *parent=0);
+	Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent=0);
 	~Shell();
 	QSize sizeIncrement() const;
 	static QColor color(qint64 color, const QColor& fallback=QColor());
@@ -146,6 +154,7 @@ private:
 
 	// Properties
 	bool m_neovimBusy;
+	ShellOptions m_options;
 };
 
 } // Namespace

@@ -14,7 +14,7 @@
 
 namespace NeovimQt {
 
-Shell::Shell(NeovimConnector *nvim, QWidget *parent)
+Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 :ShellWidget(parent), m_attached(false), m_nvim(nvim),
 	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false),
 	m_mouseHide(true),
@@ -22,7 +22,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
 	m_resizing(false),
 	m_mouse_wheel_delta_fraction(0, 0),
-	m_neovimBusy(false)
+	m_neovimBusy(false),
+	m_options(opts)
 {
 	setAttribute(Qt::WA_KeyCompression, false);
 
@@ -194,7 +195,9 @@ void Shell::init()
 	int64_t width = screenRect.width()*0.66/cellSize().width();
 	int64_t height = screenRect.height()*0.66/cellSize().height();
 	QVariantMap options;
-	options.insert("ext_tabline", true);
+	if (m_options.enable_ext_tabline) {
+		options.insert("ext_tabline", true);
+	}
 	options.insert("rgb", true);
 
 	MsgpackRequest *req;

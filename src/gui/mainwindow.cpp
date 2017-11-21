@@ -6,9 +6,10 @@
 
 namespace NeovimQt {
 
-MainWindow::MainWindow(NeovimConnector *c, QWidget *parent)
+MainWindow::MainWindow(NeovimConnector *c, ShellOptions opts, QWidget *parent)
 :QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
-	m_delayedShow(DelayedShow::Disabled), m_tabline(0), m_tabline_bar(0)
+	m_delayedShow(DelayedShow::Disabled), m_tabline(0), m_tabline_bar(0),
+	m_shell_options(opts)
 {
 	m_errorWidget = new ErrorWidget();
 	m_stack.addWidget(m_errorWidget);
@@ -29,26 +30,28 @@ void MainWindow::init(NeovimConnector *c)
 		m_nvim->deleteLater();
 	}
 
-	m_tabline_bar = addToolBar("tabline");
-	m_tabline_bar->setObjectName("tabline");
-	m_tabline_bar->setAllowedAreas(Qt::TopToolBarArea);
-	m_tabline_bar->setMovable(false);
-	m_tabline_bar->setFloatable(false);
-	// Avoid margins around the tabbar
-	m_tabline_bar->layout()->setContentsMargins(0, 0, 0, 0);
+	if (m_shell_options.enable_ext_tabline) {
+		m_tabline_bar = addToolBar("tabline");
+		m_tabline_bar->setObjectName("tabline");
+		m_tabline_bar->setAllowedAreas(Qt::TopToolBarArea);
+		m_tabline_bar->setMovable(false);
+		m_tabline_bar->setFloatable(false);
+		// Avoid margins around the tabbar
+		m_tabline_bar->layout()->setContentsMargins(0, 0, 0, 0);
 
-	m_tabline = new QTabBar(m_tabline_bar);
-	m_tabline->setDrawBase(false);
-	m_tabline->setExpanding(false);
-	m_tabline->setDocumentMode(true);
-	m_tabline->setFocusPolicy(Qt::NoFocus);
-	connect(m_tabline, &QTabBar::currentChanged,
-			this, &MainWindow::changeTab);
+		m_tabline = new QTabBar(m_tabline_bar);
+		m_tabline->setDrawBase(false);
+		m_tabline->setExpanding(false);
+		m_tabline->setDocumentMode(true);
+		m_tabline->setFocusPolicy(Qt::NoFocus);
+		connect(m_tabline, &QTabBar::currentChanged,
+				this, &MainWindow::changeTab);
 
-	m_tabline_bar->addWidget(m_tabline);
+		m_tabline_bar->addWidget(m_tabline);
+	}
 
 	m_nvim = c;
-	m_shell = new Shell(c);
+	m_shell = new Shell(c, m_shell_options);
 	m_stack.insertWidget(1, m_shell);
 	m_stack.setCurrentIndex(1);
 	connect(m_shell, SIGNAL(neovimAttached(bool)),
@@ -235,6 +238,10 @@ Shell* MainWindow::shell()
 
 void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 {
+	if (!m_shell_options.enable_ext_tabline) {
+		return;
+	}
+
 	// remove extra tabs
 	for (int index=tabs.size(); index<m_tabline->count(); index++) {
 		m_tabline->removeTab(index);
@@ -268,6 +275,10 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 
 void MainWindow::changeTab(int index)
 {
+	if (!m_shell_options.enable_ext_tabline) {
+		return;
+	}
+
 	if (m_nvim->api2() == NULL) {
 		return;
 	}
