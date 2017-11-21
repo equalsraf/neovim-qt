@@ -21,7 +21,7 @@ public:
 		FullScreen,
 	};
 
-	MainWindow(NeovimConnector *, QWidget *parent=0);
+	MainWindow(NeovimConnector *, ShellOptions opts, QWidget *parent=0);
 	bool neovimAttached() const;
 	Shell* shell();
 public slots:
@@ -54,6 +54,7 @@ private:
 	QStackedWidget m_stack;
 	QTabBar *m_tabline;
 	QToolBar *m_tabline_bar;
+	ShellOptions m_shell_options;
 };
 
 } // Namespace
