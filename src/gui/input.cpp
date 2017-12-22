@@ -1,4 +1,3 @@
-
 #include "input.h"
 #include <QDebug>
 
@@ -224,6 +223,9 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 			QList<Qt::Key> keys = { Key_Control, Key_Alt, Key_Cmd };
 			if (keys.contains((Qt::Key)k)) {
 				return QString();
+			} else if (k == Qt::Key_Shift && mod&ControlModifier) {
+				// Ignore Ctrl+Shift combo
+				return QString();
 			} else {
 				// key code will be the value of the char (hopefully)
 				c = QChar(k);
@@ -238,7 +240,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 	}
 
 	// Remove SHIFT
-    if (c.unicode() >= 0x80 || (!c.isLetterOrNumber() && c.isPrint())) {
+    if (c.unicode() >= 0x80 || c.isPrint()) {
 		mod &= ~ShiftModifier;
 	}
 
