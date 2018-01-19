@@ -6,6 +6,11 @@
 #include "neovimconnector.h"
 #include "app.h"
 
+#if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
+#include <QtPlugin>
+Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
+#endif
+
 int ui_main(int argc, char **argv)
 {
 	NeovimQt::App app(argc, argv);
