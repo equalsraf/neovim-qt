@@ -7,6 +7,8 @@ environment:
     RELEASE_ARTIFACT: true
   - SCRIPT: contrib\appveyor-msvc.bat
   - SCRIPT: contrib\appveyor-mingw-qt53.bat
+  - SCRIPT: contrib\appveyor-msys2-qt5-static.bat 32
+  - SCRIPT: contrib\appveyor-msys2-qt5-static.bat 64
 configuration:
 - RelWithDebInfo
 matrix:
