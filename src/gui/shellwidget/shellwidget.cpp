@@ -73,7 +73,7 @@ void ShellWidget::setFont(const QFont& f)
 	QWidget::setFont(f);
 }
 
-void ShellWidget::setLineSpace(unsigned int height)
+void ShellWidget::setLineSpace(int height)
 {
 	if (height != m_lineSpace) {
 		m_lineSpace = height;
