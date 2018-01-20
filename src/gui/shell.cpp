@@ -542,7 +542,7 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		} else if (guiEvName == "Linespace" && args.size() == 2) {
 			// The conversion to string and then to int happens because of http://doc.qt.io/qt-5/qvariant.html#toUInt
 			// toUint() fails to detect an overflow i.e. it converts to ulonglong and then returns a MAX UINT
-			auto val = args.at(1).toString().toUInt();
+			auto val = args.at(1).toString().toInt();
 			setLineSpace(val);
 			m_nvim->api0()->vim_set_var("GuiLinespace", val);
 			resizeNeovim(size());
