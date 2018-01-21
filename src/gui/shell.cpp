@@ -459,6 +459,10 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		}
 
 		emit neovimTablineUpdate(curtab, tabs);
+	} else if (name == "option_set") {
+		if (2 <= opargs.size()) {
+			handleSetOption(opargs.at(0).toString(), opargs.at(1));
+		}
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
@@ -579,6 +583,21 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			const QVariantList& opargs = opargs_var.toList();
 			handleRedraw(name, opargs);
 		}
+	}
+}
+
+void Shell::handleSetOption(const QString& name, const QVariant& value)
+{
+	if (name == "guifont") {
+		setGuiFont(value.toString());
+	} else if (name == "guifontset") {
+	} else if (name == "guifontwide") {
+	} else if (name == "linespace") {
+		// The conversion to string and then to int happens because of http://doc.qt.io/qt-5/qvariant.html#toUInt
+		// toUint() fails to detect an overflow i.e. it converts to ulonglong and then returns a MAX UINT
+		setLineSpace(value.toString().toInt());
+	} else {
+		qDebug() << "Received unknown option" << name << value;
 	}
 }
 
