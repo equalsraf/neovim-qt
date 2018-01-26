@@ -147,8 +147,8 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 
 					if (cell.bold || cell.italic) {
 						QFont f = p.font();
-						f.setBold(cell.bold);
-						f.setItalic(cell.italic);
+						if (cell.bold) f.setBold(cell.bold);
+						if (cell.italic) f.setItalic(cell.italic);
 						p.setFont(f);
 					} else {
 						p.setFont(font());
