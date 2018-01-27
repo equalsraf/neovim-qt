@@ -1,5 +1,9 @@
 include_directories(..)
 
+if (WIN32 AND USE_STATIC_QT)
+	add_definitions(-DUSE_STATIC_QT)
+endif ()
+
 function(add_xtest SOURCE_NAME)
 	add_executable(${SOURCE_NAME} ${SOURCE_NAME}.cpp)
 	target_link_libraries(${SOURCE_NAME} Qt5::Widgets Qt5::Test qshellwidget)
