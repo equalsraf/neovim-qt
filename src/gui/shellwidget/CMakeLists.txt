@@ -8,6 +8,10 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Test REQUIRED)
 
+if (WIN32 AND USE_STATIC_QT)
+	add_definitions(-DUSE_STATIC_QT)
+endif ()
+
 set(SOURCES shellcontents.cpp helpers.cpp shellwidget.cpp konsole_wcwidth.cpp)
 add_library(qshellwidget STATIC ${SOURCES})
 target_link_libraries(qshellwidget Qt5::Widgets)

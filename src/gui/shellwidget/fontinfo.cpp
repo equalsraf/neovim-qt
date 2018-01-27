@@ -11,6 +11,11 @@
 #include <QFontMetrics>
 #include <QFontDatabase>
 
+#if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
+#include <QtPlugin>
+Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
+#endif
+
 QTextStream& qStdOut()
 {
 	static QTextStream ts(stdout);
