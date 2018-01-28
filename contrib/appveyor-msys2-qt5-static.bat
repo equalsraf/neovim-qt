@@ -44,6 +44,6 @@ cd build
 cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_STATIC_QT=1 ^
 -DCMAKE_PREFIX_PATH=%QTDIR% -DCMAKE_INSTALL_PREFIX=../INSTALL ..
 cmake --build . --target install
+ctest -VV
 strip ..\INSTALL\bin\nvim-qt.exe
 
-rem ctest -VV
