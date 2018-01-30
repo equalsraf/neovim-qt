@@ -44,6 +44,12 @@ private slots:
 		QCOMPARE(c.doubleWidth, false);
 		c.setChar(QChar(27721));
 		QCOMPARE(c.doubleWidth, true);
+		c.setChar(QChar(0x2776));
+		QCOMPARE(c.doubleWidth, true);
+		c.setChar(QChar(0x2640));
+		QCOMPARE(c.doubleWidth, true);
+		c.setChar(QChar(0xe0b0));
+		QCOMPARE(c.doubleWidth, true);	
 	}
 
 	void cellBg() {
