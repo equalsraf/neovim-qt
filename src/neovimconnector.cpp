@@ -26,7 +26,7 @@ NeovimConnector::NeovimConnector(QIODevice *dev)
 
 NeovimConnector::NeovimConnector(MsgpackIODevice *dev)
 :QObject(), m_dev(dev), m_helper(0), m_error(NoError), m_api0(NULL), m_api1(NULL), m_api2(NULL),
-	m_channel(0), m_api_compat(0), m_api_supported(0), m_ctype(OtherConnection), m_ready(false), m_timeout(10000)
+	m_channel(0), m_api_compat(0), m_api_supported(0), m_ctype(OtherConnection), m_ready(false), m_timeout(20000)
 {
 	m_helper = new NeovimConnectorHelper(this);
 	qRegisterMetaType<NeovimError>("NeovimError");
