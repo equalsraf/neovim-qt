@@ -57,7 +57,7 @@ QDebug operator<<(QDebug dbg, const msgpack_object& obj)
 		dbg.nospace() << "}";
 		break;
 	default:
-		dbg.space() <<  "[Uknown msgpack type]";
+		dbg.space() <<  "[Unknown msgpack type]";
 	}
 	return dbg.maybeSpace();
 }

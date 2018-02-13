@@ -268,7 +268,7 @@ void MsgpackIODevice::dispatch(msgpack_object& req)
 		}
 		if (req.via.array.ptr[3].type != MSGPACK_OBJECT_ARRAY) {
 			qDebug() << "Invalid request: arguments MUST be an array";
-			sendError(req, tr("Paremeters must be an array"));
+			sendError(req, tr("Parameters must be an array"));
 			return;
 		}
 		dispatchRequest(req);
