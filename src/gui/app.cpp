@@ -160,7 +160,7 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 
 	parser.addPositionalArgument("file",
 			QCoreApplication::translate("main", "Edit specified file(s)"), "[file...]");
-	parser.addPositionalArgument("...", "Additional arguments are fowarded to Neovim", "[-- ...]");
+	parser.addPositionalArgument("...", "Additional arguments are forwarded to Neovim", "[-- ...]");
 
 	parser.process(arguments);
 
