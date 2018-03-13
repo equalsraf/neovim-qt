@@ -224,6 +224,10 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 			QList<Qt::Key> keys = { Key_Control, Key_Alt, Key_Cmd };
 			if (keys.contains((Qt::Key)k)) {
 				return QString();
+			} else if (mod & ShiftModifier) {
+				// Ignore event for Ctrl-Shift
+				// Fixes issue #344, C-S- being treated as C-Space
+				return QString();
 			} else {
 				// key code will be the value of the char (hopefully)
 				c = QChar(k);
@@ -238,7 +242,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 	}
 
 	// Remove SHIFT
-    if (c.unicode() >= 0x80 || (!c.isLetterOrNumber() && c.isPrint())) {
+	if (c.unicode() >= 0x80 || (!c.isLetterOrNumber() && c.isPrint())) {
 		mod &= ~ShiftModifier;
 	}
 
