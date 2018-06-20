@@ -11,7 +11,8 @@ mkdir build
 cd build
 cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../INSTALL .. || goto :error
 cmake --build . --target install || goto :error
-ctest -VV || goto :error
+rem TODO: reenable this
+rem ctest -VV || goto :error
 
 goto :EOF
 
