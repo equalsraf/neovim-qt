@@ -195,8 +195,8 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params, const QString
 {
 	QProcess *p = new QProcess();
 	QStringList args;
-        // Neovim accepts a `--' argument after which only filenames are passed.
-        // If the user has supplied it, our arguments must appear before.
+	// Neovim accepts a `--' argument after which only filenames are passed.
+	// If the user has supplied it, our arguments must appear before.
 	if (params.indexOf("--") == -1) {
 		args << "--embed" << "--headless";
 		args.append(params);
