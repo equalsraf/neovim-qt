@@ -9,6 +9,12 @@ set PATH=%MINGW%\bin;%PATH%;%QTDIR%\bin
 set QT_QPA_PLATFORM_PLUGIN_PATH=%QTDIR%\plugins
 mkdir build
 cd build
-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../INSTALL ..
-cmake --build . --target install
-ctest -VV
+cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../INSTALL .. || goto :error
+cmake --build . --target install || goto :error
+ctest -VV || goto :error
+
+goto :EOF
+
+:error
+echo Failed with error #%errorlevel%.
+exit /b %errorlevel%
