@@ -1,4 +1,4 @@
-set QTDIR=C:\Qt\5.7\msvc2015
+set QTDIR=C:\Qt\5.11\msvc2015
 set CMAKE_PREFIX_PATH=%QTDIR%
 set PATH=%PATH%;%QTDIR%\bin
 mkdir build
