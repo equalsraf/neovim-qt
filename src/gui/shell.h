@@ -29,8 +29,10 @@ class ShellOptions {
 public:
 	ShellOptions() {
 		enable_ext_tabline = true;
+		force_tabline = false;
 	}
 	bool enable_ext_tabline;
+	bool force_tabline;
 };
 
 class Shell: public ShellWidget
@@ -62,6 +64,7 @@ signals:
 	/// The tabline needs updating. curtab is the handle of the current tab (not its index)
 	/// as seen in Tab::tab.
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
+	void neovimShowtablineSet(int);
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);

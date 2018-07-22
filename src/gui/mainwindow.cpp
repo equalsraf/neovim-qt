@@ -74,6 +74,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimIsUnsupported);
 	connect(m_shell, &Shell::neovimTablineUpdate,
 			this, &MainWindow::neovimTablineUpdate);
+	connect(m_shell, &Shell::neovimShowtablineSet,
+			this, &MainWindow::neovimShowtablineSet);
 	m_shell->setFocus(Qt::OtherFocusReason);
 
 	if (m_nvim->errorCause()) {
@@ -236,6 +238,13 @@ Shell* MainWindow::shell()
 	return m_shell;
 }
 
+void MainWindow::neovimShowtablineSet(int val)
+{
+	m_shell_options.enable_ext_tabline = val>0;
+	m_tabline_bar->setVisible(val>0);
+	m_shell_options.force_tabline = val==2;
+}
+
 void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 {
 	if (!m_shell_options.enable_ext_tabline) {
@@ -268,7 +277,7 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 	}
 
 	// hide/show the tabline toolbar
-	m_tabline_bar->setVisible(tabs.size() > 1);
+	m_tabline_bar->setVisible((tabs.size() > 1)||(m_shell_options.force_tabline));
 
 	Q_ASSERT(tabs.size() == m_tabline->count());
 }

@@ -596,6 +596,8 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 		// The conversion to string and then to int happens because of http://doc.qt.io/qt-5/qvariant.html#toUInt
 		// toUint() fails to detect an overflow i.e. it converts to ulonglong and then returns a MAX UINT
 		setLineSpace(value.toString().toInt());
+	} else if (name == "showtabline") {
+		emit neovimShowtablineSet(value.toString().toInt());
 	} else {
 		qDebug() << "Received unknown option" << name << value;
 	}
