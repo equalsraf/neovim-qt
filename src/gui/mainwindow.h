@@ -43,6 +43,7 @@ private slots:
 	void showIfDelayed();
 	void neovimAttachmentChanged(bool);
 	void neovimIsUnsupported();
+	void neovimShowtablineSet(int);
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
 	void changeTab(int index);
 private:
