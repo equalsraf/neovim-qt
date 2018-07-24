@@ -29,10 +29,10 @@ class ShellOptions {
 public:
 	ShellOptions() {
 		enable_ext_tabline = true;
-		force_tabline = false;
+		nvim_show_tabline = 1;
 	}
 	bool enable_ext_tabline;
-	bool force_tabline;
+	int nvim_show_tabline;
 };
 
 class Shell: public ShellWidget

@@ -240,9 +240,7 @@ Shell* MainWindow::shell()
 
 void MainWindow::neovimShowtablineSet(int val)
 {
-	m_shell_options.enable_ext_tabline = val>0;
-	m_tabline_bar->setVisible(val>0);
-	m_shell_options.force_tabline = val==2;
+	m_shell_options.nvim_show_tabline = val;
 }
 
 void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
@@ -277,7 +275,13 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 	}
 
 	// hide/show the tabline toolbar
-	m_tabline_bar->setVisible((tabs.size() > 1)||(m_shell_options.force_tabline));
+	if (m_shell_options.nvim_show_tabline==0) {
+		m_tabline_bar->setVisible(false);
+	} else if (m_shell_options.nvim_show_tabline==2) {
+		m_tabline_bar->setVisible(true);
+	} else {
+		m_tabline_bar->setVisible(tabs.size() > 1);
+	}
 
 	Q_ASSERT(tabs.size() == m_tabline->count());
 }
