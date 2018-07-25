@@ -9,7 +9,7 @@ namespace NeovimQt {
 MainWindow::MainWindow(NeovimConnector *c, ShellOptions opts, QWidget *parent)
 :QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
 	m_delayedShow(DelayedShow::Disabled), m_tabline(0), m_tabline_bar(0),
-	m_shell_options(opts)
+	m_shell_options(opts), m_neovim_requested_close(false)
 {
 	m_errorWidget = new ErrorWidget();
 	m_stack.addWidget(m_errorWidget);
@@ -163,7 +163,9 @@ void MainWindow::neovimFullScreen(bool set)
 
 void MainWindow::neovimGuiCloseRequest()
 {
+	m_neovim_requested_close = true;
 	QMainWindow::close();
+	m_neovim_requested_close = false;
 }
 
 void MainWindow::reconnectNeovim()
@@ -176,8 +178,11 @@ void MainWindow::reconnectNeovim()
 
 void MainWindow::closeEvent(QCloseEvent *ev)
 {
-	// Never unless the Neovim shell closes too
-	if (m_shell->close()) {
+	if (m_neovim_requested_close) {
+		// If this was requested by nvim, shutdown
+		QWidget::closeEvent(ev);
+	} else if (m_shell->close()) {
+		// otherwise only if the Neovim shell closes too
 		QWidget::closeEvent(ev);
 	} else {
 		ev->ignore();

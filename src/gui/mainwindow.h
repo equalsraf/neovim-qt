@@ -56,6 +56,7 @@ private:
 	QTabBar *m_tabline;
 	QToolBar *m_tabline_bar;
 	ShellOptions m_shell_options;
+	bool m_neovim_requested_close;
 };
 
 } // Namespace
