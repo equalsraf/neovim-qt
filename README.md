@@ -50,6 +50,10 @@ Commands for interacting with the GUI are regular commands, available in the doc
 
 	:Guifont DejaVu Sans Mono:h13
 
+To disable the GUI tabline and use the nvim TUI tabline, call
+
+	:GuiTabline 0
+
 You can set GUI options on startup, in the GUI configuration file (:help ginit.vim).
 
 ## Development

@@ -553,6 +553,9 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		} else if (guiEvName == "Close" && args.size() == 1) {
 			qDebug() << "Neovim requested a GUI close";
 			emit neovimGuiCloseRequest();
+		} else if (guiEvName == "Option" && args.size() >= 3) {
+			QString option = m_nvim->decode(args.at(1).toByteArray());
+			handleExtGuiOption(option, args.at(2));
 		}
 		return;
 	} else if (name != "redraw") {
@@ -586,6 +589,19 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 	}
 }
 
+void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
+{
+	if (!m_nvim->api2()) return;
+	if (name == "Tabline") {
+		m_nvim->api2()->nvim_ui_set_option("ext_tabline", value.toBool());
+	} else if (name == "Popupmenu") {
+	} else if (name == "Cmdline") {
+	} else if (name == "Wildmenu") {
+	} else {
+		qDebug() << "Unknown GUI Option" << name << value;
+	}
+}
+
 void Shell::handleSetOption(const QString& name, const QVariant& value)
 {
 	if (name == "guifont") {
@@ -598,6 +614,8 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 		setLineSpace(value.toString().toInt());
 	} else if (name == "showtabline") {
 		emit neovimShowtablineSet(value.toString().toInt());
+	} else if (name == "ext_tabline") {
+		emit neovimExtTablineSet(value.toBool());
 	} else {
 		qDebug() << "Received unknown option" << name << value;
 	}

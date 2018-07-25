@@ -30,25 +30,24 @@ void MainWindow::init(NeovimConnector *c)
 		m_nvim->deleteLater();
 	}
 
-	if (m_shell_options.enable_ext_tabline) {
-		m_tabline_bar = addToolBar("tabline");
-		m_tabline_bar->setObjectName("tabline");
-		m_tabline_bar->setAllowedAreas(Qt::TopToolBarArea);
-		m_tabline_bar->setMovable(false);
-		m_tabline_bar->setFloatable(false);
-		// Avoid margins around the tabbar
-		m_tabline_bar->layout()->setContentsMargins(0, 0, 0, 0);
+	m_tabline_bar = addToolBar("tabline");
+	m_tabline_bar->setObjectName("tabline");
+	m_tabline_bar->setAllowedAreas(Qt::TopToolBarArea);
+	m_tabline_bar->setMovable(false);
+	m_tabline_bar->setFloatable(false);
+	// Avoid margins around the tabbar
+	m_tabline_bar->layout()->setContentsMargins(0, 0, 0, 0);
 
-		m_tabline = new QTabBar(m_tabline_bar);
-		m_tabline->setDrawBase(false);
-		m_tabline->setExpanding(false);
-		m_tabline->setDocumentMode(true);
-		m_tabline->setFocusPolicy(Qt::NoFocus);
-		connect(m_tabline, &QTabBar::currentChanged,
-				this, &MainWindow::changeTab);
+	m_tabline = new QTabBar(m_tabline_bar);
+	m_tabline->setDrawBase(false);
+	m_tabline->setExpanding(false);
+	m_tabline->setDocumentMode(true);
+	m_tabline->setFocusPolicy(Qt::NoFocus);
+	connect(m_tabline, &QTabBar::currentChanged,
+			this, &MainWindow::changeTab);
 
-		m_tabline_bar->addWidget(m_tabline);
-	}
+	m_tabline_bar->addWidget(m_tabline);
+	m_tabline_bar->setVisible(m_shell_options.enable_ext_tabline);
 
 	m_nvim = c;
 	m_shell = new Shell(c, m_shell_options);
@@ -72,6 +71,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimError);
 	connect(m_shell, &Shell::neovimIsUnsupported,
 			this, &MainWindow::neovimIsUnsupported);
+	connect(m_shell, &Shell::neovimExtTablineSet,
+			this, &MainWindow::extTablineSet);
 	connect(m_shell, &Shell::neovimTablineUpdate,
 			this, &MainWindow::neovimTablineUpdate);
 	connect(m_shell, &Shell::neovimShowtablineSet,
@@ -241,6 +242,17 @@ void MainWindow::neovimAttachmentChanged(bool attached)
 Shell* MainWindow::shell()
 {
 	return m_shell;
+}
+
+void MainWindow::extTablineSet(bool val)
+{
+	bool old = m_shell_options.enable_ext_tabline;
+	m_shell_options.enable_ext_tabline = val;
+	// redraw if state changed
+	if (old != m_shell_options.enable_ext_tabline) {
+		if (!val) m_tabline_bar->setVisible(false);
+		m_nvim->api0()->vim_command("silent! redraw!");
+	}
 }
 
 void MainWindow::neovimShowtablineSet(int val)

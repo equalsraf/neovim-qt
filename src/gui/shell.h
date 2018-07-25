@@ -61,6 +61,7 @@ signals:
 	void neovimGuiCloseRequest();
 	/// This signal is emmited if the running neovim version is unsupported by the GUI
 	void neovimIsUnsupported();
+	void neovimExtTablineSet(bool);
 	/// The tabline needs updating. curtab is the handle of the current tab (not its index)
 	/// as seen in Tab::tab.
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
@@ -116,6 +117,7 @@ protected:
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 	virtual void handleBusy(bool);
 	virtual void handleSetOption(const QString& name, const QVariant& value);
+	void handleExtGuiOption(const QString& name, const QVariant& value);
 
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
