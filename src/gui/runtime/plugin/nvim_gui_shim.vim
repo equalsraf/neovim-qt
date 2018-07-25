@@ -71,6 +71,11 @@ function s:GuiLinespaceCommand(height) abort
 endfunction
 command! -nargs=? GuiLinespace call s:GuiLinespaceCommand("<args>")
 
+function! s:GuiTabline(enable) abort
+	call rpcnotify(0, 'Gui', 'Option', 'Tabline', a:enable)
+endfunction
+command! -nargs=1 GuiTabline call s:GuiTabline(<args>)
+
 " GuiDrop('file1', 'file2', ...) is similar to :drop file1 file2 ...
 " but it calls fnameescape() over all arguments
 function GuiDrop(...)

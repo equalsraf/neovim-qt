@@ -79,6 +79,16 @@ private slots:
 		checkStartVars(c);
 	}
 
+	void guiExtTablineSet() {
+		QStringList args;
+		args << "-u" << "NONE";
+		NeovimConnector *c = NeovimConnector::spawn(args);
+		Shell *s = new Shell(c, ShellOptions());
+		QSignalSpy onOptionSet(s, &Shell::neovimExtTablineSet);
+		QVERIFY(onOptionSet.isValid());
+		QVERIFY(SPYWAIT(onOptionSet));
+	}
+
 	void guiShimCommands() {
 		// This function needs to be able to find the GUI runtime
 		// plugin or this test WILL FAIL
@@ -113,6 +123,11 @@ private slots:
 		checkCommand(c, "GuiFont DejaVu Sans Mono:h14:b:l", false);
 		QCOMPARE(s->shell()->fontDesc(), QString("DejaVu Sans Mono:h14:l"));
 #endif
+		QSignalSpy onOptionSet(s->shell(), &Shell::neovimExtTablineSet);
+		checkCommand(c, "GuiTabline 0");
+		QVERIFY(onOptionSet.isValid());
+		QVERIFY(SPYWAIT(onOptionSet));
+		qDebug() << onOptionSet << onOptionSet.size();
 	}
 
 protected:
