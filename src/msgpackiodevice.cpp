@@ -337,6 +337,7 @@ void MsgpackIODevice::setRequestHandler(MsgpackRequestHandler *h)
 bool MsgpackIODevice::sendResponse(uint64_t msgid, const QVariant& err, const QVariant& res)
 {
 	if (!checkVariant(err) || !checkVariant(res)) {
+		qDebug() << "Unable to serialize response" << res;
 		sendError(msgid, tr("Internal server error, could not serialize response"));
 		return false;
 	}
@@ -756,6 +757,12 @@ void MsgpackIODevice::send(const QVariant& var)
 	case QMetaType::QByteArray:
 		send(var.toByteArray());
 		break;
+	case QMetaType::QStringList:
+		msgpack_pack_array(&m_pk, var.toList().size());
+		foreach(const QVariant& elem, var.toList()) {
+			send(elem);
+		}
+		break;
 	case QMetaType::QVariantList:
 		msgpack_pack_array(&m_pk, var.toList().size());
 		foreach(const QVariant& elem, var.toList()) {
@@ -874,6 +881,8 @@ bool MsgpackIODevice::checkVariant(const QVariant& var)
 	case QMetaType::Double:
 		break;
 	case QMetaType::QByteArray:
+		break;
+	case QMetaType::QStringList:
 		break;
 	case QMetaType::QVariantList:
 		foreach(const QVariant& elem, var.toList()) {
