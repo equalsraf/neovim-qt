@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <QMimeData>
+#include <QClipboard>
 #include "msgpackrequest.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
@@ -58,8 +59,12 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 			this, &Shell::neovimError);
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &Shell::neovimExited);
+	connect(this, &ShellWidget::shellFontChanged,
+			this, &Shell::fontChanged);
 	connect(this, &ShellWidget::fontError,
 			this, &Shell::fontError);
+
+	m_nvim->setRequestHandler(new ShellRequestHandler(this));
 
 	if (m_nvim->isReady()) {
 		init();
@@ -143,10 +148,12 @@ void Shell::setAttached(bool attached)
 		if (isWindow()) {
 			updateGuiWindowState(windowState());
 		}
-		m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim");
+		auto req_shim = m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim");
+		connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
 		auto gviminit = qgetenv("GVIMINIT");
 		if (gviminit.isEmpty()) {
-			m_nvim->api0()->vim_command("runtime! ginit.vim");
+			auto req_ginit = m_nvim->api0()->vim_command("runtime! ginit.vim");
+			connect(req_ginit, &MsgpackRequest::error, this, &Shell::handleGinitError);
 		} else {
 			m_nvim->api0()->vim_command(gviminit);
 		}
@@ -682,6 +689,39 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		} else if (guiEvName == "Option" && args.size() >= 3) {
 			QString option = m_nvim->decode(args.at(1).toByteArray());
 			handleExtGuiOption(option, args.at(2));
+		} else if (guiEvName == "SetClipboard" && args.size() >= 4) {
+			QStringList lines = args.at(1).toStringList();
+			QString type = args.at(2).toString();
+			QString reg_name = args.at(3).toString();
+
+			if (reg_name != "*" && reg_name != "+") {
+				m_nvim->api0()->vim_report_error(m_nvim->encode("Cannot set register via GUI"));
+				return;
+			}
+
+			// FIXME proper newline char
+			QString data = lines.join("\n");
+
+			QByteArray payload;
+			QDataStream serialize(&payload, QIODevice::WriteOnly);
+			serialize << type;
+
+			// Store the selection type in the clipboard
+			QMimeData *clipData = new QMimeData();
+			clipData->setText(data);
+			clipData->setData("application/x-nvim-selection-type", payload);
+
+			auto clipboard = QClipboard::Clipboard;
+			if (reg_name == "*") {
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN32)
+				clipboard = QClipboard::Clipboard;
+#else
+				clipboard = QClipboard::Selection;
+#endif
+			}
+
+			qDebug() << "Neovim changed clipboard" << data << type << reg_name << clipboard;
+			QGuiApplication::clipboard()->setMimeData(clipData, clipboard);
 		}
 		return;
 	} else if (name != "redraw") {
@@ -1239,6 +1279,95 @@ void Shell::openFiles(QList<QUrl> urls)
 		// Neovim cannot open urls now. Store them to open later.
 		m_deferredOpen.append(urls);
 	}
+}
+
+ShellRequestHandler::ShellRequestHandler(Shell *parent)
+:QObject(parent)
+{
+}
+
+const char SELECTION_MIME_TYPE[] = "application/x-nvim-selection-type";
+void ShellRequestHandler::handleRequest(MsgpackIODevice* dev, quint32 msgid, const QByteArray& method, const QVariantList& args)
+{
+	if (method == "Gui" && args.size() > 0) {
+		QString ctx = args.at(0).toString();
+		if (ctx == "GetClipboard" && args.size() > 1) {
+			QVariant reg = args.at(1);
+			QString reg_name = reg.toString();
+
+			if (reg_name != "*" && reg_name != "+") {
+				dev->sendResponse(msgid, QString("Unknown register"), QVariant());
+				return;
+			}
+
+			// + by default
+			auto mode = QClipboard::Clipboard;
+			if (reg_name == "*") {
+#if defined(Q_OS_MAC) || defined(Q_OS_WIN32)
+				mode = QClipboard::Clipboard;
+#else
+				mode = QClipboard::Selection;
+#endif
+			}
+
+			// Check nvim, ops.c/get_clipboard() - Expected to return a list with two items
+			// [register data, selection type]. The type can be ommited.
+			QVariantList result;
+
+			auto clipboard_data = QGuiApplication::clipboard()->mimeData(mode);
+			auto data = clipboard_data->text();
+			// The register data is either a string with a single line,
+			// or a list of strings for multiple lines.
+			if (data.contains("\n")) {
+				result.append(data.split("\n"));
+			} else {
+				result.append(data);
+			}
+
+			// If available, deserialize the motion type from the clipboard
+			if (clipboard_data->hasFormat(SELECTION_MIME_TYPE)) {
+				QString type;
+				QDataStream serialize(clipboard_data->data(SELECTION_MIME_TYPE));
+				serialize >> type;
+				result.append(type);
+			}
+
+			qDebug() << "Neovim requested clipboard contents" << args << mode << "->" << result;
+			dev->sendResponse(msgid, QVariant(), result);
+			return;
+		}
+	}
+	// be sure to return early or this message will be sent
+	dev->sendResponse(msgid, QString("Unknown method"), QVariant());
+}
+
+/**
+ * Convert neovim error response into an error message string. If this fails
+ * serialize the entire error response as with QDebug.
+ */
+QString Shell::neovimErrorToString(const QVariant& err)
+{
+	auto lst = err.toList();
+	if (1 < lst.size()) {
+		return lst.at(1).toByteArray();
+	} else {
+		QString payload;
+		QDebug dbg(&payload);
+		dbg << err;
+		return payload;
+	}
+}
+
+void Shell::handleGinitError(quint32 msgid, quint64 fun, const QVariant& err)
+{
+	qDebug() << "ginit.vim error " << err;
+	auto msg = neovimErrorToString(err);
+	m_nvim->api0()->vim_report_error("ginit.vim error: " + msg.toUtf8());
+}
+
+void Shell::handleShimError(quint32 msgid, quint64 fun, const QVariant& err)
+{
+	qDebug() << "GUI shim error " << err;
 }
 
 } // Namespace

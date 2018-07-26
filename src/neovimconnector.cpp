@@ -381,6 +381,11 @@ void NeovimConnector::fatalTimeout()
 	setError(RuntimeMsgpackError, "Neovim is taking too long to respond");
 }
 
+void NeovimConnector::setRequestHandler(MsgpackRequestHandler *h)
+{
+	m_dev->setRequestHandler(h);
+}
+
 /**
  * True if NeovimConnector::reconnect can be called to reconnect with Neovim. This
  * is true unless you built the NeovimConnector ctor directly instead
