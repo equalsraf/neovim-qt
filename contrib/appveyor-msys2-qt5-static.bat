@@ -1,3 +1,4 @@
+@echo on
 set BITS=""
 set ARCH=""
 if "%1%"=="" (
@@ -41,9 +42,13 @@ set PATH=%PATH%;%QTDIR%\bin;%CD%\Neovim\bin;
 
 mkdir build
 cd build
-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_STATIC_QT=1 ^
--DCMAKE_PREFIX_PATH=%QTDIR% -DCMAKE_INSTALL_PREFIX=../INSTALL ..
-cmake --build . --target install
-ctest -VV
+cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_STATIC_QT=1 -DCMAKE_PREFIX_PATH=%QTDIR% -DCMAKE_INSTALL_PREFIX=../INSTALL .. || goto error
+cmake --build . --target install || goto error
+ctest -VV || goto error
 strip ..\INSTALL\bin\nvim-qt.exe
 
+goto :EOF
+
+:error
+echo Failed with error #%errorlevel%.
+exit /b %errorlevel%
