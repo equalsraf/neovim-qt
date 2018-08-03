@@ -61,6 +61,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimWidgetResized);
 	connect(m_shell, &Shell::neovimMaximized,
 			this, &MainWindow::neovimMaximized);
+	connect(m_shell, &Shell::neovimSuspend,
+			this, &MainWindow::neovimSuspend);
 	connect(m_shell, &Shell::neovimFullScreen,
 			this, &MainWindow::neovimFullScreen);
 	connect(m_shell, &Shell::neovimGuiCloseRequest,
@@ -151,6 +153,12 @@ void MainWindow::neovimMaximized(bool set)
 	} else {
 		setWindowState(windowState() & ~Qt::WindowMaximized);
 	}
+}
+
+void MainWindow::neovimSuspend()
+{
+	qDebug() << "Minimizing window";
+	setWindowState(windowState() | Qt::WindowMinimized);
 }
 
 void MainWindow::neovimFullScreen(bool set)
