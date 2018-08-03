@@ -57,6 +57,7 @@ signals:
 	void neovimResized(int rows, int cols);
 	void neovimAttached(bool);
 	void neovimMaximized(bool);
+	void neovimSuspend();
 	void neovimFullScreen(bool);
 	void neovimGuiCloseRequest();
 	/// This signal is emmited if the running neovim version is unsupported by the GUI

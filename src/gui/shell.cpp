@@ -463,6 +463,12 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		if (2 <= opargs.size()) {
 			handleSetOption(opargs.at(0).toString(), opargs.at(1));
 		}
+	} else if (name == "suspend") {
+		if (isWindow()) {
+			setWindowState(windowState() | Qt::WindowMinimized);
+		} else {
+			emit neovimSuspend();
+		}
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}

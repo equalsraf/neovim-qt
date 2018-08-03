@@ -35,6 +35,7 @@ private slots:
 	void neovimSetTitle(const QString &title);
 	void neovimWidgetResized();
 	void neovimMaximized(bool);
+	void neovimSuspend();
 	void neovimFullScreen(bool);
 	void neovimGuiCloseRequest();
 	void neovimExited(int status);
