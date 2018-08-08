@@ -25,7 +25,7 @@ NeovimConnector::NeovimConnector(QIODevice *dev)
 }
 
 NeovimConnector::NeovimConnector(MsgpackIODevice *dev)
-:QObject(), m_dev(dev), m_helper(0), m_error(NoError), m_api0(NULL), m_api1(NULL), m_api2(NULL),
+:QObject(), m_dev(dev), m_helper(0), m_error(NoError), m_api0(NULL), m_api1(NULL), m_api2(NULL), m_api3(NULL),
 	m_channel(0), m_api_compat(0), m_api_supported(0), m_ctype(OtherConnection), m_ready(false), m_timeout(20000)
 {
 	m_helper = new NeovimConnectorHelper(this);
@@ -185,6 +185,22 @@ NeovimApi2* NeovimConnector::api2()
 		}
 	}
 	return m_api2;
+}
+
+/**
+ * @warning Do not call this before NeovimConnector::ready as been signaled
+ * @see NeovimConnector::isReady
+ */
+NeovimApi3* NeovimConnector::api3()
+{
+	if ( !m_api3 ) {
+		if (m_api_compat <= 3 && 3 <= m_api_supported) {
+			m_api3 = new NeovimApi3(this);
+		} else {
+			qWarning() << "This instance of neovim not support api level 3";
+		}
+	}
+	return m_api3;
 }
 
 /**
