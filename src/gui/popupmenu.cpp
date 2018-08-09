@@ -1,5 +1,5 @@
 #include "popupmenu.h"
-#include "popupwidgetitem.h"
+#include "popupmenumodel.h"
 
 #include <QScrollBar>
 #include <QPainter>
@@ -35,7 +35,7 @@ QSize PopupMenuDelegate::sizeHint(const QStyleOptionViewItem &  option ,
     if(!index.isValid())
         return QSize();
  
-    QString text = index.data(Qt::DisplayRole).toString();
+    QString text = index.data(PopupMenuModel::Text).toString();
     QFontMetrics fm(option.font);
  
     QRect rect = fm.boundingRect(0, 0,
@@ -58,7 +58,7 @@ void PopupMenuDelegate::paint(QPainter *painter,
     if (option.state & QStyle::State_Selected)
         painter->fillRect(option.rect, option.palette.highlight());
  
-    QString text = index.data(Qt::DisplayRole).toString();
+    QString text = index.data(PopupMenuModel::Text).toString();
     painter->drawText(option.rect, Qt::AlignLeft|Qt::AlignTop, text);
  
     painter->restore();
