@@ -1,7 +1,7 @@
 #ifndef NEOVIM_QT_POPUPMODEL
 #define NEOVIM_QT_POPUPMODEL
 
-#include <QAbstractTableModel>
+#include <QAbstractListModel>
 
 namespace NeovimQt {
 
@@ -12,13 +12,19 @@ struct PopupMenuItem {
 	QString info;
 };
 
-class PopupMenuModel: public QAbstractTableModel {
+class PopupMenuModel: public QAbstractListModel {
 public:
+	enum Roles{
+		Text=Qt::UserRole,
+		Kind,
+		Extra,
+		Info,
+	};
+
+
 	PopupMenuModel(QList<PopupMenuItem>);
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-	// TODO QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 private:
 	QList<PopupMenuItem> m_data;
 };
