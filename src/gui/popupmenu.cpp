@@ -2,6 +2,7 @@
 #include "popupwidgetitem.h"
 
 #include <QScrollBar>
+#include <QPainter>
 
 namespace NeovimQt {
 
@@ -22,5 +23,46 @@ QSize PopupMenu::sizeHint() const {
 	return QSize(sizeHintForColumn(0) + 2*frameWidth(),
 			height + 2*frameWidth());
 }
+
+PopupMenuDelegate::PopupMenuDelegate(QObject *parent)
+:QStyledItemDelegate(parent)
+{
+}
+
+QSize PopupMenuDelegate::sizeHint(const QStyleOptionViewItem &  option ,
+                                        const QModelIndex & index) const
+{
+    if(!index.isValid())
+        return QSize();
+ 
+    QString text = index.data(Qt::DisplayRole).toString();
+    QFontMetrics fm(option.font);
+ 
+    QRect rect = fm.boundingRect(0, 0,
+								   option.rect.width(), 0,
+								   Qt::AlignLeft|Qt::AlignTop,
+								   text);
+    QSize size(rect.width(), rect.height() + 4);
+    return size;
+}
+ 
+void PopupMenuDelegate::paint(QPainter *painter,
+                                    const QStyleOptionViewItem &option,
+                                    const QModelIndex &index) const
+{
+    if(!index.isValid())
+        return;
+ 
+    painter->save();
+ 
+    if (option.state & QStyle::State_Selected)
+        painter->fillRect(option.rect, option.palette.highlight());
+ 
+    QString text = index.data(Qt::DisplayRole).toString();
+    painter->drawText(option.rect, Qt::AlignLeft|Qt::AlignTop, text);
+ 
+    painter->restore();
+}
+
 
 } // Namespace

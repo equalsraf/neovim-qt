@@ -529,6 +529,7 @@ void Shell::handlePopupMenuShow(const QVariantList& items,
 	}
 
 	m_pum.setModel(new PopupMenuModel(model));
+	m_pum.setItemDelegate(new PopupMenuDelegate(this));
 
 	handlePopupMenuSelect(selected);
 
