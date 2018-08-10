@@ -30,6 +30,7 @@ NeovimConnector::NeovimConnector(MsgpackIODevice *dev)
 {
 	m_helper = new NeovimConnectorHelper(this);
 	qRegisterMetaType<NeovimError>("NeovimError");
+	qRegisterMetaType<int64_t>("int64_t");
 
 	connect(m_dev, &MsgpackIODevice::error,
 			this, &NeovimConnector::msgpackError);
