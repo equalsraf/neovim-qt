@@ -130,5 +130,6 @@ private:
 };
 } // namespace NeovimQt
 Q_DECLARE_METATYPE(NeovimQt::NeovimConnector::NeovimError)
+Q_DECLARE_METATYPE(int64_t)
 
 #endif
