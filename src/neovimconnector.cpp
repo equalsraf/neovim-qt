@@ -145,7 +145,7 @@ NeovimApi0* NeovimConnector::api0()
 		if (m_api_compat <= 0) {
 			m_api0 = new NeovimApi0(this);
 		} else {
-			qDebug() << "This instance of neovim DOES NOT not support api level 0";
+			qDebug() << "This instance of neovim DOES NOT support api level 0";
 		}
 	}
 	return m_api0;
@@ -160,7 +160,7 @@ NeovimApi1* NeovimConnector::api1()
 		if (m_api_compat <= 1 && 1 <= m_api_supported) {
 			m_api1 = new NeovimApi1(this);
 		} else {
-			qDebug() << "This instance of neovim DOES NOT not support api level 1";
+			qDebug() << "This instance of neovim DOES NOT support api level 1";
 		}
 	}
 	return m_api1;
