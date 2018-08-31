@@ -132,6 +132,15 @@ GuiClose() notifies the GUI that it should close. The GUI may or may not
 respect this request. The shim setups an autocommand to call this function
 when the |'VimLeave'| event occurs.
 
+GuiStart({cmd}, {opts})					*GuiStart()*
+GuiStart is a wrapper around jobstart that launches a GUI process. When
+the GUI process exists, nvim will attempt to exit using :qa.
+The argument {cmd} specifies the command to be executed.
+
+    {opts} is a dictionary with these keys:
+	rpc     : If set, a msgpack-rpc channel is created on top of the
+		  process stdin/stdout.
+
 ==============================================================================
 4. Internals
 
