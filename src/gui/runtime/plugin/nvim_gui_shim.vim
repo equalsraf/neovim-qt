@@ -98,7 +98,6 @@ function! s:on_gui_event(jobid, data, event)
     if a:data != 0
       call chansend(v:stderr, ["GUI closed with exit code " . a:data, ''])
     endif
-	execute 'qa'
   elseif a:event ==# 'stderr'
     call chansend(v:stderr, a:data)
   endif
