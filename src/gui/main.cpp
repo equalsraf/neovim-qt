@@ -53,6 +53,10 @@ int main(int argc, char **argv)
 			break;
 		} else if (QString::compare("--spawn", argv[i]) == 0) {
 			break;
+		} else if (QString::compare("--embed", argv[i]) == 0) {
+			// Due to https://github.com/equalsraf/neovim-qt/issues/276 --embed
+			// implies --nofork
+			nofork = true;
 		} else if (QString::compare("--nofork", argv[i]) == 0) {
 			nofork = true;
 		}
