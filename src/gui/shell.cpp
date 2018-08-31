@@ -1019,8 +1019,9 @@ void Shell::updateGuiWindowState(Qt::WindowStates state)
 
 void Shell::closeEvent(QCloseEvent *ev)
 {
+	auto ctype = m_nvim->connectionType();
 	if (m_attached &&
-		m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
+		(ctype == NeovimConnector::SpawnedConnection || ctype == NeovimConnector::OtherConnection)) {
 		// If attached to a spawned Neovim process, ignore the event
 		// and try to close Neovim as :qa
 		ev->ignore();
