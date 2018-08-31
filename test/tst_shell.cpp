@@ -1,3 +1,4 @@
+#include <QtGlobal>
 #include <QtTest/QtTest>
 #include <QLocalSocket>
 #include <QFontDatabase>
@@ -87,6 +88,27 @@ private slots:
 		QSignalSpy onOptionSet(s, &Shell::neovimExtTablineSet);
 		QVERIFY(onOptionSet.isValid());
 		QVERIFY(SPYWAIT(onOptionSet));
+	}
+
+	void gviminit() {
+		qputenv("GVIMINIT", "let g:test_gviminit = 1");
+		QStringList args;
+		args << "-u" << "NONE";
+		NeovimConnector *c = NeovimConnector::spawn(args);
+		Shell *s = new Shell(c, ShellOptions());
+
+		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QVERIFY(onAttached.isValid());
+		QVERIFY(SPYWAIT(onAttached));
+		QVERIFY(s->neovimAttached());
+
+		auto req = c->api0()->vim_command_output(c->encode("echo g:test_gviminit"));
+		QSignalSpy cmd(req, SIGNAL(finished(quint32, quint64, QVariant)));
+		QVERIFY(cmd.isValid());
+		QVERIFY(SPYWAIT(cmd));
+		qDebug() << cmd;
+
+		QCOMPARE(cmd.at(0).at(2).toByteArray(), QByteArray("1"));
 	}
 
 	void guiShimCommands() {
