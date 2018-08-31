@@ -133,8 +133,7 @@ respect this request. The shim setups an autocommand to call this function
 when the |'VimLeave'| event occurs.
 
 GuiStart({cmd}, {opts})					*GuiStart()*
-GuiStart is a wrapper around jobstart that launches a GUI process. When
-the GUI process exists, nvim will attempt to exit using :qa.
+GuiStart is a wrapper around jobstart that launches a GUI process.
 The argument {cmd} specifies the command to be executed.
 
     {opts} is a dictionary with these keys:
