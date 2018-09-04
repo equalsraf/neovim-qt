@@ -132,6 +132,17 @@ GuiClose() notifies the GUI that it should close. The GUI may or may not
 respect this request. The shim setups an autocommand to call this function
 when the |'VimLeave'| event occurs.
 
+							*GuiName()*
+Returns the name of the GUI client. If multiple GUIs are connected the last
+one is used. If no name is available an empty string is returned.
+This can be used to check for a specific GUI in ginit.vim, e.g.
+>
+	if GuiName() == 'nvim-qt'
+	  " ...
+	endif
+
+This is a wrapper around |nvim_get_chan_info()|.
+
 ==============================================================================
 4. Internals
 
