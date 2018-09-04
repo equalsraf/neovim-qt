@@ -11,6 +11,7 @@
 #include "input.h"
 #include "konsole_wcwidth.h"
 #include "util.h"
+#include "version.h"
 
 namespace NeovimQt {
 
@@ -148,6 +149,15 @@ void Shell::setAttached(bool attached)
 			m_nvim->api0()->vim_command("runtime! ginit.vim");
 		} else {
 			m_nvim->api0()->vim_command(gviminit);
+		}
+
+		auto api4 = m_nvim->api4();
+		if (api4) {
+			auto version = QVariantMap();
+			version.insert("major", PROJECT_VERSION_MAJOR);
+			version.insert("minor", PROJECT_VERSION_MINOR);
+			version.insert("patch", PROJECT_VERSION_PATCH);
+			api4->nvim_set_client_info("nvim-qt", version, "ui", QVariantMap(), QVariantMap());
 		}
 
 		// Noevim was not able to open urls till now. Check if we have any to open.
