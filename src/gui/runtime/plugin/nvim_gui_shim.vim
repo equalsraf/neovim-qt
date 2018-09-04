@@ -91,3 +91,20 @@ function GuiDrop(...)
 		doautocmd BufEnter
 	endif
 endfunction
+
+function GuiName()
+	if !has('nvim-0.3')
+		return ''
+	endif
+
+	let uis = nvim_list_uis()
+	if len(uis) == 0
+		echoerr "No UIs are attached"
+		return
+	endif
+
+	" Use the last UI in the list
+	let ui_chan = uis[-1].chan
+	let info = nvim_get_chan_info(ui_chan)
+	return get(info.client, 'name', '')
+endfunction
