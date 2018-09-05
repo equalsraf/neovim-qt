@@ -44,7 +44,7 @@ private slots:
 
 	void uiStart() {
 		QStringList args;
-		args << "-u" << "NONE";
+		args << "-u" << "NORC";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
@@ -60,7 +60,7 @@ private slots:
 	}
 
 	void startVarsShellWidget() {
-		QStringList args = {"-u", "NONE"};
+		QStringList args = {"-u", "NORC"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
@@ -71,7 +71,7 @@ private slots:
 	}
 
 	void startVarsMainWindow() {
-		QStringList args = {"-u", "NONE"};
+		QStringList args = {"-u", "NORC"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c, ShellOptions());
 		s->show();
@@ -84,7 +84,7 @@ private slots:
 
 	void guiExtTablineSet() {
 		QStringList args;
-		args << "-u" << "NONE";
+		args << "-u" << "NORC";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onOptionSet(s, &Shell::neovimExtTablineSet);
@@ -95,7 +95,7 @@ private slots:
 	void gviminit() {
 		qputenv("GVIMINIT", "let g:test_gviminit = 1");
 		QStringList args;
-		args << "-u" << "NONE";
+		args << "-u" << "NORC";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 
@@ -118,7 +118,7 @@ private slots:
 		// plugin or this test WILL FAIL
 		QFileInfo fi = QFileInfo("src/gui/runtime");
 		QVERIFY2(fi.exists(), "Unable to find GUI runtime");
-		QStringList args = {"-u", "NONE",
+		QStringList args = {"-u", "NORC",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c, ShellOptions());
