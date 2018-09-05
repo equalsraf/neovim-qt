@@ -520,6 +520,10 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		handlePopupMenuSelect(opargs.at(0).toLongLong());
 	} else if (name == "popupmenu_hide") {
 		m_pum.hide();
+	} else if (name == "mode_info_set") {
+		// TODO
+	} else if (name == "default_colors_set") {
+		// TODO
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
@@ -785,6 +789,13 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 		emit neovimExtTablineSet(value.toBool());
 	} else if (name == "ext_popupmenu") {
 		emit neovimExtPopupmenuSet(value.toBool());
+	// TODO
+	} else if (name == "arabicshape") {
+	} else if (name == "ambiwidth") {
+	} else if (name == "emoji") {
+	} else if (name == "termguicolors") {
+	} else if (name == "ext_cmdline") {
+	} else if (name == "ext_wildmenu") {
 	} else {
 		qDebug() << "Received unknown option" << name << value;
 	}
