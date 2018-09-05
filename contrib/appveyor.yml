@@ -22,7 +22,7 @@ configuration:
 matrix:
   fast_finish: false
 install:
-- ps: appveyor DownloadFile -FileName Neovim.zip "https://ci.appveyor.com/api/projects/neovim/neovim/artifacts/build/Neovim.zip?branch=master&job=Configuration%3A%20MINGW_64"
+- ps: appveyor DownloadFile -FileName Neovim.zip "https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip"
 - 7z x Neovim.zip
 - set PATH=%PATH%;%CD%\Neovim\bin;
 - nvim --version
