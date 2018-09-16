@@ -191,6 +191,12 @@ protected:
 			nvim->vim_get_var(conn->encode(var));
 			QVERIFY(SPYWAIT(onVar));
 		}
+
+		// v:windowid
+		QSignalSpy onVarWindowId(nvim, SIGNAL(on_vim_get_vvar(QVariant)));
+		QVERIFY(onVarWindowId.isValid());
+		nvim->vim_get_vvar(conn->encode("windowid"));
+		QVERIFY(SPYWAIT(onVarWindowId));
 	}
 };
 
