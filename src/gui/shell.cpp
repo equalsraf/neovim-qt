@@ -935,6 +935,7 @@ void Shell::updateWindowId()
 		m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
 		WId window_id = effectiveWinId();
 		m_nvim->api0()->vim_set_var("GuiWindowId", QVariant(window_id));
+		m_nvim->api0()->vim_command(QString("let v:windowid = %1").arg(window_id).toLatin1());
 	}
 }
 
