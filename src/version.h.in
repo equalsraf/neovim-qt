@@ -2,9 +2,18 @@
 #define NEOVIM_QT_VERSION
 
 #define PROJECT "@PROJECT@"
+#define PROJECT_NAME "@PROJECT_NAME@"
 #define PROJECT_VERSION "@PROJECT_VERSION@"
 #define PROJECT_VERSION_MAJOR "@PROJECT_VERSION_MAJOR@"
 #define PROJECT_VERSION_MINOR "@PROJECT_VERSION_MINOR@"
 #define PROJECT_VERSION_PATCH "@PROJECT_VERSION_PATCH@"
+#define PROJECT_VERSION_TWEAK "@PROJECT_VERSION_TWEAK@"
+
+// Added here for Windows version info. A comma separated version numbers.
+#define RC_PROJECT_VERSION_C @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,@PROJECT_VERSION_TWEAK@
+// Not all the windows docs are consistent on this. But it seems the version
+// strings need to be explicitly terminated with \0
+#define RC_PROJECT_NAME "@PROJECT_NAME@\0"
+#define RC_PROJECT_VERSION "@PROJECT_VERSION@\0"
 
 #endif

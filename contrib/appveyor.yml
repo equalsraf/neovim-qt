@@ -45,6 +45,7 @@ test_script:
 - echo %PATH%
 - cd "%APPVEYOR_BUILD_FOLDER%"/build
 - ctest -VV -C Release
+- ps: (Get-Item "$($env:APPVEYOR_BUILD_FOLDER)\INSTALL\bin\nvim-qt.exe").VersionInfo
 artifacts:
 - path: INSTALL
   name: neovim-qt
