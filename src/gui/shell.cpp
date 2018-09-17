@@ -24,7 +24,8 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	m_resizing(false),
 	m_mouse_wheel_delta_fraction(0, 0),
 	m_neovimBusy(false),
-	m_options(opts)
+	m_options(opts),
+	m_mouseEnabled(true)
 {
 	setAttribute(Qt::WA_KeyCompression, false);
 
@@ -442,9 +443,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "set_scroll_region"){
 		handleSetScrollRegion(opargs);
 	} else if (name == "mouse_on"){
-		// See :h mouse
+		handleMouse(true);
 	} else if (name == "mouse_off"){
-		// See :h mouse
+		handleMouse(false);
 	} else if (name == "mode_change"){
 		if (opargs.size() < 1 || !opargs.at(0).canConvert<QByteArray>()) {
 			qWarning() << "Unexpected argument for change_mode:" << opargs;
@@ -750,6 +751,12 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 	}
 }
 
+// Enable/Disable mouse support. See mouse_off/mouse_on in :h ui-global.
+void Shell::handleMouse(bool enabled)
+{
+	m_mouseEnabled = enabled;
+}
+
 void Shell::paintEvent(QPaintEvent *ev)
 {
 	if (!m_attached) {
@@ -802,7 +809,7 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 
 void Shell::neovimMouseEvent(QMouseEvent *ev)
 {
-	if (!m_attached) {
+	if (!m_attached || !m_mouseEnabled) {
 		return;
 	}
 
