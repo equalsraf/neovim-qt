@@ -1034,6 +1034,7 @@ void Shell::closeEvent(QCloseEvent *ev)
 		// If attached to a spawned Neovim process, ignore the event
 		// and try to close Neovim as :qa
 		ev->ignore();
+		bailoutIfinputBlocking();
 		m_nvim->api0()->vim_command("qa");
 	} else {
 		QWidget::closeEvent(ev);
@@ -1238,6 +1239,23 @@ void Shell::openFiles(QList<QUrl> urls)
 	} else {
 		// Neovim cannot open urls now. Store them to open later.
 		m_deferredOpen.append(urls);
+	}
+}
+
+// If neovim is blocked waiting for input, attempt to bailout from
+// whatever neovim is doing by pressing Ctrl-C.
+void Shell::bailoutIfinputBlocking()
+{
+	auto api = m_nvim->api2();
+	if (api) {
+		auto req = api->nvim_get_mode();
+
+		connect(req, &MsgpackRequest::finished, [api](quint32 msgid, quint64 f, const QVariant& r) {
+				auto map = r.toMap();
+				if (map.value("blocking", false) == true) {
+					api->nvim_input("<C-c>");
+				}
+		});
 	}
 }
 
