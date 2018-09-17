@@ -239,6 +239,8 @@ void Shell::init()
 	connect(req, &MsgpackRequest::finished,
 			this, &Shell::setAttached);
 
+	bailoutIfinputBlocking();
+
 	// Subscribe to GUI events
 	m_nvim->api0()->vim_subscribe("Gui");
 }
