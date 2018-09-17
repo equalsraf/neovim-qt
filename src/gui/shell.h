@@ -128,6 +128,7 @@ protected:
 	virtual void handlePopupMenuShow(const QVariantList& items, int64_t selected,
 			int64_t row, int64_t col);
 	void handlePopupMenuSelect(int64_t selected);
+	virtual void handleMouse(bool);
 
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
@@ -173,6 +174,7 @@ private:
 	bool m_neovimBusy;
 	ShellOptions m_options;
 	PopupMenu m_pum;
+	bool m_mouseEnabled;
 };
 
 } // Namespace
