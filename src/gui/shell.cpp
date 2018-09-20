@@ -791,7 +791,7 @@ void Shell::paintEvent(QPaintEvent *ev)
 
 void Shell::keyPressEvent(QKeyEvent *ev)
 {
-	if (!m_nvim || !m_attached) {
+	if (!m_nvim) {
 		QWidget::keyPressEvent(ev);
 		return;
 	}
