@@ -232,12 +232,12 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params, const QString
 	// Neovim accepts a `--' argument after which only filenames are passed.
 	// If the user has supplied it, our arguments must appear before.
 	if (params.indexOf("--") == -1) {
-		args << "--embed" << "--headless";
+		args << "--embed";
 		args.append(params);
 	} else {
 		int idx = params.indexOf("--");
 		args.append(params.mid(0, idx));
-		args << "--embed" << "--headless";
+		args << "--embed";
 		args.append(params.mid(idx));
 	}
 
