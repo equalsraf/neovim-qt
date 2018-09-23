@@ -152,14 +152,7 @@ void Shell::setAttached(bool attached)
 			m_nvim->api0()->vim_command(gviminit);
 		}
 
-		auto api4 = m_nvim->api4();
-		if (api4) {
-			auto version = QVariantMap();
-			version.insert("major", PROJECT_VERSION_MAJOR);
-			version.insert("minor", PROJECT_VERSION_MINOR);
-			version.insert("patch", PROJECT_VERSION_PATCH);
-			api4->nvim_set_client_info("nvim-qt", version, "ui", QVariantMap(), QVariantMap());
-		}
+		updateClientInfo();
 
 		// Noevim was not able to open urls till now. Check if we have any to open.
 		if(!m_deferredOpen.isEmpty()){
@@ -943,6 +936,24 @@ void Shell::updateWindowId()
 		WId window_id = effectiveWinId();
 		m_nvim->api0()->vim_set_var("GuiWindowId", QVariant(window_id));
 		m_nvim->api0()->vim_command(QString("let v:windowid = %1").arg(window_id).toLatin1());
+		updateClientInfo();
+	}
+}
+
+void Shell::updateClientInfo()
+{
+	if (m_attached) {
+		auto api4 = m_nvim->api4();
+		if (api4) {
+			WId window_id = effectiveWinId();
+			auto version = QVariantMap();
+			version.insert("major", PROJECT_VERSION_MAJOR);
+			version.insert("minor", PROJECT_VERSION_MINOR);
+			version.insert("patch", PROJECT_VERSION_PATCH);
+			QVariantMap attrs;
+			attrs.insert("windowid", window_id);
+			api4->nvim_set_client_info("nvim-qt", version, "ui", QVariantMap(), attrs);
+		}
 	}
 }
 

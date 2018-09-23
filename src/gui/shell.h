@@ -91,6 +91,7 @@ protected slots:
 	void init();
 	void fontError(const QString& msg);
 	void updateWindowId();
+	void updateClientInfo();
 
 protected:
 	void tooltip(const QString& text);
