@@ -101,7 +101,7 @@ private slots:
 				.arg(server->serverPort()));
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
 		QVERIFY(onError.isValid());
-		QVERIFY(SPYWAIT2(onError, 20000));
+		QVERIFY(SPYWAIT2(onError));
 		QCOMPARE(c->errorCause(), NeovimConnector::RuntimeMsgpackError);
 		c->deleteLater();
 	}

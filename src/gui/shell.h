@@ -73,6 +73,7 @@ signals:
 	/// as seen in Tab::tab.
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
 	void neovimShowtablineSet(int);
+	void fontChanged();
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
@@ -92,6 +93,8 @@ protected slots:
 	void fontError(const QString& msg);
 	void updateWindowId();
 	void updateClientInfo();
+	void handleGinitError(quint32 msgid, quint64 fun, const QVariant& err);
+	void handleShimError(quint32 msgid, quint64 fun, const QVariant& err);
 
 protected:
 	void tooltip(const QString& text);
@@ -137,6 +140,8 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	void bailoutIfinputBlocking();
 
+	QString neovimErrorToString(const QVariant& err);
+
 private slots:
         void setAttached(bool attached=true);
 
@@ -177,6 +182,15 @@ private:
 	PopupMenu m_pum;
 	bool m_mouseEnabled;
 };
+
+class ShellRequestHandler: public QObject, public MsgpackRequestHandler
+{
+	Q_OBJECT
+public:
+	ShellRequestHandler(Shell *parent);
+	virtual void handleRequest(MsgpackIODevice* dev, quint32 msgid, const QByteArray& method, const QVariantList& args);
+};
+
 
 } // Namespace
 #endif

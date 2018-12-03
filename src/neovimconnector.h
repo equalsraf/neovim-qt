@@ -5,6 +5,7 @@
 #include <QAbstractSocket>
 #include <QProcess>
 #include <QTextCodec>
+#include "msgpackiodevice.h"
 #include "auto/neovimapi0.h"
 #include "auto/neovimapi1.h"
 #include "auto/neovimapi2.h"
@@ -14,6 +15,7 @@
 namespace NeovimQt {
 
 class MsgpackIODevice;
+class MsgpackRequestHandler;
 class NeovimConnectorHelper;
 class NeovimConnector: public QObject
 {
@@ -85,6 +87,8 @@ public:
 	NeovimConnectionType connectionType();
 	/** Some requests for metadata and ui attachment enforce a timeout in ms */
 	void setRequestTimeout(int);
+	/** Set a handler for msgpack rpc requests **/
+	void setRequestHandler(MsgpackRequestHandler *);
 
 	quint64 apiCompatibility();
 	quint64 apiLevel();
