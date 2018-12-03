@@ -108,3 +108,44 @@ function GuiName()
 	let info = nvim_get_chan_info(ui_chan)
 	return get(info.client, 'name', '')
 endfunction
+
+function s:ui_has_clipboard(idx, ui_info)
+	let info = nvim_get_chan_info(a:ui_info.chan)
+	let client_info = get(info, 'client', {})
+
+	if get(client_info, 'type', 0) == 'ui'
+		let attrs = get(client_info, 'attributes', {})
+		return has_key(attrs, 'gui-clipboard')
+	else
+		return 0
+	endif
+endfunction
+
+"Enable a GUI provided clipboard
+function GuiClipboard()
+	if !has("nvim-0.3.2")
+		echoerr "UI clipboard requires nvim >=0.3.2"
+		return
+	endif
+
+	let uis = nvim_list_uis()
+	call filter(uis, funcref('s:ui_has_clipboard'))
+	if len(uis) == 0
+		echoerr "No UIs with clipboard support are attached"
+		return
+	endif
+	let ui_chan = uis[-1].chan
+
+    let g:clipboard = {
+          \   'name': 'custom',
+          \   'copy': {
+          \      '+': {lines, regtype -> rpcnotify(ui_chan, 'Gui', 'SetClipboard', lines, regtype, '+')},
+          \      '*': {lines, regtype -> rpcnotify(ui_chan, 'Gui', 'SetClipboard', lines, regtype, '*')},
+          \    },
+          \   'paste': {
+          \      '+': {-> rpcrequest(ui_chan, 'Gui', 'GetClipboard', '+')},
+          \      '*': {-> rpcrequest(ui_chan, 'Gui', 'GetClipboard', '*')},
+          \   },
+          \ }
+	call provider#clipboard#Executable()
+endfunction
