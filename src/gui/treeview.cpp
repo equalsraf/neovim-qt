@@ -19,7 +19,10 @@ TreeView::TreeView(NeovimConnector *nvim, QWidget *parent)
     hideColumn(i);
   }
 
-  assert(m_nvim->isReady());
+  connect(m_nvim, &NeovimConnector::ready, this, &TreeView::connector_ready_cb);
+}
+
+void TreeView::connector_ready_cb() {
   setDirectory(QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
 
   connect(this, &TreeView::doubleClicked, this, &TreeView::open);
