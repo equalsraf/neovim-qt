@@ -19,6 +19,9 @@ TreeView::TreeView(NeovimConnector *nvim, QWidget *parent)
     hideColumn(i);
   }
 
+  if (m_nvim->isReady()) {
+    connector_ready_cb();
+  }
   connect(m_nvim, &NeovimConnector::ready, this, &TreeView::connector_ready_cb);
 }
 
