@@ -31,7 +31,7 @@ MsgpackIODevice* MsgpackIODevice::fromStdinOut(QObject* parent)
 {
 	MsgpackIODevice* rpc = new MsgpackIODevice(NULL, parent);
 	msgpack_packer_init(&rpc->m_pk, rpc,
-						(msgpack_packer_write)MsgpackIODevice::msgpack_write_to_stdout);
+	                    (msgpack_packer_write)MsgpackIODevice::msgpack_write_to_stdout);
 #ifdef _WIN32
 	StdinReader* rsn = new StdinReader(msgpack_unpacker_buffer_capacity(&rpc->m_uk), rpc);
 	connect(rsn, &StdinReader::dataAvailable, rpc, &MsgpackIODevice::dataAvailableStdin);
@@ -52,7 +52,7 @@ MsgpackIODevice::MsgpackIODevice(QIODevice* dev, QObject* parent)
 	if (m_dev) {
 		// MSVC: wont build without the (mspack_packer_write) cast
 		msgpack_packer_init(&m_pk, this,
-							(msgpack_packer_write)MsgpackIODevice::msgpack_write_to_dev);
+		                    (msgpack_packer_write)MsgpackIODevice::msgpack_write_to_dev);
 
 		m_dev->setParent(this);
 		connect(m_dev, &QAbstractSocket::readyRead, this, &MsgpackIODevice::dataAvailable);
@@ -102,7 +102,7 @@ bool MsgpackIODevice::setEncoding(const QByteArray& name)
 	m_encoding = QTextCodec::codecForName(name);
 	if (!m_encoding) {
 		setError(UnsupportedEncoding,
-				 QString("Unsupported encoding (%1)").arg(QString::fromLatin1(name)));
+		         QString("Unsupported encoding (%1)").arg(QString::fromLatin1(name)));
 		return false;
 	}
 	return true;
@@ -137,7 +137,7 @@ void MsgpackIODevice::dataAvailableStdin(const QByteArray& data)
 {
 	if ((quint64)data.length() > msgpack_unpacker_buffer_capacity(&m_uk)) {
 		setError(InvalidDevice,
-				 tr("Error when reading from stdin, BUG(buffered data exceeds capaciy)"));
+		         tr("Error when reading from stdin, BUG(buffered data exceeds capaciy)"));
 		return;
 	} else if (data.length() > 0) {
 		memcpy(msgpack_unpacker_buffer(&m_uk), data.constData(), data.length());
@@ -165,7 +165,7 @@ void MsgpackIODevice::dataAvailableFd(int fd)
 	}
 
 	qint64 bytes =
-	read(fd, msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
+	    read(fd, msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
 	if (bytes > 0) {
 		msgpack_unpacker_buffer_consumed(&m_uk, bytes);
 		msgpack_unpacked result;
@@ -263,9 +263,9 @@ void MsgpackIODevice::dispatch(msgpack_object& req)
 				return;
 			}
 			if (req.via.array.ptr[2].type != MSGPACK_OBJECT_BIN &&
-				req.via.array.ptr[2].type != MSGPACK_OBJECT_STR) {
+			    req.via.array.ptr[2].type != MSGPACK_OBJECT_STR) {
 				qDebug() << "Received Invalid request: method MUST be a String"
-						 << req.via.array.ptr[2];
+				         << req.via.array.ptr[2];
 				sendError(req, tr("Method id must be a positive integer"));
 				return;
 			}
@@ -426,7 +426,7 @@ void MsgpackIODevice::dispatchNotification(msgpack_object& nt)
 
 	QVariant val;
 	if (decodeMsgpack(nt.via.array.ptr[2], val) ||
-		(QMetaType::Type)val.type() != QMetaType::QVariantList) {
+	    (QMetaType::Type)val.type() != QMetaType::QVariantList) {
 		qDebug() << "Unable to unpack notification parameters" << nt;
 		return;
 	}
@@ -717,7 +717,7 @@ void MsgpackIODevice::send(const QVariant& var)
 	if (!checkVariant(var)) {
 		msgpack_pack_nil(&m_pk);
 		qWarning() << "Trying to pack unsupported variant type" << var.type()
-				   << "packing Nil instead";
+		           << "packing Nil instead";
 		return;
 	}
 
@@ -826,7 +826,7 @@ QByteArray MsgpackIODevice::encode(const QString& str)
 		return m_encoding->fromUnicode(str);
 	} else {
 		qWarning()
-		<< "Encoding String into MsgpackIODevice without an encoding (defaulting to utf8)";
+		    << "Encoding String into MsgpackIODevice without an encoding (defaulting to utf8)";
 		return str.toUtf8();
 	}
 }
@@ -840,7 +840,7 @@ QString MsgpackIODevice::decode(const QByteArray& data)
 		return m_encoding->toUnicode(data);
 	} else {
 		qWarning()
-		<< "Decoding String from MsgpackIODevice without an encoding (defaulting to utf8)";
+		    << "Decoding String from MsgpackIODevice without an encoding (defaulting to utf8)";
 		return QString::fromUtf8(data);
 	}
 }

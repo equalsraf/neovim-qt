@@ -116,7 +116,7 @@ private:
 class MsgpackRequestHandler {
 public:
 	virtual void handleRequest(MsgpackIODevice*, quint32 msgid, const QByteArray&,
-							   const QVariantList&) = 0;
+	                           const QVariantList&) = 0;
 };
 
 } // Namespace NeovimQt

@@ -77,7 +77,7 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 #endif
 	if (mod & ControlModifier
 #ifdef Q_OS_WIN32
-		&& !(mod & AltModifier)
+	    && !(mod & AltModifier)
 #endif
 	) {
 		modprefix += "C-";
@@ -87,7 +87,7 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 	}
 	if (mod & AltModifier
 #ifdef Q_OS_WIN32
-		&& !(mod & ControlModifier)
+	    && !(mod & ControlModifier)
 #endif
 	) {
 		modprefix += "A-";
@@ -110,7 +110,7 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
  * If the event is not valid for Neovim, returns an empty string
  */
 QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::KeyboardModifiers mod,
-								QPoint pos, short clickCount)
+                                QPoint pos, short clickCount)
 {
 	QString buttonName;
 	switch (bt) {
@@ -154,11 +154,11 @@ QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::Keybo
 	}
 
 	QString inp = QString("<%1%2%3><%4,%5>")
-				  .arg(modPrefix(mod))
-				  .arg(buttonName)
-				  .arg(evType)
-				  .arg(pos.x())
-				  .arg(pos.y());
+	                  .arg(modPrefix(mod))
+	                  .arg(buttonName)
+	                  .arg(evType)
+	                  .arg(pos.x())
+	                  .arg(pos.y());
 	return inp;
 }
 

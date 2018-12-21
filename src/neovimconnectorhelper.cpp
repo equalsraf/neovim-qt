@@ -37,9 +37,9 @@ void NeovimConnectorHelper::handleMetadata(quint32 msgid, quint64, const QVarian
 {
 	const QVariantList asList = result.toList();
 	if (asList.size() != 2 || !asList.at(0).canConvert<quint64>() ||
-		!asList.at(1).canConvert<QVariantMap>()) {
+	    !asList.at(1).canConvert<QVariantMap>()) {
 		m_c->setError(NeovimConnector::UnexpectedMsg,
-					  tr("Unable to unpack metadata response description, unexpected data type"));
+		              tr("Unable to unpack metadata response description, unexpected data type"));
 	}
 
 	m_c->m_channel = asList.at(0).toUInt();

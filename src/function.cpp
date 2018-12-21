@@ -23,7 +23,7 @@ Function::Function(): can_fail(false), m_valid(false)
  * Construct new function with the given return type, name, parameters and error
  */
 Function::Function(const QString& ret, const QString& name, QList<QPair<QString, QString>> params,
-				   bool can_fail)
+                   bool can_fail)
 : m_valid(true)
 {
 	this->return_type = ret;
@@ -36,7 +36,7 @@ Function::Function(const QString& ret, const QString& name, QList<QPair<QString,
  * Construct new function with the given return type, name, parameters and error
  */
 Function::Function(const QString& ret, const QString& name, QList<QString> paramTypes,
-				   bool can_fail)
+                   bool can_fail)
 : m_valid(true)
 {
 	this->return_type = ret;
@@ -159,11 +159,11 @@ QList<QPair<QString, QString>> Function::parseParameters(const QVariantList& obj
 		for (int j = 0; j < params.size(); j += 2) {
 			QByteArray type, name;
 			if (!params.at(j).canConvert<QByteArray>() ||
-				!params.at(j + 1).canConvert<QByteArray>()) {
+			    !params.at(j + 1).canConvert<QByteArray>()) {
 				return fail;
 			}
 			QPair<QString, QString> arg(QString::fromUtf8(params.at(j).toByteArray()),
-										QString::fromUtf8(params.at(j + 1).toByteArray()));
+			                            QString::fromUtf8(params.at(j + 1).toByteArray()));
 			res.append(arg);
 		}
 	}

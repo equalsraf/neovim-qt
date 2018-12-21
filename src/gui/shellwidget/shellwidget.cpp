@@ -37,17 +37,17 @@ void ShellWidget::setDefaultFont()
 }
 
 bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bool italic,
-							   bool force)
+                               bool force)
 {
 	QFont f(family, ptSize, weight, italic);
 	f.setStyleHint(QFont::TypeWriter,
-				   QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
+	               QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
 	f.setFixedPitch(true);
 	f.setKerning(false);
 
 	QFontInfo fi(f);
 	if (fi.family().compare(f.family(), Qt::CaseInsensitive) != 0 &&
-		f.family().compare("Monospace", Qt::CaseInsensitive) != 0) {
+	    f.family().compare("Monospace", Qt::CaseInsensitive) != 0) {
 		emit fontError(QString("Unknown font: %1").arg(f.family()));
 		return false;
 	}
@@ -59,7 +59,7 @@ bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bo
 
 		if (isBadMonospace(f)) {
 			emit fontError(
-			QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family()));
+			    QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family()));
 		}
 	}
 
@@ -231,7 +231,7 @@ void ShellWidget::resizeEvent(QResizeEvent* ev)
 QSize ShellWidget::sizeHint() const
 {
 	return QSize(m_cellSize.width() * m_contents.columns(),
-				 m_cellSize.height() * m_contents.rows());
+	             m_cellSize.height() * m_contents.rows());
 }
 
 void ShellWidget::resizeShell(int n_rows, int n_columns)
@@ -279,7 +279,7 @@ const ShellContents& ShellWidget::contents() const
 
 /// Put text in position, returns the amount of colums used
 int ShellWidget::put(const QString& text, int row, int column, QColor fg, QColor bg, QColor sp,
-					 bool bold, bool italic, bool underline, bool undercurl)
+                     bool bold, bool italic, bool underline, bool undercurl)
 {
 	if (!fg.isValid()) {
 		fg = m_fgColor;
@@ -291,7 +291,7 @@ int ShellWidget::put(const QString& text, int row, int column, QColor fg, QColor
 		sp = m_spColor;
 	}
 	int cols_changed =
-	m_contents.put(text, row, column, fg, bg, sp, bold, italic, underline, undercurl);
+	    m_contents.put(text, row, column, fg, bg, sp, bold, italic, underline, undercurl);
 	if (cols_changed > 0) {
 		QRect rect = absoluteShellRect(row, column, 1, cols_changed);
 		update(rect);
@@ -345,7 +345,7 @@ void ShellWidget::scrollShellRegion(int row0, int row1, int col0, int col1, int 
 QRect ShellWidget::absoluteShellRect(int row0, int col0, int rowcount, int colcount)
 {
 	return QRect(col0 * m_cellSize.width(), row0 * m_cellSize.height(),
-				 colcount * m_cellSize.width(), rowcount * m_cellSize.height());
+	             colcount * m_cellSize.width(), rowcount * m_cellSize.height());
 }
 
 QString ShellWidget::fontFamily() const

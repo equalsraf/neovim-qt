@@ -101,7 +101,7 @@ private slots:
 		QVERIFY(server->isListening());
 
 		NeovimConnector *c = NeovimConnector::connectToNeovim(
-		QString("%1:%2").arg(server->serverAddress().toString()).arg(server->serverPort()));
+		    QString("%1:%2").arg(server->serverAddress().toString()).arg(server->serverPort()));
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
 		QVERIFY(onError.isValid());
 		QVERIFY(SPYWAIT2(onError));

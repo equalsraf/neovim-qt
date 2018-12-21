@@ -20,7 +20,7 @@ class RequestHandler: public QObject, public MsgpackRequestHandler {
 public:
 	RequestHandler(QObject *parent = 0): QObject(parent) {}
 	virtual void handleRequest(MsgpackIODevice *dev, quint32 msgid, const QByteArray &method,
-							   const QVariantList &params)
+	                           const QVariantList &params)
 	{
 		dev->sendResponse(msgid, QVariant(), response);
 		emit receivedRequest(msgid, method, params);

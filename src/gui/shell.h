@@ -131,7 +131,7 @@ protected:
 	virtual void handleSetOption(const QString& name, const QVariant& value);
 	void handleExtGuiOption(const QString& name, const QVariant& value);
 	virtual void handlePopupMenuShow(const QVariantList& items, int64_t selected, int64_t row,
-									 int64_t col);
+	                                 int64_t col);
 	void handlePopupMenuSelect(int64_t selected);
 	virtual void handleMouse(bool);
 
@@ -189,7 +189,7 @@ class ShellRequestHandler: public QObject, public MsgpackRequestHandler {
 public:
 	ShellRequestHandler(Shell* parent);
 	virtual void handleRequest(MsgpackIODevice* dev, quint32 msgid, const QByteArray& method,
-							   const QVariantList& args);
+	                           const QVariantList& args);
 };
 
 

@@ -8,7 +8,7 @@
 struct Cell {
 public:
 	inline Cell(QChar c, QColor fgColor, QColor bgColor, QColor spColor, bool bold, bool italic,
-				bool underline, bool undercurl)
+	            bool underline, bool undercurl)
 	: foregroundColor(fgColor), backgroundColor(bgColor), specialColor(spColor), bold(bold),
 	  italic(italic), underline(underline), undercurl(undercurl), valid(true), doubleWidth(false)
 	{
@@ -71,9 +71,9 @@ inline bool operator==(const Cell& c1, const Cell& c2)
 	}
 
 	return (c1.c == c2.c && c1.foregroundColor == c2.foregroundColor &&
-			c1.backgroundColor == c2.backgroundColor && c1.specialColor == c2.specialColor &&
-			c1.bold == c2.bold && c1.italic == c2.italic && c1.underline == c2.underline &&
-			c1.undercurl == c2.undercurl);
+	        c1.backgroundColor == c2.backgroundColor && c1.specialColor == c2.specialColor &&
+	        c1.bold == c2.bold && c1.italic == c2.italic && c1.underline == c2.underline &&
+	        c1.undercurl == c2.undercurl);
 }
 
 #endif

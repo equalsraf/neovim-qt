@@ -70,6 +70,6 @@ QDebug operator<<(QDebug dbg, const NeovimQt::Function& f)
 		dbg.space() << p.first << ",";
 	}
 	dbg.space() << ")"
-				<< "fails:" << f.can_fail;
+	            << "fails:" << f.can_fail;
 	return dbg.maybeSpace();
 }

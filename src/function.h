@@ -16,7 +16,7 @@ class Function {
 public:
 	Function();
 	Function(const QString& ret, const QString& name, QList<QPair<QString, QString>> params,
-			 bool can_fail);
+	         bool can_fail);
 	Function(const QString& ret, const QString& name, QList<QString> paramTypes, bool can_fail);
 	bool isValid() const;
 	bool operator==(const Function& other);

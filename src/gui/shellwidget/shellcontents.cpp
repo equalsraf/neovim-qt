@@ -130,7 +130,7 @@ void ShellContents::scrollRegion(int row0, int row1, int col0, int col1, int cou
 	}
 	if (!verifyRegion(row0, row1, col0, col1)) {
 		qDebug() << "Scroll region is invalid (row0, row1, col0, col1)" << row0 << row1 << col0
-				 << col1;
+		         << col1;
 		return;
 	}
 
@@ -150,7 +150,7 @@ void ShellContents::scrollRegion(int row0, int row1, int col0, int col1, int cou
 		if (dst >= row0 && dst < row1) {
 			// Copy line
 			memcpy(&_data[dst * _columns + col0], &_data[i * _columns + col0],
-				   (col1 - col0) * sizeof(Cell));
+			       (col1 - col0) * sizeof(Cell));
 		}
 
 		// Clear src line
@@ -217,7 +217,7 @@ const Cell& ShellContents::constValue(int row, int column) const
 
 /// Writes content to the shell, returns the number of columns written
 int ShellContents::put(const QString& str, int row, int column, QColor fg, QColor bg, QColor sp,
-					   bool bold, bool italic, bool underline, bool undercurl)
+                       bool bold, bool italic, bool underline, bool undercurl)
 {
 	if (row < 0 || row >= _rows || column < 0 || column >= _columns) {
 		return 0;

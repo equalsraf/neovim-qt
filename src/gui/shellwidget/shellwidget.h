@@ -17,7 +17,7 @@ class ShellWidget: public QWidget {
 public:
 	ShellWidget(QWidget* parent = 0);
 	bool setShellFont(const QString& family, int ptSize, int weight = -1, bool italic = false,
-					  bool force = false);
+	                  bool force = false);
 
 	QColor background() const;
 	QColor foreground() const;
@@ -41,8 +41,8 @@ public slots:
 	void setForeground(const QColor& color);
 	void setDefaultFont();
 	int put(const QString&, int row, int column, QColor fg = QColor(), QColor bg = QColor(),
-			QColor sp = QColor(), bool bold = false, bool italic = false, bool underline = false,
-			bool undercurl = false);
+	        QColor sp = QColor(), bool bold = false, bool italic = false, bool underline = false,
+	        bool undercurl = false);
 	void clearRow(int row);
 	void clearShell(QColor bg);
 	void clearRegion(int row0, int col0, int row1, int col1);

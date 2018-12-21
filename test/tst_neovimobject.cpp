@@ -37,11 +37,11 @@ void TestNeovimObject::delayedSetup()
 	connect(n, &NeovimQt::NeovimApi1::neovimNotification, this, &TestNeovimObject::test_event);
 
 	n->vim_command(
-	QString("call rpcnotify(%1, \"test_event\", \"WAT\")").arg(m_c->channel()).toUtf8());
+	    QString("call rpcnotify(%1, \"test_event\", \"WAT\")").arg(m_c->channel()).toUtf8());
 	n->vim_command(QString("call rpcnotify(%1, \"test_event\", 42)").arg(m_c->channel()).toUtf8());
 	n->vim_command(QString("call rpcnotify(%1, \"test_event\", [\"one\", \"two\", \"\"])")
-				   .arg(m_c->channel())
-				   .toUtf8());
+	                   .arg(m_c->channel())
+	                   .toUtf8());
 }
 
 void TestNeovimObject::test_event(const QByteArray &name, const QVariantList &params)

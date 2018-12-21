@@ -204,7 +204,7 @@ void Shell::init()
 	}
 
 	connect(m_nvim->api0(), &NeovimApi0::neovimNotification, this,
-			&Shell::handleNeovimNotification);
+	        &Shell::handleNeovimNotification);
 	connect(m_nvim->api0(), &NeovimApi0::on_ui_try_resize, this, &Shell::neovimResizeFinished);
 
 	QRect screenRect = QApplication::desktop()->availableGeometry(this);
@@ -311,8 +311,8 @@ void Shell::handlePut(const QVariantList& args)
 
 	if (!text.isEmpty()) {
 		int cols =
-		put(text, m_cursor_pos.y(), m_cursor_pos.x(), m_hg_foreground, m_hg_background,
-			m_hg_special, m_font_bold, m_font_italic, m_font_underline, m_font_undercurl);
+		    put(text, m_cursor_pos.y(), m_cursor_pos.x(), m_hg_foreground, m_hg_background,
+		        m_hg_special, m_font_bold, m_font_italic, m_font_underline, m_font_undercurl);
 		// Move cursor ahead
 		update(neovimCursorRect());
 		setNeovimCursor(m_cursor_pos.y(), m_cursor_pos.x() + cols);
@@ -347,7 +347,7 @@ void Shell::handleScroll(const QVariantList& args)
 	}
 
 	scrollShellRegion(m_scroll_region.top(), m_scroll_region.bottom(), m_scroll_region.left(),
-					  m_scroll_region.right(), count);
+	                  m_scroll_region.right(), count);
 }
 
 void Shell::handleSetScrollRegion(const QVariantList& opargs)
@@ -401,7 +401,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		m_hg_special = special();
 	} else if (name == "resize") {
 		if (opargs.size() < 2 || !opargs.at(0).canConvert<quint64>() ||
-			!opargs.at(1).canConvert<quint64>()) {
+		    !opargs.at(1).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
@@ -414,7 +414,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		clearRegion(m_cursor_pos.y(), m_cursor_pos.x(), m_cursor_pos.y() + 1, columns());
 	} else if (name == "cursor_goto") {
 		if (opargs.size() < 2 || !opargs.at(0).canConvert<quint64>() ||
-			!opargs.at(1).canConvert<quint64>()) {
+		    !opargs.at(1).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
@@ -483,13 +483,13 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		}
 	} else if (name == "popupmenu_show") {
 		if (opargs.size() != 4 || !opargs.at(1).canConvert<qint64>() ||
-			!opargs.at(2).canConvert<qint64>() || !opargs.at(3).canConvert<qint64>()) {
+		    !opargs.at(2).canConvert<qint64>() || !opargs.at(3).canConvert<qint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
 			return;
 		}
 
 		handlePopupMenuShow(opargs.at(0).toList(), opargs.at(1).toLongLong(),
-							opargs.at(2).toLongLong(), opargs.at(3).toLongLong());
+		                    opargs.at(2).toLongLong(), opargs.at(3).toLongLong());
 	} else if (name == "popupmenu_select") {
 		if (opargs.size() != 1 || !opargs.at(0).canConvert<qint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
@@ -511,7 +511,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 /// Show the pum, with the given items, selecting the given item (idx)
 /// and place the pum at the given row/col
 void Shell::handlePopupMenuShow(const QVariantList& items, int64_t selected, int64_t row,
-								int64_t col)
+                                int64_t col)
 {
 	QList<PopupMenuItem> model;
 	foreach (const QVariant& v, items) {
@@ -522,7 +522,7 @@ void Shell::handlePopupMenuShow(const QVariantList& items, int64_t selected, int
 			model.append({"", "", "", ""});
 		} else {
 			model.append({item.value(0).toString(), item.value(1).toString(),
-						  item.value(2).toString(), item.value(3).toString()});
+			              item.value(2).toString(), item.value(3).toString()});
 		}
 	}
 
@@ -635,15 +635,15 @@ void Shell::handleNeovimNotification(const QByteArray& name, const QVariantList&
 		} else if (guiEvName == "WindowMaximized" && args.size() == 2) {
 			if (isWindow()) {
 				setWindowState(variant_not_zero(args.at(1)) ? windowState() | Qt::WindowMaximized :
-															  windowState() & ~Qt::WindowMaximized);
+				                                              windowState() & ~Qt::WindowMaximized);
 			} else {
 				emit neovimMaximized(variant_not_zero(args.at(1)));
 			}
 		} else if (guiEvName == "WindowFullScreen" && args.size() == 2) {
 			if (isWindow()) {
 				setWindowState(variant_not_zero(args.at(1)) ?
-							   windowState() | Qt::WindowFullScreen :
-							   windowState() & ~Qt::WindowFullScreen);
+				                   windowState() | Qt::WindowFullScreen :
+				                   windowState() & ~Qt::WindowFullScreen);
 			} else {
 				emit neovimFullScreen(variant_not_zero(args.at(1)));
 			}
@@ -851,7 +851,7 @@ void Shell::neovimMouseEvent(QMouseEvent* ev)
 		inp = Input.convertMouse(bt, ev->type(), ev->modifiers(), pos, 0);
 	} else {
 		inp =
-		Input.convertMouse(ev->button(), ev->type(), ev->modifiers(), pos, m_mouseclick_count);
+		    Input.convertMouse(ev->button(), ev->type(), ev->modifiers(), pos, m_mouseclick_count);
 	}
 	if (inp.isEmpty()) {
 		return;
@@ -924,7 +924,7 @@ void Shell::wheelEvent(QWheelEvent* ev)
 	QPoint cell_delta(total_delta.x() / scroll_step_x, total_delta.y() / scroll_step_y);
 	// Save remainder for future events
 	m_mouse_wheel_delta_fraction =
-	total_delta - QPoint(cell_delta.x() * scroll_step_x, cell_delta.y() * scroll_step_y);
+	    total_delta - QPoint(cell_delta.x() * scroll_step_x, cell_delta.y() * scroll_step_y);
 
 	int horiz = cell_delta.x();
 	int vert = cell_delta.y();
@@ -943,17 +943,17 @@ void Shell::wheelEvent(QWheelEvent* ev)
 	QString inp;
 	if (vert != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
-			   .arg(Input.modPrefix(ev->modifiers()))
-			   .arg(vert > 0 ? "Up" : "Down")
-			   .arg(pos.x())
-			   .arg(pos.y());
+		           .arg(Input.modPrefix(ev->modifiers()))
+		           .arg(vert > 0 ? "Up" : "Down")
+		           .arg(pos.x())
+		           .arg(pos.y());
 	}
 	if (horiz != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
-			   .arg(Input.modPrefix(ev->modifiers()))
-			   .arg(horiz > 0 ? "Left" : "Right")
-			   .arg(pos.x())
-			   .arg(pos.y());
+		           .arg(Input.modPrefix(ev->modifiers()))
+		           .arg(horiz > 0 ? "Left" : "Right")
+		           .arg(pos.x())
+		           .arg(pos.y());
 	}
 	m_nvim->api0()->vim_input(inp.toLatin1());
 }
@@ -1199,47 +1199,47 @@ bool Shell::isBadMonospace(const QFont& f)
 	if (fm_normal.averageCharWidth() != fm_normal.maxWidth()) {
 		QFontInfo info(f);
 		qDebug()
-		<< f.family()
-		<< "Average and Maximum font width mismatch for Regular font; QFont::exactMatch() is"
-		<< f.exactMatch() << "Real font is " << info.family() << info.pointSize();
+		    << f.family()
+		    << "Average and Maximum font width mismatch for Regular font; QFont::exactMatch() is"
+		    << f.exactMatch() << "Real font is " << info.family() << info.pointSize();
 		return true;
 	}
 
 	// Italic
 	if (fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
-		fm_italic.maxWidth() * 2 != fm_italic.width("MM")) {
+	    fm_italic.maxWidth() * 2 != fm_italic.width("MM")) {
 		QFontInfo info(fi);
 		qDebug()
-		<< fi.family()
-		<< "Average and Maximum font width mismatch for Italic font; QFont::exactMatch() is"
-		<< fi.exactMatch() << "Real font is " << info.family() << info.pointSize();
+		    << fi.family()
+		    << "Average and Maximum font width mismatch for Italic font; QFont::exactMatch() is"
+		    << fi.exactMatch() << "Real font is " << info.family() << info.pointSize();
 		return true;
 	}
 
 	// Bold
 	if (fm_bold.averageCharWidth() != fm_bold.maxWidth() ||
-		fm_bold.maxWidth() * 2 != fm_bold.width("MM")) {
+	    fm_bold.maxWidth() * 2 != fm_bold.width("MM")) {
 		QFontInfo info(fb);
 		qDebug() << fb.family()
-				 << "Average and Maximum font width mismatch for Bold font; QFont::exactMatch() is"
-				 << fb.exactMatch() << "Real font is " << info.family() << info.pointSize();
+		         << "Average and Maximum font width mismatch for Bold font; QFont::exactMatch() is"
+		         << fb.exactMatch() << "Real font is " << info.family() << info.pointSize();
 		return true;
 	}
 
 	// Bold+Italic
 	if (fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
-		fm_boldit.maxWidth() * 2 != fm_boldit.width("MM")) {
+	    fm_boldit.maxWidth() * 2 != fm_boldit.width("MM")) {
 		QFontInfo info(fbi);
-		qDebug()
-		<< fbi.family()
-		<< "Average and Maximum font width mismatch for Bold+Italic font; QFont::exactMatch() is"
-		<< fbi.exactMatch() << "Real font is " << info.family() << info.pointSize();
+		qDebug() << fbi.family()
+		         << "Average and Maximum font width mismatch for Bold+Italic font; "
+		            "QFont::exactMatch() is"
+		         << fbi.exactMatch() << "Real font is " << info.family() << info.pointSize();
 		return true;
 	}
 
 	if (fm_normal.maxWidth() != fm_italic.maxWidth() ||
-		fm_normal.maxWidth() != fm_boldit.maxWidth() ||
-		fm_normal.maxWidth() != fm_bold.maxWidth()) {
+	    fm_normal.maxWidth() != fm_boldit.maxWidth() ||
+	    fm_normal.maxWidth() != fm_bold.maxWidth()) {
 		qDebug() << f.family() << "Average and Maximum font width mismatch between font types";
 		return true;
 	}
@@ -1317,7 +1317,7 @@ ShellRequestHandler::ShellRequestHandler(Shell* parent): QObject(parent)
 
 const char SELECTION_MIME_TYPE[] = "application/x-nvim-selection-type";
 void ShellRequestHandler::handleRequest(MsgpackIODevice* dev, quint32 msgid,
-										const QByteArray& method, const QVariantList& args)
+                                        const QByteArray& method, const QVariantList& args)
 {
 	if (method == "Gui" && args.size() > 0) {
 		QString ctx = args.at(0).toString();

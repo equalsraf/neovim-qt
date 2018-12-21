@@ -45,18 +45,18 @@ void printFontMetrics(const QFont& f)
 
 	// Regular
 	char err =
-	(fm.averageCharWidth() != fm.maxWidth() || fm.width("MM") != fm.maxWidth() * 2) ? '!' : ' ';
+	    (fm.averageCharWidth() != fm.maxWidth() || fm.width("MM") != fm.maxWidth() * 2) ? '!' : ' ';
 	qStdOut() << err;
 	qStdOut() << "  (Regular) Average char width: " << fm.averageCharWidth();
 	qStdOut() << " Max char width: " << fm.maxWidth();
 	qStdOut() << " Width(MM): " << fm.width("MM") << endl;
 
 	// Italic
-	err =
-	(fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
-	 fm_italic.width("MM") != fm_italic.maxWidth() * 2 || fm_italic.maxWidth() != fm.maxWidth()) ?
-	'!' :
-	' ';
+	err = (fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
+	       fm_italic.width("MM") != fm_italic.maxWidth() * 2 ||
+	       fm_italic.maxWidth() != fm.maxWidth()) ?
+	          '!' :
+	          ' ';
 	qStdOut() << err;
 	qStdOut() << "   (Italic) Average char width: " << fm_italic.averageCharWidth();
 	qStdOut() << " Max char width: " << fm_italic.maxWidth();
@@ -64,20 +64,20 @@ void printFontMetrics(const QFont& f)
 
 	// Bold
 	err = (fm_bold.averageCharWidth() != fm_bold.maxWidth() ||
-		   fm_bold.width("MM") != fm_bold.maxWidth() * 2 || fm_bold.maxWidth() != fm.maxWidth()) ?
-		  '!' :
-		  ' ';
+	       fm_bold.width("MM") != fm_bold.maxWidth() * 2 || fm_bold.maxWidth() != fm.maxWidth()) ?
+	          '!' :
+	          ' ';
 	qStdOut() << err;
 	qStdOut() << "     (Bold) Average char width: " << fm_bold.averageCharWidth();
 	qStdOut() << " Max char width: " << fm_bold.maxWidth();
 	qStdOut() << " Width(MM): " << fm_bold.width("MM") << endl;
 
 	// BoldItalic
-	err =
-	(fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
-	 fm_boldit.width("MM") != fm_boldit.maxWidth() * 2 || fm_boldit.maxWidth() != fm.maxWidth()) ?
-	'!' :
-	' ';
+	err = (fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
+	       fm_boldit.width("MM") != fm_boldit.maxWidth() * 2 ||
+	       fm_boldit.maxWidth() != fm.maxWidth()) ?
+	          '!' :
+	          ' ';
 	qStdOut() << err;
 	qStdOut() << "  (Bold+It) Average char width: " << fm_boldit.averageCharWidth();
 	qStdOut() << " Max char width: " << fm_boldit.maxWidth();
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 
 	QFont f;
 	f.setStyleHint(QFont::TypeWriter,
-				   QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
+	               QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
 	f.setFamily(QStringList(app.arguments().mid(1)).join(" "));
 	f.setFixedPitch(true);
 	f.setKerning(false);

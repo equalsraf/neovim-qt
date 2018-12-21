@@ -18,7 +18,7 @@ public:
 	QHash<int, QString> specialKeys;
 	QHash<QString, QString> replaceKeys;
 	QString convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::KeyboardModifiers mod,
-						 QPoint pos, short clicksCount);
+	                     QPoint pos, short clicksCount);
 
 protected:
 	// define our own key and modifier modifier constants to abstract

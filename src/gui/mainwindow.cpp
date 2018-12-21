@@ -53,7 +53,7 @@ void MainWindow::init(NeovimConnector *c)
 	m_stack.setCurrentIndex(1);
 	connect(m_shell, SIGNAL(neovimAttached(bool)), this, SLOT(neovimAttachmentChanged(bool)));
 	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)), this,
-			SLOT(neovimSetTitle(const QString &)));
+	        SLOT(neovimSetTitle(const QString &)));
 	connect(m_shell, &Shell::neovimResized, this, &MainWindow::neovimWidgetResized);
 	connect(m_shell, &Shell::neovimMaximized, this, &MainWindow::neovimMaximized);
 	connect(m_shell, &Shell::neovimSuspend, this, &MainWindow::neovimSuspend);
@@ -112,9 +112,9 @@ void MainWindow::neovimIsUnsupported()
 {
 	showIfDelayed();
 	m_errorWidget->setText(
-	QString("Cannot connect to this Neovim, required API version 1, found [%1-%2]")
-	.arg(m_nvim->apiCompatibility())
-	.arg(m_nvim->apiLevel()));
+	    QString("Cannot connect to this Neovim, required API version 1, found [%1-%2]")
+	        .arg(m_nvim->apiCompatibility())
+	        .arg(m_nvim->apiLevel()));
 	m_errorWidget->showReconnect(m_nvim->canReconnect());
 	m_stack.setCurrentIndex(0);
 }

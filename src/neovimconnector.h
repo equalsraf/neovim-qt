@@ -61,7 +61,7 @@ public:
 	NeovimConnector(QIODevice* s);
 	NeovimConnector(MsgpackIODevice* s);
 	static NeovimConnector* spawn(const QStringList& params = QStringList(),
-								  const QString& exe = "nvim");
+	                              const QString& exe = "nvim");
 	static NeovimConnector* connectToSocket(const QString&);
 	static NeovimConnector* connectToHost(const QString& host, int port);
 	static NeovimConnector* connectToNeovim(const QString& server = QString());
