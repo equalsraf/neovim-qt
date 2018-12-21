@@ -13,8 +13,7 @@
  *    bugs :D
  */
 
-class TestCallAllMethods: public QObject
-{
+class TestCallAllMethods: public QObject {
 	Q_OBJECT
 
 private slots:
@@ -69,18 +68,17 @@ void TestCallAllMethods::callAll()
 	const QMetaObject *meta = obj->metaObject();
 	QSignalSpy neovimErrors(m_c, SIGNAL(error(NeovimError)));
 	QVERIFY(neovimErrors.isValid());
-	for (int i=0; i<meta->methodCount(); i++) {
+	for (int i = 0; i < meta->methodCount(); i++) {
 		QMetaMethod meth = meta->method(i);
-		if ( meth.methodType() != QMetaMethod::Slot ||
-				meth.access() != QMetaMethod::Public) {
+		if (meth.methodType() != QMetaMethod::Slot || meth.access() != QMetaMethod::Public) {
 			continue;
 		}
 
-		if ( meth.parameterNames().size() == 0 && meth.name() != "deleteLater") {
+		if (meth.parameterNames().size() == 0 && meth.name() != "deleteLater") {
 			qDebug() << "Calling" << meth.name();
 			meth.invoke(obj);
-		} else if ( meth.parameterNames().size() == 1 ) {
-			if ( meth.parameterTypes().at(0) == "Window" ) {
+		} else if (meth.parameterNames().size() == 1) {
+			if (meth.parameterTypes().at(0) == "Window") {
 				meth.invoke(obj, Q_ARG(int64_t, 1));
 			}
 		} else {

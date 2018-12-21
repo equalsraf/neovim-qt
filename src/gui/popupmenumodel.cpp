@@ -4,12 +4,12 @@
 
 namespace NeovimQt {
 
-PopupMenuModel::PopupMenuModel(QList<PopupMenuItem> l)
-:QAbstractListModel(), m_data(l)
+PopupMenuModel::PopupMenuModel(QList<PopupMenuItem> l): QAbstractListModel(), m_data(l)
 {
 }
 
-int PopupMenuModel::rowCount(const QModelIndex &parent) const {
+int PopupMenuModel::rowCount(const QModelIndex &parent) const
+{
 	if (parent.isValid()) {
 		return 0;
 	} else {
@@ -17,7 +17,8 @@ int PopupMenuModel::rowCount(const QModelIndex &parent) const {
 	}
 }
 
-QVariant PopupMenuModel::data(const QModelIndex &index, int role) const {
+QVariant PopupMenuModel::data(const QModelIndex &index, int role) const
+{
 
 	if (index.parent().isValid()) {
 		return QVariant();
@@ -28,7 +29,7 @@ QVariant PopupMenuModel::data(const QModelIndex &index, int role) const {
 	}
 	auto item = m_data.at(index.row());
 
-    if ( role == Qt::DisplayRole ) {
+	if (role == Qt::DisplayRole) {
 		QString text = item.text;
 
 		if (!item.kind.isEmpty()) {

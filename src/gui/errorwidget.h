@@ -10,9 +10,9 @@ namespace NeovimQt {
 class ErrorWidget: public QWidget {
 	Q_OBJECT
 public:
-	ErrorWidget(QWidget *parent=0);
+	ErrorWidget(QWidget *parent = 0);
 public slots:
-	void setText(const QString& text);
+	void setText(const QString &text);
 	void showReconnect(bool);
 signals:
 	void reconnectNeovim();

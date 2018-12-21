@@ -8,7 +8,7 @@
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
 #include <QtPlugin>
-Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 
 int ui_main(int argc, char **argv)
@@ -59,11 +59,11 @@ int cli_main(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-#if defined (Q_OS_UNIX) && ! defined (Q_OS_MAC)
+#if defined(Q_OS_UNIX) && !defined(Q_OS_MAC)
 	// Do an early check for --nofork. We need to do this here, before
 	// creating a QApplication, since QCommandLineParser requires one
 	bool nofork = false;
-	for (int i=1; i<argc; i++) {
+	for (int i = 1; i < argc; i++) {
 		if (QString::compare("--", argv[i]) == 0) {
 			break;
 		} else if (QString::compare("--spawn", argv[i]) == 0) {
@@ -86,4 +86,3 @@ int main(int argc, char **argv)
 	return ui_main(argc, argv);
 #endif
 }
-

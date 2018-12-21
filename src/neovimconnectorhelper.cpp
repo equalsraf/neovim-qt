@@ -10,22 +10,20 @@ namespace NeovimQt {
 
 /**
  * \class NeovimQt::NeovimConnectorHelper
- * 
+ *
  * The helper deals with Neovim API internals, it handles
  * msgpack responses on behalf of the connector.
  *
  */
 
-NeovimConnectorHelper::NeovimConnectorHelper(NeovimConnector *c)
-:QObject(c), m_c(c)
+NeovimConnectorHelper::NeovimConnectorHelper(NeovimConnector* c): QObject(c), m_c(c)
 {
 }
 
 /** Handle Msgpack-rpc errors when fetching the API metadata */
 void NeovimConnectorHelper::handleMetadataError(quint32 msgid, quint64, const QVariant& errobj)
 {
-	m_c->setError(NeovimConnector::NoMetadata,
-		tr("Unable to get Neovim api information"));
+	m_c->setError(NeovimConnector::NoMetadata, tr("Unable to get Neovim api information"));
 	// TODO: better error message (from result?)
 	return;
 }
@@ -38,11 +36,10 @@ void NeovimConnectorHelper::handleMetadataError(quint32 msgid, quint64, const QV
 void NeovimConnectorHelper::handleMetadata(quint32 msgid, quint64, const QVariant& result)
 {
 	const QVariantList asList = result.toList();
-	if (asList.size() != 2 || 
-			!asList.at(0).canConvert<quint64>() ||
-			!asList.at(1).canConvert<QVariantMap>()) {
+	if (asList.size() != 2 || !asList.at(0).canConvert<quint64>() ||
+		!asList.at(1).canConvert<QVariantMap>()) {
 		m_c->setError(NeovimConnector::UnexpectedMsg,
-				tr("Unable to unpack metadata response description, unexpected data type"));
+					  tr("Unable to unpack metadata response description, unexpected data type"));
 	}
 
 	m_c->m_channel = asList.at(0).toUInt();

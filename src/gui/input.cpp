@@ -6,7 +6,8 @@ namespace NeovimQt {
 
 InputConv Input;
 
-InputConv::InputConv() {
+InputConv::InputConv()
+{
 	// see :h key-notation
 
 	// special keys i.e. no textual representation
@@ -59,7 +60,7 @@ InputConv::InputConv() {
 }
 
 /**
- * Return keyboard modifier prefix 
+ * Return keyboard modifier prefix
  *
  * e.g. C-, A- or C-S-A-
  *
@@ -70,25 +71,25 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 {
 	QString modprefix;
 #if defined(Q_OS_MAC) || defined(Q_OS_UNIX)
-	if ( mod & CmdModifier ) {
+	if (mod & CmdModifier) {
 		modprefix += "D-"; // like MacVim does
 	}
 #endif
-	if ( mod & ControlModifier
+	if (mod & ControlModifier
 #ifdef Q_OS_WIN32
 		&& !(mod & AltModifier)
 #endif
-	   ) {
+	) {
 		modprefix += "C-";
 	}
-	if ( mod & ShiftModifier ) {
+	if (mod & ShiftModifier) {
 		modprefix += "S-";
 	}
-	if ( mod & AltModifier
+	if (mod & AltModifier
 #ifdef Q_OS_WIN32
 		&& !(mod & ControlModifier)
 #endif
-	   ) {
+	) {
 		modprefix += "A-";
 	}
 
@@ -108,50 +109,56 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
  *
  * If the event is not valid for Neovim, returns an empty string
  */
-QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::KeyboardModifiers mod, QPoint pos, short clickCount)
+QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::KeyboardModifiers mod,
+								QPoint pos, short clickCount)
 {
 	QString buttonName;
-	switch(bt) {
-	case Qt::LeftButton:
-		// In practice Neovim only supports the clickcount for Left
-		// mouse presses, even if our shell can support other buttons
-		if (clickCount > 1 && clickCount <= 4) {
-			buttonName = QString("%1-Left").arg(clickCount);
-		} else {
-			buttonName += "Left";
-		}
-		break;
-	case Qt::RightButton:
-		buttonName += "Right";
-		break;
-	case Qt::MidButton:
-		buttonName += "Middle";
-		break;
-	case Qt::NoButton:
-		break;
-	default:
-		return "";
+	switch (bt) {
+		case Qt::LeftButton:
+			// In practice Neovim only supports the clickcount for Left
+			// mouse presses, even if our shell can support other buttons
+			if (clickCount > 1 && clickCount <= 4) {
+				buttonName = QString("%1-Left").arg(clickCount);
+			} else {
+				buttonName += "Left";
+			}
+			break;
+		case Qt::RightButton:
+			buttonName += "Right";
+			break;
+		case Qt::MidButton:
+			buttonName += "Middle";
+			break;
+		case Qt::NoButton:
+			break;
+		default:
+			return "";
 	}
 
 	QString evType;
-	switch(type) {
-	case QEvent::MouseButtonDblClick:
-		// Treat this as a regular MouseButtonPress. Repeated
-		// clicks are handled above.
-	case QEvent::MouseButtonPress:
-		evType += "Mouse";
-		break;
-	case QEvent::MouseButtonRelease:
-		evType += "Release";
-		break;
-	case QEvent::MouseMove:
-		evType += "Drag";
-		break;
-	default:
-		return "";
+	switch (type) {
+		case QEvent::MouseButtonDblClick:
+			// Treat this as a regular MouseButtonPress. Repeated
+			// clicks are handled above.
+		case QEvent::MouseButtonPress:
+			evType += "Mouse";
+			break;
+		case QEvent::MouseButtonRelease:
+			evType += "Release";
+			break;
+		case QEvent::MouseMove:
+			evType += "Drag";
+			break;
+		default:
+			return "";
 	}
 
-	QString inp = QString("<%1%2%3><%4,%5>").arg(modPrefix(mod)).arg(buttonName).arg(evType).arg(pos.x()).arg(pos.y());
+	QString inp = QString("<%1%2%3><%4,%5>")
+				  .arg(modPrefix(mod))
+				  .arg(buttonName)
+				  .arg(evType)
+				  .arg(pos.x())
+				  .arg(pos.y());
 	return inp;
 }
 
@@ -162,50 +169,50 @@ QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::Keybo
  */
 QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers mod)
 {
-    if ( mod & Qt::KeypadModifier ) {
+	if (mod & Qt::KeypadModifier) {
 		switch (k) {
-		case Qt::Key_Home:
-			return QString("<%1kHome>").arg(modPrefix(mod));
-		case Qt::Key_End:
-			return QString("<%1kEnd>").arg(modPrefix(mod));
-		case Qt::Key_PageUp:
-			return QString("<%1kPageUp>").arg(modPrefix(mod));
-		case Qt::Key_PageDown:
-			return QString("<%1kPageDown>").arg(modPrefix(mod));
-		case Qt::Key_Plus:
-			return QString("<%1kPlus>").arg(modPrefix(mod));
-		case Qt::Key_Minus:
-			return QString("<%1kMinus>").arg(modPrefix(mod));
-		case Qt::Key_multiply:
-			return QString("<%1kMultiply>").arg(modPrefix(mod));
-		case Qt::Key_division:
-			return QString("<%1kDivide>").arg(modPrefix(mod));
-		case Qt::Key_Enter:
-			return QString("<%1kEnter>").arg(modPrefix(mod));
-		case Qt::Key_Period:
-			return QString("<%1kPoint>").arg(modPrefix(mod));
-		case Qt::Key_0:
-			return QString("<%1k0>").arg(modPrefix(mod));
-		case Qt::Key_1:
-			return QString("<%1k1>").arg(modPrefix(mod));
-		case Qt::Key_2:
-			return QString("<%1k2>").arg(modPrefix(mod));
-		case Qt::Key_3:
-			return QString("<%1k3>").arg(modPrefix(mod));
-		case Qt::Key_4:
-			return QString("<%1k4>").arg(modPrefix(mod));
-		case Qt::Key_5:
-			return QString("<%1k5>").arg(modPrefix(mod));
-		case Qt::Key_6:
-			return QString("<%1k6>").arg(modPrefix(mod));
-		case Qt::Key_7:
-			return QString("<%1k7>").arg(modPrefix(mod));
-		case Qt::Key_8:
-			return QString("<%1k8>").arg(modPrefix(mod));
-		case Qt::Key_9:
-			return QString("<%1k9>").arg(modPrefix(mod));
+			case Qt::Key_Home:
+				return QString("<%1kHome>").arg(modPrefix(mod));
+			case Qt::Key_End:
+				return QString("<%1kEnd>").arg(modPrefix(mod));
+			case Qt::Key_PageUp:
+				return QString("<%1kPageUp>").arg(modPrefix(mod));
+			case Qt::Key_PageDown:
+				return QString("<%1kPageDown>").arg(modPrefix(mod));
+			case Qt::Key_Plus:
+				return QString("<%1kPlus>").arg(modPrefix(mod));
+			case Qt::Key_Minus:
+				return QString("<%1kMinus>").arg(modPrefix(mod));
+			case Qt::Key_multiply:
+				return QString("<%1kMultiply>").arg(modPrefix(mod));
+			case Qt::Key_division:
+				return QString("<%1kDivide>").arg(modPrefix(mod));
+			case Qt::Key_Enter:
+				return QString("<%1kEnter>").arg(modPrefix(mod));
+			case Qt::Key_Period:
+				return QString("<%1kPoint>").arg(modPrefix(mod));
+			case Qt::Key_0:
+				return QString("<%1k0>").arg(modPrefix(mod));
+			case Qt::Key_1:
+				return QString("<%1k1>").arg(modPrefix(mod));
+			case Qt::Key_2:
+				return QString("<%1k2>").arg(modPrefix(mod));
+			case Qt::Key_3:
+				return QString("<%1k3>").arg(modPrefix(mod));
+			case Qt::Key_4:
+				return QString("<%1k4>").arg(modPrefix(mod));
+			case Qt::Key_5:
+				return QString("<%1k5>").arg(modPrefix(mod));
+			case Qt::Key_6:
+				return QString("<%1k6>").arg(modPrefix(mod));
+			case Qt::Key_7:
+				return QString("<%1k7>").arg(modPrefix(mod));
+			case Qt::Key_8:
+				return QString("<%1k8>").arg(modPrefix(mod));
+			case Qt::Key_9:
+				return QString("<%1k9>").arg(modPrefix(mod));
 		}
-    }
+	}
 
 	if (specialKeys.contains(k)) {
 		return QString("<%1%2>").arg(modPrefix(mod)).arg(specialKeys.value(k));
@@ -221,7 +228,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 		// on macs, text is empty for ctrl+key and cmd+key combos (with or without alt)
 		if (mod & ControlModifier || mod & CmdModifier) {
 			// ignore ctrl, alt and cmd key combos by themselves
-			QList<Qt::Key> keys = { Key_Control, Key_Alt, Key_Cmd };
+			QList<Qt::Key> keys = {Key_Control, Key_Alt, Key_Cmd};
 			if (keys.contains((Qt::Key)k)) {
 				return QString();
 			} else if (mod & ShiftModifier) {

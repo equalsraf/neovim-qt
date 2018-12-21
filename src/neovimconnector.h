@@ -17,8 +17,7 @@ namespace NeovimQt {
 class MsgpackIODevice;
 class MsgpackRequestHandler;
 class NeovimConnectorHelper;
-class NeovimConnector: public QObject
-{
+class NeovimConnector: public QObject {
 	friend class NeovimApi0;
 	friend class NeovimApi1;
 	friend class NeovimApi2;
@@ -33,7 +32,7 @@ class NeovimConnector: public QObject
 	Q_PROPERTY(bool ready READ isReady NOTIFY ready)
 public:
 	enum NeovimError {
-		NoError=0,
+		NoError = 0,
 		NoMetadata,
 		MetadataDescriptorError,
 		UnexpectedMsg,
@@ -52,20 +51,20 @@ public:
 #endif
 
 	/** Underlying connection used to read Neovim */
-        enum NeovimConnectionType {
+	enum NeovimConnectionType {
 		OtherConnection,
 		SpawnedConnection,
 		HostConnection,
 		SocketConnection,
-        };
+	};
 
 	NeovimConnector(QIODevice* s);
 	NeovimConnector(MsgpackIODevice* s);
-	static NeovimConnector* spawn(const QStringList& params=QStringList(),
-									const QString& exe="nvim");
+	static NeovimConnector* spawn(const QStringList& params = QStringList(),
+								  const QString& exe = "nvim");
 	static NeovimConnector* connectToSocket(const QString&);
 	static NeovimConnector* connectToHost(const QString& host, int port);
-	static NeovimConnector* connectToNeovim(const QString& server=QString());
+	static NeovimConnector* connectToNeovim(const QString& server = QString());
 	static NeovimConnector* fromStdinOut();
 
 	bool canReconnect();
@@ -75,12 +74,12 @@ public:
 	QString errorString();
 
 	bool isReady();
-	NeovimApi0 * api0();
-	NeovimApi1 * neovimObject();
-	NeovimApi1 * api1();
-	NeovimApi2 * api2();
-	NeovimApi3 * api3();
-	NeovimApi4 * api4();
+	NeovimApi0* api0();
+	NeovimApi1* neovimObject();
+	NeovimApi1* api1();
+	NeovimApi2* api2();
+	NeovimApi3* api3();
+	NeovimApi4* api4();
 	uint64_t channel();
 	QString decode(const QByteArray&);
 	QByteArray encode(const QString&);
@@ -88,7 +87,7 @@ public:
 	/** Some requests for metadata and ui attachment enforce a timeout in ms */
 	void setRequestTimeout(int);
 	/** Set a handler for msgpack rpc requests **/
-	void setRequestHandler(MsgpackRequestHandler *);
+	void setRequestHandler(MsgpackRequestHandler*);
 
 	quint64 apiCompatibility();
 	quint64 apiLevel();
@@ -113,16 +112,16 @@ protected slots:
 	void msgpackError();
 
 private:
-	MsgpackIODevice *m_dev;
-	NeovimConnectorHelper *m_helper;
+	MsgpackIODevice* m_dev;
+	NeovimConnectorHelper* m_helper;
 	QString m_errorString;
 	NeovimError m_error;
 
-	NeovimApi0 *m_api0;
-	NeovimApi1 *m_api1;
-	NeovimApi2 *m_api2;
-	NeovimApi3 *m_api3;
-	NeovimApi4 *m_api4;
+	NeovimApi0* m_api0;
+	NeovimApi1* m_api1;
+	NeovimApi2* m_api2;
+	NeovimApi3* m_api3;
+	NeovimApi4* m_api4;
 	quint64 m_channel;
 	quint64 m_api_compat;
 	quint64 m_api_supported;

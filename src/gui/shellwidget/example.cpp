@@ -5,7 +5,7 @@
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
 #include <QtPlugin>
-Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 
 int main(int argc, char **argv)
@@ -22,9 +22,8 @@ int main(int argc, char **argv)
 	s->put("汉语", 0, 0);
 	s->show();
 
-	const ShellContents& data = s->contents();
+	const ShellContents &data = s->contents();
 	saveShellContents(data, "example.jpg");
 
 	return app.exec();
 }
-

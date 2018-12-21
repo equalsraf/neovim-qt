@@ -9,14 +9,13 @@ namespace NeovimQt {
 
 class MsgpackRequest;
 class MsgpackRequestHandler;
-class MsgpackIODevice: public QObject
-{
+class MsgpackIODevice: public QObject {
 	Q_OBJECT
 	Q_PROPERTY(MsgpackError error READ errorCause NOTIFY error)
 	Q_PROPERTY(QByteArray encoding READ encoding WRITE setEncoding)
 public:
 	enum MsgpackError {
-		NoError=0,
+		NoError = 0,
 		InvalidDevice,
 		InvalidMsgpack,
 		UnsupportedEncoding,
@@ -26,13 +25,13 @@ public:
 #else
 	Q_ENUMS(MsgpackError)
 #endif
-	MsgpackIODevice(QIODevice *, QObject *parent=0);
+	MsgpackIODevice(QIODevice*, QObject* parent = 0);
 	~MsgpackIODevice();
-        static MsgpackIODevice* fromStdinOut(QObject *parent=0);
+	static MsgpackIODevice* fromStdinOut(QObject* parent = 0);
 
 	bool isOpen();
 	QString errorString() const;
-	MsgpackError errorCause() const {return m_error;};
+	MsgpackError errorCause() const { return m_error; };
 
 	QByteArray encoding() const;
 	bool setEncoding(const QByteArray&);
@@ -45,10 +44,10 @@ public:
 	void send(const QByteArray&);
 	void send(bool);
 	void send(const QList<QByteArray>& list);
-	template <class T>
-	void sendArrayOf(const QList<T>& list) {
+	template <class T> void sendArrayOf(const QList<T>& list)
+	{
 		msgpack_pack_array(&m_pk, list.size());
-		foreach(const T& elem, list) {
+		foreach (const T& elem, list) {
 			send(elem);
 		}
 	}
@@ -60,7 +59,7 @@ public:
 	bool sendResponse(uint64_t msgid, const QVariant& err, const QVariant& res);
 	bool sendNotification(const QByteArray& method, const QVariantList& params);
 
-	void setRequestHandler(MsgpackRequestHandler *);
+	void setRequestHandler(MsgpackRequestHandler*);
 
 	/** Typedef for msgpack-to-Qvariant decoder @see registerExtType */
 	typedef QVariant (*msgpackExtDecoder)(MsgpackIODevice*, const char* data, quint32 size);
@@ -70,7 +69,7 @@ public:
 signals:
 	void error(MsgpackError);
 	/** A notification with the given name and arguments was received */
-	void notification(const QByteArray &name, const QVariantList& args);
+	void notification(const QByteArray& name, const QVariantList& args);
 
 protected:
 	void sendError(const msgpack_object& req, const QString& msg);
@@ -102,12 +101,12 @@ private:
 	static int msgpack_write_to_dev(void* data, const char* buf, unsigned long int len);
 
 	quint32 m_reqid;
-	QIODevice *m_dev;
-	QTextCodec *m_encoding;
+	QIODevice* m_dev;
+	QTextCodec* m_encoding;
 	msgpack_packer m_pk;
 	msgpack_unpacker m_uk;
 	QHash<quint32, MsgpackRequest*> m_requests;
-	MsgpackRequestHandler *m_reqHandler;
+	MsgpackRequestHandler* m_reqHandler;
 	QHash<int8_t, msgpackExtDecoder> m_extTypes;
 
 	QString m_errorString;
@@ -116,7 +115,8 @@ private:
 
 class MsgpackRequestHandler {
 public:
-	virtual void handleRequest(MsgpackIODevice*, quint32 msgid, const QByteArray&, const QVariantList&)=0;
+	virtual void handleRequest(MsgpackIODevice*, quint32 msgid, const QByteArray&,
+							   const QVariantList&) = 0;
 };
 
 } // Namespace NeovimQt

@@ -34,19 +34,18 @@ bool getLoginEnvironment(const QString& path)
 	}
 
 	QByteArray out = proc.readAllStandardOutput();
-	foreach(const QByteArray& item, out.split('\n')) {
+	foreach (const QByteArray& item, out.split('\n')) {
 		int index = item.indexOf('=');
 		if (index > 0) {
-			qputenv(item.mid(0, index), item.mid(index+1));
-			qDebug() << item.mid(0, index) << item.mid(index+1);
+			qputenv(item.mid(0, index), item.mid(index + 1));
+			qDebug() << item.mid(0, index) << item.mid(index + 1);
 		}
 	}
 	return true;
 }
 #endif
 
-App::App(int &argc, char ** argv)
-:QApplication(argc, argv)
+App::App(int& argc, char** argv): QApplication(argc, argv)
 {
 	setWindowIcon(QIcon(":/neovim.png"));
 	setApplicationDisplayName("Neovim");
@@ -73,18 +72,18 @@ App::App(int &argc, char ** argv)
 	}
 }
 
-bool App::event(QEvent *event)
+bool App::event(QEvent* event)
 {
-	if( event->type()  == QEvent::FileOpen) {
-		QFileOpenEvent * fileOpenEvent = static_cast<QFileOpenEvent *>(event);
-		if(fileOpenEvent) {
+	if (event->type() == QEvent::FileOpen) {
+		QFileOpenEvent* fileOpenEvent = static_cast<QFileOpenEvent*>(event);
+		if (fileOpenEvent) {
 			emit openFilesTriggered({fileOpenEvent->url()});
 		}
 	}
 	return QApplication::event(event);
 }
 
-void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
+void App::showUi(NeovimConnector* c, const QCommandLineParser& parser)
 {
 	auto opts = ShellOptions();
 	if (parser.isSet("no-ext-tabline")) {
@@ -92,7 +91,7 @@ void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
 	}
 
 #ifdef NEOVIMQT_GUI_WIDGET
-	NeovimQt::Shell *win = new NeovimQt::Shell(c);
+	NeovimQt::Shell* win = new NeovimQt::Shell(c);
 	win->show();
 	if (parser.isSet("fullscreen")) {
 		win->showFullScreen();
@@ -102,10 +101,10 @@ void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
 		win->show();
 	}
 #else
-	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(c, opts);
+	NeovimQt::MainWindow* win = new NeovimQt::MainWindow(c, opts);
 
-	QObject::connect(instance(), SIGNAL(openFilesTriggered(const QList<QUrl>)),
-		win->shell(), SLOT(openFiles(const QList<QUrl>)));
+	QObject::connect(instance(), SIGNAL(openFilesTriggered(const QList<QUrl>)), win->shell(),
+					 SLOT(openFiles(const QList<QUrl>)));
 
 	if (parser.isSet("fullscreen")) {
 		win->delayedShow(NeovimQt::MainWindow::DelayedShow::FullScreen);
@@ -122,44 +121,43 @@ void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
 ///
 /// When appropriate this function will call QCommandLineParser::showHelp()
 /// terminating the program.
-void App::processCliOptions(QCommandLineParser &parser, const QStringList& arguments)
+void App::processCliOptions(QCommandLineParser& parser, const QStringList& arguments)
 {
 	parser.addOption(QCommandLineOption("nvim",
-				QCoreApplication::translate("main", "nvim executable path"),
-				QCoreApplication::translate("main", "nvim_path"),
-				"nvim"));
-	parser.addOption(QCommandLineOption("timeout",
-				QCoreApplication::translate("main", "Error if nvim does not responde after count milliseconds"),
-				QCoreApplication::translate("main", "ms"),
-				"20000"));
-	parser.addOption(QCommandLineOption("geometry",
-				QCoreApplication::translate("main", "Initial window geometry"),
-				QCoreApplication::translate("main", "geometry")));
-	parser.addOption(QCommandLineOption("stylesheet",
-				QCoreApplication::translate("main", "Apply qss stylesheet from file"),
-				QCoreApplication::translate("main", "stylesheet")));
-	parser.addOption(QCommandLineOption("maximized",
-				QCoreApplication::translate("main", "Maximize the window on startup")));
-	parser.addOption(QCommandLineOption("no-ext-tabline",
-				QCoreApplication::translate("main", "Disable the external GUI tabline")));
-	parser.addOption(QCommandLineOption("fullscreen",
-				QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
-	parser.addOption(QCommandLineOption("embed",
-				QCoreApplication::translate("main", "Communicate with Neovim over stdin/out")));
-	parser.addOption(QCommandLineOption("server",
-				QCoreApplication::translate("main", "Connect to existing Neovim instance"),
-				QCoreApplication::translate("main", "addr")));
-	parser.addOption(QCommandLineOption("spawn",
-				QCoreApplication::translate("main", "Treat positional arguments as the nvim argv")));
+										QCoreApplication::translate("main", "nvim executable path"),
+										QCoreApplication::translate("main", "nvim_path"), "nvim"));
+	parser.addOption(QCommandLineOption(
+	"timeout",
+	QCoreApplication::translate("main", "Error if nvim does not responde after count milliseconds"),
+	QCoreApplication::translate("main", "ms"), "20000"));
+	parser.addOption(
+	QCommandLineOption("geometry", QCoreApplication::translate("main", "Initial window geometry"),
+					   QCoreApplication::translate("main", "geometry")));
+	parser.addOption(QCommandLineOption(
+	"stylesheet", QCoreApplication::translate("main", "Apply qss stylesheet from file"),
+	QCoreApplication::translate("main", "stylesheet")));
+	parser.addOption(QCommandLineOption(
+	"maximized", QCoreApplication::translate("main", "Maximize the window on startup")));
+	parser.addOption(QCommandLineOption(
+	"no-ext-tabline", QCoreApplication::translate("main", "Disable the external GUI tabline")));
+	parser.addOption(QCommandLineOption(
+	"fullscreen", QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
+	parser.addOption(QCommandLineOption(
+	"embed", QCoreApplication::translate("main", "Communicate with Neovim over stdin/out")));
+	parser.addOption(QCommandLineOption(
+	"server", QCoreApplication::translate("main", "Connect to existing Neovim instance"),
+	QCoreApplication::translate("main", "addr")));
+	parser.addOption(QCommandLineOption(
+	"spawn", QCoreApplication::translate("main", "Treat positional arguments as the nvim argv")));
 	parser.addHelpOption();
 
 #ifdef Q_OS_UNIX
-	parser.addOption(QCommandLineOption("nofork",
-				QCoreApplication::translate("main", "Run in foreground")));
+	parser.addOption(
+	QCommandLineOption("nofork", QCoreApplication::translate("main", "Run in foreground")));
 #endif
 
-	parser.addPositionalArgument("file",
-			QCoreApplication::translate("main", "Edit specified file(s)"), "[file...]");
+	parser.addPositionalArgument(
+	"file", QCoreApplication::translate("main", "Edit specified file(s)"), "[file...]");
 	parser.addPositionalArgument("...", "Additional arguments are forwarded to Neovim", "[-- ...]");
 
 	parser.process(arguments);
@@ -175,7 +173,7 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 	}
 
 	if (!parser.positionalArguments().isEmpty() &&
-			(parser.isSet("embed") || parser.isSet("server"))) {
+		(parser.isSet("embed") || parser.isSet("server"))) {
 		qWarning() << "--embed and --server do not accept positional arguments\n";
 		::exit(-1);
 	}
@@ -210,14 +208,12 @@ NeovimConnector* App::createConnector(const QCommandLineParser& parser)
 		auto path = qgetenv("NVIM_QT_RUNTIME_PATH");
 		if (QFileInfo(path).isDir()) {
 			neovimArgs.insert(0, "--cmd");
-			neovimArgs.insert(1, QString("let &rtp.=',%1'")
-					.arg(QString::fromLocal8Bit(path)));
+			neovimArgs.insert(1, QString("let &rtp.=',%1'").arg(QString::fromLocal8Bit(path)));
 		}
 #ifdef NVIM_QT_RUNTIME_PATH
 		else if (QFileInfo(NVIM_QT_RUNTIME_PATH).isDir()) {
 			neovimArgs.insert(0, "--cmd");
-			neovimArgs.insert(1, QString("let &rtp.=',%1'")
-					.arg(NVIM_QT_RUNTIME_PATH));
+			neovimArgs.insert(1, QString("let &rtp.=',%1'").arg(NVIM_QT_RUNTIME_PATH));
 		} else
 #endif
 		{
@@ -236,8 +232,7 @@ NeovimConnector* App::createConnector(const QCommandLineParser& parser)
 
 			if (d.exists()) {
 				neovimArgs.insert(0, "--cmd");
-				neovimArgs.insert(1, QString("let &rtp.=',%1'")
-						.arg(d.path()));
+				neovimArgs.insert(1, QString("let &rtp.=',%1'").arg(d.path()));
 			}
 		}
 

@@ -13,7 +13,7 @@
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
 #include <QtPlugin>
-Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 
 QTextStream& qStdOut()
@@ -44,17 +44,19 @@ void printFontMetrics(const QFont& f)
 	QFontMetrics fm_boldit(fbi);
 
 	// Regular
-	char err = (fm.averageCharWidth() != fm.maxWidth() ||
-			fm.width("MM") != fm.maxWidth()*2) ? '!' : ' ';
+	char err =
+	(fm.averageCharWidth() != fm.maxWidth() || fm.width("MM") != fm.maxWidth() * 2) ? '!' : ' ';
 	qStdOut() << err;
 	qStdOut() << "  (Regular) Average char width: " << fm.averageCharWidth();
 	qStdOut() << " Max char width: " << fm.maxWidth();
 	qStdOut() << " Width(MM): " << fm.width("MM") << endl;
 
 	// Italic
-	err = (fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
-			fm_italic.width("MM") != fm_italic.maxWidth()*2 ||
-			fm_italic.maxWidth() != fm.maxWidth()) ? '!' : ' ';
+	err =
+	(fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
+	 fm_italic.width("MM") != fm_italic.maxWidth() * 2 || fm_italic.maxWidth() != fm.maxWidth()) ?
+	'!' :
+	' ';
 	qStdOut() << err;
 	qStdOut() << "   (Italic) Average char width: " << fm_italic.averageCharWidth();
 	qStdOut() << " Max char width: " << fm_italic.maxWidth();
@@ -62,17 +64,20 @@ void printFontMetrics(const QFont& f)
 
 	// Bold
 	err = (fm_bold.averageCharWidth() != fm_bold.maxWidth() ||
-			fm_bold.width("MM") != fm_bold.maxWidth()*2 ||
-			fm_bold.maxWidth() != fm.maxWidth()) ? '!' : ' ';
+		   fm_bold.width("MM") != fm_bold.maxWidth() * 2 || fm_bold.maxWidth() != fm.maxWidth()) ?
+		  '!' :
+		  ' ';
 	qStdOut() << err;
 	qStdOut() << "     (Bold) Average char width: " << fm_bold.averageCharWidth();
 	qStdOut() << " Max char width: " << fm_bold.maxWidth();
 	qStdOut() << " Width(MM): " << fm_bold.width("MM") << endl;
 
 	// BoldItalic
-	err = (fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
-			fm_boldit.width("MM") != fm_boldit.maxWidth()*2 ||
-			fm_boldit.maxWidth() != fm.maxWidth()) ? '!' : ' ';
+	err =
+	(fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
+	 fm_boldit.width("MM") != fm_boldit.maxWidth() * 2 || fm_boldit.maxWidth() != fm.maxWidth()) ?
+	'!' :
+	' ';
 	qStdOut() << err;
 	qStdOut() << "  (Bold+It) Average char width: " << fm_boldit.averageCharWidth();
 	qStdOut() << " Max char width: " << fm_boldit.maxWidth();
@@ -82,15 +87,15 @@ void printFontMetrics(const QFont& f)
 void printFontList()
 {
 	QFontDatabase db;
-    foreach (const QString &family, db.families()) {
+	foreach (const QString& family, db.families()) {
 		qStdOut() << family << "\n";
-        foreach (const QString &style, db.styles(family)) {
+		foreach (const QString& style, db.styles(family)) {
 			qStdOut() << "\t" << style << "\n";
 		}
 	}
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 	QGuiApplication app(argc, argv);
 
@@ -106,13 +111,14 @@ int main(int argc, char **argv)
 	}
 
 	QFont f;
-	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
+	f.setStyleHint(QFont::TypeWriter,
+				   QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
 	f.setFamily(QStringList(app.arguments().mid(1)).join(" "));
 	f.setFixedPitch(true);
 	f.setKerning(false);
 
 	printFontInfo(f);
-	for (int i=10; i<=18; i++) {
+	for (int i = 10; i <= 18; i++) {
 		qStdOut() << "Font size: " << i << endl;
 		f.setPointSize(i);
 		printFontMetrics(f);

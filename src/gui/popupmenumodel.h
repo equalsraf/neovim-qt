@@ -14,8 +14,8 @@ struct PopupMenuItem {
 
 class PopupMenuModel: public QAbstractListModel {
 public:
-	enum Roles{
-		Text=Qt::UserRole,
+	enum Roles {
+		Text = Qt::UserRole,
 		Kind,
 		Extra,
 		Info,
@@ -25,6 +25,7 @@ public:
 	PopupMenuModel(QList<PopupMenuItem>);
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
 private:
 	QList<PopupMenuItem> m_data;
 };

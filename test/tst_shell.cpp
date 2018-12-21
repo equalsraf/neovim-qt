@@ -9,27 +9,29 @@
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
 #include <QtPlugin>
-Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 
 namespace NeovimQt {
 
-class Test: public QObject
-{
+class Test: public QObject {
 	Q_OBJECT
 private slots:
-	void initTestCase() {
+	void initTestCase()
+	{
 		QStringList fonts;
 		fonts << "third-party/DejaVuSansMono.ttf"
-			<< "third-party/DejaVuSansMono-Bold.ttf"
-			<< "third-party/DejaVuSansMono-BoldOblique.ttf";
-		foreach(QString path, fonts) {
+			  << "third-party/DejaVuSansMono-Bold.ttf"
+			  << "third-party/DejaVuSansMono-BoldOblique.ttf";
+		foreach (QString path, fonts) {
 			QFontDatabase::addApplicationFont(path);
 		}
 	}
 
-	void benchStart() {
-		QBENCHMARK {
+	void benchStart()
+	{
+		QBENCHMARK
+		{
 			NeovimConnector *c = NeovimConnector::spawn({"-u", "NORC"});
 			QSignalSpy onReady(c, SIGNAL(ready()));
 			QVERIFY(onReady.isValid());
@@ -42,9 +44,11 @@ private slots:
 		}
 	}
 
-	void uiStart() {
+	void uiStart()
+	{
 		QStringList args;
-		args << "-u" << "NORC";
+		args << "-u"
+			 << "NORC";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
@@ -56,10 +60,10 @@ private slots:
 
 		QPixmap p = s->grab();
 		p.save("tst_shell_start.jpg");
-
 	}
 
-	void startVarsShellWidget() {
+	void startVarsShellWidget()
+	{
 		QStringList args = {"-u", "NORC"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
@@ -70,7 +74,8 @@ private slots:
 		checkStartVars(c);
 	}
 
-	void startVarsMainWindow() {
+	void startVarsMainWindow()
+	{
 		QStringList args = {"-u", "NORC"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c, ShellOptions());
@@ -82,9 +87,11 @@ private slots:
 		checkStartVars(c);
 	}
 
-	void guiExtTablineSet() {
+	void guiExtTablineSet()
+	{
 		QStringList args;
-		args << "-u" << "NORC";
+		args << "-u"
+			 << "NORC";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onOptionSet(s, &Shell::neovimExtTablineSet);
@@ -92,10 +99,12 @@ private slots:
 		QVERIFY(SPYWAIT(onOptionSet));
 	}
 
-	void gviminit() {
+	void gviminit()
+	{
 		qputenv("GVIMINIT", "let g:test_gviminit = 1");
 		QStringList args;
-		args << "-u" << "NORC";
+		args << "-u"
+			 << "NORC";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 
@@ -113,13 +122,13 @@ private slots:
 		QCOMPARE(cmd.at(0).at(2).toByteArray(), QByteArray("1"));
 	}
 
-	void guiShimCommands() {
+	void guiShimCommands()
+	{
 		// This function needs to be able to find the GUI runtime
 		// plugin or this test WILL FAIL
 		QFileInfo fi = QFileInfo("src/gui/runtime");
 		QVERIFY2(fi.exists(), "Unable to find GUI runtime");
-		QStringList args = {"-u", "NORC",
-			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
+		QStringList args = {"-u", "NORC", "--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
@@ -127,23 +136,27 @@ private slots:
 		QVERIFY(SPYWAIT(onAttached));
 		QVERIFY(s->neovimAttached());
 
-		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, [](QString msg, const QVariant& err) {
-				qDebug() << msg << err;
-			});
+		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output,
+						 [](QString msg, const QVariant &err) { qDebug() << msg << err; });
 
-		QSignalSpy cmd_font(c->neovimObject()->vim_command_output(c->encode("GuiFont")), &MsgpackRequest::finished);
+		QSignalSpy cmd_font(c->neovimObject()->vim_command_output(c->encode("GuiFont")),
+							&MsgpackRequest::finished);
 		QVERIFY(cmd_font.isValid());
 		QVERIFY2(SPYWAIT(cmd_font), "Waiting for GuiFont");
 
-		QSignalSpy cmd_ls(c->neovimObject()->vim_command_output(c->encode("GuiLinespace")), &MsgpackRequest::finished);
+		QSignalSpy cmd_ls(c->neovimObject()->vim_command_output(c->encode("GuiLinespace")),
+						  &MsgpackRequest::finished);
 		QVERIFY(cmd_ls.isValid());
 		QVERIFY2(SPYWAIT(cmd_ls), "Waiting for GuiLinespace");
 
 		// Test font attributes
 #ifdef Q_OS_MAC
-		QSignalSpy cmd_gf(c->neovimObject()->vim_command_output(c->encode("GuiFont Monaco:h14")), &MsgpackRequest::finished);
+		QSignalSpy cmd_gf(c->neovimObject()->vim_command_output(c->encode("GuiFont Monaco:h14")),
+						  &MsgpackRequest::finished);
 #else
-		QSignalSpy cmd_gf(c->neovimObject()->vim_command_output(c->encode("GuiFont DejaVu Sans Mono:h14")), &MsgpackRequest::finished);
+		QSignalSpy cmd_gf(
+		c->neovimObject()->vim_command_output(c->encode("GuiFont DejaVu Sans Mono:h14")),
+		&MsgpackRequest::finished);
 #endif
 		QVERIFY(cmd_gf.isValid());
 		QVERIFY(SPYWAIT(cmd_gf));
@@ -158,9 +171,13 @@ private slots:
 
 		// Normalization removes the :b attribute
 #ifdef Q_OS_MAC
-		QSignalSpy cmd_gf2(c->neovimObject()->vim_command_output(c->encode("GuiFont Monaco:h14:b:l")), &MsgpackRequest::finished);
+		QSignalSpy cmd_gf2(
+		c->neovimObject()->vim_command_output(c->encode("GuiFont Monaco:h14:b:l")),
+		&MsgpackRequest::finished);
 #else
-		QSignalSpy cmd_gf2(c->neovimObject()->vim_command_output(c->encode("GuiFont DejaVu Sans Mono:h14:b:l")), &MsgpackRequest::finished);
+		QSignalSpy cmd_gf2(
+		c->neovimObject()->vim_command_output(c->encode("GuiFont DejaVu Sans Mono:h14:b:l")),
+		&MsgpackRequest::finished);
 #endif
 		QVERIFY(cmd_gf2.isValid());
 		QVERIFY(SPYWAIT(cmd_gf2));
@@ -177,42 +194,36 @@ private slots:
 		QSignalSpy onOptionSet(s->shell(), &Shell::neovimExtTablineSet);
 		QVERIFY(onOptionSet.isValid());
 
-//		QSignalSpy cmd_gtab(c->neovimObject()->vim_command_output(c->encode("GuiTabline 0")), &MsgpackRequest::finished);
-//		QVERIFY(cmd_gtab.isValid());
-//		QVERIFY(SPYWAIT2(cmd_gtab));
-//
-//		QVERIFY(SPYWAIT(onOptionSet));
-//		qDebug() << onOptionSet << onOptionSet.size();
+		//		QSignalSpy cmd_gtab(c->neovimObject()->vim_command_output(c->encode("GuiTabline 0")),
+		//&MsgpackRequest::finished); 		QVERIFY(cmd_gtab.isValid()); 		QVERIFY(SPYWAIT2(cmd_gtab));
+		//
+		//		QVERIFY(SPYWAIT(onOptionSet));
+		//		qDebug() << onOptionSet << onOptionSet.size();
 	}
 
-	void GetClipboard_data() {
+	void GetClipboard_data()
+	{
 		// * or +
 		QTest::addColumn<char>("reg");
 		// data set in the register when starting test, this is set
 		// externaly (i.e. without going through the provider)
 		QTest::addColumn<QByteArray>("register_data");
 
-		QTest::newRow("empty *")
-			<< '*' << QByteArray();
-		QTest::newRow("set *")
-			<< '*' << QByteArray("something");
-		QTest::newRow("empty +")
-			<< '+' << QByteArray();
-		QTest::newRow("set +")
-			<< '+' << QByteArray("something");
-		QTest::newRow("paste *")
-			<< '*' << QByteArray("something");
-		QTest::newRow("paste +")
-			<< '+' << QByteArray("something");
+		QTest::newRow("empty *") << '*' << QByteArray();
+		QTest::newRow("set *") << '*' << QByteArray("something");
+		QTest::newRow("empty +") << '+' << QByteArray();
+		QTest::newRow("set +") << '+' << QByteArray("something");
+		QTest::newRow("paste *") << '*' << QByteArray("something");
+		QTest::newRow("paste +") << '+' << QByteArray("something");
 	}
 
-	void GetClipboard() {
+	void GetClipboard()
+	{
 		QFETCH(char, reg);
 		QFETCH(QByteArray, register_data);
 
 		QFileInfo fi = QFileInfo("src/gui/runtime");
-		QStringList args = {"-u", "NORC",
-			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
+		QStringList args = {"-u", "NORC", "--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
@@ -220,9 +231,8 @@ private slots:
 		QVERIFY(SPYWAIT(onAttached));
 		QVERIFY(s->neovimAttached());
 
-		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, [](QString msg, const QVariant& err) {
-				qDebug() << msg << err;
-			});
+		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output,
+						 [](QString msg, const QVariant &err) { qDebug() << msg << err; });
 
 		// provided by the GUI shim
 		c->api0()->vim_command(c->encode("call GuiClipboard()"));
@@ -244,34 +254,29 @@ private slots:
 		QCOMPARE(cmd_clip.takeFirst().at(2), QVariant(register_data));
 	}
 
-	void SetClipboard_data() {
+	void SetClipboard_data()
+	{
 		// * or +
 		QTest::addColumn<char>("reg");
 		// data set in the register when starting test, this is set
 		// externaly (i.e. without going through the provider)
 		QTest::addColumn<QByteArray>("register_data");
 
-		QTest::newRow("empty *")
-			<< '*' << QByteArray();
-		QTest::newRow("set *")
-			<< '*' << QByteArray("something");
-		QTest::newRow("empty +")
-			<< '+' << QByteArray();
-		QTest::newRow("set +")
-			<< '+' << QByteArray("something");
-		QTest::newRow("paste *")
-			<< '*' << QByteArray("something");
-		QTest::newRow("paste +")
-			<< '+' << QByteArray("something");
+		QTest::newRow("empty *") << '*' << QByteArray();
+		QTest::newRow("set *") << '*' << QByteArray("something");
+		QTest::newRow("empty +") << '+' << QByteArray();
+		QTest::newRow("set +") << '+' << QByteArray("something");
+		QTest::newRow("paste *") << '*' << QByteArray("something");
+		QTest::newRow("paste +") << '+' << QByteArray("something");
 	}
 
-	void SetClipboard() {
+	void SetClipboard()
+	{
 		QFETCH(char, reg);
 		QFETCH(QByteArray, register_data);
 
 		QFileInfo fi = QFileInfo("src/gui/runtime");
-		QStringList args = {"-u", "NORC",
-			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
+		QStringList args = {"-u", "NORC", "--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
@@ -279,17 +284,18 @@ private slots:
 		QVERIFY(SPYWAIT(onAttached));
 		QVERIFY(s->neovimAttached());
 
-		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, [](QString msg, const QVariant& err) {
-				qDebug() << msg << err;
-			});
+		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output,
+						 [](QString msg, const QVariant &err) { qDebug() << msg << err; });
 
 		// provided by the GUI shim
 		c->api0()->vim_command(c->encode("call GuiClipboard()"));
 
-		QString setreg_cmd = QString("setreg('%1', '%2')\n").arg(reg).arg(QString::fromUtf8(register_data));
+		QString setreg_cmd =
+		QString("setreg('%1', '%2')\n").arg(reg).arg(QString::fromUtf8(register_data));
 		c->neovimObject()->vim_command(c->encode(setreg_cmd));
-		QSignalSpy spy_sync(c->neovimObject()->vim_feedkeys("", "", false), &MsgpackRequest::finished);
-SPYWAIT(spy_sync);
+		QSignalSpy spy_sync(c->neovimObject()->vim_feedkeys("", "", false),
+							&MsgpackRequest::finished);
+		SPYWAIT(spy_sync);
 		QVERIFY(spy_sync.isValid());
 		QVERIFY(SPYWAIT(spy_sync));
 
@@ -304,21 +310,19 @@ SPYWAIT(spy_sync);
 #endif
 
 		// the additional \n seems to be a side effect from vim_command_output()
-//		QCOMPARE(cmd_clip.takeFirst().at(2), QVariant(register_data + "\n"));
+		//		QCOMPARE(cmd_clip.takeFirst().at(2), QVariant(register_data + "\n"));
 	}
 
 protected:
 	/// Check for the presence of the GUI variables in Neovim
-	void checkStartVars(NeovimQt::NeovimConnector *conn) {
+	void checkStartVars(NeovimQt::NeovimConnector *conn)
+	{
 		auto *nvim = conn->api1();
 		connect(nvim, &NeovimQt::NeovimApi1::err_vim_get_var,
-			[](const QString& err, const QVariant& v) {
-				qDebug() << err<< v;
-			});
+				[](const QString &err, const QVariant &v) { qDebug() << err << v; });
 
-		QStringList vars = {"GuiWindowId", "GuiWindowMaximized",
-			"GuiWindowFullScreen", "GuiFont"};
-		foreach(const QString& var, vars) {
+		QStringList vars = {"GuiWindowId", "GuiWindowMaximized", "GuiWindowFullScreen", "GuiFont"};
+		foreach (const QString &var, vars) {
 			qDebug() << "Checking Neovim for Gui var" << var;
 			QSignalSpy onVar(nvim, SIGNAL(on_vim_get_var(QVariant)));
 			QVERIFY(onVar.isValid());

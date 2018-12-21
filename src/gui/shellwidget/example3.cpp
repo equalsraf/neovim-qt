@@ -7,7 +7,7 @@
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
 #include <QtPlugin>
-Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 
 ShellWidget *s = NULL;
@@ -17,12 +17,12 @@ void fun()
 {
 	static bool start = true;
 	int r = s->contents().rows();
-	QColor fg = QColor(qrand() % 255, qrand() % 255, qrand() & 255); 
+	QColor fg = QColor(qrand() % 255, qrand() % 255, qrand() & 255);
 
 	if (start) {
 		start = false;
 
-		for (int i=0; i<r; i++) {
+		for (int i = 0; i < r; i++) {
 			if (f->atEnd()) {
 				start = true;
 				if (!f->seek(0)) {
@@ -35,7 +35,7 @@ void fun()
 		}
 	} else {
 		s->scrollShell(1);
-		for (int i=r-1; i<r; i++) {
+		for (int i = r - 1; i < r; i++) {
 			if (f->atEnd()) {
 				if (!f->seek(0)) {
 					break;

@@ -10,12 +10,12 @@
 
 namespace NeovimQt {
 
-class Test: public QObject
-{
+class Test: public QObject {
 	Q_OBJECT
 private slots:
 
-	void reconnect() {
+	void reconnect()
+	{
 		NeovimConnector c(new QBuffer());
 		QCOMPARE(c.canReconnect(), false);
 
@@ -26,7 +26,8 @@ private slots:
 		spawned->reconnect();
 	}
 
-	void isReady() {
+	void isReady()
+	{
 
 		NeovimConnector *c = NeovimConnector::spawn({"-u", "NORC"});
 		QSignalSpy onReady(c, SIGNAL(ready()));
@@ -36,7 +37,8 @@ private slots:
 		QVERIFY(c->isReady());
 	}
 
-	void encodeDecode() {
+	void encodeDecode()
+	{
 		NeovimConnector *c = NeovimConnector::spawn({"-u", "NORC"});
 
 		// This will print a warning, but should succeed
@@ -50,10 +52,10 @@ private slots:
 
 		bytes = c->encode(s);
 		QCOMPARE(c->decode(bytes), s);
-
 	}
 
-	void connectToNeovimTCP() {
+	void connectToNeovimTCP()
+	{
 		// These 2 cases WILL FAIL because there is no Neovim instance running
 		NeovimConnector *c = NeovimConnector::connectToNeovim("127.0.0.1:64999");
 		QCOMPARE(c->connectionType(), NeovimConnector::HostConnection);
@@ -66,7 +68,8 @@ private slots:
 		c->deleteLater();
 	}
 
-	void connectToNeovimSocket() {
+	void connectToNeovimSocket()
+	{
 		NeovimConnector *c = NeovimConnector::connectToNeovim("NoSuchFile");
 		QCOMPARE(c->connectionType(), NeovimConnector::SocketConnection);
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
@@ -78,7 +81,8 @@ private slots:
 		c->deleteLater();
 	}
 
-	void connectToNeovimEnvEmpty() {
+	void connectToNeovimEnvEmpty()
+	{
 		// This is the same as ::spawn()
 		NeovimConnector *c = NeovimConnector::connectToNeovim("");
 		QSignalSpy onReady(c, SIGNAL(ready()));
@@ -88,7 +92,8 @@ private slots:
 		c->deleteLater();
 	}
 
-	void metadataTimeout() {
+	void metadataTimeout()
+	{
 		// Connect to a TCP socket that will never respond, should trigger
 		// a timeout for the discoverMetadata call
 		QTcpServer *server = new QTcpServer();
@@ -96,9 +101,7 @@ private slots:
 		QVERIFY(server->isListening());
 
 		NeovimConnector *c = NeovimConnector::connectToNeovim(
-			QString("%1:%2")
-				.arg(server->serverAddress().toString())
-				.arg(server->serverPort()));
+		QString("%1:%2").arg(server->serverAddress().toString()).arg(server->serverPort()));
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
 		QVERIFY(onError.isValid());
 		QVERIFY(SPYWAIT2(onError));

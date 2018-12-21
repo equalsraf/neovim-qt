@@ -15,27 +15,27 @@ namespace NeovimQt {
  * A dummy request handler to help testing, it responds to all calls
  * with response
  */
-class RequestHandler: public QObject, public MsgpackRequestHandler
-{
+class RequestHandler: public QObject, public MsgpackRequestHandler {
 	Q_OBJECT
 public:
-	RequestHandler(QObject *parent=0):QObject(parent) {}
-	virtual void handleRequest(MsgpackIODevice* dev, quint32 msgid, const QByteArray& method, const QVariantList& params) {
+	RequestHandler(QObject *parent = 0): QObject(parent) {}
+	virtual void handleRequest(MsgpackIODevice *dev, quint32 msgid, const QByteArray &method,
+							   const QVariantList &params)
+	{
 		dev->sendResponse(msgid, QVariant(), response);
 		emit receivedRequest(msgid, method, params);
 	}
 	QVariant response;
 signals:
-	void receivedRequest(quint32 msgid, const QByteArray&, const QVariantList&);
-
+	void receivedRequest(quint32 msgid, const QByteArray &, const QVariantList &);
 };
 
-class Test: public QObject
-{
+class Test: public QObject {
 	Q_OBJECT
 private:
 	MsgpackIODevice *one, *two;
-	void resetLoop() {
+	void resetLoop()
+	{
 		QTcpServer *server = new QTcpServer();
 		QVERIFY(server->listen(QHostAddress::LocalHost));
 
@@ -59,32 +59,35 @@ private:
 		QVERIFY(two->isOpen());
 	}
 private slots:
-	void init() {
-		resetLoop();
-	}
+	void init() { resetLoop(); }
 
-	void cleanup() {
+	void cleanup()
+	{
 		delete one;
 		delete two;
 	}
 
-	void invalidDevice() {
+	void invalidDevice()
+	{
 		MsgpackIODevice *io = new MsgpackIODevice(new QBuffer);
 		QCOMPARE(io->errorCause(), MsgpackIODevice::InvalidDevice);
 	}
 
-	void defaultValues() {
+	void defaultValues()
+	{
 		QVERIFY(one->encoding().isEmpty());
 		QCOMPARE(one->errorCause(), MsgpackIODevice::NoError);
 	}
 
-	void setEncoding() {
+	void setEncoding()
+	{
 		QCOMPARE(one->setEncoding("utf8"), true);
 		QCOMPARE(one->errorCause(), MsgpackIODevice::NoError);
 		QVERIFY(!one->encoding().isEmpty());
 	}
 
-	void setInvalidEncoding() {
+	void setInvalidEncoding()
+	{
 		QSignalSpy onError(one, SIGNAL(error(MsgpackError)));
 		QVERIFY(onError.isValid());
 
@@ -98,9 +101,10 @@ private slots:
 	/**
 	 * These errors are not fatal but increase coverage
 	 */
-	void recvError() {
+	void recvError()
+	{
 		one->send(QByteArray("Hello!"));
-		
+
 		// An array of size 1 is an invalid msgpack-rpc
 		QVariantList brokenRequest;
 		brokenRequest << 42;
@@ -123,7 +127,8 @@ private slots:
 		QVERIFY2(SPYWAIT(gotResp), "By default all requests get an error");
 	}
 
-	void notification() {
+	void notification()
+	{
 		QVariantList list;
 		list << 44 << 45;
 
@@ -142,9 +147,10 @@ private slots:
 		QCOMPARE(n.at(1).toList(), params);
 	}
 
-	void request() {
+	void request()
+	{
 		auto req = one->startRequestUnchecked("testRequest", 0);
-		
+
 		QSignalSpy gotResp(req, SIGNAL(error(quint32, quint64, QVariant)));
 		QVERIFY(gotResp.isValid());
 
@@ -187,10 +193,11 @@ private slots:
 		QVERIFY(one->checkVariant(QByteArray()));
 		QVERIFY(one->checkVariant(QVariantList() << "test"));
 		QVERIFY(one->checkVariant(QVariantMap()));
-		QVERIFY(one->checkVariant(QPoint(1,1)));
+		QVERIFY(one->checkVariant(QPoint(1, 1)));
 	}
 
-	void msgId() {
+	void msgId()
+	{
 		QCOMPARE(one->msgId(), (quint32)0);
 		QCOMPARE(one->msgId(), (quint32)1);
 		// Sending a request increases the id
@@ -201,7 +208,8 @@ private slots:
 		QCOMPARE(one->msgId(), (quint32)4);
 	}
 
-	void timeout() {
+	void timeout()
+	{
 		QBuffer buf;
 		buf.open(QBuffer::ReadWrite);
 
@@ -219,7 +227,6 @@ private slots:
 		QVariantList params = timedOut.at(0);
 		QCOMPARE(params.at(0).toUInt(), r->id);
 	}
-
 };
 
 } // Namespace NeovimQt

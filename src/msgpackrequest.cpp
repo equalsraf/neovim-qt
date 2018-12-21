@@ -21,10 +21,9 @@ namespace NeovimQt {
  * \see NeovimQt::MsgpackIODevice::msgId
  */
 MsgpackRequest::MsgpackRequest(quint32 id, MsgpackIODevice *dev, QObject *parent)
-:QObject(parent), id(id), m_dev(dev), m_function(0)
+: QObject(parent), id(id), m_dev(dev), m_function(0)
 {
-	connect(&m_timer, &QTimer::timeout,
-		this, &MsgpackRequest::requestTimeout);
+	connect(&m_timer, &QTimer::timeout, this, &MsgpackRequest::requestTimeout);
 }
 
 /**
