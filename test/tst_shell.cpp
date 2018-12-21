@@ -116,7 +116,9 @@ private slots:
 	void guiShimCommands() {
 		// This function needs to be able to find the GUI runtime
 		// plugin or this test WILL FAIL
-		QFileInfo fi = QFileInfo("src/gui/runtime");
+		QString path_to_src_runtime(CMAKE_SOURCE_DIR);
+		path_to_src_runtime.append("/src/gui/runtime");
+		QFileInfo fi = QFileInfo(path_to_src_runtime);
 		QVERIFY2(fi.exists(), "Unable to find GUI runtime");
 		QStringList args = {"-u", "NORC",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
@@ -210,7 +212,9 @@ private slots:
 		QFETCH(char, reg);
 		QFETCH(QByteArray, register_data);
 
-		QFileInfo fi = QFileInfo("src/gui/runtime");
+		QString path_to_src_runtime(CMAKE_SOURCE_DIR);
+		path_to_src_runtime.append("/src/gui/runtime");
+		QFileInfo fi = QFileInfo(path_to_src_runtime);
 		QStringList args = {"-u", "NORC",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
@@ -269,7 +273,9 @@ private slots:
 		QFETCH(char, reg);
 		QFETCH(QByteArray, register_data);
 
-		QFileInfo fi = QFileInfo("src/gui/runtime");
+		QString path_to_src_runtime(CMAKE_SOURCE_DIR);
+		path_to_src_runtime.append("/src/gui/runtime");
+		QFileInfo fi = QFileInfo(path_to_src_runtime);
 		QStringList args = {"-u", "NORC",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);

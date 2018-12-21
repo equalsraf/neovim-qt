@@ -1,5 +1,6 @@
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
+add_definitions(-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
 if (WIN32 AND USE_STATIC_QT)
 	add_definitions(-DUSE_STATIC_QT)
 endif ()
