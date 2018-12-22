@@ -149,12 +149,32 @@ function GuiClipboard()
           \ }
 	call provider#clipboard#Executable()
 endfunction
-augroup guiau
+
+" Directory autocommands for Treeview
+augroup guiDirEvents
     autocmd!
     autocmd DirChanged * call rpcnotify(0, 'Dir', getcwd())
     autocmd WinEnter * call rpcnotify(0, 'Dir', getcwd())
 augroup END
 
-command! TreeViewShow call rpcnotify(0, 'TreeView', 'ShowHide', 1)
-command! TreeViewHide call rpcnotify(0, 'TreeView', 'ShowHide', 0)
-command! TreeViewToggle call rpcnotify(0, 'TreeView', 'Toggle')
+
+" Notifies the TreeView widget of a Show or Hide event
+function! s:TreeViewShowHide(show)
+    call rpcnotify(0, 'TreeView', 'ShowHide', a:show)
+endfunction
+
+command! TreeViewShow call <SID>TreeViewShowHide(1)
+command! TreeViewHide call <SID>TreeViewShowHide(0)
+noremap <script> <Plug>TreeviewShow :call <SID>TreeViewShowHide(1)
+noremap <script> <Plug>TreeviewHide :call <SID>TreeViewShowHide(0)
+anoremenu <script> Plugin.TreeView.Show :call <SID>TreeViewShowHide(1)
+anoremenu <script> Plugin.TreeView.Hide :call <SID>TreeViewShowHide(0)
+
+" Notifies the TreeView widget of a Toggle event
+function! s:TreeViewToggle()
+    call rpcnotify(0, 'TreeView', 'Toggle')
+endfunction
+
+command! TreeViewToggle call <SID>TreeViewToggle()
+noremap <script> <Plug>TreeviewToggle :call <SID>TreeViewToggle()
+anoremenu <script> Plugin.TreeView.Toggle :call <SID>TreeViewShowToggle()
