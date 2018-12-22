@@ -10,7 +10,10 @@ function! GuiClose() abort
 endfunction
 
 " Notify the GUI when exiting Neovim
-autocmd VimLeave * call GuiClose()
+augroup nvim_gui_shim
+  autocmd!
+  autocmd VimLeave * call GuiClose()
+augroup END
 
 " A replacement for foreground()
 function! GuiForeground() abort

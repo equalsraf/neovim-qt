@@ -32,7 +32,7 @@ private slots:
 
 	void benchStart() {
 		QBENCHMARK {
-			NeovimConnector *c = NeovimConnector::spawn({"-u", "NORC"});
+			NeovimConnector *c = NeovimConnector::spawn({"-u", "NONE"});
 			QSignalSpy onReady(c, SIGNAL(ready()));
 			QVERIFY(onReady.isValid());
 			QVERIFY(SPYWAIT(onReady));
@@ -46,7 +46,7 @@ private slots:
 
 	void uiStart() {
 		QStringList args;
-		args << "-u" << "NORC";
+		args << "-u" << "NONE";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
@@ -62,7 +62,7 @@ private slots:
 	}
 
 	void startVarsShellWidget() {
-		QStringList args = {"-u", "NORC"};
+		QStringList args = {"-u", "NONE"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
@@ -73,7 +73,7 @@ private slots:
 	}
 
 	void startVarsMainWindow() {
-		QStringList args = {"-u", "NORC"};
+		QStringList args = {"-u", "NONE"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c, ShellOptions());
 		s->show();
@@ -86,7 +86,7 @@ private slots:
 
 	void guiExtTablineSet() {
 		QStringList args;
-		args << "-u" << "NORC";
+		args << "-u" << "NONE";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onOptionSet(s, &Shell::neovimExtTablineSet);
@@ -97,7 +97,7 @@ private slots:
 	void gviminit() {
 		qputenv("GVIMINIT", "let g:test_gviminit = 1");
 		QStringList args;
-		args << "-u" << "NORC";
+		args << "-u" << "NONE";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 
@@ -122,7 +122,7 @@ private slots:
 		path_to_src_runtime.append("/src/gui/runtime");
 		QFileInfo fi = QFileInfo(path_to_src_runtime);
 		QVERIFY2(fi.exists(), "Unable to find GUI runtime");
-		QStringList args = {"-u", "NORC",
+		QStringList args = {"-u", "NONE",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c, ShellOptions());
@@ -217,7 +217,7 @@ private slots:
 		QString path_to_src_runtime(CMAKE_SOURCE_DIR);
 		path_to_src_runtime.append("/src/gui/runtime");
 		QFileInfo fi = QFileInfo(path_to_src_runtime);
-		QStringList args = {"-u", "NORC",
+		QStringList args = {"-u", "NONE",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c, ShellOptions());
@@ -278,7 +278,7 @@ private slots:
 		QString path_to_src_runtime(CMAKE_SOURCE_DIR);
 		path_to_src_runtime.append("/src/gui/runtime");
 		QFileInfo fi = QFileInfo(path_to_src_runtime);
-		QStringList args = {"-u", "NORC",
+		QStringList args = {"-u", "NONE",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c, ShellOptions());
