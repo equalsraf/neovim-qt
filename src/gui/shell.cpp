@@ -883,6 +883,8 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 		setLineSpace(value.toString().toInt());
 	} else if (name == "showtabline") {
 		emit neovimShowtablineSet(value.toString().toInt());
+	} else if (name == "ext_cmdline") {
+		emit neovimExtCmdlineSet(value.toBool());
 	} else if (name == "ext_tabline") {
 		emit neovimExtTablineSet(value.toBool());
 	} else if (name == "ext_popupmenu") {

@@ -69,6 +69,7 @@ signals:
 	void neovimGuiCloseRequest();
 	/// This signal is emmited if the running neovim version is unsupported by the GUI
 	void neovimIsUnsupported();
+	void neovimExtCmdlineSet(bool);
 	void neovimExtTablineSet(bool);
 	void neovimExtPopupmenuSet(bool);
 	/// The tabline needs updating. curtab is the handle of the current tab (not its index)

@@ -94,6 +94,16 @@ private slots:
 		QVERIFY(SPYWAIT(onOptionSet));
 	}
 
+	void guiExtCmdlineSet() {
+		QStringList args;
+		args << "-u" << "NORC";
+		NeovimConnector *c = NeovimConnector::spawn(args);
+		Shell *s = new Shell(c, ShellOptions());
+		QSignalSpy onOptionSet(s, &Shell::neovimExtCmdlineSet);
+		QVERIFY(onOptionSet.isValid());
+		QVERIFY(SPYWAIT(onOptionSet));
+	}
+
 	void gviminit() {
 		qputenv("GVIMINIT", "let g:test_gviminit = 1");
 		QStringList args;
