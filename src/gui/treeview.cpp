@@ -14,6 +14,7 @@ TreeView::TreeView(NeovimConnector *nvim, QWidget *parent)
 	setModel(model);
 
 	header()->hide();
+	hide();
 	// FIXME: MAGIC NUMBER!!
 	for (int i = 1; i < 5; i++) {
 		hideColumn(i);

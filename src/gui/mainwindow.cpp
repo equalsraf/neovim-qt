@@ -52,7 +52,6 @@ void MainWindow::init(NeovimConnector *c)
 	m_nvim = c;
 
 	m_tree = new TreeView(c);
-
 	m_shell = new Shell(c, m_shell_options);
 
 	m_window = new QSplitter();
@@ -60,8 +59,8 @@ void MainWindow::init(NeovimConnector *c)
 	m_window->addWidget(m_shell);
 
 	m_stack.insertWidget(1, m_window);
-
 	m_stack.setCurrentIndex(1);
+
 	connect(m_shell, SIGNAL(neovimAttached(bool)),
 			this, SLOT(neovimAttachmentChanged(bool)));
 	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)),
