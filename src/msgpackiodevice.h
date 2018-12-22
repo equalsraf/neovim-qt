@@ -15,7 +15,7 @@ class MsgpackIODevice: public QObject {
 	Q_PROPERTY(QByteArray encoding READ encoding WRITE setEncoding)
 public:
 	enum MsgpackError {
-		NoError = 0,
+		NoError= 0,
 		InvalidDevice,
 		InvalidMsgpack,
 		UnsupportedEncoding,
@@ -25,9 +25,9 @@ public:
 #else
 	Q_ENUMS(MsgpackError)
 #endif
-	MsgpackIODevice(QIODevice*, QObject* parent = 0);
+	MsgpackIODevice(QIODevice*, QObject* parent= 0);
 	~MsgpackIODevice();
-	static MsgpackIODevice* fromStdinOut(QObject* parent = 0);
+	static MsgpackIODevice* fromStdinOut(QObject* parent= 0);
 
 	bool isOpen();
 	QString errorString() const;
@@ -44,7 +44,8 @@ public:
 	void send(const QByteArray&);
 	void send(bool);
 	void send(const QList<QByteArray>& list);
-	template <class T> void sendArrayOf(const QList<T>& list)
+	template <class T>
+	void sendArrayOf(const QList<T>& list)
 	{
 		msgpack_pack_array(&m_pk, list.size());
 		foreach (const T& elem, list) {
@@ -115,8 +116,7 @@ private:
 
 class MsgpackRequestHandler {
 public:
-	virtual void handleRequest(MsgpackIODevice*, quint32 msgid, const QByteArray&,
-	                           const QVariantList&) = 0;
+	virtual void handleRequest(MsgpackIODevice*, quint32 msgid, const QByteArray&, const QVariantList&)= 0;
 };
 
 } // Namespace NeovimQt

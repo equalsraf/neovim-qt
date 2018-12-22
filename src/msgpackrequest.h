@@ -10,7 +10,7 @@ class MsgpackIODevice;
 class MsgpackRequest: public QObject {
 	Q_OBJECT
 public:
-	MsgpackRequest(quint32 id, MsgpackIODevice *dev, QObject *parent = 0);
+	MsgpackRequest(quint32 id, MsgpackIODevice *dev, QObject *parent= 0);
 	void setFunction(quint64);
 	quint64 function();
 	void setTimeout(int msec);

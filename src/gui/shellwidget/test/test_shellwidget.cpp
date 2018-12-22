@@ -16,7 +16,7 @@ private slots:
 
 void Test::clearRegion()
 {
-	ShellWidget *w = new ShellWidget();
+	ShellWidget *w= new ShellWidget();
 	w->show();
 	w->resizeShell(2, 2);
 }

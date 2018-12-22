@@ -21,8 +21,8 @@ class Tab {
 public:
 	Tab(int64_t id, QString name)
 	{
-		this->tab = id;
-		this->name = name;
+		this->tab= id;
+		this->name= name;
 	}
 	/// The tab handle, a unique tab identifier
 	int64_t tab;
@@ -33,9 +33,9 @@ class ShellOptions {
 public:
 	ShellOptions()
 	{
-		enable_ext_tabline = true;
-		enable_ext_popupmenu = true;
-		nvim_show_tabline = 1;
+		enable_ext_tabline= true;
+		enable_ext_popupmenu= true;
+		nvim_show_tabline= 1;
 	}
 	bool enable_ext_tabline;
 	int nvim_show_tabline;
@@ -47,10 +47,10 @@ class Shell: public ShellWidget {
 	Q_PROPERTY(bool neovimBusy READ neovimBusy() NOTIFY neovimBusy())
 	Q_PROPERTY(bool neovimAttached READ neovimAttached() NOTIFY neovimAttached())
 public:
-	Shell(NeovimConnector* nvim, ShellOptions opts, QWidget* parent = 0);
+	Shell(NeovimConnector* nvim, ShellOptions opts, QWidget* parent= 0);
 	~Shell();
 	QSize sizeIncrement() const;
-	static QColor color(qint64 color, const QColor& fallback = QColor());
+	static QColor color(qint64 color, const QColor& fallback= QColor());
 	static bool isBadMonospace(const QFont& f);
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
@@ -80,7 +80,7 @@ public slots:
 	void handleNeovimNotification(const QByteArray& name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
 	void resizeNeovim(int n_cols, int n_rows);
-	bool setGuiFont(const QString& fdesc, bool force = false);
+	bool setGuiFont(const QString& fdesc, bool force= false);
 	void updateGuiWindowState(Qt::WindowStates state);
 	void openFiles(const QList<QUrl> url);
 
@@ -130,8 +130,8 @@ protected:
 	virtual void handleBusy(bool);
 	virtual void handleSetOption(const QString& name, const QVariant& value);
 	void handleExtGuiOption(const QString& name, const QVariant& value);
-	virtual void handlePopupMenuShow(const QVariantList& items, int64_t selected, int64_t row,
-	                                 int64_t col);
+	virtual void handlePopupMenuShow(const QVariantList& items, int64_t selected,
+	                                 int64_t row, int64_t col);
 	void handlePopupMenuSelect(int64_t selected);
 	virtual void handleMouse(bool);
 
@@ -144,7 +144,7 @@ protected:
 	QString neovimErrorToString(const QVariant& err);
 
 private slots:
-	void setAttached(bool attached = true);
+	void setAttached(bool attached= true);
 
 private:
 	bool m_attached;
@@ -188,8 +188,7 @@ class ShellRequestHandler: public QObject, public MsgpackRequestHandler {
 	Q_OBJECT
 public:
 	ShellRequestHandler(Shell* parent);
-	virtual void handleRequest(MsgpackIODevice* dev, quint32 msgid, const QByteArray& method,
-	                           const QVariantList& args);
+	virtual void handleRequest(MsgpackIODevice* dev, quint32 msgid, const QByteArray& method, const QVariantList& args);
 };
 
 

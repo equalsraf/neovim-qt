@@ -5,23 +5,25 @@
 
 namespace NeovimQt {
 
-ErrorWidget::ErrorWidget(QWidget *parent): QWidget(parent), m_errorLabel(0), m_closeButton(0)
+ErrorWidget::ErrorWidget(QWidget *parent)
+: QWidget(parent), m_errorLabel(0), m_closeButton(0)
 {
-	m_errorLabel = new QLabel();
-	m_closeButton = new QPushButton(tr("Retry"));
+	m_errorLabel= new QLabel();
+	m_closeButton= new QPushButton(tr("Retry"));
 
-	m_image = new QLabel();
+	m_image= new QLabel();
 	m_image->setPixmap(QPixmap(":/neovim.png").scaled(64, 64, Qt::KeepAspectRatio));
 
-	connect(m_closeButton, &QPushButton::clicked, this, &ErrorWidget::reconnectNeovim);
+	connect(m_closeButton, &QPushButton::clicked,
+	        this, &ErrorWidget::reconnectNeovim);
 
-	QHBoxLayout *inner_layout = new QHBoxLayout();
+	QHBoxLayout *inner_layout= new QHBoxLayout();
 	inner_layout->addStretch();
 	inner_layout->addWidget(m_image);
 	inner_layout->addWidget(m_errorLabel);
 	inner_layout->addWidget(m_closeButton);
 	inner_layout->addStretch();
-	QVBoxLayout *outer_layout = new QVBoxLayout();
+	QVBoxLayout *outer_layout= new QVBoxLayout();
 	outer_layout->addStretch();
 	outer_layout->addLayout(inner_layout);
 	outer_layout->addStretch();
@@ -38,4 +40,4 @@ void ErrorWidget::showReconnect(bool on)
 	m_closeButton->setVisible(on);
 }
 
-} // Namespace
+} //Namespace

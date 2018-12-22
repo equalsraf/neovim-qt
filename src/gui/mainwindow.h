@@ -20,11 +20,11 @@ public:
 		FullScreen,
 	};
 
-	MainWindow(NeovimConnector *, ShellOptions opts, QWidget *parent = 0);
+	MainWindow(NeovimConnector *, ShellOptions opts, QWidget *parent= 0);
 	bool neovimAttached() const;
 	Shell *shell();
 public slots:
-	void delayedShow(DelayedShow type = DelayedShow::Normal);
+	void delayedShow(DelayedShow type= DelayedShow::Normal);
 signals:
 	void neovimAttached(bool);
 

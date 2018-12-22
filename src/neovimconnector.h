@@ -32,7 +32,7 @@ class NeovimConnector: public QObject {
 	Q_PROPERTY(bool ready READ isReady NOTIFY ready)
 public:
 	enum NeovimError {
-		NoError = 0,
+		NoError= 0,
 		NoMetadata,
 		MetadataDescriptorError,
 		UnexpectedMsg,
@@ -60,11 +60,11 @@ public:
 
 	NeovimConnector(QIODevice* s);
 	NeovimConnector(MsgpackIODevice* s);
-	static NeovimConnector* spawn(const QStringList& params = QStringList(),
-	                              const QString& exe = "nvim");
+	static NeovimConnector* spawn(const QStringList& params= QStringList(),
+	                              const QString& exe= "nvim");
 	static NeovimConnector* connectToSocket(const QString&);
 	static NeovimConnector* connectToHost(const QString& host, int port);
-	static NeovimConnector* connectToNeovim(const QString& server = QString());
+	static NeovimConnector* connectToNeovim(const QString& server= QString());
 	static NeovimConnector* fromStdinOut();
 
 	bool canReconnect();

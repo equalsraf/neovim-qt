@@ -18,9 +18,9 @@ namespace NeovimQt {
 class RequestHandler: public QObject, public MsgpackRequestHandler {
 	Q_OBJECT
 public:
-	RequestHandler(QObject *parent = 0): QObject(parent) {}
-	virtual void handleRequest(MsgpackIODevice *dev, quint32 msgid, const QByteArray &method,
-	                           const QVariantList &params)
+	RequestHandler(QObject *parent= 0)
+	: QObject(parent) {}
+	virtual void handleRequest(MsgpackIODevice *dev, quint32 msgid, const QByteArray &method, const QVariantList &params)
 	{
 		dev->sendResponse(msgid, QVariant(), response);
 		emit receivedRequest(msgid, method, params);
@@ -36,12 +36,12 @@ private:
 	MsgpackIODevice *one, *two;
 	void resetLoop()
 	{
-		QTcpServer *server = new QTcpServer();
+		QTcpServer *server= new QTcpServer();
 		QVERIFY(server->listen(QHostAddress::LocalHost));
 
 		QVERIFY(server->isListening());
 
-		QTcpSocket *client = new QTcpSocket(this);
+		QTcpSocket *client= new QTcpSocket(this);
 		QSignalSpy onConnected(client, SIGNAL(connected()));
 		QVERIFY(onConnected.isValid());
 		QSignalSpy onNewConnection(server, SIGNAL(newConnection()));
@@ -51,15 +51,18 @@ private:
 		QVERIFY(SPYWAIT(onConnected));
 		QVERIFY(SPYWAIT(onNewConnection));
 
-		QTcpSocket *other = server->nextPendingConnection();
+		QTcpSocket *other= server->nextPendingConnection();
 
-		one = new MsgpackIODevice(client);
-		two = new MsgpackIODevice(other);
+		one= new MsgpackIODevice(client);
+		two= new MsgpackIODevice(other);
 		QVERIFY(one->isOpen());
 		QVERIFY(two->isOpen());
 	}
 private slots:
-	void init() { resetLoop(); }
+	void init()
+	{
+		resetLoop();
+	}
 
 	void cleanup()
 	{
@@ -69,7 +72,7 @@ private slots:
 
 	void invalidDevice()
 	{
-		MsgpackIODevice *io = new MsgpackIODevice(new QBuffer);
+		MsgpackIODevice *io= new MsgpackIODevice(new QBuffer);
 		QCOMPARE(io->errorCause(), MsgpackIODevice::InvalidDevice);
 	}
 
@@ -121,7 +124,7 @@ private slots:
 		one->send(brokenRequest3);
 
 		// Just to finish
-		auto req = one->startRequestUnchecked("testRequest", 0);
+		auto req= one->startRequestUnchecked("testRequest", 0);
 		QSignalSpy gotResp(req, SIGNAL(error(quint32, quint64, QVariant)));
 		QVERIFY(gotResp.isValid());
 		QVERIFY2(SPYWAIT(gotResp), "By default all requests get an error");
@@ -142,14 +145,14 @@ private slots:
 		one->sendNotification(method, params);
 		QVERIFY(SPYWAIT(onNotification));
 
-		QVariantList n = onNotification.at(0);
+		QVariantList n= onNotification.at(0);
 		QCOMPARE(n.at(0).toByteArray(), method);
 		QCOMPARE(n.at(1).toList(), params);
 	}
 
 	void request()
 	{
-		auto req = one->startRequestUnchecked("testRequest", 0);
+		auto req= one->startRequestUnchecked("testRequest", 0);
 
 		QSignalSpy gotResp(req, SIGNAL(error(quint32, quint64, QVariant)));
 		QVERIFY(gotResp.isValid());
@@ -157,19 +160,19 @@ private slots:
 		QVERIFY2(SPYWAIT(gotResp), "By default all requests get an error");
 
 		// Now test with an actual response
-		RequestHandler *handler = new RequestHandler(two);
-		handler->response = 42;
+		RequestHandler *handler= new RequestHandler(two);
+		handler->response= 42;
 		two->setRequestHandler(handler);
 
 		QSignalSpy gotReq(handler, SIGNAL(receivedRequest(quint32, QByteArray, QVariantList)));
 		QVERIFY(gotReq.isValid());
 
-		auto req2 = one->startRequestUnchecked("testRequest2", 1);
+		auto req2= one->startRequestUnchecked("testRequest2", 1);
 		one->send(QByteArray("hello"));
 		QVERIFY(SPYWAIT(gotReq));
 
 		// Make sure the request msgid/method/params matches the ones we sent
-		QVariantList signal = gotReq.at(0);
+		QVariantList signal= gotReq.at(0);
 		QCOMPARE(signal.at(0).toUInt(), req2->id);
 		QCOMPARE(signal.at(1).toByteArray(), QByteArray("testRequest2"));
 		QCOMPARE(signal.at(2).toList().at(0).toByteArray(), QByteArray("hello"));
@@ -216,15 +219,15 @@ private slots:
 		// This will actually trigger a fatal error because the buffer
 		// is not a valid device, but is still enough to get the timeout
 		// below
-		MsgpackIODevice *dev = new MsgpackIODevice(&buf);
+		MsgpackIODevice *dev= new MsgpackIODevice(&buf);
 
-		MsgpackRequest *r = dev->startRequestUnchecked("testTimeout", 0);
+		MsgpackRequest *r= dev->startRequestUnchecked("testTimeout", 0);
 		r->setTimeout(3);
 
 		QSignalSpy timedOut(r, SIGNAL(timeout(quint32)));
 		QVERIFY(timedOut.isValid());
 		QVERIFY(SPYWAIT(timedOut));
-		QVariantList params = timedOut.at(0);
+		QVariantList params= timedOut.at(0);
 		QCOMPARE(params.at(0).toUInt(), r->id);
 	}
 };

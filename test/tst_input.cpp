@@ -14,9 +14,12 @@ private:
 
 void TestInput::modifiersAreNotKeys()
 {
-	QCOMPARE(input.convertKey("", Qt::Key_Meta, Qt::MetaModifier), QString());
-	QCOMPARE(input.convertKey("", Qt::Key_Control, Qt::ControlModifier), QString());
-	QCOMPARE(input.convertKey("", Qt::Key_Alt, Qt::AltModifier), QString());
+	QCOMPARE(input.convertKey("", Qt::Key_Meta, Qt::MetaModifier),
+	         QString());
+	QCOMPARE(input.convertKey("", Qt::Key_Control, Qt::ControlModifier),
+	         QString());
+	QCOMPARE(input.convertKey("", Qt::Key_Alt, Qt::AltModifier),
+	         QString());
 }
 
 void TestInput::specialKeys()

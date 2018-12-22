@@ -4,7 +4,7 @@ namespace NeovimQt {
 
 bool decode(const QVariant& in, QVariant& out)
 {
-	out = in;
+	out= in;
 	return false;
 }
 
@@ -40,7 +40,7 @@ QDebug operator<<(QDebug dbg, const msgpack_object& obj)
 		break;
 	case MSGPACK_OBJECT_ARRAY:
 		dbg.nospace() << "[";
-		for (uint32_t i = 0; i < obj.via.array.size; i++) {
+		for (uint32_t i= 0; i < obj.via.array.size; i++) {
 			dbg.nospace() << obj.via.array.ptr[i];
 			dbg.space() << ",";
 		}
@@ -48,7 +48,7 @@ QDebug operator<<(QDebug dbg, const msgpack_object& obj)
 		break;
 	case MSGPACK_OBJECT_MAP:
 		dbg.nospace() << "{";
-		for (uint32_t i = 0; i < obj.via.map.size; i++) {
+		for (uint32_t i= 0; i < obj.via.map.size; i++) {
 			dbg.nospace() << obj.via.map.ptr[i].key;
 			dbg.space() << ":";
 			dbg.nospace() << obj.via.map.ptr[i].val;

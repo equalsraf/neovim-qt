@@ -11,7 +11,7 @@ namespace NeovimQt {
 
 /**
  * \class NeovimQt::NeovimConnector
- *
+ * 
  * \brief A Connection to a Neovim instance
  *
  */
@@ -19,20 +19,22 @@ namespace NeovimQt {
 /**
  * Create a new Neovim API connection from an open IO device
  */
-NeovimConnector::NeovimConnector(QIODevice* dev): NeovimConnector(new MsgpackIODevice(dev))
+NeovimConnector::NeovimConnector(QIODevice* dev)
+: NeovimConnector(new MsgpackIODevice(dev))
 {
 }
 
 NeovimConnector::NeovimConnector(MsgpackIODevice* dev)
-: QObject(), m_dev(dev), m_helper(0), m_error(NoError), m_api0(NULL), m_api1(NULL), m_api2(NULL),
-  m_api3(NULL), m_api4(NULL), m_channel(0), m_api_compat(0), m_api_supported(0),
-  m_ctype(OtherConnection), m_ready(false), m_timeout(20000)
+: QObject(), m_dev(dev), m_helper(0), m_error(NoError), m_api0(NULL), m_api1(NULL), m_api2(NULL), m_api3(NULL),
+  m_api4(NULL), m_channel(0), m_api_compat(0), m_api_supported(0), m_ctype(OtherConnection), m_ready(false),
+  m_timeout(20000)
 {
-	m_helper = new NeovimConnectorHelper(this);
+	m_helper= new NeovimConnectorHelper(this);
 	qRegisterMetaType<NeovimError>("NeovimError");
 	qRegisterMetaType<int64_t>("int64_t");
 
-	connect(m_dev, &MsgpackIODevice::error, this, &NeovimConnector::msgpackError);
+	connect(m_dev, &MsgpackIODevice::error,
+	        this, &NeovimConnector::msgpackError);
 
 	if (!m_dev->isOpen()) {
 		return;
@@ -42,7 +44,7 @@ NeovimConnector::NeovimConnector(MsgpackIODevice* dev)
 
 void NeovimConnector::setRequestTimeout(int ms)
 {
-	this->m_timeout = ms;
+	this->m_timeout= ms;
 }
 
 /**
@@ -50,10 +52,10 @@ void NeovimConnector::setRequestTimeout(int ms)
  */
 void NeovimConnector::setError(NeovimError err, const QString& msg)
 {
-	m_ready = false;
+	m_ready= false;
 	if (m_error == NoError && err != NoError) {
-		m_error = err;
-		m_errorString = msg;
+		m_error= err;
+		m_errorString= msg;
 		qWarning() << "Neovim fatal error" << m_errorString;
 		emit error(m_error);
 	} else {
@@ -65,8 +67,8 @@ void NeovimConnector::setError(NeovimError err, const QString& msg)
 /** Reset error state */
 void NeovimConnector::clearError()
 {
-	m_error = NoError;
-	m_errorString = "";
+	m_error= NoError;
+	m_errorString= "";
 }
 
 /**
@@ -98,10 +100,13 @@ uint64_t NeovimConnector::channel()
  */
 void NeovimConnector::discoverMetadata()
 {
-	MsgpackRequest* r = m_dev->startRequestUnchecked("vim_get_api_info", 0);
-	connect(r, &MsgpackRequest::finished, m_helper, &NeovimConnectorHelper::handleMetadata);
-	connect(r, &MsgpackRequest::error, m_helper, &NeovimConnectorHelper::handleMetadataError);
-	connect(r, &MsgpackRequest::timeout, this, &NeovimConnector::fatalTimeout);
+	MsgpackRequest* r= m_dev->startRequestUnchecked("vim_get_api_info", 0);
+	connect(r, &MsgpackRequest::finished,
+	        m_helper, &NeovimConnectorHelper::handleMetadata);
+	connect(r, &MsgpackRequest::error,
+	        m_helper, &NeovimConnectorHelper::handleMetadataError);
+	connect(r, &MsgpackRequest::timeout,
+	        this, &NeovimConnector::fatalTimeout);
 	r->setTimeout(m_timeout);
 }
 
@@ -139,7 +144,7 @@ NeovimApi0* NeovimConnector::api0()
 {
 	if (!m_api0) {
 		if (m_api_compat <= 0) {
-			m_api0 = new NeovimApi0(this);
+			m_api0= new NeovimApi0(this);
 		} else {
 			qDebug() << "This instance of neovim DOES NOT support api level 0";
 		}
@@ -154,7 +159,7 @@ NeovimApi1* NeovimConnector::api1()
 {
 	if (!m_api1) {
 		if (m_api_compat <= 1 && 1 <= m_api_supported) {
-			m_api1 = new NeovimApi1(this);
+			m_api1= new NeovimApi1(this);
 		} else {
 			qDebug() << "This instance of neovim DOES NOT support api level 1";
 		}
@@ -176,7 +181,7 @@ NeovimApi2* NeovimConnector::api2()
 {
 	if (!m_api2) {
 		if (m_api_compat <= 2 && 2 <= m_api_supported) {
-			m_api2 = new NeovimApi2(this);
+			m_api2= new NeovimApi2(this);
 		} else {
 			qWarning() << "This instance of neovim not support api level 2";
 		}
@@ -192,7 +197,7 @@ NeovimApi3* NeovimConnector::api3()
 {
 	if (!m_api3) {
 		if (m_api_compat <= 3 && 3 <= m_api_supported) {
-			m_api3 = new NeovimApi3(this);
+			m_api3= new NeovimApi3(this);
 		} else {
 			qWarning() << "This instance of neovim not support api level 3";
 		}
@@ -208,7 +213,7 @@ NeovimApi4* NeovimConnector::api4()
 {
 	if (!m_api4) {
 		if (m_api_compat <= 4 && 4 <= m_api_supported) {
-			m_api4 = new NeovimApi4(this);
+			m_api4= new NeovimApi4(this);
 		} else {
 			qWarning() << "This instance of neovim not support api level 4";
 		}
@@ -222,7 +227,7 @@ NeovimApi4* NeovimConnector::api4()
  */
 NeovimConnector* NeovimConnector::spawn(const QStringList& params, const QString& exe)
 {
-	QProcess* p = new QProcess();
+	QProcess* p= new QProcess();
 	QStringList args;
 	// Neovim accepts a `--' argument after which only filenames are passed.
 	// If the user has supplied it, our arguments must appear before.
@@ -230,21 +235,23 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params, const QString
 		args << "--embed";
 		args.append(params);
 	} else {
-		int idx = params.indexOf("--");
+		int idx= params.indexOf("--");
 		args.append(params.mid(0, idx));
 		args << "--embed";
 		args.append(params.mid(idx));
 	}
 
-	NeovimConnector* c = new NeovimConnector(p);
-	c->m_ctype = SpawnedConnection;
-	c->m_spawnArgs = params;
-	c->m_spawnExe = exe;
+	NeovimConnector* c= new NeovimConnector(p);
+	c->m_ctype= SpawnedConnection;
+	c->m_spawnArgs= params;
+	c->m_spawnExe= exe;
 
-	connect(p, SIGNAL(error(QProcess::ProcessError)), c,
-	        SLOT(processError(QProcess::ProcessError)));
-	connect(p, SIGNAL(finished(int, QProcess::ExitStatus)), c, SIGNAL(processExited(int)));
-	connect(p, &QProcess::started, c, &NeovimConnector::discoverMetadata);
+	connect(p, SIGNAL(error(QProcess::ProcessError)),
+	        c, SLOT(processError(QProcess::ProcessError)));
+	connect(p, SIGNAL(finished(int, QProcess::ExitStatus)),
+	        c, SIGNAL(processExited(int)));
+	connect(p, &QProcess::started,
+	        c, &NeovimConnector::discoverMetadata);
 	p->start(exe, args);
 	return c;
 }
@@ -258,14 +265,16 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params, const QString
  */
 NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 {
-	QLocalSocket* s = new QLocalSocket();
-	NeovimConnector* c = new NeovimConnector(s);
+	QLocalSocket* s= new QLocalSocket();
+	NeovimConnector* c= new NeovimConnector(s);
 
-	c->m_ctype = SocketConnection;
-	c->m_connSocket = path;
+	c->m_ctype= SocketConnection;
+	c->m_connSocket= path;
 
-	connect(s, SIGNAL(error(QLocalSocket::LocalSocketError)), c, SLOT(socketError()));
-	connect(s, &QLocalSocket::connected, c, &NeovimConnector::discoverMetadata);
+	connect(s, SIGNAL(error(QLocalSocket::LocalSocketError)),
+	        c, SLOT(socketError()));
+	connect(s, &QLocalSocket::connected,
+	        c, &NeovimConnector::discoverMetadata);
 	s->connectToServer(path);
 	return c;
 }
@@ -278,15 +287,17 @@ NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
  */
 NeovimConnector* NeovimConnector::connectToHost(const QString& host, int port)
 {
-	QTcpSocket* s = new QTcpSocket();
-	NeovimConnector* c = new NeovimConnector(s);
+	QTcpSocket* s= new QTcpSocket();
+	NeovimConnector* c= new NeovimConnector(s);
 
-	c->m_ctype = HostConnection;
-	c->m_connHost = host;
-	c->m_connPort = port;
+	c->m_ctype= HostConnection;
+	c->m_connHost= host;
+	c->m_connPort= port;
 
-	connect(s, SIGNAL(error(QAbstractSocket::SocketError)), c, SLOT(socketError()));
-	connect(s, &QAbstractSocket::connected, c, &NeovimConnector::discoverMetadata);
+	connect(s, SIGNAL(error(QAbstractSocket::SocketError)),
+	        c, SLOT(socketError()));
+	connect(s, &QAbstractSocket::connected,
+	        c, &NeovimConnector::discoverMetadata);
 	s->connectToHost(host, port);
 	return c;
 }
@@ -301,20 +312,20 @@ NeovimConnector* NeovimConnector::connectToHost(const QString& host, int port)
  */
 NeovimConnector* NeovimConnector::connectToNeovim(const QString& server)
 {
-	QString addr = server;
+	QString addr= server;
 	if (addr.isEmpty()) {
-		addr = QString::fromLocal8Bit(qgetenv("NVIM_LISTEN_ADDRESS"));
+		addr= QString::fromLocal8Bit(qgetenv("NVIM_LISTEN_ADDRESS"));
 	}
 	if (addr.isEmpty()) {
 		return spawn();
 	}
 
-	int colon_pos = addr.lastIndexOf(':');
+	int colon_pos= addr.lastIndexOf(':');
 	if (colon_pos != -1 && colon_pos != 0 && addr[colon_pos - 1] != ':') {
 		bool ok;
-		int port = addr.mid(colon_pos + 1).toInt(&ok);
+		int port= addr.mid(colon_pos + 1).toInt(&ok);
 		if (ok) {
-			QString host = addr.mid(0, colon_pos);
+			QString host= addr.mid(0, colon_pos);
 			return connectToHost(host, port);
 		}
 	}

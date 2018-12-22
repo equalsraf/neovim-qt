@@ -3,7 +3,7 @@
 #include "shellcontents.h"
 #include "konsole_wcwidth.h"
 
-Cell ShellContents::invalidCell = Cell::invalid();
+Cell ShellContents::invalidCell= Cell::invalid();
 ;
 
 /// Build shell contents from file, each line in the
@@ -13,8 +13,8 @@ bool ShellContents::fromFile(const QString& path)
 	if (_data != NULL) {
 		delete[] _data;
 	}
-	_rows = 1;
-	_columns = 1;
+	_rows= 1;
+	_columns= 1;
 	allocData();
 
 	QFile f(path);
@@ -22,17 +22,18 @@ bool ShellContents::fromFile(const QString& path)
 		return false;
 	}
 
-	int row = 0;
+	int row= 0;
 	while (!f.atEnd()) {
-		QString line = f.readLine();
+		QString line= f.readLine();
 		resize(_rows + 1, qMax(_columns, string_width(line)));
 		put(line, row, 0);
-		row += 1;
+		row+= 1;
 	}
 	return true;
 }
 
-ShellContents::ShellContents(int rows, int columns): _data(0), _rows(rows), _columns(columns)
+ShellContents::ShellContents(int rows, int columns)
+: _data(0), _rows(rows), _columns(columns)
 {
 	allocData();
 }
@@ -58,28 +59,29 @@ ShellContents::ShellContents(const ShellContents& other)
 /// needed.
 void ShellContents::allocData()
 {
-	_data = new Cell[_rows * _columns];
+	_data= new Cell[_rows * _columns];
 }
 
 void ShellContents::clearAll(QColor bg)
 {
-	for (int i = 0; i < _rows; i++) {
-		for (int j = 0; j < _columns; j++) {
-			_data[i * _columns + j] = Cell::bg(bg);
+	for (int i= 0; i < _rows; i++) {
+		for (int j= 0; j < _columns; j++) {
+			_data[i * _columns + j]= Cell::bg(bg);
 		}
 	}
 }
 
 void ShellContents::clearRow(int r, int startCol)
 {
-	if (r < 0 || r >= _rows || startCol < 0 || startCol > _rows) {
+	if (r < 0 || r >= _rows || startCol < 0 ||
+	    startCol > _rows) {
 		return;
 	}
 
-	int start = r * _columns + startCol;
-	int end = start + _columns;
-	for (int i = start; i < end - startCol; i++) {
-		_data[i] = Cell();
+	int start= r * _columns + startCol;
+	int end= start + _columns;
+	for (int i= start; i < end - startCol; i++) {
+		_data[i]= Cell();
 	}
 }
 
@@ -92,31 +94,32 @@ bool ShellContents::verifyRegion(int& row0, int& row1, int& col0, int& col1)
 		return false;
 	}
 	if (row0 < 0) {
-		row0 = 0;
+		row0= 0;
 	}
 	if (col0 < 0) {
-		col0 = 0;
+		col0= 0;
 	}
 	if (row1 >= _rows) {
-		row1 = _rows;
+		row1= _rows;
 	}
 	if (col1 >= _columns) {
-		col1 = _columns;
+		col1= _columns;
 	}
 	return true;
 }
 
 /// Clear shell region starting at (row0, col0) up until (row1, col1)
 /// e.g. clearRegion(1, 1, 3, 3) clears a region with size 2x2
-void ShellContents::clearRegion(int row0, int col0, int row1, int col1, QColor bg)
+void ShellContents::clearRegion(int row0, int col0, int row1, int col1,
+                                QColor bg)
 {
 	if (!verifyRegion(row0, row1, col0, col1)) {
 		return;
 	}
 
-	for (int i = row0; i < row1; i++) {
-		for (int j = col0; j < col1; j++) {
-			_data[i * _columns + j] = Cell::bg(bg);
+	for (int i= row0; i < row1; i++) {
+		for (int j= col0; j < col1; j++) {
+			_data[i * _columns + j]= Cell::bg(bg);
 		}
 	}
 }
@@ -129,32 +132,33 @@ void ShellContents::scrollRegion(int row0, int row1, int col0, int col1, int cou
 		return;
 	}
 	if (!verifyRegion(row0, row1, col0, col1)) {
-		qDebug() << "Scroll region is invalid (row0, row1, col0, col1)" << row0 << row1 << col0
-		         << col1;
+		qDebug() << "Scroll region is invalid (row0, row1, col0, col1)"
+		         << row0 << row1 << col0 << col1;
 		return;
 	}
 
 	int start, stop, inc;
 	if (count > 0) {
-		start = row0;
-		stop = row1;
-		inc = +1;
+		start= row0;
+		stop= row1;
+		inc= +1;
 	} else {
-		start = row1 - 1;
-		stop = row0 - 1;
-		inc = -1;
+		start= row1 - 1;
+		stop= row0 - 1;
+		inc= -1;
 	}
 
-	for (int i = start; i != stop; i += inc) {
-		int dst = i - count;
+	for (int i= start; i != stop; i+= inc) {
+		int dst= i - count;
 		if (dst >= row0 && dst < row1) {
 			// Copy line
-			memcpy(&_data[dst * _columns + col0], &_data[i * _columns + col0],
+			memcpy(&_data[dst * _columns + col0],
+			       &_data[i * _columns + col0],
 			       (col1 - col0) * sizeof(Cell));
 		}
 
 		// Clear src line
-		for (int j = col0; j < col1; j++) {
+		for (int j= col0; j < col1; j++) {
 			new (&_data[i * _columns + j]) Cell();
 		}
 	}
@@ -176,20 +180,22 @@ void ShellContents::resize(int newRows, int newColumns)
 		return;
 	}
 
-	Cell* old = _data;
-	int oldRows = _rows;
-	int oldColumns = _columns;
+	Cell* old= _data;
+	int oldRows= _rows;
+	int oldColumns= _columns;
 
-	_rows = newRows;
-	_columns = newColumns;
+	_rows= newRows;
+	_columns= newColumns;
 	allocData();
 
 	// Copy the original
-	int copyRows = qMin(oldRows, _rows);
-	int copyColumns = qMin(oldColumns, _columns);
+	int copyRows= qMin(oldRows, _rows);
+	int copyColumns= qMin(oldColumns, _columns);
 
-	for (int i = 0; i < copyRows; i++) {
-		memcpy(&_data[i * _columns], &old[i * oldColumns], copyColumns * sizeof(Cell));
+	for (int i= 0; i < copyRows; i++) {
+		memcpy(&_data[i * _columns],
+		       &old[i * oldColumns],
+		       copyColumns * sizeof(Cell));
 	}
 
 	delete[] old;
@@ -216,22 +222,23 @@ const Cell& ShellContents::constValue(int row, int column) const
 }
 
 /// Writes content to the shell, returns the number of columns written
-int ShellContents::put(const QString& str, int row, int column, QColor fg, QColor bg, QColor sp,
-                       bool bold, bool italic, bool underline, bool undercurl)
+int ShellContents::put(const QString& str, int row, int column,
+                       QColor fg, QColor bg, QColor sp, bool bold, bool italic,
+                       bool underline, bool undercurl)
 {
 	if (row < 0 || row >= _rows || column < 0 || column >= _columns) {
 		return 0;
 	}
 
-	int pos = column;
+	int pos= column;
 	foreach (const QChar chr, str) {
-		Cell& c = value(row, pos);
-		c = Cell(chr, fg, bg, sp, bold, italic, underline, undercurl);
+		Cell& c= value(row, pos);
+		c= Cell(chr, fg, bg, sp, bold, italic, underline, undercurl);
 		if (c.doubleWidth) {
-			value(row, pos + 1) = Cell();
-			pos += 2;
+			value(row, pos + 1)= Cell();
+			pos+= 2;
 		} else {
-			pos += 1;
+			pos+= 1;
 		}
 	}
 	return pos - column;

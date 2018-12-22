@@ -60,7 +60,7 @@ InputConv::InputConv()
 }
 
 /**
- * Return keyboard modifier prefix
+ * Return keyboard modifier prefix 
  *
  * e.g. C-, A- or C-S-A-
  *
@@ -72,7 +72,7 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 	QString modprefix;
 #if defined(Q_OS_MAC) || defined(Q_OS_UNIX)
 	if (mod & CmdModifier) {
-		modprefix += "D-"; // like MacVim does
+		modprefix+= "D-"; // like MacVim does
 	}
 #endif
 	if (mod & ControlModifier
@@ -80,17 +80,17 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
 	    && !(mod & AltModifier)
 #endif
 	) {
-		modprefix += "C-";
+		modprefix+= "C-";
 	}
 	if (mod & ShiftModifier) {
-		modprefix += "S-";
+		modprefix+= "S-";
 	}
 	if (mod & AltModifier
 #ifdef Q_OS_WIN32
 	    && !(mod & ControlModifier)
 #endif
 	) {
-		modprefix += "A-";
+		modprefix+= "A-";
 	}
 
 	return modprefix;
@@ -109,8 +109,7 @@ QString InputConv::modPrefix(Qt::KeyboardModifiers mod)
  *
  * If the event is not valid for Neovim, returns an empty string
  */
-QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::KeyboardModifiers mod,
-                                QPoint pos, short clickCount)
+QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::KeyboardModifiers mod, QPoint pos, short clickCount)
 {
 	QString buttonName;
 	switch (bt) {
@@ -118,16 +117,16 @@ QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::Keybo
 		// In practice Neovim only supports the clickcount for Left
 		// mouse presses, even if our shell can support other buttons
 		if (clickCount > 1 && clickCount <= 4) {
-			buttonName = QString("%1-Left").arg(clickCount);
+			buttonName= QString("%1-Left").arg(clickCount);
 		} else {
-			buttonName += "Left";
+			buttonName+= "Left";
 		}
 		break;
 	case Qt::RightButton:
-		buttonName += "Right";
+		buttonName+= "Right";
 		break;
 	case Qt::MidButton:
-		buttonName += "Middle";
+		buttonName+= "Middle";
 		break;
 	case Qt::NoButton:
 		break;
@@ -141,24 +140,19 @@ QString InputConv::convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::Keybo
 		// Treat this as a regular MouseButtonPress. Repeated
 		// clicks are handled above.
 	case QEvent::MouseButtonPress:
-		evType += "Mouse";
+		evType+= "Mouse";
 		break;
 	case QEvent::MouseButtonRelease:
-		evType += "Release";
+		evType+= "Release";
 		break;
 	case QEvent::MouseMove:
-		evType += "Drag";
+		evType+= "Drag";
 		break;
 	default:
 		return "";
 	}
 
-	QString inp = QString("<%1%2%3><%4,%5>")
-	                  .arg(modPrefix(mod))
-	                  .arg(buttonName)
-	                  .arg(evType)
-	                  .arg(pos.x())
-	                  .arg(pos.y());
+	QString inp= QString("<%1%2%3><%4,%5>").arg(modPrefix(mod)).arg(buttonName).arg(evType).arg(pos.x()).arg(pos.y());
 	return inp;
 }
 
@@ -228,7 +222,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 		// on macs, text is empty for ctrl+key and cmd+key combos (with or without alt)
 		if (mod & ControlModifier || mod & CmdModifier) {
 			// ignore ctrl, alt and cmd key combos by themselves
-			QList<Qt::Key> keys = {Key_Control, Key_Alt, Key_Cmd};
+			QList<Qt::Key> keys= {Key_Control, Key_Alt, Key_Cmd};
 			if (keys.contains((Qt::Key)k)) {
 				return QString();
 			} else if (mod & ShiftModifier) {
@@ -237,7 +231,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 				return QString();
 			} else {
 				// key code will be the value of the char (hopefully)
-				c = QChar(k);
+				c= QChar(k);
 			}
 		} else {
 			// This is a special key we can't handle
@@ -245,21 +239,21 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 		}
 	} else {
 		// Key event compression is disabled, text has one char
-		c = text.at(0);
+		c= text.at(0);
 	}
 
 	// Remove SHIFT
 	if (c.unicode() >= 0x80 || (!c.isLetterOrNumber() && c.isPrint())) {
-		mod &= ~ShiftModifier;
+		mod&= ~ShiftModifier;
 	}
 
 	// Remove CTRL empty characters at the start of the ASCII range
 	if (c.unicode() < 0x20) {
-		mod &= ~ControlModifier;
+		mod&= ~ControlModifier;
 	}
 
 	// Format with prefix if necessary
-	QString prefix = modPrefix(mod);
+	QString prefix= modPrefix(mod);
 	if (!prefix.isEmpty()) {
 		return QString("<%1%2>").arg(prefix).arg(c);
 	}

@@ -21,16 +21,27 @@ private slots:
 		QVERIFY(!c.backgroundColor.isValid());
 		QVERIFY(!c.specialColor.isValid());
 
-		QBENCHMARK { Cell c; }
+		QBENCHMARK
+		{
+			Cell c;
+		}
 	}
 
 	void cellValue()
 	{
-		QBENCHMARK { Cell c('z', Qt::black, Qt::white, QColor(), false, false, false, false); }
+		QBENCHMARK
+		{
+			Cell c('z', Qt::black, Qt::white, QColor(),
+			       false, false, false, false);
+		}
 	}
 	void cellValueRgb()
 	{
-		QBENCHMARK { Cell c('z', QRgb(33), QRgb(66), QColor(), false, false, false, false); }
+		QBENCHMARK
+		{
+			Cell c('z', QRgb(33), QRgb(66), QColor(),
+			       false, false, false, false);
+		}
 	}
 
 	void cellWidth()
@@ -44,10 +55,10 @@ private slots:
 	void cellBg()
 	{
 		Cell c0;
-		Cell c1 = Cell::bg(QColor());
+		Cell c1= Cell::bg(QColor());
 		QCOMPARE(c0, c1);
 
-		Cell c2 = Cell::bg(Qt::red);
+		Cell c2= Cell::bg(Qt::red);
 		QCOMPARE(c2.backgroundColor, QColor(Qt::red));
 	}
 };

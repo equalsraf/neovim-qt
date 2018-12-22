@@ -5,13 +5,14 @@
 #include "helpers.h"
 
 ShellWidget::ShellWidget(QWidget* parent)
-: QWidget(parent), m_contents(0, 0), m_bgColor(Qt::white), m_fgColor(Qt::black),
-  m_spColor(QColor()), m_lineSpace(0)
+: QWidget(parent), m_contents(0, 0), m_bgColor(Qt::white),
+  m_fgColor(Qt::black), m_spColor(QColor()), m_lineSpace(0)
 {
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_KeyCompression, false);
 	setFocusPolicy(Qt::StrongFocus);
-	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	setSizePolicy(QSizePolicy::Expanding,
+	              QSizePolicy::Expanding);
 	setMouseTracking(true);
 
 	setDefaultFont();
@@ -19,7 +20,7 @@ ShellWidget::ShellWidget(QWidget* parent)
 
 ShellWidget* ShellWidget::fromFile(const QString& path)
 {
-	ShellWidget* w = new ShellWidget();
+	ShellWidget* w= new ShellWidget();
 	w->m_contents.fromFile(path);
 	return w;
 }
@@ -36,12 +37,10 @@ void ShellWidget::setDefaultFont()
 	setShellFont(DEFAULT_FONT, 11, -1, false, true);
 }
 
-bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bool italic,
-                               bool force)
+bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bool italic, bool force)
 {
 	QFont f(family, ptSize, weight, italic);
-	f.setStyleHint(QFont::TypeWriter,
-	               QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
+	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
 	f.setFixedPitch(true);
 	f.setKerning(false);
 
@@ -58,8 +57,7 @@ bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bo
 		}
 
 		if (isBadMonospace(f)) {
-			emit fontError(
-			    QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family()));
+			emit fontError(QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family()));
 		}
 	}
 
@@ -78,7 +76,7 @@ void ShellWidget::setFont(const QFont& f)
 void ShellWidget::setLineSpace(int height)
 {
 	if (height != m_lineSpace) {
-		m_lineSpace = height;
+		m_lineSpace= height;
 		setCellSize();
 		emit shellFontChanged();
 	}
@@ -92,8 +90,9 @@ void ShellWidget::setLineSpace(int height)
 void ShellWidget::setCellSize()
 {
 	QFontMetrics fm(font());
-	m_ascent = fm.ascent();
-	m_cellSize = QSize(fm.width('W'), qMax(fm.lineSpacing(), fm.height()) + m_lineSpace);
+	m_ascent= fm.ascent();
+	m_cellSize= QSize(fm.width('W'),
+	                  qMax(fm.lineSpacing(), fm.height()) + m_lineSpace);
 	setSizeIncrement(m_cellSize);
 }
 QSize ShellWidget::cellSize() const
@@ -105,26 +104,27 @@ void ShellWidget::paintEvent(QPaintEvent* ev)
 {
 	QPainter p(this);
 	foreach (QRect rect, ev->region().rects()) {
-		int start_row = rect.top() / m_cellSize.height();
-		int end_row = rect.bottom() / m_cellSize.height();
-		int start_col = rect.left() / m_cellSize.width();
-		int end_col = rect.right() / m_cellSize.width();
+		int start_row= rect.top() / m_cellSize.height();
+		int end_row= rect.bottom() / m_cellSize.height();
+		int start_col= rect.left() / m_cellSize.width();
+		int end_col= rect.right() / m_cellSize.width();
 
 		// Paint margins
 		if (end_col > m_contents.columns()) {
-			end_col = m_contents.columns();
+			end_col= m_contents.columns();
 		}
 		if (end_row > m_contents.rows()) {
-			end_col = m_contents.columns();
+			end_col= m_contents.columns();
 		}
 
 		// end_col/row is inclusive
-		for (int i = start_row; i <= end_row && i < m_contents.rows(); i++) {
-			for (int j = start_col; j <= end_col && j < m_contents.columns(); j++) {
+		for (int i= start_row; i <= end_row && i < m_contents.rows(); i++) {
+			for (int j= start_col; j <= end_col && j < m_contents.columns();
+			     j++) {
 
-				const Cell& cell = m_contents.constValue(i, j);
-				int chars = cell.doubleWidth ? 2 : 1;
-				QRect r = absoluteShellRect(i, j, 1, chars);
+				const Cell& cell= m_contents.constValue(i, j);
+				int chars= cell.doubleWidth ? 2 : 1;
+				QRect r= absoluteShellRect(i, j, 1, chars);
 
 				if (j <= 0 || !contents().constValue(i, j - 1).doubleWidth) {
 					// Only paint bg/fg if this is not the second cell
@@ -146,7 +146,7 @@ void ShellWidget::paintEvent(QPaintEvent* ev)
 					}
 
 					if (cell.bold || cell.italic) {
-						QFont f = p.font();
+						QFont f= p.font();
 						f.setBold(cell.bold);
 						f.setItalic(cell.italic);
 						p.setFont(f);
@@ -161,7 +161,7 @@ void ShellWidget::paintEvent(QPaintEvent* ev)
 
 				// Draw "undercurl" at the bottom of the cell
 				if (cell.underline || cell.undercurl) {
-					QPen pen = QPen();
+					QPen pen= QPen();
 					if (cell.undercurl) {
 						if (cell.specialColor.isValid()) {
 							pen.setColor(cell.specialColor);
@@ -181,17 +181,17 @@ void ShellWidget::paintEvent(QPaintEvent* ev)
 					}
 
 					p.setPen(pen);
-					QPoint start = r.bottomLeft();
-					QPoint end = r.bottomRight();
+					QPoint start= r.bottomLeft();
+					QPoint end= r.bottomRight();
 					start.ry()--;
 					end.ry()--;
 					if (cell.underline) {
 						p.drawLine(start, end);
 					} else if (cell.undercurl) {
-						static const int val[8] = {1, 0, 0, 1, 1, 2, 2, 2};
+						static const int val[8]= {1, 0, 0, 1, 1, 2, 2, 2};
 						QPainterPath path(start);
-						for (int i = start.x() + 1; i <= end.x(); i++) {
-							int offset = val[i % 8];
+						for (int i= start.x() + 1; i <= end.x(); i++) {
+							int offset= val[i % 8];
 							path.lineTo(QPoint(i, start.y() - offset));
 						}
 						p.drawPath(path);
@@ -201,8 +201,9 @@ void ShellWidget::paintEvent(QPaintEvent* ev)
 		}
 	}
 
-	QRect shellArea = absoluteShellRect(0, 0, m_contents.rows(), m_contents.columns());
-	QRegion margins = QRegion(rect()).subtracted(shellArea);
+	QRect shellArea= absoluteShellRect(0, 0,
+	                                   m_contents.rows(), m_contents.columns());
+	QRegion margins= QRegion(rect()).subtracted(shellArea);
 	foreach (QRect margin, margins.intersected(ev->region()).rects()) {
 		p.fillRect(margin, m_bgColor);
 	}
@@ -222,8 +223,8 @@ void ShellWidget::paintEvent(QPaintEvent* ev)
 
 void ShellWidget::resizeEvent(QResizeEvent* ev)
 {
-	int cols = ev->size().width() / m_cellSize.width();
-	int rows = ev->size().height() / m_cellSize.height();
+	int cols= ev->size().width() / m_cellSize.width();
+	int rows= ev->size().height() / m_cellSize.height();
 	resizeShell(rows, cols);
 	QWidget::resizeEvent(ev);
 }
@@ -244,7 +245,7 @@ void ShellWidget::resizeShell(int n_rows, int n_columns)
 
 void ShellWidget::setSpecial(const QColor& color)
 {
-	m_spColor = color;
+	m_spColor= color;
 }
 
 QColor ShellWidget::special() const
@@ -254,7 +255,7 @@ QColor ShellWidget::special() const
 
 void ShellWidget::setBackground(const QColor& color)
 {
-	m_bgColor = color;
+	m_bgColor= color;
 }
 
 QColor ShellWidget::background() const
@@ -264,7 +265,7 @@ QColor ShellWidget::background() const
 
 void ShellWidget::setForeground(const QColor& color)
 {
-	m_fgColor = color;
+	m_fgColor= color;
 }
 
 QColor ShellWidget::foreground() const
@@ -278,22 +279,23 @@ const ShellContents& ShellWidget::contents() const
 }
 
 /// Put text in position, returns the amount of colums used
-int ShellWidget::put(const QString& text, int row, int column, QColor fg, QColor bg, QColor sp,
-                     bool bold, bool italic, bool underline, bool undercurl)
+int ShellWidget::put(const QString& text, int row, int column,
+                     QColor fg, QColor bg, QColor sp, bool bold, bool italic,
+                     bool underline, bool undercurl)
 {
 	if (!fg.isValid()) {
-		fg = m_fgColor;
+		fg= m_fgColor;
 	}
 	if (!bg.isValid()) {
-		bg = m_bgColor;
+		bg= m_bgColor;
 	}
 	if (!sp.isValid()) {
-		sp = m_spColor;
+		sp= m_spColor;
 	}
-	int cols_changed =
-	    m_contents.put(text, row, column, fg, bg, sp, bold, italic, underline, undercurl);
+	int cols_changed= m_contents.put(text, row, column, fg, bg, sp,
+	                                 bold, italic, underline, undercurl);
 	if (cols_changed > 0) {
-		QRect rect = absoluteShellRect(row, column, 1, cols_changed);
+		QRect rect= absoluteShellRect(row, column, 1, cols_changed);
 		update(rect);
 	}
 	return cols_changed;
@@ -302,7 +304,7 @@ int ShellWidget::put(const QString& text, int row, int column, QColor fg, QColor
 void ShellWidget::clearRow(int row)
 {
 	m_contents.clearRow(row);
-	QRect rect = absoluteShellRect(row, 0, 1, m_contents.columns());
+	QRect rect= absoluteShellRect(row, 0, 1, m_contents.columns());
 	update(rect);
 }
 void ShellWidget::clearShell(QColor bg)
@@ -329,12 +331,13 @@ void ShellWidget::scrollShell(int rows)
 	}
 }
 /// Scroll an area, count rows (positive numbers move content up)
-void ShellWidget::scrollShellRegion(int row0, int row1, int col0, int col1, int rows)
+void ShellWidget::scrollShellRegion(int row0, int row1, int col0,
+                                    int col1, int rows)
 {
 	if (rows != 0) {
 		m_contents.scrollRegion(row0, row1, col0, col1, rows);
 		// Qt's delta uses positive numbers to move down
-		QRect r = absoluteShellRect(row0, col0, row1 - row0, col1 - col0);
+		QRect r= absoluteShellRect(row0, col0, row1 - row0, col1 - col0);
 		scroll(0, -rows * m_cellSize.height(), r);
 	}
 }

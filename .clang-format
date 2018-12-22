@@ -26,7 +26,7 @@ BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Custom
 BreakBeforeTernaryOperators: false
 BreakConstructorInitializers: BeforeColon
-ColumnLimit: 100
+ColumnLimit: 0
 ConstructorInitializerIndentWidth: 0
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
@@ -43,7 +43,9 @@ PenaltyBreakString: 1000
 PenaltyBreakTemplateDeclaration: 10
 PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
+PointerAlignment: Right
 SortIncludes: false
+SpaceBeforeAssignmentOperators: false
 SpaceBeforeCtorInitializerColon: false
 SpaceBeforeInheritanceColon: false
 Standard: Cpp11
