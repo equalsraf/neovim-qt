@@ -19,7 +19,7 @@ private slots:
 		NeovimConnector c(new QBuffer());
 		QCOMPARE(c.canReconnect(), false);
 
-		NeovimConnector *spawned = NeovimConnector::spawn({"-u", "NORC"});
+		NeovimConnector *spawned = NeovimConnector::spawn({"-u", "NONE"});
 		QCOMPARE(spawned->connectionType(), NeovimConnector::SpawnedConnection);
 		QCOMPARE(spawned->canReconnect(), true);
 
@@ -28,7 +28,7 @@ private slots:
 
 	void isReady() {
 
-		NeovimConnector *c = NeovimConnector::spawn({"-u", "NORC"});
+		NeovimConnector *c = NeovimConnector::spawn({"-u", "NONE"});
 		QSignalSpy onReady(c, SIGNAL(ready()));
 		QVERIFY(onReady.isValid());
 
@@ -37,7 +37,7 @@ private slots:
 	}
 
 	void encodeDecode() {
-		NeovimConnector *c = NeovimConnector::spawn({"-u", "NORC"});
+		NeovimConnector *c = NeovimConnector::spawn({"-u", "NONE"});
 
 		// This will print a warning, but should succeed
 		QString s = "ç日本語";
