@@ -163,18 +163,18 @@ function! s:TreeViewShowHide(show)
     call rpcnotify(0, 'TreeView', 'ShowHide', a:show)
 endfunction
 
-command! TreeViewShow call <SID>TreeViewShowHide(1)
-command! TreeViewHide call <SID>TreeViewShowHide(0)
-noremap <script> <Plug>TreeviewShow :call <SID>TreeViewShowHide(1)
-noremap <script> <Plug>TreeviewHide :call <SID>TreeViewShowHide(0)
-anoremenu <script> Plugin.TreeView.Show :call <SID>TreeViewShowHide(1)
-anoremenu <script> Plugin.TreeView.Hide :call <SID>TreeViewShowHide(0)
+command! GuiTreeviewShow call <SID>TreeViewShowHide(1)
+command! GuiTreeviewHide call <SID>TreeViewShowHide(0)
+noremap <script> <Plug>GuiTreeviewShow :call <SID>TreeViewShowHide(1)
+noremap <script> <Plug>GuiTreeviewHide :call <SID>TreeViewShowHide(0)
+anoremenu <script> Gui.Treeview.Show :call <SID>TreeViewShowHide(1)
+anoremenu <script> Gui.Treeview.Hide :call <SID>TreeViewShowHide(0)
 
 " Notifies the TreeView widget of a Toggle event
 function! s:TreeViewToggle()
     call rpcnotify(0, 'TreeView', 'Toggle')
 endfunction
 
-command! TreeViewToggle call <SID>TreeViewToggle()
-noremap <script> <Plug>TreeviewToggle :call <SID>TreeViewToggle()
-anoremenu <script> Plugin.TreeView.Toggle :call <SID>TreeViewShowToggle()
+command! GuiTreeviewToggle call <SID>TreeViewToggle()
+noremap <script> <Plug>GuiTreeviewToggle :call <SID>TreeViewToggle()
+anoremenu <script> Gui.Treeview.Toggle :call <SID>TreeViewShowToggle()
