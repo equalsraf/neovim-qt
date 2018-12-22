@@ -24,7 +24,9 @@ private slots:
 			<< "third-party/DejaVuSansMono-Bold.ttf"
 			<< "third-party/DejaVuSansMono-BoldOblique.ttf";
 		foreach(QString path, fonts) {
-			QFontDatabase::addApplicationFont(path);
+		    QString abs_path_to_font(CMAKE_SOURCE_DIR);
+		    abs_path_to_font.append("/").append(path);
+			QFontDatabase::addApplicationFont(abs_path_to_font);
 		}
 	}
 
