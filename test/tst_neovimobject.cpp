@@ -109,7 +109,7 @@ void TestNeovimObject::initTestCase()
 {
 	// needed for the nvim api signal spy
 	qRegisterMetaType<int64_t>("int64_t");
-	m_c = NeovimQt::NeovimConnector::spawn({"-u", "NORC"});
+	m_c = NeovimQt::NeovimConnector::spawn({"-u", "NONE"});
 	connect(m_c, &NeovimQt::NeovimConnector::ready,
 			this, &TestNeovimObject::delayedSetup);
 	QTest::qWait(1500);
