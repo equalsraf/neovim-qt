@@ -2,10 +2,10 @@
 
 #include <QDebug>
 #ifdef _WIN32
-#include <io.h>
-#include <fcntl.h>
+#	include <io.h>
+#	include <fcntl.h>
 #else
-#include <unistd.h>
+#	include <unistd.h>
 #endif
 
 namespace NeovimQt {

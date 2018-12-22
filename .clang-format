@@ -31,7 +31,8 @@ ConstructorInitializerIndentWidth: 0
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
 DerivePointerAlignment: true
-IndentCaseLabels: true
+IndentCaseLabels: false
+IndentPPDirectives: AfterHash
 IndentWrappedFunctionNames: true
 MaxEmptyLinesToKeep: 2
 PenaltyBreakAssignment: 2

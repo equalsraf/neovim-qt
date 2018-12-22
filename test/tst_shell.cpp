@@ -8,7 +8,7 @@
 #include "common.h"
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
-#include <QtPlugin>
+#	include <QtPlugin>
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 
@@ -194,9 +194,8 @@ private slots:
 		QSignalSpy onOptionSet(s->shell(), &Shell::neovimExtTablineSet);
 		QVERIFY(onOptionSet.isValid());
 
-		//		QSignalSpy cmd_gtab(c->neovimObject()->vim_command_output(c->encode("GuiTabline
-		//0")), &MsgpackRequest::finished); 		QVERIFY(cmd_gtab.isValid());
-		//QVERIFY(SPYWAIT2(cmd_gtab));
+		//		QSignalSpy cmd_gtab(c->neovimObject()->vim_command_output(c->encode("GuiTabline 0")),
+		//&MsgpackRequest::finished); 		QVERIFY(cmd_gtab.isValid()); 		QVERIFY(SPYWAIT2(cmd_gtab));
 		//
 		//		QVERIFY(SPYWAIT(onOptionSet));
 		//		qDebug() << onOptionSet << onOptionSet.size();

@@ -4,10 +4,10 @@
 
 // read/write
 #ifdef _WIN32
-#include <io.h>
-#include "stdinreader.h"
+#	include <io.h>
+#	include "stdinreader.h"
 #else
-#include <unistd.h>
+#	include <unistd.h>
 #endif
 
 #include "msgpackiodevice.h"
@@ -256,38 +256,37 @@ void MsgpackIODevice::dispatch(msgpack_object& req)
 	uint64_t type = req.via.array.ptr[0].via.u64;
 
 	switch (type) {
-		case 0:
-			if (req.via.array.ptr[1].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
-				qDebug() << "Received Invalid request: msg id MUST be a positive integer";
-				sendError(req, tr("Msg Id must be a positive integer"));
-				return;
-			}
-			if (req.via.array.ptr[2].type != MSGPACK_OBJECT_BIN &&
-			    req.via.array.ptr[2].type != MSGPACK_OBJECT_STR) {
-				qDebug() << "Received Invalid request: method MUST be a String"
-				         << req.via.array.ptr[2];
-				sendError(req, tr("Method id must be a positive integer"));
-				return;
-			}
-			if (req.via.array.ptr[3].type != MSGPACK_OBJECT_ARRAY) {
-				qDebug() << "Invalid request: arguments MUST be an array";
-				sendError(req, tr("Parameters must be an array"));
-				return;
-			}
-			dispatchRequest(req);
-			break;
-		case 1:
-			if (req.via.array.ptr[1].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
-				qDebug() << "Received Invalid response: msg id MUST be a positive integer";
-				return;
-			}
-			dispatchResponse(req);
-			break;
-		case 2:
-			dispatchNotification(req);
-			break;
-		default:
-			qDebug() << "Unsupported msg type" << type;
+	case 0:
+		if (req.via.array.ptr[1].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
+			qDebug() << "Received Invalid request: msg id MUST be a positive integer";
+			sendError(req, tr("Msg Id must be a positive integer"));
+			return;
+		}
+		if (req.via.array.ptr[2].type != MSGPACK_OBJECT_BIN &&
+		    req.via.array.ptr[2].type != MSGPACK_OBJECT_STR) {
+			qDebug() << "Received Invalid request: method MUST be a String" << req.via.array.ptr[2];
+			sendError(req, tr("Method id must be a positive integer"));
+			return;
+		}
+		if (req.via.array.ptr[3].type != MSGPACK_OBJECT_ARRAY) {
+			qDebug() << "Invalid request: arguments MUST be an array";
+			sendError(req, tr("Parameters must be an array"));
+			return;
+		}
+		dispatchRequest(req);
+		break;
+	case 1:
+		if (req.via.array.ptr[1].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
+			qDebug() << "Received Invalid response: msg id MUST be a positive integer";
+			return;
+		}
+		dispatchResponse(req);
+		break;
+	case 2:
+		dispatchNotification(req);
+		break;
+	default:
+		qDebug() << "Unsupported msg type" << type;
 	}
 }
 
@@ -615,83 +614,83 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QList<int64_t>& ou
 bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QVariant& out)
 {
 	switch (in.type) {
-		case MSGPACK_OBJECT_NIL:
+	case MSGPACK_OBJECT_NIL:
+		out = QVariant();
+		break;
+	case MSGPACK_OBJECT_BOOLEAN:
+		out = in.via.boolean;
+		break;
+	case MSGPACK_OBJECT_NEGATIVE_INTEGER:
+		out = QVariant((qint64)in.via.i64);
+		break;
+	case MSGPACK_OBJECT_POSITIVE_INTEGER:
+		out = QVariant((quint64)in.via.u64);
+		break;
+	case MSGPACK_OBJECT_FLOAT:
+		out = in.via.f64;
+		break;
+	case MSGPACK_OBJECT_STR:
+	case MSGPACK_OBJECT_BIN: {
+		QByteArray val;
+		if (decodeMsgpack(in, val)) {
+			qWarning() << "Error unpacking ByteArray as QVariant";
 			out = QVariant();
-			break;
-		case MSGPACK_OBJECT_BOOLEAN:
-			out = in.via.boolean;
-			break;
-		case MSGPACK_OBJECT_NEGATIVE_INTEGER:
-			out = QVariant((qint64)in.via.i64);
-			break;
-		case MSGPACK_OBJECT_POSITIVE_INTEGER:
-			out = QVariant((quint64)in.via.u64);
-			break;
-		case MSGPACK_OBJECT_FLOAT:
-			out = in.via.f64;
-			break;
-		case MSGPACK_OBJECT_STR:
-		case MSGPACK_OBJECT_BIN: {
-			QByteArray val;
-			if (decodeMsgpack(in, val)) {
-				qWarning() << "Error unpacking ByteArray as QVariant";
+			return true;
+		}
+		out = val;
+	} break;
+	case MSGPACK_OBJECT_ARRAY:
+		// Either a QVariantList or a QStringList
+		{
+			QVariantList ls;
+			for (uint64_t i = 0; i < in.via.array.size; i++) {
+				QVariant v;
+				bool failed = decodeMsgpack(in.via.array.ptr[i], v);
+				if (failed) {
+					qWarning() << "Error unpacking Map as QVariantList";
+					out = QVariant();
+					return true;
+				}
+				ls.append(v);
+			}
+			out = ls;
+		}
+		break;
+	case MSGPACK_OBJECT_MAP: {
+		QVariantMap m;
+		for (uint64_t i = 0; i < in.via.map.size; i++) {
+			QByteArray key;
+			if (decodeMsgpack(in.via.map.ptr[i].key, key)) {
+				qWarning() << "Error decoding Object(Map) key";
 				out = QVariant();
 				return true;
 			}
-			out = val;
-		} break;
-		case MSGPACK_OBJECT_ARRAY:
-			// Either a QVariantList or a QStringList
-			{
-				QVariantList ls;
-				for (uint64_t i = 0; i < in.via.array.size; i++) {
-					QVariant v;
-					bool failed = decodeMsgpack(in.via.array.ptr[i], v);
-					if (failed) {
-						qWarning() << "Error unpacking Map as QVariantList";
-						out = QVariant();
-						return true;
-					}
-					ls.append(v);
-				}
-				out = ls;
-			}
-			break;
-		case MSGPACK_OBJECT_MAP: {
-			QVariantMap m;
-			for (uint64_t i = 0; i < in.via.map.size; i++) {
-				QByteArray key;
-				if (decodeMsgpack(in.via.map.ptr[i].key, key)) {
-					qWarning() << "Error decoding Object(Map) key";
-					out = QVariant();
-					return true;
-				}
-				QVariant val;
-				if (decodeMsgpack(in.via.map.ptr[i].val, val)) {
-					qWarning() << "Error decoding Object(Map) value";
-					out = QVariant();
-					return true;
-				}
-				m.insert(key, val);
-			}
-			out = m;
-		} break;
-		case MSGPACK_OBJECT_EXT:
-			if (m_extTypes.contains(in.via.ext.type)) {
-				out = m_extTypes.value(in.via.ext.type)(this, in.via.ext.ptr, in.via.ext.size);
-				if (!out.isValid()) {
-					qWarning() << "EXT unpacking failed" << in.via.ext.type;
-					return true;
-				}
-			} else {
+			QVariant val;
+			if (decodeMsgpack(in.via.map.ptr[i].val, val)) {
+				qWarning() << "Error decoding Object(Map) value";
 				out = QVariant();
-				qWarning() << "Unsupported EXT type found in Object" << in.via.ext.type;
+				return true;
 			}
-			break;
-		default:
+			m.insert(key, val);
+		}
+		out = m;
+	} break;
+	case MSGPACK_OBJECT_EXT:
+		if (m_extTypes.contains(in.via.ext.type)) {
+			out = m_extTypes.value(in.via.ext.type)(this, in.via.ext.ptr, in.via.ext.size);
+			if (!out.isValid()) {
+				qWarning() << "EXT unpacking failed" << in.via.ext.type;
+				return true;
+			}
+		} else {
 			out = QVariant();
-			qWarning() << "Unsupported type found in Object" << in.type << in;
-			return true;
+			qWarning() << "Unsupported EXT type found in Object" << in.via.ext.type;
+		}
+		break;
+	default:
+		out = QVariant();
+		qWarning() << "Unsupported type found in Object" << in.type << in;
+		return true;
 	}
 	return false;
 }
@@ -722,74 +721,74 @@ void MsgpackIODevice::send(const QVariant& var)
 	}
 
 	switch ((QMetaType::Type)var.type()) {
-		case QMetaType::Void:
-		case QMetaType::UnknownType:
-			msgpack_pack_nil(&m_pk);
-			break;
-		case QMetaType::Bool:
-			send(var.toBool());
-			break;
-		case QMetaType::Int:
-			msgpack_pack_int(&m_pk, var.toInt());
-			break;
-		case QMetaType::UInt:
-			msgpack_pack_unsigned_int(&m_pk, var.toUInt());
-			break;
-		case QMetaType::Long:
-			msgpack_pack_long_long(&m_pk, var.toLongLong());
-			break;
-		case QMetaType::LongLong:
-			msgpack_pack_long_long(&m_pk, var.toLongLong());
-			break;
-		case QMetaType::ULong:
-			msgpack_pack_unsigned_long_long(&m_pk, var.toULongLong());
-			break;
-		case QMetaType::ULongLong:
-			msgpack_pack_unsigned_long_long(&m_pk, var.toULongLong());
-			break;
-		case QMetaType::Float:
-			msgpack_pack_float(&m_pk, var.toFloat());
-			break;
-		case QMetaType::Double:
-			msgpack_pack_double(&m_pk, var.toDouble());
-			break;
-		case QMetaType::QByteArray:
-			send(var.toByteArray());
-			break;
-		case QMetaType::QStringList:
-			msgpack_pack_array(&m_pk, var.toList().size());
-			foreach (const QVariant& elem, var.toList()) {
-				send(elem);
-			}
-			break;
-		case QMetaType::QVariantList:
-			msgpack_pack_array(&m_pk, var.toList().size());
-			foreach (const QVariant& elem, var.toList()) {
-				send(elem);
-			}
-			break;
-		case QMetaType::QVariantMap: {
-			const QVariantMap& m = var.toMap();
-			msgpack_pack_map(&m_pk, m.size());
-			QMapIterator<QString, QVariant> it(m);
-			while (it.hasNext()) {
-				it.next();
-				send(it.key());
-				send(it.value());
-			}
-		} break;
-		case QMetaType::QPoint:
-			// As an array [row, col]
-			msgpack_pack_array(&m_pk, 2);
-			msgpack_pack_int64(&m_pk, var.toPoint().y());
-			msgpack_pack_int64(&m_pk, var.toPoint().x());
-			break;
-		case QMetaType::QString:
-			send(encode(var.toString()));
-			break;
-		default:
-			msgpack_pack_nil(&m_pk);
-			qWarning() << "There is a BUG in the QVariant serializer" << var.type();
+	case QMetaType::Void:
+	case QMetaType::UnknownType:
+		msgpack_pack_nil(&m_pk);
+		break;
+	case QMetaType::Bool:
+		send(var.toBool());
+		break;
+	case QMetaType::Int:
+		msgpack_pack_int(&m_pk, var.toInt());
+		break;
+	case QMetaType::UInt:
+		msgpack_pack_unsigned_int(&m_pk, var.toUInt());
+		break;
+	case QMetaType::Long:
+		msgpack_pack_long_long(&m_pk, var.toLongLong());
+		break;
+	case QMetaType::LongLong:
+		msgpack_pack_long_long(&m_pk, var.toLongLong());
+		break;
+	case QMetaType::ULong:
+		msgpack_pack_unsigned_long_long(&m_pk, var.toULongLong());
+		break;
+	case QMetaType::ULongLong:
+		msgpack_pack_unsigned_long_long(&m_pk, var.toULongLong());
+		break;
+	case QMetaType::Float:
+		msgpack_pack_float(&m_pk, var.toFloat());
+		break;
+	case QMetaType::Double:
+		msgpack_pack_double(&m_pk, var.toDouble());
+		break;
+	case QMetaType::QByteArray:
+		send(var.toByteArray());
+		break;
+	case QMetaType::QStringList:
+		msgpack_pack_array(&m_pk, var.toList().size());
+		foreach (const QVariant& elem, var.toList()) {
+			send(elem);
+		}
+		break;
+	case QMetaType::QVariantList:
+		msgpack_pack_array(&m_pk, var.toList().size());
+		foreach (const QVariant& elem, var.toList()) {
+			send(elem);
+		}
+		break;
+	case QMetaType::QVariantMap: {
+		const QVariantMap& m = var.toMap();
+		msgpack_pack_map(&m_pk, m.size());
+		QMapIterator<QString, QVariant> it(m);
+		while (it.hasNext()) {
+			it.next();
+			send(it.key());
+			send(it.value());
+		}
+	} break;
+	case QMetaType::QPoint:
+		// As an array [row, col]
+		msgpack_pack_array(&m_pk, 2);
+		msgpack_pack_int64(&m_pk, var.toPoint().y());
+		msgpack_pack_int64(&m_pk, var.toPoint().x());
+		break;
+	case QMetaType::QString:
+		send(encode(var.toString()));
+		break;
+	default:
+		msgpack_pack_nil(&m_pk);
+		qWarning() << "There is a BUG in the QVariant serializer" << var.type();
 	}
 }
 
@@ -857,56 +856,56 @@ QString MsgpackIODevice::decode(const QByteArray& data)
 bool MsgpackIODevice::checkVariant(const QVariant& var)
 {
 	switch ((QMetaType::Type)var.type()) {
-		case QMetaType::UnknownType:
-			break;
-		case QMetaType::Bool:
-			break;
-		case QMetaType::Int:
-			break;
-		case QMetaType::UInt:
-			break;
-		case QMetaType::Long:
-			break;
-		case QMetaType::LongLong:
-			break;
-		case QMetaType::ULong:
-			break;
-		case QMetaType::ULongLong:
-			break;
-		case QMetaType::Float:
-			break;
-		case QMetaType::QString:
-			break;
-		case QMetaType::Double:
-			break;
-		case QMetaType::QByteArray:
-			break;
-		case QMetaType::QStringList:
-			break;
-		case QMetaType::QVariantList:
-			foreach (const QVariant& elem, var.toList()) {
-				if (!checkVariant(elem)) {
-					return false;
-				}
+	case QMetaType::UnknownType:
+		break;
+	case QMetaType::Bool:
+		break;
+	case QMetaType::Int:
+		break;
+	case QMetaType::UInt:
+		break;
+	case QMetaType::Long:
+		break;
+	case QMetaType::LongLong:
+		break;
+	case QMetaType::ULong:
+		break;
+	case QMetaType::ULongLong:
+		break;
+	case QMetaType::Float:
+		break;
+	case QMetaType::QString:
+		break;
+	case QMetaType::Double:
+		break;
+	case QMetaType::QByteArray:
+		break;
+	case QMetaType::QStringList:
+		break;
+	case QMetaType::QVariantList:
+		foreach (const QVariant& elem, var.toList()) {
+			if (!checkVariant(elem)) {
+				return false;
 			}
-			break;
-		case QMetaType::QVariantMap: {
-			const QVariantMap& m = var.toMap();
-			QMapIterator<QString, QVariant> it(m);
-			while (it.hasNext()) {
-				it.next();
-				if (!checkVariant(it.key())) {
-					return false;
-				}
-				if (!checkVariant(it.value())) {
-					return false;
-				}
+		}
+		break;
+	case QMetaType::QVariantMap: {
+		const QVariantMap& m = var.toMap();
+		QMapIterator<QString, QVariant> it(m);
+		while (it.hasNext()) {
+			it.next();
+			if (!checkVariant(it.key())) {
+				return false;
 			}
-		} break;
-		case QMetaType::QPoint:
-			break;
-		default:
-			return false;
+			if (!checkVariant(it.value())) {
+				return false;
+			}
+		}
+	} break;
+	case QMetaType::QPoint:
+		break;
+	default:
+		return false;
 	}
 	return true;
 }

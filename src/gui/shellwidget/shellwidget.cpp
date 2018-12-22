@@ -27,11 +27,11 @@ ShellWidget* ShellWidget::fromFile(const QString& path)
 void ShellWidget::setDefaultFont()
 {
 #if defined(Q_OS_MAC)
-#define DEFAULT_FONT "Courier New"
+#	define DEFAULT_FONT "Courier New"
 #elif defined(Q_OS_WIN)
-#define DEFAULT_FONT "Consolas"
+#	define DEFAULT_FONT "Consolas"
 #else
-#define DEFAULT_FONT "Monospace"
+#	define DEFAULT_FONT "Monospace"
 #endif
 	setShellFont(DEFAULT_FONT, 11, -1, false, true);
 }

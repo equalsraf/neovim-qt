@@ -31,14 +31,14 @@ protected:
 	const Qt::Key Key_Cmd = Qt::Key_Control;
 #else
 	const Qt::KeyboardModifiers ControlModifier = Qt::ControlModifier;
-#ifdef Q_OS_UNIX
+#	ifdef Q_OS_UNIX
 	const Qt::KeyboardModifiers CmdModifier = Qt::MetaModifier;
 	const Qt::Key Key_Cmd = Qt::Key_Meta;
 	;
-#else
+#	else
 	const Qt::KeyboardModifiers CmdModifier = (Qt::KeyboardModifiers)0;
 	const Qt::Key Key_Cmd = (Qt::Key)0;
-#endif
+#	endif
 	const Qt::KeyboardModifiers MetaModifier = Qt::MetaModifier;
 	const Qt::Key Key_Control = Qt::Key_Control;
 #endif

@@ -333,16 +333,16 @@ NeovimConnector* NeovimConnector::fromStdinOut()
 void NeovimConnector::processError(QProcess::ProcessError err)
 {
 	switch (err) {
-		case QProcess::FailedToStart:
-			setError(FailedToStart, m_dev->errorString());
-			break;
-		case QProcess::Crashed:
-			setError(Crashed, "The Neovim process has crashed");
-			break;
-		default:
-			// In practice we should be able to catch other types of
-			// errors from the QIODevice
-			qDebug() << "Neovim process error " << m_dev->errorString();
+	case QProcess::FailedToStart:
+		setError(FailedToStart, m_dev->errorString());
+		break;
+	case QProcess::Crashed:
+		setError(Crashed, "The Neovim process has crashed");
+		break;
+	default:
+		// In practice we should be able to catch other types of
+		// errors from the QIODevice
+		qDebug() << "Neovim process error " << m_dev->errorString();
 	}
 }
 
@@ -402,14 +402,14 @@ NeovimConnector::NeovimConnectionType NeovimConnector::connectionType()
 NeovimConnector* NeovimConnector::reconnect()
 {
 	switch (m_ctype) {
-		case SpawnedConnection:
-			return NeovimConnector::spawn(m_spawnArgs, m_spawnExe);
-		case HostConnection:
-			return NeovimConnector::connectToHost(m_connHost, m_connPort);
-		case SocketConnection:
-			return NeovimConnector::connectToSocket(m_connSocket);
-		default:
-			return NULL;
+	case SpawnedConnection:
+		return NeovimConnector::spawn(m_spawnArgs, m_spawnExe);
+	case HostConnection:
+		return NeovimConnector::connectToHost(m_connHost, m_connPort);
+	case SocketConnection:
+		return NeovimConnector::connectToSocket(m_connSocket);
+	default:
+		return NULL;
 	}
 	// NOT-REACHED
 	return NULL;
