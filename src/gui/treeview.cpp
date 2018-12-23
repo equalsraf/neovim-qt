@@ -6,6 +6,8 @@
 #include <QProcess>
 #include <QStandardPaths>
 
+static const int MAX_COLUMNS_ON_INIT = 10;
+
 namespace NeovimQt {
 TreeView::TreeView(NeovimConnector *nvim, QWidget *parent)
 : QTreeView(parent), m_nvim(nvim) {
@@ -14,8 +16,8 @@ TreeView::TreeView(NeovimConnector *nvim, QWidget *parent)
 	setModel(model);
 
 	header()->hide();
-	// FIXME: MAGIC NUMBER!!
-	for (int i = 1; i < 5; i++) {
+
+	for (int i = 1; i < MAX_COLUMNS_ON_INIT; i++) {
 		hideColumn(i);
 	}
 
