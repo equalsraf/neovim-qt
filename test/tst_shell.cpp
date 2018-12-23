@@ -96,7 +96,7 @@ private slots:
 
 	void guiExtCmdlineSet() {
 		QStringList args;
-		args << "-u" << "NORC";
+		args << "-u" << "NONE";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 		QSignalSpy onOptionSet(s, &Shell::neovimExtCmdlineSet);
