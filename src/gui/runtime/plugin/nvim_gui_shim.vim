@@ -163,7 +163,7 @@ augroup END
 
 " Notifies the TreeView widget of a Show or Hide event
 function! s:TreeViewShowHide(show)
-    call rpcnotify(0, 'TreeView', 'ShowHide', a:show)
+    call rpcnotify(0, 'GuiTreeView', 'ShowHide', a:show)
 endfunction
 
 command! GuiTreeviewShow call <SID>TreeViewShowHide(1)
@@ -175,7 +175,7 @@ anoremenu <script> Gui.Treeview.Hide :call <SID>TreeViewShowHide(0)
 
 " Notifies the TreeView widget of a Toggle event
 function! s:TreeViewToggle()
-    call rpcnotify(0, 'TreeView', 'Toggle')
+    call rpcnotify(0, 'GuiTreeView', 'Toggle')
 endfunction
 
 command! GuiTreeviewToggle call <SID>TreeViewToggle()

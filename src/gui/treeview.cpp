@@ -34,7 +34,7 @@ void TreeView::connector_ready_cb() {
 			&TreeView::handleNeovimNotification);
 
 	m_nvim->neovimObject()->vim_subscribe("Dir");
-	m_nvim->neovimObject()->vim_subscribe("TreeView");
+	m_nvim->neovimObject()->vim_subscribe("GuiTreeView");
 }
 
 void TreeView::open(const QModelIndex &index) {
@@ -63,7 +63,7 @@ void TreeView::handleNeovimNotification(const QByteArray &name,
 					const QVariantList &args) {
 	if (name == "Dir" && args.size() >= 0) {
 		setDirectory(m_nvim->decode(args.at(0).toByteArray()), false);
-	} else if (name == "TreeView") {
+	} else if (name == "GuiTreeView") {
 		QByteArray action = args.at(0).toByteArray();
 		if (action == "Toggle" && args.size() == 1) {
 			if (isVisible())
