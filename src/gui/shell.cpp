@@ -1431,16 +1431,25 @@ void Shell::openFiles(QList<QUrl> urls)
 void Shell::handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
 			QString prompt, int64_t indent, int64_t level)
 {
-	foreach(QVariant piece, content) {
-		qDebug() << piece.toList();
-	}
-	qDebug() << prompt << firstc;
 	auto anchor_x = 0;
-	auto anchor_y = 0;
+    auto anchor_y = (rows()-1)*cellSize().height();
 	auto cmdline_width = columns()*cellSize().width();
-	auto cmdline_height = (rows()-1)*cellSize().height();
+    // TODO : deduce a better height than taking everything below last grid row
+    auto cmdline_height = height() - anchor_y;
 	m_cmdline.setGeometry(anchor_x, anchor_y, cmdline_width, cmdline_height);
-	m_cmdline.updateGeometry();
+    m_cmdline.setFrameShape(QFrame::NoFrame);
+
+    // TODO : display more than just the first char and prompt
+    // We'll need to tamper with QDocument to handle highlight and stuff like
+    // that properly. Maybe with a m_cmdline.computeDocument(content) method ?
+    QString plaintext_content;
+    foreach(QVariant piece, content){
+        qDebug() << piece.toList();
+        plaintext_content += piece.toStringList().at(1);
+    }
+    qDebug() << prompt << firstc;
+    m_cmdline.setPlainText(firstc + prompt + plaintext_content);
+
 	m_cmdline.show();
 }
 
