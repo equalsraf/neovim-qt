@@ -26,7 +26,7 @@ private slots:
 		foreach(QString path, fonts) {
 		    QString abs_path_to_font(CMAKE_SOURCE_DIR);
 		    abs_path_to_font.append("/").append(path);
-			QFontDatabase::addApplicationFont(abs_path_to_font);
+		    QFontDatabase::addApplicationFont(abs_path_to_font);
 		}
 	}
 
