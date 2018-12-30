@@ -49,6 +49,10 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	m_pum.setParent(this);
 	m_pum.hide();
 
+	// Command line
+	m_cmdline.setParent(this);
+	m_cmdline.hide();
+
 	if (m_nvim == NULL) {
 		qWarning() << "Received NULL as Neovim Connector";
 		return;
@@ -865,6 +869,7 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 	} else if (name == "Popupmenu") {
 		m_nvim->api2()->nvim_ui_set_option("ext_popupmenu", value.toBool());
 	} else if (name == "Cmdline") {
+		m_nvim->api2()->nvim_ui_set_option("ext_cmdline", value.toBool());
 	} else if (name == "Wildmenu") {
 	} else {
 		qDebug() << "Unknown GUI Option" << name << value;
@@ -1426,6 +1431,22 @@ void Shell::openFiles(QList<QUrl> urls)
 	}
 }
 
+void Shell::handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
+			QString prompt, int64_t indent, int64_t level)
+{
+	foreach(QVariant piece, content) {
+		qDebug() << piece.toList();
+	}
+	qDebug() << prompt << firstc;
+	auto anchor_x = 0;
+	auto anchor_y = 0;
+	auto cmdline_width = columns()*cellSize().width();
+	auto cmdline_height = (rows()-1)*cellSize().height();
+	m_cmdline.setGeometry(anchor_x, anchor_y, cmdline_width, cmdline_height);
+	m_cmdline.updateGeometry();
+	m_cmdline.show();
+}
+
 // If neovim is blocked waiting for input, attempt to bailout from
 // whatever neovim is doing by pressing Ctrl-C.
 void Shell::bailoutIfinputBlocking()
@@ -1534,14 +1555,4 @@ void Shell::handleShimError(quint32 msgid, quint64 fun, const QVariant& err)
 {
 	qDebug() << "GUI shim error " << err;
 }
-
-void Shell::handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
-			QString prompt, int64_t indent, int64_t level)
-{
-	foreach(QVariant piece, content) {
-		qDebug() << piece.toList();
-	}
-	qDebug() << prompt << firstc;
-}
-
 } // Namespace

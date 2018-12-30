@@ -14,6 +14,7 @@
 #include "shellwidget/shellwidget.h"
 #include "popupmenu.h"
 #include "popupmenumodel.h"
+#include "cmdwidget.h"
 
 namespace NeovimQt {
 
@@ -186,6 +187,7 @@ private:
 	ShellOptions m_options;
 	PopupMenu m_pum;
 	bool m_mouseEnabled;
+	CmdWidget m_cmdline;
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler
