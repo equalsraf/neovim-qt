@@ -607,8 +607,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		int64_t level = opargs.at(2).toInt();
 		qDebug() << name << c << shift << level;
 	} else if (name == "cmdline_hide") {
-		qDebug() << name;
-		//handleCmdlineHide();
+        m_cmdline.hide();
 	} else if (name == "cmdline_block_show") {
 		if (opargs.size() < 1) {
 			qWarning() << "Unexpected argument for cmdline_block_show:" << opargs;
@@ -624,8 +623,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		qDebug() << "cmdline_block_append" << opargs;
 		// - line
 	} else if (name == "cmdline_block_hide") {
-		qDebug() << name;
-		//handleCmdlineBlockHide();
+        m_cmdline.hide();
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
@@ -894,13 +892,12 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 		emit neovimExtTablineSet(value.toBool());
 	} else if (name == "ext_popupmenu") {
 		emit neovimExtPopupmenuSet(value.toBool());
-	// TODO
+    // TODO
 	} else if (name == "arabicshape") {
 	} else if (name == "ambiwidth") {
 	} else if (name == "emoji") {
 	} else if (name == "termguicolors") {
-	} else if (name == "ext_cmdline") {
-	} else if (name == "ext_wildmenu") {
+    } else if (name == "ext_wildmenu") {
 	} else {
 		qDebug() << "Received unknown option" << name << value;
 	}
