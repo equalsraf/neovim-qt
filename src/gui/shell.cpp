@@ -612,7 +612,6 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		qDebug() << name << c << shift << level;
         handleCmdlineSpecialChar(c, shift, level);
 	} else if (name == "cmdline_hide") {
-        // TODO : check the level in the command
         for (auto cmdline : m_cmdline_list) {
                 cmdline->hide();
         }
