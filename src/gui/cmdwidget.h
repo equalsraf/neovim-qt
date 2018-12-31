@@ -27,6 +27,19 @@ public:
      */
     void add_special_char(const QString& c, bool shift_c);
 
+    /**
+     * @brief compute_block sets the underlying QTextDocument as a cmdline_block
+     * @param lines the list of lines with content-syntax following :h ui-event-highlight_set specs
+     * This typically means that lines is QVariantList of QVariantLists
+     */
+    // void compute_block(const QVariantList& lines);
+
+    /**
+     * @brief append_block appends the underlying QTextDocument with the line "content"
+     * @param content the new line to append
+     */
+    // void append_block(const QVariantList& content);
+
     void setPos(int64_t pos);
 
 public slots:
