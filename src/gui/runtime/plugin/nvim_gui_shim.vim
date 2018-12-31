@@ -176,12 +176,7 @@ augroup END
 
 " Notifies the TreeView widget of a Show or Hide event
 function! s:TreeViewShowHide(show)
-	  " Use the last UI in the list
-	  let ui_chan = s:get_last_ui_chan()
-    if (ui_chan == -1)
-      return
-    endif
-    call rpcnotify(ui_chan, 'Gui', 'TreeView', 'ShowHide', a:show)
+    call rpcnotify(0, 'Gui', 'TreeView', 'ShowHide', a:show)
 endfunction
 
 command! GuiTreeviewShow call <SID>TreeViewShowHide(1)
@@ -193,12 +188,7 @@ anoremenu <script> Gui.Treeview.Hide :call <SID>TreeViewShowHide(0)
 
 " Notifies the TreeView widget of a Toggle event
 function! s:TreeViewToggle()
-	  " Use the last UI in the list
-	  let ui_chan = s:get_last_ui_chan()
-    if (ui_chan == -1)
-      return
-    endif
-    call rpcnotify(ui_chan, 'Gui', 'TreeView', 'Toggle')
+    call rpcnotify(0, 'Gui', 'TreeView', 'Toggle')
 endfunction
 
 command! GuiTreeviewToggle call <SID>TreeViewToggle()
