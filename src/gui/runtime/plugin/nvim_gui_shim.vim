@@ -4,6 +4,18 @@ if !has('nvim') || exists('g:GuiLoaded')
 endif
 let g:GuiLoaded = 1
 
+" Get the channel to the last UI in the uis_list
+function! s:get_last_ui_chan()
+	let uis = nvim_list_uis()
+	if len(uis) == 0
+		echoerr "No UIs are attached"
+		return -1
+	endif
+
+	" Use the last UI in the list
+	return uis[-1].chan
+endfunction
+
 " Close the GUI
 function! GuiClose() abort
   call rpcnotify(0, 'Gui', 'Close')
@@ -100,14 +112,12 @@ function GuiName()
 		return ''
 	endif
 
-	let uis = nvim_list_uis()
-	if len(uis) == 0
-		echoerr "No UIs are attached"
-		return
-	endif
-
 	" Use the last UI in the list
-	let ui_chan = uis[-1].chan
+	let ui_chan = s:get_last_ui_chan()
+  if (ui_chan == -1)
+    return
+  endif
+
 	let info = nvim_get_chan_info(ui_chan)
 	return get(info.client, 'name', '')
 endfunction
@@ -152,3 +162,35 @@ function GuiClipboard()
           \ }
 	call provider#clipboard#Executable()
 endfunction
+
+" Directory autocommands for Treeview
+" TODO : for the time being, the chdir events are broadcasted to all
+"        UIs. Being able to select a "correct" UI would be an improvement.
+"        But what is "the correct UI" ?
+augroup guiDirEvents
+    autocmd!
+    autocmd DirChanged * call rpcnotify(0, 'Dir', getcwd())
+    autocmd WinEnter * call rpcnotify(0, 'Dir', getcwd())
+augroup END
+
+
+" Notifies the TreeView widget of a Show or Hide event
+function! s:TreeViewShowHide(show)
+    call rpcnotify(0, 'Gui', 'TreeView', 'ShowHide', a:show)
+endfunction
+
+command! GuiTreeviewShow call <SID>TreeViewShowHide(1)
+command! GuiTreeviewHide call <SID>TreeViewShowHide(0)
+noremap <script> <Plug>GuiTreeviewShow :call <SID>TreeViewShowHide(1)
+noremap <script> <Plug>GuiTreeviewHide :call <SID>TreeViewShowHide(0)
+anoremenu <script> Gui.Treeview.Show :call <SID>TreeViewShowHide(1)
+anoremenu <script> Gui.Treeview.Hide :call <SID>TreeViewShowHide(0)
+
+" Notifies the TreeView widget of a Toggle event
+function! s:TreeViewToggle()
+    call rpcnotify(0, 'Gui', 'TreeView', 'Toggle')
+endfunction
+
+command! GuiTreeviewToggle call <SID>TreeViewToggle()
+noremap <script> <Plug>GuiTreeviewToggle :call <SID>TreeViewToggle()
+anoremenu <script> Gui.Treeview.Toggle :call <SID>TreeViewShowToggle()

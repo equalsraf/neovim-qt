@@ -1020,6 +1020,13 @@ void Shell::updateClientInfo()
 
 bool Shell::event(QEvent *event)
 {
+	if (event->type() == QEvent::KeyPress) {
+		QKeyEvent *ke = (QKeyEvent *)(event);
+		if (ke->key() == Qt::Key_Tab || ke->key() == Qt::Key_Backtab) {
+			keyPressEvent(ke);
+			return true;
+		}
+	}
 	if (event->type() == QEvent::WinIdChange){
 		updateWindowId();
 	}

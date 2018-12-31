@@ -50,9 +50,18 @@ void MainWindow::init(NeovimConnector *c)
 	m_tabline_bar->setVisible(m_shell_options.enable_ext_tabline);
 
 	m_nvim = c;
+
+	m_tree = new TreeView(c);
 	m_shell = new Shell(c, m_shell_options);
-	m_stack.insertWidget(1, m_shell);
+
+	m_window = new QSplitter();
+	m_window->addWidget(m_tree);
+	m_tree->hide();
+	m_window->addWidget(m_shell);
+
+	m_stack.insertWidget(1, m_window);
 	m_stack.setCurrentIndex(1);
+
 	connect(m_shell, SIGNAL(neovimAttached(bool)),
 			this, SLOT(neovimAttachmentChanged(bool)));
 	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)),
@@ -143,7 +152,16 @@ void MainWindow::neovimWidgetResized()
 	// widget size - this avoids situations when neovim wants a size that
 	// exceeds the available widget size i.e. the GUI tells neovim its
 	// size, not the other way around.
-	m_shell->resizeNeovim(m_shell->size());
+	if (isMaximized() || isFullScreen()) {
+		QSize size = geometry().size();
+		if (m_tree->isVisible()) {
+			size.scale(size.width() - m_tree->geometry().size().width(),
+				size.height(), Qt::IgnoreAspectRatio);
+		}
+		m_shell->resizeNeovim(size);
+	} else {
+		m_shell->resizeNeovim(m_shell->size());
+	}
 }
 
 void MainWindow::neovimMaximized(bool set)
@@ -324,5 +342,4 @@ void MainWindow::changeTab(int index)
 	int64_t tab = m_tabline->tabData(index).toInt();
 	m_nvim->api2()->nvim_set_current_tabpage(tab);
 }
-} // Namespace
-
+}  // namespace NeovimQt

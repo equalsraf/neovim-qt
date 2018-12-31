@@ -24,7 +24,9 @@ private slots:
 			<< "third-party/DejaVuSansMono-Bold.ttf"
 			<< "third-party/DejaVuSansMono-BoldOblique.ttf";
 		foreach(QString path, fonts) {
-			QFontDatabase::addApplicationFont(path);
+		    QString abs_path_to_font(CMAKE_SOURCE_DIR);
+		    abs_path_to_font.append("/").append(path);
+		    QFontDatabase::addApplicationFont(abs_path_to_font);
 		}
 	}
 
@@ -116,7 +118,9 @@ private slots:
 	void guiShimCommands() {
 		// This function needs to be able to find the GUI runtime
 		// plugin or this test WILL FAIL
-		QFileInfo fi = QFileInfo("src/gui/runtime");
+		QString path_to_src_runtime(CMAKE_SOURCE_DIR);
+		path_to_src_runtime.append("/src/gui/runtime");
+		QFileInfo fi = QFileInfo(path_to_src_runtime);
 		QVERIFY2(fi.exists(), "Unable to find GUI runtime");
 		QStringList args = {"-u", "NONE",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
@@ -210,7 +214,9 @@ private slots:
 		QFETCH(char, reg);
 		QFETCH(QByteArray, register_data);
 
-		QFileInfo fi = QFileInfo("src/gui/runtime");
+		QString path_to_src_runtime(CMAKE_SOURCE_DIR);
+		path_to_src_runtime.append("/src/gui/runtime");
+		QFileInfo fi = QFileInfo(path_to_src_runtime);
 		QStringList args = {"-u", "NONE",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
@@ -269,7 +275,9 @@ private slots:
 		QFETCH(char, reg);
 		QFETCH(QByteArray, register_data);
 
-		QFileInfo fi = QFileInfo("src/gui/runtime");
+		QString path_to_src_runtime(CMAKE_SOURCE_DIR);
+		path_to_src_runtime.append("/src/gui/runtime");
+		QFileInfo fi = QFileInfo(path_to_src_runtime);
 		QStringList args = {"-u", "NONE",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
