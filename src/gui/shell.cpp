@@ -49,9 +49,11 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	m_pum.setParent(this);
 	m_pum.hide();
 
-	// Command line
-	m_cmdline.setParent(this);
-	m_cmdline.hide();
+    // Command line (instantiate the first one)
+    m_cmdline_list.reserve(5);
+    if (m_cmdline_list.size() < 1) {
+        m_cmdline_list.push_back(new CmdWidget(this));
+    }
 
 	if (m_nvim == NULL) {
 		qWarning() << "Received NULL as Neovim Connector";
@@ -582,6 +584,8 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		int64_t pos = opargs.at(0).toInt();
 		int64_t level = opargs.at(1).toInt();
 		qDebug() << name << pos << level;
+        // TODO : failure handling if the cmdline doesn't exist
+        m_cmdline_list[level - 1]->setPos(pos);
 	} else if (name == "cmdline_special_char") {
 		if (opargs.size() < 3) {
 			qWarning() << "Unexpected argument for cmdline_special_char:" << opargs;
@@ -606,8 +610,12 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		}
 		int64_t level = opargs.at(2).toInt();
 		qDebug() << name << c << shift << level;
+        handleCmdlineSpecialChar(c, shift, level);
 	} else if (name == "cmdline_hide") {
-        m_cmdline.hide();
+        // TODO : check the level in the command
+        for (auto cmdline : m_cmdline_list) {
+                cmdline->hide();
+        }
 	} else if (name == "cmdline_block_show") {
 		if (opargs.size() < 1) {
 			qWarning() << "Unexpected argument for cmdline_block_show:" << opargs;
@@ -623,7 +631,10 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		qDebug() << "cmdline_block_append" << opargs;
 		// - line
 	} else if (name == "cmdline_block_hide") {
-        m_cmdline.hide();
+        // TODO : check the level in the command
+        for (auto cmdline : m_cmdline_list) {
+                cmdline->hide();
+        }
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
@@ -1431,26 +1442,35 @@ void Shell::openFiles(QList<QUrl> urls)
 void Shell::handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
 			QString prompt, int64_t indent, int64_t level)
 {
-	auto anchor_x = 0;
-    auto anchor_y = (rows()-1)*cellSize().height();
-	auto cmdline_width = columns()*cellSize().width();
-    // TODO : deduce a better height than taking everything below last grid row
-    auto cmdline_height = height() - anchor_y;
-	m_cmdline.setGeometry(anchor_x, anchor_y, cmdline_width, cmdline_height);
-    m_cmdline.setFrameShape(QFrame::NoFrame);
-
-    // TODO : display more than just the first char and prompt
-    // We'll need to tamper with QDocument to handle highlight and stuff like
-    // that properly. Maybe with a m_cmdline.computeDocument(content) method ?
-    QString plaintext_content;
-    foreach(QVariant piece, content){
-        qDebug() << piece.toList();
-        plaintext_content += piece.toStringList().at(1);
+    auto ulevel = static_cast<size_t>(level);
+    if ( m_cmdline_list.size() < ulevel) {
+        for (size_t i = m_cmdline_list.size() ; i < ulevel ; ++i) {
+            m_cmdline_list.push_back(new CmdWidget(this));
+        }
     }
-    qDebug() << prompt << firstc;
-    m_cmdline.setPlainText(firstc + prompt + plaintext_content);
+    auto current_cmdline = m_cmdline_list[ulevel-1];
+	auto anchor_x = 0;
+    // FIXME : this anchor_y definition will break with cmdline_block commands
+    auto anchor_y = (rows() - level)*cellSize().height();
+	auto cmdline_width = columns()*cellSize().width();
+    auto cmdline_height = cellSize().height();
+    current_cmdline->setGeometry(anchor_x, anchor_y, cmdline_width, cmdline_height);
+    current_cmdline->setFrameShape(QFrame::NoFrame);
 
-	m_cmdline.show();
+    current_cmdline->compute_document(firstc, prompt, content);
+    current_cmdline->setPos(pos + indent + 1);
+    current_cmdline->show();
+}
+
+void Shell::handleCmdlineSpecialChar(QString c, bool shift, int64_t level) {
+    auto ulevel = static_cast<size_t>(level);
+    if ( m_cmdline_list.size() < ulevel) {
+        for (size_t i = m_cmdline_list.size() ; i < ulevel ; ++i) {
+            m_cmdline_list.push_back(new CmdWidget(this));
+        }
+    }
+    auto current_cmdline = m_cmdline_list[ulevel-1];
+    current_cmdline->add_special_char(c, shift);
 }
 
 // If neovim is blocked waiting for input, attempt to bailout from

@@ -10,6 +10,7 @@
 #include <QUrl>
 #include <QList>
 #include <QMenu>
+#include <vector>
 #include "neovimconnector.h"
 #include "shellwidget/shellwidget.h"
 #include "popupmenu.h"
@@ -139,6 +140,7 @@ protected:
 	virtual void handleMouse(bool);
 	virtual void handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
 			QString prompt, int64_t indent, int64_t level);
+    virtual void handleCmdlineSpecialChar(QString c, bool shift, int64_t level);
 
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
@@ -187,7 +189,7 @@ private:
 	ShellOptions m_options;
 	PopupMenu m_pum;
 	bool m_mouseEnabled;
-	CmdWidget m_cmdline;
+    std::vector<CmdWidget*> m_cmdline_list;
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler
