@@ -32,15 +32,17 @@ public:
      * @param lines the list of lines with content-syntax following :h ui-event-highlight_set specs
      * This typically means that lines is QVariantList of QVariantLists
      */
-    // void compute_block(const QVariantList& lines);
+    void compute_block(const QList<QVariantList>& lines);
 
     /**
      * @brief append_block appends the underlying QTextDocument with the line "content"
      * @param content the new line to append
      */
-    // void append_block(const QVariantList& content);
+    void append_block(const QVariantList& content);
 
     void setPos(int64_t pos);
+
+    inline uint16_t lines() const { return line_count; }
 
 public slots:
 
@@ -52,6 +54,7 @@ protected:
 
 private:
     QTextCursor cursor;
+    uint16_t line_count{0};
 };
 
 } // Namespace

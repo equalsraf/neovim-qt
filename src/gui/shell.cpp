@@ -54,6 +54,7 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
     if (m_cmdline_list.size() < 1) {
         m_cmdline_list.push_back(new CmdWidget(this));
     }
+    m_cmdline_block = new CmdWidget(this);
 
 	if (m_nvim == NULL) {
 		qWarning() << "Received NULL as Neovim Connector";
@@ -620,20 +621,22 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 			qWarning() << "Unexpected argument for cmdline_block_show:" << opargs;
 			return;
 		}
-		// - lines
-		qDebug() << "cmdline_block_show" << opargs;
+        qDebug() << "cmdline_block_show" << opargs;
+        foreach(QVariant line, opargs.at(0).toList()) {
+            qDebug() << line.toList() << "\n";
+            m_cmdline_block->append_block(line.toList());
+        }
+        // TODO : setGeometry for m_cmdline_block
+        m_cmdline_block->show();
 	} else if (name == "cmdline_block_append") {
 		if (opargs.size() < 1) {
 			qWarning() << "Unexpected argument for cmdline_block_append:" << opargs;
 			return;
 		}
 		qDebug() << "cmdline_block_append" << opargs;
-		// - line
+        m_cmdline_block->append_block(opargs.at(0).toList());
 	} else if (name == "cmdline_block_hide") {
-        // TODO : check the level in the command
-        for (auto cmdline : m_cmdline_list) {
-                cmdline->hide();
-        }
+        m_cmdline_block->hide();
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
@@ -1448,16 +1451,18 @@ void Shell::handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
         }
     }
     auto current_cmdline = m_cmdline_list[ulevel-1];
-	auto anchor_x = 0;
-    // FIXME : this anchor_y definition will break with cmdline_block commands
-    auto anchor_y = (rows() - level)*cellSize().height();
-	auto cmdline_width = columns()*cellSize().width();
-    auto cmdline_height = cellSize().height();
-    current_cmdline->setGeometry(anchor_x, anchor_y, cmdline_width, cmdline_height);
-    current_cmdline->setFrameShape(QFrame::NoFrame);
 
     current_cmdline->compute_document(firstc, prompt, content);
     current_cmdline->setPos(pos + indent + 1);
+
+    auto anchor_x = 0;
+    // FIXME : this anchor_y definition will break with cmdline_block commands
+    auto anchor_y = (rows() - level) * cellSize().height();
+    auto cmdline_width = columns() * cellSize().width();
+    auto cmdline_height = cellSize().height(); // cmdline_show is always called for one line
+    current_cmdline->setGeometry(anchor_x, anchor_y, cmdline_width, cmdline_height);
+    current_cmdline->setFrameShape(QFrame::NoFrame);
+
     current_cmdline->show();
 }
 

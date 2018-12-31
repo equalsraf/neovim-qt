@@ -190,6 +190,7 @@ private:
 	PopupMenu m_pum;
 	bool m_mouseEnabled;
     std::vector<CmdWidget*> m_cmdline_list;
+    CmdWidget *m_cmdline_block{nullptr};
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler
