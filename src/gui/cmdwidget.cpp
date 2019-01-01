@@ -2,8 +2,7 @@
 
 namespace NeovimQt {
 
-CmdWidget::CmdWidget(ShellWidget *parent) {
-    setParent(parent);
+CmdWidget::CmdWidget(ShellWidget *parent) : QTextEdit(parent) {
     hide();
     cursor = QTextCursor(document());
     setTextCursor(cursor);
