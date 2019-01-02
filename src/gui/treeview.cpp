@@ -28,8 +28,6 @@ TreeView::TreeView(NeovimConnector *nvim, QWidget *parent)
 }
 
 void TreeView::connector_ready_cb() {
-	setDirectory(QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
-
 	connect(this, &TreeView::doubleClicked, this, &TreeView::open);
 
 	connect(m_nvim->neovimObject(), &NeovimApi1::neovimNotification, this,
