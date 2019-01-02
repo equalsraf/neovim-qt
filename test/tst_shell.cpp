@@ -104,6 +104,40 @@ private slots:
 		QVERIFY(SPYWAIT(onOptionSet));
 	}
 
+	void guiExtCmdlineScreenshot() {
+		QStringList args;
+		args << "-u" << "NONE";
+		NeovimConnector *c = NeovimConnector::spawn(args);
+		Shell *s = new Shell(c, ShellOptions());
+
+		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QVERIFY(onAttached.isValid());
+		QVERIFY(SPYWAIT(onAttached));
+		QVERIFY(s->neovimAttached());
+
+		// The delay is to let nvim time to process the calls.
+		// the 20 ms delay is 3.3 ms more than 60 fps.
+		QTest::keyClicks(s, "iThis should appear in screenshot because it is a long line now that you think about it");
+		QTest::keyClick(s, Qt::Key_Escape, Qt::NoModifier, 20);
+		QTest::keyClicks(s, ":function Test()");
+		QTest::keyClick(s, Qt::Key_Enter, Qt::NoModifier, 20);
+		QTest::keyClicks(s, "if !has('nvim')");
+		QTest::keyClick(s, Qt::Key_Enter, Qt::NoModifier, 20);
+		QTest::keyClicks(s, "finish");
+		QTest::keyClick(s, Qt::Key_Enter, Qt::NoModifier, 20);
+		QTest::keyClicks(s, "endif");
+		QTest::keyClick(s, Qt::Key_Enter, Qt::NoModifier, 20);
+		QTest::keyClicks(s, "let l:indent = 1");
+		QTest::keyClick(s, Qt::Key_Enter, Qt::NoModifier, 20);
+		QTest::keyClicks(s, "Here I type ^R=");
+		QTest::keyClick(s, 'r', Qt::ControlModifier, 20);
+		QTest::keyClicks(s, "=strftime('%H')", Qt::NoModifier, 20);
+
+		s->repaint();
+		auto p = s->grab();
+		p.save("tst_shell_cmdline.png");
+	}
+
 	void gviminit() {
 		qputenv("GVIMINIT", "let g:test_gviminit = 1");
 		QStringList args;
