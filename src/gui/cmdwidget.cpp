@@ -1,60 +1,87 @@
 #include "cmdwidget.h"
+#include <QVBoxLayout>
 
 namespace NeovimQt {
 
-CmdWidget::CmdWidget(ShellWidget *parent) : QTextEdit(parent) {
-    hide();
-    cursor = QTextCursor(document());
-    setTextCursor(cursor);
-    document()->setDefaultFont(parent->font());
+CmdWidget::CmdWidget(ShellWidget *parent) : QFrame(parent) {
+  shell_parent = parent;
+  hide();
+  cmd_lines.reserve(5);
 }
 
-void CmdWidget::compute_document(const QString& firstc, const QString& prompt, const QVariantList& content) {
-    QString plaintext_content;
-    foreach(QVariant piece, content){
-        qDebug() << piece.toList();
-        plaintext_content += piece.toStringList().at(1);
-    }
-    qDebug() << prompt << firstc;
-    setPlainText(firstc + prompt + plaintext_content);
-    cursor = QTextCursor(document());
+CmdLine* CmdWidget::getLevel(int64_t level) {
+  if (level <= 0) {
+    qWarning() << "Wrong level asked : " << level;
+    return nullptr;
+  }
+
+  if (level <= levels) {
+    return cmd_lines[level - 1];
+  }
+
+  for (int i = levels; i < level; ++i) {
+    cmd_lines.push_back(new CmdLine(this));
+    ++levels;
+  }
+  return cmd_lines[level - 1];
 }
 
-void CmdWidget::add_special_char(const QString &c, bool shift_c) {
-    if (!shift_c) {
-        setOverwriteMode(true);
-    }
-    cursor.insertText(c);
-    setOverwriteMode(false);
+void CmdWidget::setGeometry2() {
+  auto anchor_x = 0;
+  // FIXME : this anchor_y definition will break with cmdline_block commands
+  auto anchor_y = (shell_parent->rows() - levels) * shell_parent->cellSize().height();
+  auto cmdline_width = shell_parent->columns() * shell_parent->cellSize().width();
+  auto cmdline_height = shell_parent->cellSize().height() + 5; // cmdline_show is always called for one line
+
+  auto current_layout = dynamic_cast<QVBoxLayout*>(layout());
+  if (!current_layout) {
+    current_layout = new QVBoxLayout(this);
+    current_layout->setDirection(QBoxLayout::BottomToTop);
+    current_layout->setSpacing(0);
+    current_layout->setContentsMargins(0, 0, 0, 0);
+  }
+
+  for (auto line : cmd_lines) {
+    line->setGeometry(anchor_x, anchor_y, cmdline_width, cmdline_height);
+    current_layout->addWidget(line);
+  }
+  setGeometry(anchor_x, anchor_y, cmdline_width, levels*cmdline_height);
+  setLayout(current_layout);
+  setFrameShape(QFrame::NoFrame);
 }
 
-void CmdWidget::compute_block(const QList<QVariantList> &lines) {
-    foreach(QVariantList line, lines) {
-        append_block(line);
-    }
-    cursor = QTextCursor(document());
-    cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
-    cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+void CmdWidget::compute_document(const QString& firstc, const QString& prompt, const QVariantList& content, int64_t level) {
+  auto current_line = getLevel(level);
+  current_line->compute_document(firstc, prompt, content);
+  current_line->show();
 }
 
-void CmdWidget::append_block(const QVariantList &content) {
-    QString plaintext_content;
-    foreach(QVariant piece, content){
-        qDebug() << piece.toList();
-        plaintext_content += piece.toStringList().at(1);
-    }
-    append(plaintext_content);
-    line_count++;
+void CmdWidget::add_special_char(const QString &c, bool shift_c, int64_t level) {
+  auto current_line = getLevel(level);
+  current_line->add_special_char(c, shift_c);
+  current_line->show();
 }
 
-void CmdWidget::setPos(int64_t pos) {
-    cursor.movePosition(QTextCursor::StartOfLine);
-    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
+void CmdWidget::setPos(int64_t pos, int64_t level) {
+  auto current_line = getLevel(level);
+  current_line->setPos(pos);
+}
+
+void CmdWidget::handleCmdlineHide() {
+  // Clear layout and cmd_lines
+  hide();
+  for (auto line : cmd_lines) {
+    delete line;
+  }
+  cmd_lines.clear();
+  levels = 0;
+  auto old_layout = layout();
+  delete old_layout;
 }
 
 void CmdWidget::keyPressEvent(QKeyEvent *ev)
 {
-    QWidget::keyPressEvent(ev);
+  QWidget::keyPressEvent(ev);
 }
 
 }  // namespace NeovimQt

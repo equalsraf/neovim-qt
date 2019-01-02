@@ -21,7 +21,10 @@ add_subdirectory(shellwidget)
 
 include(GNUInstallDirs)
 set(RUNTIME_PATH )
-add_library(neovim-qt-gui shell.cpp input.cpp treeview.cpp errorwidget.cpp mainwindow.cpp app.cpp
+add_library(neovim-qt-gui shell.cpp input.cpp errorwidget.cpp mainwindow.cpp app.cpp
+	treeview.cpp
+	cmdline.cpp
+	cmdblock.cpp
 	cmdwidget.cpp
 	popupmenumodel.cpp
 	popupmenu.cpp
