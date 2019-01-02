@@ -6,6 +6,8 @@ CmdLine::CmdLine(QWidget *parent) : QTextEdit(parent) {
     hide();
     cursor = QTextCursor(document());
     setTextCursor(cursor);
+    setFrameShape(QFrame::NoFrame);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     document()->setDefaultFont(parent->font());
 }
 

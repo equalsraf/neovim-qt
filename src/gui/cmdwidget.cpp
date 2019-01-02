@@ -29,7 +29,9 @@ CmdLine* CmdWidget::getLevel(int64_t level) {
 void CmdWidget::setGeometry2() {
   auto anchor_x = 0;
   // FIXME : this anchor_y definition will break with cmdline_block commands
-  auto anchor_y = (shell_parent->rows() - levels) * shell_parent->cellSize().height();
+  // FIXME : Magic number : 5 is a tiny amount of pixels so chars fit the line
+  auto anchor_y = (shell_parent->rows() - levels) * shell_parent->cellSize().height()
+                  - 5 * levels;
   auto cmdline_width = shell_parent->columns() * shell_parent->cellSize().width();
   auto cmdline_height = shell_parent->cellSize().height() + 5; // cmdline_show is always called for one line
 
