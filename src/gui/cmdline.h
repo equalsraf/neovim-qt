@@ -37,10 +37,9 @@ signals:
 protected:
 	virtual void keyPressEvent(QKeyEvent *ev) Q_DECL_OVERRIDE;
     QColor color(qint64 color, const QColor& fallback) const;
-    QString html_style_attribute(const QVariantMap& attrs);
+    void style_cursor_CharFormat(const QVariantMap& attrs);
 
 private:
-    QTextCursor cursor;
 };
 
 } // Namespace NeovimQt

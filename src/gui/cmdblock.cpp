@@ -19,14 +19,13 @@ void CmdBlock::compute_block(const QList<QVariantList> &lines) {
 
 void CmdBlock::append_block(const QVariantList &content) {
     QString plaintext_content;
-    QString html_content;
     foreach(QVariant piece, content){
         qDebug() << piece.toList();
-        auto style = html_style_attribute(piece.toList().at(0).toMap());
-        plaintext_content += piece.toStringList().at(1);
-        html_content += "<span " + style + ">" + piece.toStringList().at(1) + "</span>";
+        style_cursor_CharFormat(piece.toList().at(0).toMap());
+        plaintext_content = piece.toStringList().at(1);
+        textCursor().insertText(plaintext_content);
     }
-    append(html_content);
+    textCursor().insertText("\n");
     line_count++;
 }
 
@@ -38,8 +37,8 @@ QColor CmdBlock::color(qint64 color, const QColor& fallback) const
     return QRgb(color);
 }
 
-QString CmdBlock::html_style_attribute(const QVariantMap& attrs) {
-    QString style = "style=\"white-space: pre; ";
+void CmdBlock::style_cursor_CharFormat(const QVariantMap& attrs) {
+    QTextCharFormat cur_format;
 
     auto shell_parent = dynamic_cast<ShellWidget*>(parent());
     QColor cur_foreground, cur_background, cur_special;
@@ -70,28 +69,26 @@ QString CmdBlock::html_style_attribute(const QVariantMap& attrs) {
     }
 
     if (attrs.value("bold").toBool()) {
-        style += "font-weight: bold; ";
+        cur_format.setFontWeight(QFont::Bold);
     } else {
-        style += "font-weight: normal; ";
+        cur_format.setFontWeight(QFont::Normal);
     }
-    if (attrs.value("italic").toBool()) {
-        style += "font-style: italic; ";
-    } else {
-        style += "font-style: normal; ";
-    }
+    cur_format.setFontItalic(attrs.value("italic").toBool());
 
     if (attrs.value("underline").toBool()) {
-        style += "text-decoration: underline; ";
+        cur_format.setFontUnderline(true);
+        cur_format.setUnderlineStyle(QTextCharFormat::SingleUnderline);
     } else if (attrs.value("undercurl").toBool()){
-        style += "text-decoration: underline; ";
+        cur_format.setFontUnderline(true);
+        cur_format.setUnderlineStyle(QTextCharFormat::WaveUnderline);
     } else {
-        style += "text-decoration: normal; ";
+        cur_format.setFontUnderline(false);
     }
 
-    style += "color: " + cur_foreground.toRgb().name() + "; ";
-    style += "background-color: " + cur_background.toRgb().name() + "; ";
-    style += "\"";
-    return style;
+    cur_format.setForeground(cur_foreground);
+    cur_format.setBackground(cur_background);
+    cur_format.setUnderlineColor(cur_special);
+    setCurrentCharFormat(cur_format);
 }
 
 void CmdBlock::keyPressEvent(QKeyEvent *ev)
@@ -101,4 +98,3 @@ void CmdBlock::keyPressEvent(QKeyEvent *ev)
 }
 
 }  // namespace NeovimQt
-

@@ -6,8 +6,6 @@ namespace NeovimQt {
 CmdLine::CmdLine(QWidget *parent) : QTextEdit(parent) {
     hide();
 
-    cursor = QTextCursor(document());
-    setTextCursor(cursor);
     setFrameShape(QFrame::NoFrame);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
@@ -21,15 +19,15 @@ CmdLine::CmdLine(QWidget *parent) : QTextEdit(parent) {
 void CmdLine::compute_document(const QString& firstc, const QString& prompt, const QVariantList& content) {
     QString plaintext_content;
     QString html_content;
+    clear();
+    style_cursor_CharFormat(QVariantMap());
+    textCursor().insertText(firstc + prompt);
     foreach(QVariant piece, content){
         qDebug() << piece.toList();
-        auto style = html_style_attribute(piece.toList().at(0).toMap());
-        plaintext_content += piece.toStringList().at(1);
-        html_content += "<span " + style + ">" + piece.toStringList().at(1) + "</span>";
+        style_cursor_CharFormat(piece.toList().at(0).toMap());
+        plaintext_content = piece.toStringList().at(1);
+        textCursor().insertText(plaintext_content, textCursor().charFormat());
     }
-    QString header = "<span " + html_style_attribute(QVariantMap()) + ">" + firstc + prompt + "</span>";
-    setText(header + html_content);
-    cursor = QTextCursor(document());
 }
 
 QColor CmdLine::color(qint64 color, const QColor& fallback) const
@@ -40,8 +38,8 @@ QColor CmdLine::color(qint64 color, const QColor& fallback) const
     return QRgb(color);
 }
 
-QString CmdLine::html_style_attribute(const QVariantMap& attrs) {
-    QString style = "style=\"white-space: pre; ";
+void CmdLine::style_cursor_CharFormat(const QVariantMap& attrs) {
+    QTextCharFormat cur_format;
 
     auto cmdwidget_parent = dynamic_cast<CmdWidget*>(parent());
     QColor cur_foreground, cur_background, cur_special;
@@ -72,41 +70,41 @@ QString CmdLine::html_style_attribute(const QVariantMap& attrs) {
     }
 
     if (attrs.value("bold").toBool()) {
-        style += "font-weight: bold; ";
+        cur_format.setFontWeight(QFont::Bold);
     } else {
-        style += "font-weight: normal; ";
+        cur_format.setFontWeight(QFont::Normal);
     }
-    if (attrs.value("italic").toBool()) {
-        style += "font-style: italic; ";
-    } else {
-        style += "font-style: normal; ";
-    }
+    cur_format.setFontItalic(attrs.value("italic").toBool());
 
     if (attrs.value("underline").toBool()) {
-        style += "text-decoration: underline; ";
+        cur_format.setFontUnderline(true);
+        cur_format.setUnderlineStyle(QTextCharFormat::SingleUnderline);
     } else if (attrs.value("undercurl").toBool()){
-        style += "text-decoration: underline; ";
+        cur_format.setFontUnderline(true);
+        cur_format.setUnderlineStyle(QTextCharFormat::WaveUnderline);
     } else {
-        style += "text-decoration: normal; ";
+        cur_format.setFontUnderline(false);
     }
 
-    style += "color: " + cur_foreground.toRgb().name() + "; ";
-    style += "background-color: " + cur_background.toRgb().name() + "; ";
-    style += "\"";
-    return style;
+    cur_format.setForeground(cur_foreground);
+    cur_format.setBackground(cur_background);
+    cur_format.setUnderlineColor(cur_special);
+    setCurrentCharFormat(cur_format);
 }
 
 void CmdLine::add_special_char(const QString &c, bool shift_c) {
     if (!shift_c) {
         setOverwriteMode(true);
     }
-    cursor.insertText(c);
+    textCursor().insertText(c);
     setOverwriteMode(false);
 }
 
 void CmdLine::setPos(int64_t pos) {
-    cursor.movePosition(QTextCursor::StartOfLine);
-    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
+    moveCursor(QTextCursor::StartOfLine);
+    for (int i = 0; i < pos; ++i) {
+        moveCursor(QTextCursor::Right, QTextCursor::MoveAnchor);
+    }
 }
 
 void CmdLine::keyPressEvent(QKeyEvent *ev)
