@@ -404,6 +404,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 			setForeground(QRgb(val));
 		}
 		m_hg_foreground = foreground();
+		QPalette p = palette();
+		p.setColor(QPalette::Text, foreground());
+		setPalette(p);
 	} else if (name == "update_bg") {
 		if (opargs.size() < 1 || !opargs.at(0).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
@@ -414,6 +417,10 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 			setBackground(QRgb(val));
 		}
 		m_hg_background = background();
+		QPalette p = palette();
+		p.setColor(QPalette::Base, background());
+		setAutoFillBackground(true);
+		setPalette(p);
 		update();
 	} else if (name == "update_sp") {
 		if (opargs.size() < 1 || !opargs.at(0).canConvert<quint64>()) {
