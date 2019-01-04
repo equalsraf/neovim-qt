@@ -104,9 +104,35 @@ private slots:
 		QVERIFY(SPYWAIT(onOptionSet));
 	}
 
-	void guiExtCmdlineScreenshot() {
+        void guiExtCmdlineScreenshot_data() {
+                // Colorscheme command
+		QTest::addColumn<QString>("colorscheme_command");
+                // Name of the screenshot
+		QTest::addColumn<QString>("screenshot_name");
+
+		QTest::newRow("Default")
+			<< ":colorscheme default"
+                        << "tst_shell_cmdline_default.png";
+		QTest::newRow("Desert")
+			<< ":colorscheme desert"
+                        << "tst_shell_cmdline_desert.png";
+		QTest::newRow("Elflord")
+			<< ":colorscheme elflord"
+                        << "tst_shell_cmdline_elflord.png";
+		QTest::newRow("Evening")
+			<< ":colorscheme evening"
+                        << "tst_shell_cmdline_evening.png";
+
+        }
+
+        // Test that simulates typing to showcase ext_cmdline in different highlights
+        void guiExtCmdlineScreenshot() {
+		QFETCH(QString, colorscheme_command);
+		QFETCH(QString, screenshot_name);
+
 		QStringList args;
-		args << "-u" << "NONE";
+		args << "-u" << "NONE" << "--cmd"
+                     << "set rtp=" + QString(CMAKE_SOURCE_DIR).append("/").append("test/runtime");
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c, ShellOptions());
 
@@ -117,6 +143,10 @@ private slots:
 
 		// The delay is to let nvim time to process the calls.
 		// the 20 ms delay is 3.3 ms more than 60 fps.
+		QTest::keyClicks(s, ":syntax on");
+		QTest::keyClick(s, Qt::Key_Enter, Qt::NoModifier, 20);
+		QTest::keyClicks(s, colorscheme_command);
+		QTest::keyClick(s, Qt::Key_Enter, Qt::NoModifier, 20);
 		QTest::keyClicks(s, "iThis should appear in screenshot because it is a long line now that you think about it");
 		QTest::keyClick(s, Qt::Key_Escape, Qt::NoModifier, 20);
 		QTest::keyClicks(s, ":function Test()");
@@ -135,7 +165,7 @@ private slots:
 
 		s->repaint();
 		auto p = s->grab();
-		p.save("tst_shell_cmdline.png");
+		p.save(screenshot_name);
 	}
 
 	void gviminit() {
