@@ -7,6 +7,8 @@ CmdWidget::CmdWidget(ShellWidget *parent) : QFrame(parent) {
   shell_parent = parent;
   hide();
   cmd_lines.reserve(5);
+  setFrameShape(QFrame::Panel);
+  setFrameShadow(QFrame::Raised);
   connect(shell_parent, &ShellWidget::shellFontChanged,
           this, &CmdWidget::setDefaultFont);
 }
@@ -32,15 +34,7 @@ CmdLine* CmdWidget::getLevel(int64_t level) {
   return cmd_lines[level - 1];
 }
 
-void CmdWidget::setGeometry2() {
-  auto anchor_x = 0;
-  // FIXME : this anchor_y definition will break with cmdline_block commands
-  // FIXME : Magic number : 5 is a tiny amount of pixels so chars fit the line
-  auto anchor_y = (shell_parent->rows() - levels) * shell_parent->cellSize().height()
-                  - 5 * levels;
-  auto cmdline_width = shell_parent->columns() * shell_parent->cellSize().width();
-  auto cmdline_height = shell_parent->cellSize().height() + 5; // cmdline_show is always called for one line
-
+void CmdWidget::compute_layout() {
   auto current_layout = dynamic_cast<QVBoxLayout*>(layout());
   if (!current_layout) {
     current_layout = new QVBoxLayout(this);
@@ -50,13 +44,22 @@ void CmdWidget::setGeometry2() {
   }
 
   for (auto line : cmd_lines) {
-    line->setGeometry(anchor_x, anchor_y, cmdline_width, cmdline_height);
     current_layout->addWidget(line);
   }
-  setGeometry(anchor_x, anchor_y, cmdline_width, levels*cmdline_height);
   setLayout(current_layout);
-  setFrameShape(QFrame::Panel);
-  setFrameShadow(QFrame::Raised);
+}
+
+void CmdWidget::setGeometry2() {
+  auto anchor_x = 0;
+  // FIXME : this anchor_y definition will break with cmdline_block commands
+  // FIXME : Magic number : 5 is a tiny amount of pixels so chars fit the line
+  auto anchor_y = (shell_parent->rows() - levels) * shell_parent->cellSize().height()
+                  - 5 * levels;
+  auto cmdline_width = shell_parent->columns() * shell_parent->cellSize().width();
+  auto cmdline_height = shell_parent->cellSize().height() + 5; // cmdline_show is always called for one line
+  setGeometry(anchor_x, anchor_y, cmdline_width, levels*cmdline_height);
+
+  compute_layout();
 }
 
 void CmdWidget::compute_document(const QString& firstc, const QString& prompt, const QVariantList& content, int64_t level) {
