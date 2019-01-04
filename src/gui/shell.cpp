@@ -526,7 +526,40 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "mode_info_set") {
 		// TODO
 	} else if (name == "default_colors_set") {
-		// TODO
+		if (opargs.size() < 5
+                    || !opargs.at(0).canConvert<quint64>()
+                    || !opargs.at(1).canConvert<quint64>()
+                    || !opargs.at(2).canConvert<quint64>()
+                    || !opargs.at(3).canConvert<quint64>()
+                    || !opargs.at(4).canConvert<quint64>()
+                    ) {
+			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
+			return;
+		}
+		qint64 rgb_fg = opargs.at(0).toLongLong();
+		qint64 rgb_bg = opargs.at(1).toLongLong();
+		qint64 rgb_sp = opargs.at(2).toLongLong();
+                /* XXX : cterm_fg and cterm_bg are ignored
+		*  qint64 cterm_fg = opargs.at(3).toLongLong();
+		*  qint64 cterm_bg = opargs.at(4).toLongLong();
+                */
+
+		if (rgb_fg != -1) {
+			setForeground(QRgb(rgb_fg));
+		}
+		m_hg_foreground = foreground();
+
+		if (rgb_bg != -1) {
+			setBackground(QRgb(rgb_bg));
+		}
+		m_hg_background = background();
+
+		if (rgb_fg != -1) {
+			setSpecial(QRgb(rgb_sp));
+		}
+		m_hg_special = special();
+
+                update();
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
