@@ -42,7 +42,7 @@ public:
     void handleCmdlineHide();
 
 public slots:
-    void setDefaultFont();
+        void setDefaultFont();
 
 signals:
 	void reconnectNeovim();
@@ -50,12 +50,12 @@ signals:
 protected:
 	virtual void keyPressEvent(QKeyEvent *ev) Q_DECL_OVERRIDE;
         CmdLine* getLevel(int64_t level);
-    void compute_layout();
+        void compute_layout();
 
 private:
-    uint16_t levels{0};
-    std::vector<CmdLine*> cmd_lines;
-    ShellWidget* shell_parent{nullptr};
+        uint16_t levels{0};
+        std::vector<CmdLine*> cmd_lines;
+        ShellWidget* shell_parent{nullptr};
 };
 
 } // Namespace
