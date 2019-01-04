@@ -33,18 +33,20 @@ CmdLine *CmdWidget::getLevel(int64_t level) {
 }
 
 void CmdWidget::compute_layout() {
-	auto current_layout = dynamic_cast<QVBoxLayout *>(layout());
-	if (!current_layout) {
-		current_layout = new QVBoxLayout(this);
-		current_layout->setDirection(QBoxLayout::BottomToTop);
-		current_layout->setSpacing(0);
-		current_layout->setContentsMargins(0, 0, 0, 0);
-	}
+	auto old_layout = layout();
+	if (old_layout) {
+                delete old_layout;
+        }
+
+	auto new_layout = new QVBoxLayout(this);
+	new_layout->setDirection(QBoxLayout::BottomToTop);
+	new_layout->setSpacing(0);
+	new_layout->setContentsMargins(0, 0, 0, 0);
 
 	for (auto line : cmd_lines) {
-		current_layout->addWidget(line);
+		new_layout->addWidget(line);
 	}
-	setLayout(current_layout);
+	setLayout(new_layout);
 }
 
 void CmdWidget::setGeometry2() {
@@ -86,9 +88,10 @@ void CmdWidget::handleCmdlineHide() {
 	// Clear layout and cmd_lines
 	hide();
 	for (auto line : cmd_lines) {
-		line->clear();
-		line->hide();
+                delete line;
 	}
+        cmd_lines.clear();
+        levels = 0;
 }
 
 void CmdWidget::keyPressEvent(QKeyEvent *ev) {
