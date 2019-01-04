@@ -30,6 +30,7 @@ public:
     inline uint16_t lines() const { return line_count; }
 
 public slots:
+    void setDefaultFont();
 
 signals:
 	void reconnectNeovim();

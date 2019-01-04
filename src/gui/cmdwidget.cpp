@@ -7,6 +7,12 @@ CmdWidget::CmdWidget(ShellWidget *parent) : QFrame(parent) {
   shell_parent = parent;
   hide();
   cmd_lines.reserve(5);
+  connect(shell_parent, &ShellWidget::shellFontChanged,
+          this, &CmdWidget::setDefaultFont);
+}
+
+void CmdWidget::setDefaultFont() {
+    setFont(shell_parent->font());
 }
 
 CmdLine* CmdWidget::getLevel(int64_t level) {

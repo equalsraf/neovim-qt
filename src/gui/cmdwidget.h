@@ -42,6 +42,7 @@ public:
     void handleCmdlineHide();
 
 public slots:
+    void setDefaultFont();
 
 signals:
 	void reconnectNeovim();

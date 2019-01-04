@@ -9,6 +9,14 @@ CmdBlock::CmdBlock(ShellWidget *parent) : QTextEdit(parent) {
 
     setTextBackgroundColor(parent->background());
     setTextColor(parent->foreground());
+
+    connect(parent, &ShellWidget::shellFontChanged,
+            this, &CmdBlock::setDefaultFont);
+}
+
+void CmdBlock::setDefaultFont() {
+    auto shell_parent = dynamic_cast<ShellWidget*>(parent());
+    setFont(shell_parent->font());
 }
 
 void CmdBlock::compute_block(const QList<QVariantList> &lines) {
