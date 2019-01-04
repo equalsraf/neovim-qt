@@ -3,7 +3,7 @@
 
 namespace NeovimQt {
 
-CmdLine::CmdLine(QWidget *parent) : QTextEdit(parent) {
+CmdLine::CmdLine(CmdWidget *parent) : QTextEdit(parent), cmdwidget_parent(parent) {
         hide();
 
         setFrameShape(QFrame::NoFrame);
@@ -41,7 +41,6 @@ QColor CmdLine::color(qint64 color, const QColor& fallback) const {
 void CmdLine::style_cursor_CharFormat(const QVariantMap& attrs) {
         QTextCharFormat cur_format;
 
-        auto cmdwidget_parent = dynamic_cast<CmdWidget*>(parent());
         QColor cur_foreground, cur_background, cur_special;
         if (attrs.contains("foreground")) {
                 // TODO: When does Neovim send -1

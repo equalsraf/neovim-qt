@@ -9,11 +9,13 @@
 
 namespace NeovimQt {
 
+class CmdWidget;
+
 // A Widget that holds one cmdline
 class CmdLine: public QTextEdit {
 	Q_OBJECT
 public:
-        CmdLine(QWidget *parent=nullptr);
+        CmdLine(CmdWidget *parent=nullptr);
         /**
          * @brief compute_document sets the underlying QTextDocument properly with highlights
          * @param content the list of content following :h ui-event-highlight_set specs
@@ -40,6 +42,7 @@ protected:
         void style_cursor_CharFormat(const QVariantMap& attrs);
 
 private:
+        CmdWidget* cmdwidget_parent;
 };
 
 } // Namespace NeovimQt
