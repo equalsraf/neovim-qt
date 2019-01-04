@@ -49,7 +49,8 @@ void CmdWidget::setGeometry2() {
   }
   setGeometry(anchor_x, anchor_y, cmdline_width, levels*cmdline_height);
   setLayout(current_layout);
-  setFrameShape(QFrame::NoFrame);
+  setFrameShape(QFrame::Panel);
+  setFrameShadow(QFrame::Raised);
 }
 
 void CmdWidget::compute_document(const QString& firstc, const QString& prompt, const QVariantList& content, int64_t level) {
