@@ -28,6 +28,7 @@ void CmdLine::compute_document(const QString& firstc, const QString& prompt, con
         plaintext_content = piece.toStringList().at(1);
         textCursor().insertText(plaintext_content, textCursor().charFormat());
     }
+    setFocus();
 }
 
 QColor CmdLine::color(qint64 color, const QColor& fallback) const

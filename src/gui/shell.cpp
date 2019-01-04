@@ -589,8 +589,8 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		int64_t pos = opargs.at(0).toInt();
 		int64_t level = opargs.at(1).toInt();
 		qDebug() << name << pos << level;
-		// TODO : failure handling if the cmdline doesn't exist
-		m_cmdline_widget->setPos(pos, level);
+                // +1 to account for first char like in cmdline_show
+		m_cmdline_widget->setPos(pos + 1, level);
 	} else if (name == "cmdline_special_char") {
 		if (opargs.size() < 3) {
 			qWarning() << "Unexpected argument for cmdline_special_char:" << opargs;
@@ -1447,7 +1447,7 @@ void Shell::handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
 			QString prompt, int64_t indent, int64_t level)
 {
     m_cmdline_widget->compute_document(firstc, prompt, content, level);
-    m_cmdline_widget->setPos(pos + indent + 1, level);
+    m_cmdline_widget->setPos(pos + 1, level);
     m_cmdline_widget->setGeometry2();
     m_cmdline_widget->show();
 }
