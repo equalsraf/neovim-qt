@@ -579,6 +579,8 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		}
 		int64_t level = opargs.at(5).toInt();
 
+                qDebug() << name << content << pos << firstc << prompt
+                         << indent << level;
 		handleCmdlineShow(content, pos, firstc, prompt, indent, level);
 	} else if (name == "cmdline_pos") {
 		if (opargs.size() < 2 || !opargs.at(0).canConvert<int64_t>()
@@ -617,27 +619,29 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		qDebug() << name << c << shift << level;
 		handleCmdlineSpecialChar(c, shift, level);
 	} else if (name == "cmdline_hide") {
-		m_cmdline_widget->handleCmdlineHide();
+                qDebug() << name;
+                m_cmdline_widget->handleCmdlineHide();
 	} else if (name == "cmdline_block_show") {
 		if (opargs.size() < 1) {
 			qWarning() << "Unexpected argument for cmdline_block_show:" << opargs;
 			return;
 		}
-        qDebug() << "cmdline_block_show" << opargs;
         foreach(QVariant line, opargs.at(0).toList()) {
             qDebug() << line.toList() << "\n";
             m_cmdline_block->append_block(line.toList());
         }
         // TODO : setGeometry for m_cmdline_block
         m_cmdline_block->show();
+                qDebug() << "cmdline_block_show" << opargs;
 	} else if (name == "cmdline_block_append") {
 		if (opargs.size() < 1) {
 			qWarning() << "Unexpected argument for cmdline_block_append:" << opargs;
 			return;
 		}
 		qDebug() << "cmdline_block_append" << opargs;
-        m_cmdline_block->append_block(opargs.at(0).toList());
+                m_cmdline_block->append_block(opargs.at(0).toList());
 	} else if (name == "cmdline_block_hide") {
+                qDebug() << name;
                 m_cmdline_block->clear();
                 m_cmdline_block->hide();
 	} else {

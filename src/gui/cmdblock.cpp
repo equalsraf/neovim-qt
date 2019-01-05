@@ -28,7 +28,6 @@ void CmdBlock::compute_block(const QList<QVariantList> &lines) {
 void CmdBlock::append_block(const QVariantList &content) {
 	QString plaintext_content;
 	foreach(QVariant piece, content){
-		qDebug() << piece.toList();
 		style_cursor_CharFormat(piece.toList().at(0).toMap());
 		plaintext_content = piece.toStringList().at(1);
 		textCursor().insertText(plaintext_content);
@@ -51,7 +50,6 @@ void CmdBlock::style_cursor_CharFormat(const QVariantMap& attrs) {
 	auto shell_parent = dynamic_cast<ShellWidget*>(parent());
 	QColor cur_foreground, cur_background, cur_special;
 	if (attrs.contains("foreground")) {
-		// TODO: When does Neovim send -1
 		cur_foreground = color(attrs.value("foreground").toLongLong(),
                                        shell_parent->foreground());
 	} else {
@@ -103,7 +101,6 @@ void CmdBlock::style_cursor_CharFormat(const QVariantMap& attrs) {
 
 void CmdBlock::keyPressEvent(QKeyEvent *ev)
 {
-	// TODO : should it just eat the QKeyEvent ?
 	QWidget::keyPressEvent(ev);
 }
 

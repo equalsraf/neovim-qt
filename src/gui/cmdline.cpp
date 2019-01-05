@@ -23,7 +23,6 @@ void CmdLine::compute_document(const QString& firstc, const QString& prompt, con
         style_cursor_CharFormat(QVariantMap());
         textCursor().insertText(firstc + prompt);
         foreach(QVariant piece, content){
-                qDebug() << piece.toList();
                 style_cursor_CharFormat(piece.toList().at(0).toMap());
                 plaintext_content = piece.toStringList().at(1);
                 textCursor().insertText(plaintext_content, textCursor().charFormat());
