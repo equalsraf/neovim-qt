@@ -50,15 +50,12 @@ void CmdWidget::compute_layout() {
 }
 
 void CmdWidget::setGeometry2() {
-	auto anchor_x = 0;
-	// FIXME : this anchor_y definition will break with cmdline_block commands
-	// FIXME : Magic number : 5 is a tiny amount of pixels so chars fit the line
-	auto anchor_y = (shell_parent->rows() - levels)
-                * shell_parent->cellSize().height()
-                - 5 * levels;
-	auto cmdline_width = shell_parent->columns()
-                * shell_parent->cellSize().width();
-        // cmdline_show is always called for one line
+        auto cols_in_px = shell_parent->columns() * shell_parent->cellSize().width();
+        // How wide the CmdWidget should be w.r.t. grid width
+        auto ratio_width = 0.66;
+	auto anchor_x = static_cast<int64_t>((1 - ratio_width) / 2 * cols_in_px);
+	auto anchor_y = 0;
+	auto cmdline_width = static_cast<int64_t>(ratio_width * cols_in_px);
 	auto cmdline_height = shell_parent->cellSize().height() + 5;
 	setGeometry(anchor_x, anchor_y, cmdline_width, levels * cmdline_height);
 
