@@ -32,12 +32,19 @@ void CmdBlock::compute_block(const QList<QVariantList> &lines) {
 }
 
 void CmdBlock::append_block(const QVariantList &content) {
-	QString plaintext_content;
+	QString plaintext_piece, plaintext_line;
 	foreach(QVariant piece, content){
 		style_cursor_CharFormat(piece.toList().at(0).toMap());
-		plaintext_content = piece.toStringList().at(1);
-		textCursor().insertText(plaintext_content);
-	}
+		plaintext_piece = piece.toStringList().at(1);
+                plaintext_line += plaintext_piece;
+		textCursor().insertText(plaintext_piece);
+        }
+
+        auto fm = QFontMetrics(font());
+        auto current_line_len = fm.width(plaintext_line);
+        if (current_line_len > longest_line_pix) {
+                longest_line_pix = current_line_len;
+        }
 	textCursor().insertText("\n");
 	line_count++;
         adjustSize();
@@ -111,11 +118,10 @@ void CmdBlock::keyPressEvent(QKeyEvent *ev)
 	QWidget::keyPressEvent(ev);
 }
 
-QSize CmdBlock::sizeHint() const {
-        QSize sizehint = QTextEdit::sizeHint();
-        sizehint.setHeight(fitted_height);
-        qDebug() << "Current CmdBlock size hint : " << sizehint;
-        return sizehint;
+QSize CmdBlock::viewportSizeHint() const {
+        qDebug() << "CmdBlock Viewport sizehint asked : "
+                 << fitted_width << "x" << fitted_height;
+        return QSize(fitted_width, fitted_height);
 }
 
 QSize CmdBlock::minimumSizeHint() const {
@@ -123,10 +129,19 @@ QSize CmdBlock::minimumSizeHint() const {
 }
 
 void CmdBlock::fitSizeToDocument() {
+        auto font_metrics = QFontMetrics(font());
         document()->setTextWidth(viewport()->width());
         QSize document_size(document()->size().toSize());
         fitted_height = document_size.height();
+        // Pad the longest line with one additionnal char
+        fitted_width = longest_line_pix + font_metrics.averageCharWidth();
         updateGeometry();
+        adjustSize();
+}
+
+void CmdBlock::clear() {
+        longest_line_pix = 0;
+        QTextEdit::clear();
 }
 
 }  // namespace NeovimQt

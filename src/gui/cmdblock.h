@@ -32,13 +32,14 @@ public:
 public slots:
 	void setDefaultFont();
         void fitSizeToDocument();
+        void clear();
 
 signals:
 	void reconnectNeovim();
 
 protected:
 	virtual void keyPressEvent(QKeyEvent *ev) Q_DECL_OVERRIDE;
-        virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+        virtual QSize viewportSizeHint() const Q_DECL_OVERRIDE;
         virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 	QColor color(qint64 color, const QColor& fallback) const;
 	void style_cursor_CharFormat(const QVariantMap& attrs);
@@ -46,6 +47,8 @@ protected:
 private:
 	uint16_t line_count{0};
         int64_t fitted_height{0};
+        int64_t fitted_width{0};
+        int32_t longest_line_pix{0};
 };
 
 } // Namespace

@@ -1469,9 +1469,8 @@ void Shell::moveCmdBlockToLines() {
         auto max_height = (rows() - m_cmdline_widget->lines()) * cellSize().height();
 
         m_cmdline_block->move(anchor_x, anchor_y);
-        m_cmdline_block->setMinimumWidth(width);
-        m_cmdline_block->setMaximumHeight(max_height);
-        qDebug() << "New CmdBlock max height : " << max_height;
+        m_cmdline_block->setMaximumSize(width, max_height);
+        m_cmdline_block->adjustSize();
 }
 
 void Shell::handleCmdlineSpecialChar(QString c, bool shift, int64_t level) {
