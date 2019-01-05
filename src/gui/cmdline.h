@@ -15,7 +15,12 @@ class CmdWidget;
 class CmdLine: public QTextEdit {
 	Q_OBJECT
 public:
+        /**
+         * @brief constructor defining the CmdWidget parent
+         * @param parent a pointer to the CmdWidget parent.
+         */
         CmdLine(CmdWidget *parent=nullptr);
+
         /**
          * @brief compute_document sets the underlying QTextDocument properly with highlights
          * @param content the list of content following :h ui-event-highlight_set specs

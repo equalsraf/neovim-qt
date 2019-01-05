@@ -9,11 +9,16 @@
 
 namespace NeovimQt {
 
-// A Widget that complies to Neovim ui-cmdline API
+// A Widget that complies to Neovim ui-cmdline API. It handles cmdline_block calls
 class CmdBlock: public QTextEdit {
 	Q_OBJECT
 public:
+        /**
+         * @brief constructor defining the ShellWidget parent
+         * @param parent is a pointer to the ShellWidget parent.
+         */
 	CmdBlock(ShellWidget *parent=nullptr);
+
 	/**
 	 * @brief compute_block sets the underlying QTextDocument as a cmdline_block
 	 * @param lines the list of lines with content-syntax following :h ui-event-highlight_set specs
