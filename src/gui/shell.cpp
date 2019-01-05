@@ -638,7 +638,8 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		qDebug() << "cmdline_block_append" << opargs;
         m_cmdline_block->append_block(opargs.at(0).toList());
 	} else if (name == "cmdline_block_hide") {
-        m_cmdline_block->hide();
+                m_cmdline_block->clear();
+                m_cmdline_block->hide();
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
