@@ -54,9 +54,10 @@ void CmdWidget::setGeometry2() {
         // How wide the CmdWidget should be w.r.t. grid width
         auto ratio_width = 0.66;
 	auto anchor_x = static_cast<int64_t>((1 - ratio_width) / 2 * cols_in_px);
-	auto anchor_y = 0;
+	auto anchor_y = shell_parent->frameGeometry().bottom();
 	auto cmdline_width = static_cast<int64_t>(ratio_width * cols_in_px);
 	auto cmdline_height = shell_parent->cellSize().height() + 5;
+        anchor_y -= levels * cmdline_height - frameWidth();
 	setGeometry(anchor_x, anchor_y, cmdline_width, levels * cmdline_height);
 
 	compute_layout();

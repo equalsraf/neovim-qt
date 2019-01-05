@@ -1464,7 +1464,9 @@ void Shell::handleCmdlineBlockShow(QVariantList lines) {
 
 void Shell::moveCmdBlockToLines() {
         auto anchor_x = m_cmdline_widget->frameGeometry().left();
-        auto anchor_y = m_cmdline_widget->frameGeometry().bottom();
+        auto anchor_y = m_cmdline_widget->frameGeometry().top();
+        auto offset = m_cmdline_block->frameGeometry().height();
+        anchor_y -= offset;
         auto width = m_cmdline_widget->geometry().width();
         auto max_height = (rows() - m_cmdline_widget->lines()) * cellSize().height();
 
