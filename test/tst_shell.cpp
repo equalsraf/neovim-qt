@@ -164,7 +164,7 @@ private slots:
 		QTest::keyClicks(s, "=strftime('%H')", Qt::NoModifier, 20);
 
 		s->repaint();
-		auto p = s->grab();
+		auto p = s->grab(s->frameGeometry());
 		p.save(screenshot_name);
 	}
 
