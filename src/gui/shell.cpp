@@ -614,6 +614,7 @@ void Shell::setNeovimCursor(quint64 row, quint64 col)
 	update(neovimCursorRect());
 	m_cursor_pos = QPoint(col, row);
 	update(neovimCursorRect());
+	qApp->inputMethod()->update(Qt::ImCursorRectangle);
 }
 
 void Shell::handleModeChange(const QString& mode)
@@ -1199,7 +1200,7 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 	if ( query == Qt::ImFont) {
 		return font();
 	} else if ( query == Qt::ImMicroFocus || query == Qt::ImCursorRectangle ) {
-		return QRect(neovimCursorTopLeft(), QSize(0, cellSize().height()));
+		return QRect(neovimCursorTopLeft(), cellSize());
 	}
 
 	return QVariant();
