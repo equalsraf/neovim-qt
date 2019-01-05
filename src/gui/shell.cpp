@@ -1463,9 +1463,6 @@ void Shell::handleCmdlineBlockShow(QVariantList lines) {
 }
 
 void Shell::moveCmdBlockToLines() {
-        if (!m_cmdline_block->isVisible()) {
-                return;
-        }
         auto anchor_x = m_cmdline_widget->frameGeometry().left();
         auto anchor_y = m_cmdline_widget->frameGeometry().bottom();
         auto width = m_cmdline_widget->geometry().width();
