@@ -139,10 +139,12 @@ protected:
 			int64_t row, int64_t col);
 	void handlePopupMenuSelect(int64_t selected);
 	virtual void handleMouse(bool);
+
         virtual void handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
                                        QString prompt, int64_t indent, int64_t level);
         virtual void handleCmdlineSpecialChar(QString c, bool shift, int64_t level);
         virtual void handleCmdlineBlockShow(QVariantList lines);
+        void moveCmdBlockToLines();
 
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;

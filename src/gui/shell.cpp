@@ -1449,6 +1449,7 @@ void Shell::handleCmdlineShow(QVariantList content, int64_t pos, QString firstc,
     m_cmdline_widget->compute_document(firstc, prompt, content, level);
     m_cmdline_widget->setPos(pos + 1, level);
     m_cmdline_widget->setGeometry2();
+    moveCmdBlockToLines();
     m_cmdline_widget->show();
 }
 
@@ -1457,16 +1458,20 @@ void Shell::handleCmdlineBlockShow(QVariantList lines) {
                 qDebug() << line.toList() << "\n";
                 m_cmdline_block->append_block(line.toList());
         }
+        moveCmdBlockToLines();
+        m_cmdline_block->show();
+}
+
+void Shell::moveCmdBlockToLines() {
         auto anchor_x = m_cmdline_widget->frameGeometry().left();
         auto anchor_y = m_cmdline_widget->frameGeometry().bottom();
         auto width = m_cmdline_widget->geometry().width();
         auto max_height = (rows() - m_cmdline_widget->lines()) * cellSize().height();
-        qDebug() << "New CmdBlock max height : " << max_height;
+
         m_cmdline_block->move(anchor_x, anchor_y);
         m_cmdline_block->setMinimumWidth(width);
         m_cmdline_block->setMaximumHeight(max_height);
-        m_cmdline_block->show();
-        update();
+        qDebug() << "New CmdBlock max height : " << max_height;
 }
 
 void Shell::handleCmdlineSpecialChar(QString c, bool shift, int64_t level) {
