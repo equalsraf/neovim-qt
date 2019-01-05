@@ -6,12 +6,18 @@ CmdBlock::CmdBlock(ShellWidget *parent) : QTextEdit(parent) {
 	hide();
 	setReadOnly(true);
 	document()->setDefaultFont(parent->font());
+        setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
 	setTextBackgroundColor(parent->background());
 	setTextColor(parent->foreground());
+        setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+        setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
 	connect(parent, &ShellWidget::shellFontChanged,
 		    this, &CmdBlock::setDefaultFont);
+        connect(this, &QTextEdit::textChanged,
+                this, &CmdBlock::fitSizeToDocument);
 }
 
 void CmdBlock::setDefaultFont() {
@@ -34,6 +40,7 @@ void CmdBlock::append_block(const QVariantList &content) {
 	}
 	textCursor().insertText("\n");
 	line_count++;
+        adjustSize();
 }
 
 QColor CmdBlock::color(qint64 color, const QColor& fallback) const
@@ -102,6 +109,24 @@ void CmdBlock::style_cursor_CharFormat(const QVariantMap& attrs) {
 void CmdBlock::keyPressEvent(QKeyEvent *ev)
 {
 	QWidget::keyPressEvent(ev);
+}
+
+QSize CmdBlock::sizeHint() const {
+        QSize sizehint = QTextEdit::sizeHint();
+        sizehint.setHeight(fitted_height);
+        qDebug() << "Current CmdBlock size hint : " << sizehint;
+        return sizehint;
+}
+
+QSize CmdBlock::minimumSizeHint() const {
+        return sizeHint();
+}
+
+void CmdBlock::fitSizeToDocument() {
+        document()->setTextWidth(viewport()->width());
+        QSize document_size(document()->size().toSize());
+        fitted_height = document_size.height();
+        updateGeometry();
 }
 
 }  // namespace NeovimQt
