@@ -5,7 +5,6 @@ namespace NeovimQt {
 
 CmdWidget::CmdWidget(ShellWidget *parent) : QFrame(parent) {
 	shell_parent = parent;
-	hide();
 	cmd_lines.reserve(5);
 	setFrameShape(QFrame::Panel);
 	setFrameShadow(QFrame::Raised);

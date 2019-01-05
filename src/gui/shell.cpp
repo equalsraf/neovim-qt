@@ -51,7 +51,9 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 
 	// Command line (instantiate the first one)
 	m_cmdline_widget = new CmdWidget(this);
+        m_cmdline_widget->hide();
 	m_cmdline_block = new CmdBlock(this);
+        m_cmdline_block->hide();
 
 	if (m_nvim == NULL) {
 		qWarning() << "Received NULL as Neovim Connector";

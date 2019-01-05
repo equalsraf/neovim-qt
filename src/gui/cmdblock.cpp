@@ -3,7 +3,6 @@
 namespace NeovimQt {
 
 CmdBlock::CmdBlock(ShellWidget *parent) : QTextEdit(parent) {
-	hide();
 	setReadOnly(true);
 	document()->setDefaultFont(parent->font());
         setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
