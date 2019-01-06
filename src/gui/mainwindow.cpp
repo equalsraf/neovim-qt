@@ -7,14 +7,14 @@
 namespace NeovimQt {
 
 MainWindow::MainWindow(NeovimConnector *c, ShellOptions opts, QWidget *parent)
-: QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
-  m_delayedShow(DelayedShow::Disabled), m_tabline(0), m_tabline_bar(0),
-  m_shell_options(opts), m_neovim_requested_close(false)
+:QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
+	m_delayedShow(DelayedShow::Disabled), m_tabline(0), m_tabline_bar(0),
+	m_shell_options(opts), m_neovim_requested_close(false)
 {
-	m_errorWidget= new ErrorWidget();
+	m_errorWidget = new ErrorWidget();
 	m_stack.addWidget(m_errorWidget);
 	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
-	        this, &MainWindow::reconnectNeovim);
+			this, &MainWindow::reconnectNeovim);
 	setCentralWidget(&m_stack);
 
 	init(c);
@@ -30,7 +30,7 @@ void MainWindow::init(NeovimConnector *c)
 		m_nvim->deleteLater();
 	}
 
-	m_tabline_bar= addToolBar("tabline");
+	m_tabline_bar = addToolBar("tabline");
 	m_tabline_bar->setObjectName("tabline");
 	m_tabline_bar->setAllowedAreas(Qt::TopToolBarArea);
 	m_tabline_bar->setMovable(false);
@@ -38,47 +38,56 @@ void MainWindow::init(NeovimConnector *c)
 	// Avoid margins around the tabbar
 	m_tabline_bar->layout()->setContentsMargins(0, 0, 0, 0);
 
-	m_tabline= new QTabBar(m_tabline_bar);
+	m_tabline = new QTabBar(m_tabline_bar);
 	m_tabline->setDrawBase(false);
 	m_tabline->setExpanding(false);
 	m_tabline->setDocumentMode(true);
 	m_tabline->setFocusPolicy(Qt::NoFocus);
 	connect(m_tabline, &QTabBar::currentChanged,
-	        this, &MainWindow::changeTab);
+			this, &MainWindow::changeTab);
 
 	m_tabline_bar->addWidget(m_tabline);
 	m_tabline_bar->setVisible(m_shell_options.enable_ext_tabline);
 
-	m_nvim= c;
-	m_shell= new Shell(c, m_shell_options);
-	m_stack.insertWidget(1, m_shell);
+	m_nvim = c;
+
+	m_tree = new TreeView(c);
+	m_shell = new Shell(c, m_shell_options);
+
+	m_window = new QSplitter();
+	m_window->addWidget(m_tree);
+	m_tree->hide();
+	m_window->addWidget(m_shell);
+
+	m_stack.insertWidget(1, m_window);
 	m_stack.setCurrentIndex(1);
+
 	connect(m_shell, SIGNAL(neovimAttached(bool)),
-	        this, SLOT(neovimAttachmentChanged(bool)));
+			this, SLOT(neovimAttachmentChanged(bool)));
 	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)),
-	        this, SLOT(neovimSetTitle(const QString &)));
+			this, SLOT(neovimSetTitle(const QString &)));
 	connect(m_shell, &Shell::neovimResized,
-	        this, &MainWindow::neovimWidgetResized);
+			this, &MainWindow::neovimWidgetResized);
 	connect(m_shell, &Shell::neovimMaximized,
-	        this, &MainWindow::neovimMaximized);
+			this, &MainWindow::neovimMaximized);
 	connect(m_shell, &Shell::neovimSuspend,
-	        this, &MainWindow::neovimSuspend);
+			this, &MainWindow::neovimSuspend);
 	connect(m_shell, &Shell::neovimFullScreen,
-	        this, &MainWindow::neovimFullScreen);
+			this, &MainWindow::neovimFullScreen);
 	connect(m_shell, &Shell::neovimGuiCloseRequest,
-	        this, &MainWindow::neovimGuiCloseRequest);
+			this, &MainWindow::neovimGuiCloseRequest);
 	connect(m_nvim, &NeovimConnector::processExited,
-	        this, &MainWindow::neovimExited);
+			this, &MainWindow::neovimExited);
 	connect(m_nvim, &NeovimConnector::error,
-	        this, &MainWindow::neovimError);
+			this, &MainWindow::neovimError);
 	connect(m_shell, &Shell::neovimIsUnsupported,
-	        this, &MainWindow::neovimIsUnsupported);
+			this, &MainWindow::neovimIsUnsupported);
 	connect(m_shell, &Shell::neovimExtTablineSet,
-	        this, &MainWindow::extTablineSet);
+			this, &MainWindow::extTablineSet);
 	connect(m_shell, &Shell::neovimTablineUpdate,
-	        this, &MainWindow::neovimTablineUpdate);
+			this, &MainWindow::neovimTablineUpdate);
 	connect(m_shell, &Shell::neovimShowtablineSet,
-	        this, &MainWindow::neovimShowtablineSet);
+			this, &MainWindow::neovimShowtablineSet);
 	m_shell->setFocus(Qt::OtherFocusReason);
 
 	if (m_nvim->errorCause()) {
@@ -112,7 +121,7 @@ void MainWindow::neovimError(NeovimConnector::NeovimError err)
 {
 	showIfDelayed();
 
-	switch (err) {
+	switch(err) {
 	case NeovimConnector::FailedToStart:
 		m_errorWidget->setText("Unable to start nvim: " + m_nvim->errorString());
 		break;
@@ -126,8 +135,8 @@ void MainWindow::neovimIsUnsupported()
 {
 	showIfDelayed();
 	m_errorWidget->setText(QString("Cannot connect to this Neovim, required API version 1, found [%1-%2]")
-	                           .arg(m_nvim->apiCompatibility())
-	                           .arg(m_nvim->apiLevel()));
+			.arg(m_nvim->apiCompatibility())
+			.arg(m_nvim->apiLevel()));
 	m_errorWidget->showReconnect(m_nvim->canReconnect());
 	m_stack.setCurrentIndex(0);
 }
@@ -143,7 +152,16 @@ void MainWindow::neovimWidgetResized()
 	// widget size - this avoids situations when neovim wants a size that
 	// exceeds the available widget size i.e. the GUI tells neovim its
 	// size, not the other way around.
-	m_shell->resizeNeovim(m_shell->size());
+	if (isMaximized() || isFullScreen()) {
+		QSize size = geometry().size();
+		if (m_tree->isVisible()) {
+			size.scale(size.width() - m_tree->geometry().size().width(),
+				size.height(), Qt::IgnoreAspectRatio);
+		}
+		m_shell->resizeNeovim(size);
+	} else {
+		m_shell->resizeNeovim(m_shell->size());
+	}
 }
 
 void MainWindow::neovimMaximized(bool set)
@@ -172,9 +190,9 @@ void MainWindow::neovimFullScreen(bool set)
 
 void MainWindow::neovimGuiCloseRequest()
 {
-	m_neovim_requested_close= true;
+	m_neovim_requested_close = true;
 	QMainWindow::close();
-	m_neovim_requested_close= false;
+	m_neovim_requested_close = false;
 }
 
 void MainWindow::reconnectNeovim()
@@ -197,7 +215,7 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 		ev->ignore();
 	}
 }
-void MainWindow::changeEvent(QEvent *ev)
+void MainWindow::changeEvent( QEvent *ev)
 {
 	if (ev->type() == QEvent::WindowStateChange && isWindow()) {
 		m_shell->updateGuiWindowState(windowState());
@@ -209,14 +227,14 @@ void MainWindow::changeEvent(QEvent *ev)
 /// is complete, whichever comes first
 void MainWindow::delayedShow(DelayedShow type)
 {
-	m_delayedShow= type;
+	m_delayedShow = type;
 	if (m_nvim->errorCause() != NeovimConnector::NoError) {
 		showIfDelayed();
 		return;
 	}
 
 	if (type != DelayedShow::Disabled) {
-		QTimer *t= new QTimer(this);
+		QTimer *t = new QTimer(this);
 		t->setSingleShot(true);
 		t->setInterval(1000);
 		connect(m_shell, &Shell::neovimResized, this, &MainWindow::showIfDelayed);
@@ -236,7 +254,7 @@ void MainWindow::showIfDelayed()
 			showFullScreen();
 		}
 	}
-	m_delayedShow= DelayedShow::Disabled;
+	m_delayedShow = DelayedShow::Disabled;
 }
 
 void MainWindow::neovimAttachmentChanged(bool attached)
@@ -247,15 +265,15 @@ void MainWindow::neovimAttachmentChanged(bool attached)
 	}
 }
 
-Shell *MainWindow::shell()
+Shell* MainWindow::shell()
 {
 	return m_shell;
 }
 
 void MainWindow::extTablineSet(bool val)
 {
-	bool old= m_shell_options.enable_ext_tabline;
-	m_shell_options.enable_ext_tabline= val;
+	bool old = m_shell_options.enable_ext_tabline;
+	m_shell_options.enable_ext_tabline = val;
 	// redraw if state changed
 	if (old != m_shell_options.enable_ext_tabline) {
 		if (!val) m_tabline_bar->setVisible(false);
@@ -265,7 +283,7 @@ void MainWindow::extTablineSet(bool val)
 
 void MainWindow::neovimShowtablineSet(int val)
 {
-	m_shell_options.nvim_show_tabline= val;
+	m_shell_options.nvim_show_tabline = val;
 }
 
 void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
@@ -275,15 +293,15 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 	}
 
 	// remove extra tabs
-	for (int index= tabs.size(); index < m_tabline->count(); index++) {
+	for (int index=tabs.size(); index<m_tabline->count(); index++) {
 		m_tabline->removeTab(index);
 	}
 
 
-	for (int index= 0; index < tabs.size(); index++) {
+	for (int index=0; index<tabs.size(); index++) {
 		// Escape & in tab name otherwise it will be interpreted as
 		// a keyboard shortcut (#357) - escaping is done using &&
-		QString text= tabs[index].name;
+		QString text = tabs[index].name;
 		text.replace("&", "&&");
 
 		if (m_tabline->count() <= index) {
@@ -300,9 +318,9 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 	}
 
 	// hide/show the tabline toolbar
-	if (m_shell_options.nvim_show_tabline == 0) {
+	if (m_shell_options.nvim_show_tabline==0) {
 		m_tabline_bar->setVisible(false);
-	} else if (m_shell_options.nvim_show_tabline == 2) {
+	} else if (m_shell_options.nvim_show_tabline==2) {
 		m_tabline_bar->setVisible(true);
 	} else {
 		m_tabline_bar->setVisible(tabs.size() > 1);
@@ -321,7 +339,7 @@ void MainWindow::changeTab(int index)
 		return;
 	}
 
-	int64_t tab= m_tabline->tabData(index).toInt();
+	int64_t tab = m_tabline->tabData(index).toInt();
 	m_nvim->api2()->nvim_set_current_tabpage(tab);
 }
-} // Namespace
+}  // namespace NeovimQt

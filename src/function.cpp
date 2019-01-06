@@ -4,7 +4,7 @@
 
 namespace NeovimQt {
 
-typedef QPair<QString, QString> StringPair;
+typedef QPair<QString,QString> StringPair;
 
 /**
  * \class NeovimQt::Function
@@ -16,34 +16,34 @@ typedef QPair<QString, QString> StringPair;
  * Construct invalid function
  */
 Function::Function()
-: can_fail(false), m_valid(false)
+:can_fail(false), m_valid(false)
 {
 }
 
 /**
  * Construct new function with the given return type, name, parameters and error
  */
-Function::Function(const QString& ret, const QString& name, QList<QPair<QString, QString>> params, bool can_fail)
-: m_valid(true)
+Function::Function(const QString& ret, const QString& name, QList<QPair<QString,QString> > params, bool can_fail)
+:m_valid(true)
 {
-	this->return_type= ret;
-	this->name= name;
-	this->parameters= params;
-	this->can_fail= can_fail;
+	this->return_type = ret;
+	this->name = name;
+	this->parameters = params;
+	this->can_fail = can_fail;
 }
 
 /**
  * Construct new function with the given return type, name, parameters and error
  */
 Function::Function(const QString& ret, const QString& name, QList<QString> paramTypes, bool can_fail)
-: m_valid(true)
+:m_valid(true)
 {
-	this->return_type= ret;
-	this->name= name;
+	this->return_type = ret;
+	this->name = name;
 	foreach (QString type, paramTypes) {
-		this->parameters.append(QPair<QString, QString>(type, ""));
+		this->parameters .append(QPair<QString,QString>(type, ""));
 	}
-	this->can_fail= can_fail;
+	this->can_fail = can_fail;
 }
 
 /**
@@ -60,18 +60,18 @@ bool Function::isValid() const
  */
 bool Function::operator==(const Function& other)
 {
-	if (this->name != other.name) {
+	if ( this->name != other.name ) {
 		return false;
 	}
 
-	if (this->return_type != other.return_type) {
+	if ( this->return_type != other.return_type ) {
 		return false;
 	}
 	if (this->parameters.size() != other.parameters.size()) {
 		return false;
 	}
-	for (int i= 0; i < this->parameters.size(); i++) {
-		if (this->parameters.at(i).first != other.parameters.at(i).first) {
+	for (int i=0; i<this->parameters.size(); i++) {
+		if ( this->parameters.at(i).first != other.parameters.at(i).first ) {
 			return false;
 		}
 	}
@@ -86,55 +86,55 @@ Function Function::fromVariant(const QVariant& fun)
 		return f;
 	}
 
-	const QVariantMap& m= fun.toMap();
-	QMapIterator<QString, QVariant> it(m);
-	while (it.hasNext()) {
+	const QVariantMap& m = fun.toMap();
+	QMapIterator<QString,QVariant> it(m);
+	while(it.hasNext()) {
 		it.next();
 
-		if (it.key() == "return_type") {
+		if ( it.key() == "return_type" ) {
 			if (!it.value().canConvert<QByteArray>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.return_type= QString::fromUtf8(it.value().toByteArray());
-		} else if (it.key() == "name") {
+			f.return_type = QString::fromUtf8(it.value().toByteArray());
+		} else if ( it.key() == "name" ) {
 			if (!it.value().canConvert<QByteArray>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.name= QString::fromUtf8(it.value().toByteArray());
-		} else if (it.key() == "can_fail") {
+			f.name = QString::fromUtf8(it.value().toByteArray());
+		} else if ( it.key() == "can_fail" ) {
 			if (!it.value().canConvert<bool>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.can_fail= it.value().toBool();
-		} else if (it.key() == "parameters") {
+			f.can_fail = it.value().toBool();
+		} else if ( it.key() == "parameters" ) {
 			if (!it.value().canConvert<QVariantList>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.parameters= parseParameters(it.value().toList());
-		} else if (it.key() == "id") {
+			f.parameters = parseParameters(it.value().toList());
+		} else if ( it.key() == "id" ) {
 			// Deprecated
-		} else if (it.key() == "receives_channel_id") {
+		} else if ( it.key() == "receives_channel_id" ) {
 			// Internal
-		} else if (it.key() == "impl_name") {
+		} else if ( it.key() == "impl_name" ) {
 			// Internal
-		} else if (it.key() == "method") {
+		} else if ( it.key() == "method" ) {
 			// Internal
-		} else if (it.key() == "noeval") {
+		} else if ( it.key() == "noeval" ) {
 			// API only function
-		} else if (it.key() == "deferred" || it.key() == "async") {
+		} else if ( it.key() == "deferred" || it.key() == "async" ) {
 			// Internal, "deferred" renamed "async" in neovim/ccdeb91
-		} else if (it.key() == "deprecated_since" || it.key() == "since") {
+		} else if ( it.key() == "deprecated_since" || it.key() == "since" ) {
 			// Creation/Deprecation
 		} else {
-			qDebug() << "Unsupported function attribute" << it.key() << it.value();
+			qDebug() << "Unsupported function attribute"<< it.key() << it.value();
 		}
 	}
 
-	f.m_valid= true;
+	f.m_valid = true;
 	return f;
 }
 
@@ -144,26 +144,26 @@ Function Function::fromVariant(const QVariant& fun)
  * i.e. [Type0 name0 Type1 name1 ... ] -> [Type0 Type1 ...]
  *
  */
-QList<QPair<QString, QString>> Function::parseParameters(const QVariantList& obj)
+QList<QPair<QString,QString> > Function::parseParameters(const QVariantList& obj)
 {
-	QList<QPair<QString, QString>> fail;
-	QList<QPair<QString, QString>> res;
-	foreach (const QVariant& val, obj) {
+	QList<QPair<QString,QString> > fail;
+	QList<QPair<QString,QString> > res;
+	foreach(const QVariant& val, obj) {
 
-		const QVariantList& params= val.toList();
-		if (params.size() % 2 != 0) {
+		const QVariantList& params = val.toList();
+		if ( params.size() % 2 != 0 ) {
 			return fail;
 		}
 
-		for (int j= 0; j < params.size(); j+= 2) {
+		for (int j=0; j<params.size(); j+=2) {
 			QByteArray type, name;
-			if (!params.at(j).canConvert<QByteArray>() ||
-			    !params.at(j + 1).canConvert<QByteArray>()) {
+			if (!params.at(j).canConvert<QByteArray>() || 
+					!params.at(j+1).canConvert<QByteArray>()) {
 				return fail;
 			}
-			QPair<QString, QString> arg(
-			    QString::fromUtf8(params.at(j).toByteArray()),
-			    QString::fromUtf8(params.at(j + 1).toByteArray()));
+			QPair<QString,QString> arg(
+					QString::fromUtf8(params.at(j).toByteArray()),
+					QString::fromUtf8(params.at(j+1).toByteArray()));
 			res.append(arg);
 		}
 	}
@@ -173,15 +173,16 @@ QList<QPair<QString, QString>> Function::parseParameters(const QVariantList& obj
 QString Function::signature() const
 {
 	QStringList sigparams;
-	foreach (const StringPair p, parameters) {
+	foreach(const StringPair p, parameters) {
 		sigparams.append(QString("%1 %2").arg(p.first).arg(p.second));
 	}
 
 	QString notes;
 	if (can_fail) {
-		notes+= " !fail";
+		notes += " !fail";
 	}
-	return QString("%1 %2(%3)%4").arg(return_type).arg(name).arg(sigparams.join(", ")).arg(notes);
+	return  QString("%1 %2(%3)%4").arg(return_type).arg(name).arg(sigparams.join(", ")).arg(notes);
 }
 
 } // Namespace
+

@@ -5,7 +5,8 @@
 
 #include "shellcontents.h"
 
-class ShellWidget: public QWidget {
+class ShellWidget: public QWidget
+{
 	Q_OBJECT
 	Q_PROPERTY(QColor background READ background WRITE setBackground)
 	Q_PROPERTY(QColor foreground READ foreground WRITE setForeground)
@@ -15,8 +16,8 @@ class ShellWidget: public QWidget {
 	Q_PROPERTY(int columns READ columns)
 	Q_PROPERTY(QSize cellSize READ cellSize)
 public:
-	ShellWidget(QWidget* parent= 0);
-	bool setShellFont(const QString& family, int ptSize, int weight= -1, bool italic= false, bool force= false);
+	ShellWidget(QWidget *parent=0);
+	bool setShellFont(const QString& family, int ptSize, int weight = -1, bool italic = false, bool force = false);
 
 	QColor background() const;
 	QColor foreground() const;
@@ -40,20 +41,19 @@ public slots:
 	void setForeground(const QColor& color);
 	void setDefaultFont();
 	int put(const QString&, int row, int column,
-	        QColor fg= QColor(), QColor bg= QColor(), QColor sp= QColor(),
-	        bool bold= false, bool italic= false,
-	        bool underline= false, bool undercurl= false);
+			QColor fg=QColor(), QColor bg=QColor(), QColor sp=QColor(),
+			bool bold=false, bool italic=false,
+			bool underline=false, bool undercurl=false);
 	void clearRow(int row);
 	void clearShell(QColor bg);
 	void clearRegion(int row0, int col0, int row1, int col1);
 	void scrollShell(int rows);
 	void scrollShellRegion(int row0, int row1, int col0,
-	                       int col1, int rows);
+			int col1, int rows);
 	void setLineSpace(int height);
-
 protected:
-	virtual void paintEvent(QPaintEvent* ev) Q_DECL_OVERRIDE;
-	virtual void resizeEvent(QResizeEvent* ev) Q_DECL_OVERRIDE;
+	virtual void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
+	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
 
 	void setCellSize();
 	QRect absoluteShellRect(int row0, int col0, int rowcount, int colcount);

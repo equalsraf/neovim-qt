@@ -4,10 +4,10 @@
 
 // read/write
 #ifdef _WIN32
-#	include <io.h>
-#	include "stdinreader.h"
+# include <io.h>
+# include "stdinreader.h"
 #else
-#	include <unistd.h>
+# include <unistd.h>
 #endif
 
 #include "msgpackiodevice.h"
@@ -27,25 +27,25 @@ namespace NeovimQt {
  * Build a MsgpackIODevice that reads from stdin and writes to
  * stdout
  */
-MsgpackIODevice* MsgpackIODevice::fromStdinOut(QObject* parent)
+MsgpackIODevice* MsgpackIODevice::fromStdinOut(QObject *parent)
 {
-	MsgpackIODevice* rpc= new MsgpackIODevice(NULL, parent);
+	MsgpackIODevice *rpc = new MsgpackIODevice(NULL, parent);
 	msgpack_packer_init(&rpc->m_pk, rpc, (msgpack_packer_write)MsgpackIODevice::msgpack_write_to_stdout);
 #ifdef _WIN32
-	StdinReader* rsn= new StdinReader(msgpack_unpacker_buffer_capacity(&rpc->m_uk), rpc);
+	StdinReader *rsn = new StdinReader(msgpack_unpacker_buffer_capacity(&rpc->m_uk), rpc);
 	connect(rsn, &StdinReader::dataAvailable,
-	        rpc, &MsgpackIODevice::dataAvailableStdin);
+			rpc, &MsgpackIODevice::dataAvailableStdin);
 	rsn->start();
 #else
-	QSocketNotifier* rsn= new QSocketNotifier(0, QSocketNotifier::Read, rpc);
+	QSocketNotifier *rsn = new QSocketNotifier(0, QSocketNotifier::Read, rpc);
 	connect(rsn, &QSocketNotifier::activated,
-	        rpc, &MsgpackIODevice::dataAvailableFd);
+			rpc, &MsgpackIODevice::dataAvailableFd);
 #endif
 	return rpc;
 }
 
-MsgpackIODevice::MsgpackIODevice(QIODevice* dev, QObject* parent)
-: QObject(parent), m_reqid(0), m_dev(dev), m_encoding(0), m_reqHandler(0), m_error(NoError)
+MsgpackIODevice::MsgpackIODevice(QIODevice *dev, QObject *parent)
+:QObject(parent), m_reqid(0), m_dev(dev), m_encoding(0), m_reqHandler(0), m_error(NoError)
 {
 	qRegisterMetaType<MsgpackError>("MsgpackError");
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
@@ -56,9 +56,9 @@ MsgpackIODevice::MsgpackIODevice(QIODevice* dev, QObject* parent)
 
 		m_dev->setParent(this);
 		connect(m_dev, &QAbstractSocket::readyRead,
-		        this, &MsgpackIODevice::dataAvailable);
+				this, &MsgpackIODevice::dataAvailable);
 
-		if (!m_dev->isSequential()) {
+		if ( !m_dev->isSequential() ) {
 			setError(InvalidDevice, tr("IO device needs to be sequential"));
 			return;
 		}
@@ -99,7 +99,7 @@ QByteArray MsgpackIODevice::encoding() const
  */
 bool MsgpackIODevice::setEncoding(const QByteArray& name)
 {
-	m_encoding= QTextCodec::codecForName(name);
+	m_encoding = QTextCodec::codecForName(name);
 	if (!m_encoding) {
 		setError(UnsupportedEncoding, QString("Unsupported encoding (%1)").arg(QString::fromLatin1(name)));
 		return false;
@@ -109,8 +109,8 @@ bool MsgpackIODevice::setEncoding(const QByteArray& name)
 
 int MsgpackIODevice::msgpack_write_to_stdout(void* data, const char* buf, unsigned long int len)
 {
-	MsgpackIODevice* c= static_cast<MsgpackIODevice*>(data);
-	qint64 bytes= write(1, buf, len);
+	MsgpackIODevice *c = static_cast<MsgpackIODevice*>(data);
+	qint64 bytes = write(1, buf, len);
 	if (bytes == -1) {
 		c->setError(InvalidDevice, tr("Error writing to device"));
 	}
@@ -119,8 +119,8 @@ int MsgpackIODevice::msgpack_write_to_stdout(void* data, const char* buf, unsign
 
 int MsgpackIODevice::msgpack_write_to_dev(void* data, const char* buf, unsigned long int len)
 {
-	MsgpackIODevice* c= static_cast<MsgpackIODevice*>(data);
-	qint64 bytes= c->m_dev->write(buf, len);
+	MsgpackIODevice *c = static_cast<MsgpackIODevice*>(data);
+	qint64 bytes = c->m_dev->write(buf, len);
 	if (bytes == -1) {
 		c->setError(InvalidDevice, tr("Error writing to device"));
 	}
@@ -134,15 +134,15 @@ int MsgpackIODevice::msgpack_write_to_dev(void* data, const char* buf, unsigned 
  */
 void MsgpackIODevice::dataAvailableStdin(const QByteArray& data)
 {
-	if ((quint64)data.length() > msgpack_unpacker_buffer_capacity(&m_uk)) {
+	if ( (quint64)data.length() > msgpack_unpacker_buffer_capacity(&m_uk)) {
 		setError(InvalidDevice, tr("Error when reading from stdin, BUG(buffered data exceeds capaciy)"));
 		return;
-	} else if (data.length() > 0) {
+	} else if ( data.length() > 0 ) {
 		memcpy(msgpack_unpacker_buffer(&m_uk), data.constData(), data.length());
 		msgpack_unpacker_buffer_consumed(&m_uk, data.length());
 		msgpack_unpacked result;
 		msgpack_unpacked_init(&result);
-		while (msgpack_unpacker_next(&m_uk, &result)) {
+		while(msgpack_unpacker_next(&m_uk, &result)) {
 			dispatch(result.data);
 		}
 	}
@@ -155,20 +155,20 @@ void MsgpackIODevice::dataAvailableStdin(const QByteArray& data)
  */
 void MsgpackIODevice::dataAvailableFd(int fd)
 {
-	if (msgpack_unpacker_buffer_capacity(&m_uk) == 0) {
-		if (!msgpack_unpacker_reserve_buffer(&m_uk, 8192)) {
+	if ( msgpack_unpacker_buffer_capacity(&m_uk) == 0 ) {
+		if ( !msgpack_unpacker_reserve_buffer(&m_uk, 8192 ) ) {
 			qFatal("Could not allocate memory in unpack buffer");
 			return;
 		}
 	}
 
-	qint64 bytes= read(fd, msgpack_unpacker_buffer(&m_uk),
-	                   msgpack_unpacker_buffer_capacity(&m_uk));
+	qint64 bytes = read(fd, msgpack_unpacker_buffer(&m_uk),
+			msgpack_unpacker_buffer_capacity(&m_uk));
 	if (bytes > 0) {
 		msgpack_unpacker_buffer_consumed(&m_uk, bytes);
 		msgpack_unpacked result;
 		msgpack_unpacked_init(&result);
-		while (msgpack_unpacker_next(&m_uk, &result)) {
+		while(msgpack_unpacker_next(&m_uk, &result)) {
 			dispatch(result.data);
 		}
 	} else if (bytes == -1) {
@@ -183,21 +183,21 @@ void MsgpackIODevice::dataAvailableFd(int fd)
  */
 void MsgpackIODevice::dataAvailable()
 {
-	qint64 read= 1;
+	qint64 read = 1;
 	while (read > 0) {
-		if (msgpack_unpacker_buffer_capacity(&m_uk) == 0) {
-			if (!msgpack_unpacker_reserve_buffer(&m_uk, 8192)) {
+		if ( msgpack_unpacker_buffer_capacity(&m_uk) == 0 ) {
+			if ( !msgpack_unpacker_reserve_buffer(&m_uk, 8192 ) ) {
 				qFatal("Could not allocate memory in unpack buffer");
 				return;
 			}
 		}
 
-		read= m_dev->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
-		if (read > 0) {
+		read = m_dev->read(msgpack_unpacker_buffer(&m_uk), msgpack_unpacker_buffer_capacity(&m_uk));
+		if ( read > 0 ) {
 			msgpack_unpacker_buffer_consumed(&m_uk, read);
 			msgpack_unpacked result;
 			msgpack_unpacked_init(&result);
-			while (msgpack_unpacker_next(&m_uk, &result)) {
+			while(msgpack_unpacker_next(&m_uk, &result)) {
 				dispatch(result.data);
 			}
 		}
@@ -209,7 +209,7 @@ void MsgpackIODevice::dataAvailable()
  */
 void MsgpackIODevice::sendError(const msgpack_object& req, const QString& msg)
 {
-	if (req.via.array.ptr[0].via.u64 != 0) {
+	if ( req.via.array.ptr[0].via.u64 != 0 ) {
 		qFatal("Errors can only be send as replies to Requests(type=0)");
 	}
 	sendError(req.via.array.ptr[1].via.u64, msg);
@@ -221,7 +221,7 @@ void MsgpackIODevice::sendError(uint64_t msgid, const QString& msg)
 	msgpack_pack_array(&m_pk, 4);
 	msgpack_pack_int(&m_pk, 1); // 1 = Response
 	msgpack_pack_int(&m_pk, msgid);
-	QByteArray utf8= msg.toUtf8();
+	QByteArray utf8 = msg.toUtf8();
 	msgpack_pack_bin(&m_pk, utf8.size());
 	msgpack_pack_bin_body(&m_pk, utf8.constData(), utf8.size());
 	msgpack_pack_nil(&m_pk);
@@ -251,9 +251,9 @@ void MsgpackIODevice::dispatch(msgpack_object& req)
 		qDebug() << "Received Invalid msgpack: msg type MUST be an integer";
 		return;
 	}
-	uint64_t type= req.via.array.ptr[0].via.u64;
+	uint64_t type = req.via.array.ptr[0].via.u64;
 
-	switch (type) {
+	switch(type) {
 	case 0:
 		if (req.via.array.ptr[1].type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
 			qDebug() << "Received Invalid request: msg id MUST be a positive integer";
@@ -261,7 +261,7 @@ void MsgpackIODevice::dispatch(msgpack_object& req)
 			return;
 		}
 		if (req.via.array.ptr[2].type != MSGPACK_OBJECT_BIN &&
-		    req.via.array.ptr[2].type != MSGPACK_OBJECT_STR) {
+				req.via.array.ptr[2].type != MSGPACK_OBJECT_STR) {
 			qDebug() << "Received Invalid request: method MUST be a String" << req.via.array.ptr[2];
 			sendError(req, tr("Method id must be a positive integer"));
 			return;
@@ -295,7 +295,7 @@ void MsgpackIODevice::dispatch(msgpack_object& req)
  */
 void MsgpackIODevice::dispatchRequest(msgpack_object& req)
 {
-	uint64_t msgid= req.via.array.ptr[1].via.u64;
+	uint64_t msgid = req.via.array.ptr[1].via.u64;
 	QByteArray errmsg("Unknown method");
 	QVariant params;
 	QByteArray method;
@@ -326,9 +326,9 @@ err:
 }
 
 /** Assign a handler for Msgpack-RPC requests */
-void MsgpackIODevice::setRequestHandler(MsgpackRequestHandler* h)
+void MsgpackIODevice::setRequestHandler(MsgpackRequestHandler *h)
 {
-	m_reqHandler= h;
+	m_reqHandler = h;
 }
 
 /**
@@ -375,15 +375,15 @@ bool MsgpackIODevice::sendNotification(const QByteArray& method, const QVariantL
 void MsgpackIODevice::dispatchResponse(msgpack_object& resp)
 {
 	// [type(1), msgid, error, result]
-	uint64_t msgid= resp.via.array.ptr[1].via.u64;
+	uint64_t msgid = resp.via.array.ptr[1].via.u64;
 
-	if (!m_requests.contains(msgid)) {
+	if ( !m_requests.contains(msgid) ) {
 		qWarning() << "Received response for unknown message" << msgid;
 		return;
 	}
 
-	MsgpackRequest* req= m_requests.take(msgid);
-	if (resp.via.array.ptr[2].type != MSGPACK_OBJECT_NIL) {
+	MsgpackRequest *req = m_requests.take(msgid);
+	if ( resp.via.array.ptr[2].type != MSGPACK_OBJECT_NIL ) {
 		// Error response
 		QVariant val;
 		if (decodeMsgpack(resp.via.array.ptr[2], val)) {
@@ -421,9 +421,9 @@ void MsgpackIODevice::dispatchNotification(msgpack_object& nt)
 		return;
 	}
 
-	QVariant val;
+	QVariant val; 
 	if (decodeMsgpack(nt.via.array.ptr[2], val) ||
-	    (QMetaType::Type)val.type() != QMetaType::QVariantList) {
+			(QMetaType::Type)val.type() != QMetaType::QVariantList  ) {
 		qDebug() << "Unable to unpack notification parameters" << nt;
 		return;
 	}
@@ -435,8 +435,8 @@ void MsgpackIODevice::dispatchNotification(msgpack_object& nt)
  */
 void MsgpackIODevice::setError(MsgpackError err, const QString& msg)
 {
-	m_error= err;
-	m_errorString= msg;
+	m_error = err;
+	m_errorString = msg;
 	qWarning() << "MsgpackIO fatal error" << m_errorString;
 	emit error(m_error);
 }
@@ -463,19 +463,19 @@ QString MsgpackIODevice::errorString() const
  */
 MsgpackRequest* MsgpackIODevice::startRequestUnchecked(const QString& method, quint32 argcount)
 {
-	quint32 msgid= msgId();
+	quint32 msgid = msgId();
 	// [type(0), msgid, method, args]
 	msgpack_pack_array(&m_pk, 4);
 	msgpack_pack_int(&m_pk, 0);
 	msgpack_pack_int(&m_pk, msgid);
-	const QByteArray& utf8= method.toUtf8();
+	const QByteArray& utf8 = method.toUtf8();
 	msgpack_pack_bin(&m_pk, utf8.size());
 	msgpack_pack_bin_body(&m_pk, utf8.constData(), utf8.size());
 	msgpack_pack_array(&m_pk, argcount);
 
-	MsgpackRequest* r= new MsgpackRequest(msgid, this);
+	MsgpackRequest *r = new MsgpackRequest( msgid, this);
 	connect(r, &MsgpackRequest::timeout,
-	        this, &MsgpackIODevice::requestTimeout);
+			this, &MsgpackIODevice::requestTimeout);
 	m_requests.insert(msgid, r);
 	return r;
 }
@@ -486,9 +486,9 @@ MsgpackRequest* MsgpackIODevice::startRequestUnchecked(const QString& method, qu
 void MsgpackIODevice::requestTimeout(quint32 id)
 {
 	if (m_requests.contains(id)) {
-		MsgpackRequest* r= m_requests.take(id);
+		MsgpackRequest *r = m_requests.take(id);
 		r->deleteLater();
-		qWarning() << "Request" << id << "timed out:" << r->function();
+		qWarning() << "Request" << id << "timed out:"  << r->function();
 	}
 }
 
@@ -506,12 +506,12 @@ void MsgpackIODevice::send(int64_t i)
 }
 bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, int64_t& out)
 {
-	if (in.type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
+	if ( in.type != MSGPACK_OBJECT_POSITIVE_INTEGER) {
 		qWarning() << "Attempting to decode as int64_t when type is" << in.type << in;
-		out= -1;
+		out = -1;
 		return true;
 	}
-	out= in.via.i64;
+	out = in.via.i64;
 	return false;
 }
 
@@ -525,13 +525,13 @@ void MsgpackIODevice::send(const QByteArray& bin)
 }
 bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QByteArray& out)
 {
-	if (in.type == MSGPACK_OBJECT_BIN) {
-		out= QByteArray(in.via.bin.ptr, in.via.bin.size);
-	} else if (in.type == MSGPACK_OBJECT_STR) {
-		out= QByteArray(in.via.str.ptr, in.via.str.size);
+	if ( in.type == MSGPACK_OBJECT_BIN) {
+		out = QByteArray(in.via.bin.ptr, in.via.bin.size);
+	} else if ( in.type == MSGPACK_OBJECT_STR) {
+		out = QByteArray(in.via.str.ptr, in.via.str.size);
 	} else {
 		qWarning() << "Attempting to decode as QByteArray when type is" << in.type << in;
-		out= QByteArray();
+		out = QByteArray();
 		return true;
 	}
 	return false;
@@ -543,7 +543,7 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QByteArray& out)
  */
 void MsgpackIODevice::send(bool b)
 {
-	if (b) {
+	if ( b ) {
 		msgpack_pack_true(&m_pk);
 	} else {
 		msgpack_pack_false(&m_pk);
@@ -551,12 +551,12 @@ void MsgpackIODevice::send(bool b)
 }
 bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, bool& out)
 {
-	if (in.type != MSGPACK_OBJECT_BOOLEAN) {
+	if ( in.type != MSGPACK_OBJECT_BOOLEAN) {
 		qWarning() << "Attempting to decode as bool when type is" << in.type << in;
-		out= false;
+		out = false;
 		return true;
 	}
-	out= in.via.boolean;
+	out = in.via.boolean;
 	return false;
 }
 
@@ -564,19 +564,19 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, bool& out)
 void MsgpackIODevice::send(const QList<QByteArray>& list)
 {
 	msgpack_pack_array(&m_pk, list.size());
-	foreach (const QByteArray& elem, list) {
+	foreach(const QByteArray& elem, list) {
 		send(elem);
 	}
 }
 bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QList<QByteArray>& out)
 {
 	out.clear();
-	if (in.type != MSGPACK_OBJECT_ARRAY) {
+	if ( in.type != MSGPACK_OBJECT_ARRAY) {
 		qWarning() << "Attempting to decode as QList<QByteArray> when type is" << in.type << in;
 		return true;
 	}
 
-	for (uint64_t i= 0; i < in.via.array.size; i++) {
+	for (uint64_t i=0; i<in.via.array.size; i++) {
 		QByteArray val;
 		if (decodeMsgpack(in.via.array.ptr[i], val)) {
 			out.clear();
@@ -590,12 +590,12 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QList<QByteArray>&
 bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QList<int64_t>& out)
 {
 	out.clear();
-	if (in.type != MSGPACK_OBJECT_ARRAY) {
+	if ( in.type != MSGPACK_OBJECT_ARRAY) {
 		qWarning() << "Attempting to decode as QList<int64_t> when type is" << in.type << in;
 		return true;
 	}
 
-	for (uint64_t i= 0; i < in.via.array.size; i++) {
+	for (uint64_t i=0; i<in.via.array.size; i++) {
 		int64_t val;
 		if (decodeMsgpack(in.via.array.ptr[i], val)) {
 			out.clear();
@@ -614,80 +614,84 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QVariant& out)
 {
 	switch (in.type) {
 	case MSGPACK_OBJECT_NIL:
-		out= QVariant();
+		out = QVariant();
 		break;
 	case MSGPACK_OBJECT_BOOLEAN:
-		out= in.via.boolean;
+		out = in.via.boolean;
 		break;
 	case MSGPACK_OBJECT_NEGATIVE_INTEGER:
-		out= QVariant((qint64)in.via.i64);
+		out = QVariant((qint64)in.via.i64);
 		break;
 	case MSGPACK_OBJECT_POSITIVE_INTEGER:
-		out= QVariant((quint64)in.via.u64);
+		out = QVariant((quint64)in.via.u64);
 		break;
 	case MSGPACK_OBJECT_FLOAT:
-		out= in.via.f64;
+		out = in.via.f64;
 		break;
 	case MSGPACK_OBJECT_STR:
-	case MSGPACK_OBJECT_BIN: {
+	case MSGPACK_OBJECT_BIN:
+		{
 		QByteArray val;
 		if (decodeMsgpack(in, val)) {
 			qWarning() << "Error unpacking ByteArray as QVariant";
-			out= QVariant();
+			out = QVariant();
 			return true;
 		}
-		out= val;
-	} break;
+		out = val;
+		}
+		break;
 	case MSGPACK_OBJECT_ARRAY:
 		// Either a QVariantList or a QStringList
 		{
-			QVariantList ls;
-			for (uint64_t i= 0; i < in.via.array.size; i++) {
-				QVariant v;
-				bool failed= decodeMsgpack(in.via.array.ptr[i], v);
-				if (failed) {
-					qWarning() << "Error unpacking Map as QVariantList";
-					out= QVariant();
-					return true;
-				}
-				ls.append(v);
+		QVariantList ls;
+		for (uint64_t i=0; i<in.via.array.size; i++) {
+			QVariant v;
+			bool failed = decodeMsgpack(in.via.array.ptr[i], v);
+			if (failed) {
+				qWarning() << "Error unpacking Map as QVariantList";
+				out = QVariant();
+				return true;
 			}
-			out= ls;
+			ls.append(v);
+		}
+		out = ls;
 		}
 		break;
-	case MSGPACK_OBJECT_MAP: {
+	case MSGPACK_OBJECT_MAP:
+		{
 		QVariantMap m;
-		for (uint64_t i= 0; i < in.via.map.size; i++) {
+		for (uint64_t i=0; i<in.via.map.size; i++) {
 			QByteArray key;
 			if (decodeMsgpack(in.via.map.ptr[i].key, key)) {
 				qWarning() << "Error decoding Object(Map) key";
-				out= QVariant();
+				out = QVariant();
 				return true;
 			}
 			QVariant val;
 			if (decodeMsgpack(in.via.map.ptr[i].val, val)) {
 				qWarning() << "Error decoding Object(Map) value";
-				out= QVariant();
+				out = QVariant();
 				return true;
 			}
-			m.insert(key, val);
+			m.insert(key,val);
 		}
-		out= m;
-	} break;
+		out = m;
+		}
+		break;
 	case MSGPACK_OBJECT_EXT:
 		if (m_extTypes.contains(in.via.ext.type)) {
-			out= m_extTypes.value(in.via.ext.type)(this, in.via.ext.ptr, in.via.ext.size);
+			out = m_extTypes.value(in.via.ext.type)(this, in.via.ext.ptr, in.via.ext.size);
 			if (!out.isValid()) {
 				qWarning() << "EXT unpacking failed" << in.via.ext.type;
 				return true;
 			}
 		} else {
-			out= QVariant();
+			out = QVariant();
 			qWarning() << "Unsupported EXT type found in Object" << in.via.ext.type;
 		}
 		break;
 	default:
-		out= QVariant();
+		out = QVariant();
 		qWarning() << "Unsupported type found in Object" << in.type << in;
 		return true;
 	}
@@ -718,7 +722,7 @@ void MsgpackIODevice::send(const QVariant& var)
 		return;
 	}
 
-	switch ((QMetaType::Type)var.type()) {
+	switch((QMetaType::Type)var.type()) {
 	case QMetaType::Void:
 	case QMetaType::UnknownType:
 		msgpack_pack_nil(&m_pk);
@@ -755,26 +759,28 @@ void MsgpackIODevice::send(const QVariant& var)
 		break;
 	case QMetaType::QStringList:
 		msgpack_pack_array(&m_pk, var.toList().size());
-		foreach (const QVariant& elem, var.toList()) {
+		foreach(const QVariant& elem, var.toList()) {
 			send(elem);
 		}
 		break;
 	case QMetaType::QVariantList:
 		msgpack_pack_array(&m_pk, var.toList().size());
-		foreach (const QVariant& elem, var.toList()) {
+		foreach(const QVariant& elem, var.toList()) {
 			send(elem);
 		}
 		break;
-	case QMetaType::QVariantMap: {
-		const QVariantMap& m= var.toMap();
+	case QMetaType::QVariantMap:
+		{
+		const QVariantMap& m = var.toMap();
 		msgpack_pack_map(&m_pk, m.size());
-		QMapIterator<QString, QVariant> it(m);
-		while (it.hasNext()) {
+		QMapIterator<QString,QVariant> it(m);
+		while(it.hasNext()) {
 			it.next();
 			send(it.key());
 			send(it.value());
 		}
-	} break;
+		}
+		break;
 	case QMetaType::QPoint:
 		// As an array [row, col]
 		msgpack_pack_array(&m_pk, 2);
@@ -792,7 +798,7 @@ void MsgpackIODevice::send(const QVariant& var)
 
 bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QPoint& out)
 {
-	if (in.type != MSGPACK_OBJECT_ARRAY || in.via.array.size != 2) {
+	if ( in.type != MSGPACK_OBJECT_ARRAY || in.via.array.size != 2 ) {
 		goto fail;
 	}
 	int64_t col, row;
@@ -804,12 +810,12 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QPoint& out)
 	}
 
 	// QPoint is (x,y)  neovim Position is (row, col)
-	out= QPoint(col, row);
+	out = QPoint(col, row);
 	return false;
 
 fail:
 	qWarning() << "Attempting to decode as QPoint failed" << in.type << in;
-	out= QPoint();
+	out =  QPoint();
 	return true;
 }
 
@@ -851,7 +857,7 @@ QString MsgpackIODevice::decode(const QByteArray& data)
  */
 bool MsgpackIODevice::checkVariant(const QVariant& var)
 {
-	switch ((QMetaType::Type)var.type()) {
+	switch((QMetaType::Type)var.type()) {
 	case QMetaType::UnknownType:
 		break;
 	case QMetaType::Bool:
@@ -879,16 +885,17 @@ bool MsgpackIODevice::checkVariant(const QVariant& var)
 	case QMetaType::QStringList:
 		break;
 	case QMetaType::QVariantList:
-		foreach (const QVariant& elem, var.toList()) {
+		foreach(const QVariant& elem, var.toList()) {
 			if (!checkVariant(elem)) {
 				return false;
 			}
 		}
 		break;
-	case QMetaType::QVariantMap: {
-		const QVariantMap& m= var.toMap();
-		QMapIterator<QString, QVariant> it(m);
-		while (it.hasNext()) {
+	case QMetaType::QVariantMap:
+		{
+		const QVariantMap& m = var.toMap();
+		QMapIterator<QString,QVariant> it(m);
+		while(it.hasNext()) {
 			it.next();
 			if (!checkVariant(it.key())) {
 				return false;
@@ -897,7 +904,8 @@ bool MsgpackIODevice::checkVariant(const QVariant& var)
 				return false;
 			}
 		}
-	} break;
+		}
+		break;
 	case QMetaType::QPoint:
 		break;
 	default:

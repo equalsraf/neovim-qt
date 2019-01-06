@@ -4,13 +4,16 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QTabBar>
+#include <QSplitter>
+#include "treeview.h"
 #include "neovimconnector.h"
 #include "errorwidget.h"
 #include "shell.h"
 
 namespace NeovimQt {
 
-class MainWindow: public QMainWindow {
+class MainWindow: public QMainWindow
+{
 	Q_OBJECT
 public:
 	enum DelayedShow {
@@ -20,14 +23,13 @@ public:
 		FullScreen,
 	};
 
-	MainWindow(NeovimConnector *, ShellOptions opts, QWidget *parent= 0);
+	MainWindow(NeovimConnector *, ShellOptions opts, QWidget *parent=0);
 	bool neovimAttached() const;
-	Shell *shell();
+	Shell* shell();
 public slots:
-	void delayedShow(DelayedShow type= DelayedShow::Normal);
+	void delayedShow(DelayedShow type=DelayedShow::Normal);
 signals:
 	void neovimAttached(bool);
-
 protected:
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;
@@ -48,11 +50,12 @@ private slots:
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
 	void extTablineSet(bool);
 	void changeTab(int index);
-
 private:
 	void init(NeovimConnector *);
-	NeovimConnector *m_nvim;
+        NeovimConnector *m_nvim;
 	ErrorWidget *m_errorWidget;
+	QSplitter *m_window;
+	TreeView *m_tree;
 	Shell *m_shell;
 	DelayedShow m_delayedShow;
 	QStackedWidget m_stack;

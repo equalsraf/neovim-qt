@@ -14,13 +14,14 @@ namespace NeovimQt {
 class Function {
 	Q_ENUMS(FunctionId)
 public:
+
 	Function();
-	Function(const QString& ret, const QString& name, QList<QPair<QString, QString>> params, bool can_fail);
+	Function(const QString& ret, const QString& name, QList<QPair<QString,QString> > params, bool can_fail);
 	Function(const QString& ret, const QString& name, QList<QString> paramTypes, bool can_fail);
 	bool isValid() const;
 	bool operator==(const Function& other);
 	static Function fromVariant(const QVariant&);
-	static QList<QPair<QString, QString>> parseParameters(const QVariantList& obj);
+	static QList<QPair<QString,QString> > parseParameters(const QVariantList& obj);
 
 	/** Whether this function call fail without returning*/
 	bool can_fail;
@@ -29,7 +30,7 @@ public:
 	/** Function name */
 	QString name;
 	/** Function parameter types and name */
-	QList<QPair<QString, QString>> parameters;
+	QList<QPair<QString,QString> > parameters;
 
 	QString signature() const;
 	/**
@@ -37,7 +38,6 @@ public:
 	 * signature. The list is populated at compile time from a code generator.
 	 */
 	const static QList<Function> knownFunctions;
-
 private:
 	bool m_valid;
 };

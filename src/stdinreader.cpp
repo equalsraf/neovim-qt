@@ -2,10 +2,10 @@
 
 #include <QDebug>
 #ifdef _WIN32
-#	include <io.h>
-#	include <fcntl.h>
+# include <io.h>
+# include <fcntl.h>
 #else
-#	include <unistd.h>
+# include <unistd.h>
 #endif
 
 namespace NeovimQt {
@@ -24,7 +24,7 @@ namespace NeovimQt {
  * @arg maxSize is the read buffer size
  */
 StdinReader::StdinReader(qint64 maxSize, QObject *parent)
-: QThread(parent), m_maxSize(maxSize)
+:QThread(parent), m_maxSize(maxSize)
 {
 #ifdef _WIN32
 	setmode(0, _O_BINARY);
@@ -36,10 +36,10 @@ StdinReader::StdinReader(qint64 maxSize, QObject *parent)
 
 void StdinReader::run()
 {
-	char *buf= new char[m_maxSize];
+	char *buf = new char[m_maxSize];
 	while (true) {
-		qint64 bytes= read(0, buf, m_maxSize);
-		if (bytes > 0) {
+		qint64 bytes = read(0, buf, m_maxSize);
+		if (bytes > 0 ) {
 			qDebug() << "Reading data from Stdin" << bytes;
 			emit dataAvailable(QByteArray(buf, bytes));
 		}

@@ -20,24 +20,23 @@ bool decode(const QVariant& in, QList<T>& out)
 		qWarning() << "Attempting to decode as QList<...> when type is" << in.type() << in;
 		return true;
 	}
-	foreach (const QVariant val, in.toList()) {
+	foreach(const QVariant val, in.toList()) {
 		if (!val.canConvert<T>()) {
 			return false;
 		}
 	}
-	foreach (const QVariant val, in.toList()) {
+	foreach(const QVariant val, in.toList()) {
 		out.append(val.value<T>());
 	}
 	return false;
 }
 bool decode(const QVariant& in, QVariant& out);
 template <class T>
-bool decode(const QVariant& in, T& out)
-{
+bool decode(const QVariant& in, T& out) {
 	if (!in.canConvert<T>()) {
 		return true;
 	}
-	out= in.value<T>();
+	out = in.value<T>();
 	return false;
 }
 
@@ -45,8 +44,8 @@ bool decode(const QVariant& in, T& out)
 /// value (0), all other values return true
 inline bool variant_not_zero(const QVariant& v)
 {
-	bool ok= false;
-	int int_val= v.toInt(&ok);
+	bool ok=false;
+	int int_val = v.toInt(&ok);
 	return !ok || int_val != 0;
 }
 

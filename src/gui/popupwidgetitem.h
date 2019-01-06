@@ -7,9 +7,8 @@ namespace NeovimQt {
 
 class PopupWidgetItem: public QListWidgetItem {
 public:
-	PopupWidgetItem(const QString& text, const QString& kind= QString(),
-	                const QString& extra= QString(), const QString& info= QString());
-
+	PopupWidgetItem(const QString& text, const QString& kind=QString(),
+			const QString& extra=QString(), const QString& info=QString());
 private:
 };
 

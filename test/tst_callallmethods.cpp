@@ -13,7 +13,8 @@
  *    bugs :D
  */
 
-class TestCallAllMethods: public QObject {
+class TestCallAllMethods: public QObject
+{
 	Q_OBJECT
 
 private slots:
@@ -29,7 +30,7 @@ private:
 
 void TestCallAllMethods::initTestCase()
 {
-	m_c= NeovimQt::NeovimConnector::spawn({"-u", "NORC"});
+	m_c = NeovimQt::NeovimConnector::spawn({"-u", "NONE"});
 	QSignalSpy onReady(m_c, SIGNAL(ready()));
 	QVERIFY(onReady.isValid());
 
@@ -39,7 +40,7 @@ void TestCallAllMethods::initTestCase()
 void TestCallAllMethods::vim_get_current_buffer()
 {
 	QVERIFY(m_c->neovimObject());
-	auto *obj= m_c->neovimObject();
+	auto *obj = m_c->neovimObject();
 
 	QSignalSpy result(obj, SIGNAL(on_vim_get_current_buffer(int64_t)));
 	QVERIFY(result.isValid());
@@ -51,7 +52,7 @@ void TestCallAllMethods::vim_get_current_buffer()
 void TestCallAllMethods::vim_list_runtime_paths()
 {
 	QVERIFY(m_c->neovimObject());
-	auto *obj= m_c->neovimObject();
+	auto *obj = m_c->neovimObject();
 
 	QSignalSpy result(obj, SIGNAL(on_vim_list_runtime_paths(QList<QByteArray>)));
 	QVERIFY(result.isValid());
@@ -64,22 +65,22 @@ void TestCallAllMethods::callAll()
 {
 	QVERIFY(m_c->neovimObject());
 
-	auto *obj= m_c->neovimObject();
-	const QMetaObject *meta= obj->metaObject();
+	auto *obj = m_c->neovimObject();
+	const QMetaObject *meta = obj->metaObject();
 	QSignalSpy neovimErrors(m_c, SIGNAL(error(NeovimError)));
 	QVERIFY(neovimErrors.isValid());
-	for (int i= 0; i < meta->methodCount(); i++) {
-		QMetaMethod meth= meta->method(i);
-		if (meth.methodType() != QMetaMethod::Slot ||
-		    meth.access() != QMetaMethod::Public) {
+	for (int i=0; i<meta->methodCount(); i++) {
+		QMetaMethod meth = meta->method(i);
+		if ( meth.methodType() != QMetaMethod::Slot ||
+				meth.access() != QMetaMethod::Public) {
 			continue;
 		}
 
-		if (meth.parameterNames().size() == 0 && meth.name() != "deleteLater") {
+		if ( meth.parameterNames().size() == 0 && meth.name() != "deleteLater") {
 			qDebug() << "Calling" << meth.name();
 			meth.invoke(obj);
-		} else if (meth.parameterNames().size() == 1) {
-			if (meth.parameterTypes().at(0) == "Window") {
+		} else if ( meth.parameterNames().size() == 1 ) {
+			if ( meth.parameterTypes().at(0) == "Window" ) {
 				meth.invoke(obj, Q_ARG(int64_t, 1));
 			}
 		} else {
@@ -94,7 +95,7 @@ void TestCallAllMethods::callAll()
 void TestCallAllMethods::vim_call_function()
 {
 	QVERIFY(m_c->neovimObject());
-	auto *obj= m_c->neovimObject();
+	auto *obj = m_c->neovimObject();
 
 	QSignalSpy result(obj, SIGNAL(on_vim_call_function(QVariant)));
 	QVERIFY(result.isValid());

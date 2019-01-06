@@ -5,12 +5,11 @@
 namespace NeovimQt {
 
 PopupMenuModel::PopupMenuModel(QList<PopupMenuItem> l)
-: QAbstractListModel(), m_data(l)
+:QAbstractListModel(), m_data(l)
 {
 }
 
-int PopupMenuModel::rowCount(const QModelIndex &parent) const
-{
+int PopupMenuModel::rowCount(const QModelIndex &parent) const {
 	if (parent.isValid()) {
 		return 0;
 	} else {
@@ -18,8 +17,7 @@ int PopupMenuModel::rowCount(const QModelIndex &parent) const
 	}
 }
 
-QVariant PopupMenuModel::data(const QModelIndex &index, int role) const
-{
+QVariant PopupMenuModel::data(const QModelIndex &index, int role) const {
 
 	if (index.parent().isValid()) {
 		return QVariant();
@@ -28,19 +26,19 @@ QVariant PopupMenuModel::data(const QModelIndex &index, int role) const
 	if (index.row() < 0 || m_data.size() <= index.row()) {
 		return QVariant();
 	}
-	auto item= m_data.at(index.row());
+	auto item = m_data.at(index.row());
 
-	if (role == Qt::DisplayRole) {
-		QString text= item.text;
+    if ( role == Qt::DisplayRole ) {
+		QString text = item.text;
 
 		if (!item.kind.isEmpty()) {
-			text= text + " " + item.kind;
+			text = text + " " + item.kind;
 		}
 		if (!item.extra.isEmpty()) {
-			text= text + " " + item.extra;
+			text = text + " " + item.extra;
 		}
 		if (!item.info.isEmpty()) {
-			text= text + " " + item.info;
+			text = text + " " + item.info;
 		}
 		return text;
 	} else if (role == PopupMenuModel::Text) {

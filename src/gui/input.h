@@ -23,28 +23,27 @@ protected:
 	// define our own key and modifier modifier constants to abstract
 	// OS-specific issues
 #ifdef Q_OS_MAC
-	const Qt::KeyboardModifiers ControlModifier= Qt::MetaModifier;
-	const Qt::KeyboardModifiers CmdModifier= Qt::ControlModifier;
-	const Qt::KeyboardModifiers MetaModifier= Qt::AltModifier;
-	const Qt::Key Key_Control= Qt::Key_Meta;
-	const Qt::Key Key_Cmd= Qt::Key_Control;
+	const Qt::KeyboardModifiers ControlModifier = Qt::MetaModifier;
+	const Qt::KeyboardModifiers CmdModifier = Qt::ControlModifier;
+	const Qt::KeyboardModifiers MetaModifier  = Qt::AltModifier;
+	const Qt::Key Key_Control = Qt::Key_Meta;
+	const Qt::Key Key_Cmd = Qt::Key_Control;
 #else
-	const Qt::KeyboardModifiers ControlModifier= Qt::ControlModifier;
-#	ifdef Q_OS_UNIX
-	const Qt::KeyboardModifiers CmdModifier= Qt::MetaModifier;
-	const Qt::Key Key_Cmd= Qt::Key_Meta;
-	;
-#	else
-	const Qt::KeyboardModifiers CmdModifier= (Qt::KeyboardModifiers)0;
-	const Qt::Key Key_Cmd= (Qt::Key)0;
-#	endif
-	const Qt::KeyboardModifiers MetaModifier= Qt::MetaModifier;
-	const Qt::Key Key_Control= Qt::Key_Control;
+	const Qt::KeyboardModifiers ControlModifier = Qt::ControlModifier;
+# ifdef Q_OS_UNIX
+	const Qt::KeyboardModifiers CmdModifier = Qt::MetaModifier;
+	const Qt::Key Key_Cmd = Qt::Key_Meta;;
+# else
+	const Qt::KeyboardModifiers CmdModifier = (Qt::KeyboardModifiers)0;
+	const Qt::Key Key_Cmd = (Qt::Key)0;
+# endif
+	const Qt::KeyboardModifiers MetaModifier  = Qt::MetaModifier;
+	const Qt::Key Key_Control = Qt::Key_Control;
 #endif
-	const Qt::KeyboardModifiers ShiftModifier= Qt::ShiftModifier;
-	const Qt::KeyboardModifiers AltModifier= Qt::AltModifier;
-	const Qt::KeyboardModifiers NoModifier= Qt::NoModifier;
-	const Qt::Key Key_Alt= Qt::Key_Alt;
+	const Qt::KeyboardModifiers ShiftModifier = Qt::ShiftModifier;
+	const Qt::KeyboardModifiers AltModifier   = Qt::AltModifier;
+	const Qt::KeyboardModifiers NoModifier    = Qt::NoModifier;
+	const Qt::Key Key_Alt = Qt::Key_Alt;
 };
 
 extern InputConv Input;

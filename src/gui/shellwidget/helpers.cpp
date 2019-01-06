@@ -8,23 +8,23 @@ bool saveShellContents(const ShellContents& s, const QString& filename)
 {
 	QFont f;
 	QFontMetrics fm(f);
-	int w= fm.width('W');
-	int h= fm.height();
+	int w = fm.width('W');
+	int h = fm.height();
 
-	QImage img(s.columns() * w,
-	           s.rows() * h,
-	           QImage::Format_ARGB32_Premultiplied);
+	QImage img( s.columns()*w,
+			s.rows()*h,
+			QImage::Format_ARGB32_Premultiplied);
 	img.fill(Qt::white);
 
 	QPainter p(&img);
 	p.setFont(f);
-	for (int i= 0; i < s.rows(); i++) {
+	for (int i=0; i<s.rows(); i++) {
 		// Draw guide
 		p.setPen(Qt::red);
-		p.drawLine(0, i * h, img.width(), i * h);
-		for (int j= 0; j < s.columns(); j++) {
-			QRect r(j * w, i * h, w, h);
-			const Cell& cell= s.constValue(i, j);
+		p.drawLine(0, i*h, img.width(), i*h);
+		for (int j=0; j<s.columns(); j++) {
+			QRect r(j*w, i*h, w, h);
+			const Cell& cell = s.constValue(i,j);
 			p.setPen(cell.foregroundColor);
 			if (cell.backgroundColor.isValid()) {
 				p.fillRect(r, cell.backgroundColor);
@@ -57,44 +57,44 @@ bool isBadMonospace(const QFont& f)
 	QFontMetrics fm_bold(fb);
 
 	// Regular
-	if (fm_normal.averageCharWidth() != fm_normal.maxWidth()) {
+	if ( fm_normal.averageCharWidth() != fm_normal.maxWidth() ) {
 		QFontInfo info(f);
 		qDebug() << f.family()
-		         << "Average and Maximum font width mismatch for Regular font; QFont::exactMatch() is" << f.exactMatch()
-		         << "Real font is " << info.family() << info.pointSize();
+			<< "Average and Maximum font width mismatch for Regular font; QFont::exactMatch() is" << f.exactMatch()
+			<< "Real font is " << info.family() << info.pointSize();
 		return true;
 	}
 
 	// Italic
-	if (fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
-	    fm_italic.maxWidth() * 2 != fm_italic.width("MM")) {
+	if ( fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
+			fm_italic.maxWidth()*2 != fm_italic.width("MM") ) {
 		QFontInfo info(fi);
 		qDebug() << fi.family() << "Average and Maximum font width mismatch for Italic font; QFont::exactMatch() is" << fi.exactMatch()
-		         << "Real font is " << info.family() << info.pointSize();
+			<< "Real font is " << info.family() << info.pointSize();
 		return true;
 	}
 
 	// Bold
-	if (fm_bold.averageCharWidth() != fm_bold.maxWidth() ||
-	    fm_bold.maxWidth() * 2 != fm_bold.width("MM")) {
+	if ( fm_bold.averageCharWidth() != fm_bold.maxWidth() ||
+			fm_bold.maxWidth()*2 != fm_bold.width("MM") ) {
 		QFontInfo info(fb);
 		qDebug() << fb.family() << "Average and Maximum font width mismatch for Bold font; QFont::exactMatch() is" << fb.exactMatch()
-		         << "Real font is " << info.family() << info.pointSize();
+			<< "Real font is " << info.family() << info.pointSize();
 		return true;
 	}
 
 	// Bold+Italic
-	if (fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
-	    fm_boldit.maxWidth() * 2 != fm_boldit.width("MM")) {
+	if ( fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
+			fm_boldit.maxWidth()*2 != fm_boldit.width("MM") ) {
 		QFontInfo info(fbi);
 		qDebug() << fbi.family() << "Average and Maximum font width mismatch for Bold+Italic font; QFont::exactMatch() is" << fbi.exactMatch()
-		         << "Real font is " << info.family() << info.pointSize();
+			<< "Real font is " << info.family() << info.pointSize();
 		return true;
 	}
 
-	if (fm_normal.maxWidth() != fm_italic.maxWidth() ||
-	    fm_normal.maxWidth() != fm_boldit.maxWidth() ||
-	    fm_normal.maxWidth() != fm_bold.maxWidth()) {
+	if ( fm_normal.maxWidth() != fm_italic.maxWidth() ||
+		fm_normal.maxWidth() != fm_boldit.maxWidth() ||
+		fm_normal.maxWidth() != fm_bold.maxWidth()) {
 		qDebug() << f.family() << "Average and Maximum font width mismatch between font types";
 		return true;
 	}
