@@ -7,8 +7,8 @@ namespace NeovimQt {
 
 class PopupMenu: public QListView {
 public:
-	PopupMenu(QWidget *parent=0);
-	QSize sizeHint() const Q_DECL_OVERRIDE;
+    PopupMenu(QWidget *parent= 0);
+    QSize sizeHint() const Q_DECL_OVERRIDE;
 };
 
 } // Namespace

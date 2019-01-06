@@ -49,5 +49,5 @@ SpaceBeforeAssignmentOperators: false
 SpaceBeforeCtorInitializerColon: false
 SpaceBeforeInheritanceColon: false
 Standard: Cpp11
-TabWidth: 4
-UseTab: ForIndentation
+TabWidth: 8
+UseTab: Always

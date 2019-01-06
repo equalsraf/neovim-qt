@@ -21,10 +21,10 @@ namespace NeovimQt {
  * \see NeovimQt::MsgpackIODevice::msgId
  */
 MsgpackRequest::MsgpackRequest(quint32 id, MsgpackIODevice *dev, QObject *parent)
-:QObject(parent), id(id), m_dev(dev), m_function(0)
+: QObject(parent), id(id), m_dev(dev), m_function(0)
 {
-	connect(&m_timer, &QTimer::timeout,
-		this, &MsgpackRequest::requestTimeout);
+    connect(&m_timer, &QTimer::timeout,
+	    this, &MsgpackRequest::requestTimeout);
 }
 
 /**
@@ -32,7 +32,7 @@ MsgpackRequest::MsgpackRequest(quint32 id, MsgpackIODevice *dev, QObject *parent
  */
 quint64 MsgpackRequest::function()
 {
-	return m_function;
+    return m_function;
 }
 
 /**
@@ -43,19 +43,19 @@ quint64 MsgpackRequest::function()
  */
 void MsgpackRequest::setFunction(quint64 f)
 {
-	m_function = f;
+    m_function= f;
 }
 
 void MsgpackRequest::setTimeout(int msec)
 {
-	m_timer.setInterval(msec);
-	m_timer.setSingleShot(true);
-	m_timer.start();
+    m_timer.setInterval(msec);
+    m_timer.setSingleShot(true);
+    m_timer.start();
 }
 
 void MsgpackRequest::requestTimeout()
 {
-	emit timeout(this->id);
+    emit timeout(this->id);
 }
 
 } // namespace NeovimQt
