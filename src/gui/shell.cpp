@@ -439,6 +439,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 			return;
 		}
 		setNeovimCursor(opargs.at(0).toULongLong(), opargs.at(1).toULongLong());
+		// @zhmars: On my system, call update(Qt::ImCursorRectangle) in function
+		// setNeovimCursor will cause typing lags
+		qApp->inputMethod()->update(Qt::ImCursorRectangle);
 	} else if (name == "highlight_set") {
 		if (opargs.size() < 1 && (QMetaType::Type)opargs.at(0).type() != QMetaType::QVariantMap) {
 			qWarning() << "Unexpected argument for redraw:" << name << opargs;
@@ -614,7 +617,6 @@ void Shell::setNeovimCursor(quint64 row, quint64 col)
 	update(neovimCursorRect());
 	m_cursor_pos = QPoint(col, row);
 	update(neovimCursorRect());
-	qApp->inputMethod()->update(Qt::ImCursorRectangle);
 }
 
 void Shell::handleModeChange(const QString& mode)
