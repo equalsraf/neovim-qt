@@ -149,6 +149,9 @@ void Shell::setAttached(bool attached)
 		if (isWindow()) {
 			updateGuiWindowState(windowState());
 		}
+
+		updateClientInfo();
+
 		auto req_shim = m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim");
 		connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
 		auto gviminit = qgetenv("GVIMINIT");
@@ -158,8 +161,6 @@ void Shell::setAttached(bool attached)
 		} else {
 			m_nvim->api0()->vim_command(gviminit);
 		}
-
-		updateClientInfo();
 
 		// Noevim was not able to open urls till now. Check if we have any to open.
 		if(!m_deferredOpen.isEmpty()){
