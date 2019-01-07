@@ -502,8 +502,10 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 			emit neovimSuspend();
 		}
 	} else if (name == "popupmenu_show") {
-		if (!(opargs.size() == 4
-          || (opargs.size() == 5 && opargs.at(4).canConvert<qint64>()))
+    // The 5th argument was added to popupmenu_show in neovim/neovim@16c3337.
+    // Since neovim-qt does not use this argument, it checks that the argument
+    // is 4 or more.
+    if (opargs.size() < 4
 				|| !opargs.at(1).canConvert<qint64>()
 				|| !opargs.at(2).canConvert<qint64>()
 				|| !opargs.at(3).canConvert<qint64>()) {
