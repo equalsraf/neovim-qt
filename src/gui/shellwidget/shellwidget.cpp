@@ -114,7 +114,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 			end_col = m_contents.columns();
 		}
 		if (end_row > m_contents.rows()) {
-			end_col = m_contents.columns();
+			end_row = m_contents.rows();
 		}
 
 		// end_col/row is inclusive
