@@ -167,15 +167,6 @@ void Shell::setAttached(bool attached)
 			m_deferredOpen.clear();    //Neovim may change state. Clear to prevent reopening.
 		}
 
-		// Show v:errmsg if available
-		auto api1 = m_nvim->api1();
-		auto req = api1->nvim_get_vvar("errmsg");
-		connect(req, &MsgpackRequest::finished, [api1](quint32 m, quint64 f, const QVariant& r) {
-			auto err = r.toString();
-			if (!err.isEmpty()) {
-				api1->nvim_err_writeln(err.toLatin1());
-			}
-		});
 	}
 	emit neovimAttached(attached);
 	update();
