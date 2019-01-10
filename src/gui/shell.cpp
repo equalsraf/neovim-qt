@@ -173,15 +173,6 @@ void Shell::setAttached(bool attached)
 			m_deferredOpen.clear();    //Neovim may change state. Clear to prevent reopening.
 		}
 
-		// Show v:errmsg if available
-		auto api1 = m_nvim->api1();
-		auto req = api1->nvim_get_vvar("errmsg");
-		connect(req, &MsgpackRequest::finished, [api1](quint32 m, quint64 f, const QVariant& r) {
-			auto err = r.toString();
-			if (!err.isEmpty()) {
-				api1->nvim_err_writeln(err.toLatin1());
-			}
-		});
 	}
 	emit neovimAttached(attached);
 	update();
@@ -455,6 +446,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 			return;
 		}
 		setNeovimCursor(opargs.at(0).toULongLong(), opargs.at(1).toULongLong());
+		// @zhmars: On my system, call update(Qt::ImCursorRectangle) in function
+		// setNeovimCursor will cause typing lags
+		qApp->inputMethod()->update(Qt::ImCursorRectangle);
 	} else if (name == "highlight_set") {
 		if (opargs.size() < 1 && (QMetaType::Type)opargs.at(0).type() != QMetaType::QVariantMap) {
 			qWarning() << "Unexpected argument for redraw:" << name << opargs;
@@ -518,7 +512,10 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 			emit neovimSuspend();
 		}
 	} else if (name == "popupmenu_show") {
-		if (opargs.size() != 4
+    // The 5th argument was added to popupmenu_show in neovim/neovim@16c3337.
+    // Since neovim-qt does not use this argument, it checks that the argument
+    // is 4 or more.
+    if (opargs.size() < 4
 				|| !opargs.at(1).canConvert<qint64>()
 				|| !opargs.at(2).canConvert<qint64>()
 				|| !opargs.at(3).canConvert<qint64>()) {
@@ -1314,8 +1311,8 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 {
 	if ( query == Qt::ImFont) {
 		return font();
-	} else if ( query == Qt::ImMicroFocus ) {
-		return QRect(neovimCursorTopLeft(), QSize(0, cellSize().height()));
+	} else if ( query == Qt::ImMicroFocus || query == Qt::ImCursorRectangle ) {
+		return QRect(neovimCursorTopLeft(), cellSize());
 	}
 
 	return QVariant();
