@@ -216,7 +216,7 @@ if __name__ == '__main__':
         sys.exit(-1)
 
     if outpath:
-        if api.has_key('version'):
+        if 'version' in api:
             api_level = api['version']['api_level']
         else:
             api_level = 0
