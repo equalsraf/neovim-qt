@@ -56,6 +56,11 @@ To disable the GUI tabline and use the nvim TUI tabline, call
 
 You can set GUI options on startup, in the GUI configuration file (:help ginit.vim).
 
+In recent versions of Neovim you can also use regular options (in init.vim) that have the same effect:
+
+- set guifont=DejaVu\ Sans\ Mono:h11
+- set linespace=4
+
 ## Development
 
 The *NeovimConnector* class is used to setup the connection to Neovim. It also
