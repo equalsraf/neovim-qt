@@ -123,6 +123,10 @@ function GuiName()
 endfunction
 
 function s:ui_has_clipboard(idx, ui_info)
+	if has_key(a:ui_info, 'chan') == 0
+		return 0
+	endif
+
 	let info = nvim_get_chan_info(a:ui_info.chan)
 	let client_info = get(info, 'client', {})
 
