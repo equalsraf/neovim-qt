@@ -123,6 +123,10 @@ function GuiName()
 endfunction
 
 function s:ui_has_clipboard(idx, ui_info)
+	if has_key(a:ui_info, 'chan') == 0
+		return 0
+	endif
+
 	let info = nvim_get_chan_info(a:ui_info.chan)
 	let client_info = get(info, 'client', {})
 
@@ -160,7 +164,15 @@ function GuiClipboard()
           \      '*': {-> rpcrequest(ui_chan, 'Gui', 'GetClipboard', '*')},
           \   },
           \ }
-	call provider#clipboard#Executable()
+
+	" When the clipboard provider is sourced it short circuits if it cannot
+	" find a working clipboard - this behaviour is used internally by nvim to
+	" check if the provider is available, by checking for
+	" provider#clipboard#Call which is not defined if no clipboard is
+	" available.
+	"
+	" TLDR; we need to source this to reinitialize the clipboard provider
+	runtime autoload/provider/clipboard.vim
 endfunction
 
 " Directory autocommands for Treeview
