@@ -8,7 +8,7 @@ compiler:
 before_install:
   - brew update
   # Install Neovim for the unit tests
-  - brew install neovim/neovim/neovim
+  - brew install neovim
   - brew ls | grep -wq cmake || brew install cmake
   - brew ls | grep -wq qt5 || brew install qt5
   - brew ls | grep -wq msgpack || brew install msgpack
