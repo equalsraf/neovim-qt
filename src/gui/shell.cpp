@@ -938,7 +938,7 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 
 void Shell::wheelEvent(QWheelEvent *ev)
 {
-	if (!m_attached) {
+	if (!m_attached || !m_mouseEnabled) {
 		return;
 	}
 #ifdef Q_OS_MAC
