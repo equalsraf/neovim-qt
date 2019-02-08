@@ -616,11 +616,18 @@ void Shell::setNeovimCursor(quint64 row, quint64 col)
 
 void Shell::handleModeChange(const QString& mode)
 {
+	auto old = m_insertMode;
+
 	// TODO: Implement visual aids for other modes
 	if (mode == "insert") {
 		m_insertMode = true;
 	} else {
 		m_insertMode = false;
+	}
+
+	// redraw the cursor
+	if (old != m_insertMode) {
+		update(neovimCursorRect());
 	}
 }
 
