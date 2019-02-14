@@ -156,9 +156,7 @@ void MainWindow::neovimWidgetResized()
     if (isMaximized() || isFullScreen()) {
         QSize size = geometry().size();
         if (m_tabline_bar->isVisible()) {
-            size.scale(size.width(),
-                       size.height() - m_tabline_bar->geometry().size().height(),
-                       Qt::IgnoreAspectRatio);
+            size.setHeight(size.height() - m_tabline_bar->geometry().size().height());
         }
             if (m_tree->isVisible()) {
                 size.scale(size.width() - m_tree->geometry().size().width(),
