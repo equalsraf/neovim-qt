@@ -263,8 +263,13 @@ void MainWindow::showIfDelayed()
 void MainWindow::neovimAttachmentChanged(bool attached)
 {
 	emit neovimAttached(attached);
-	if (isWindow() && m_shell != NULL) {
-		m_shell->updateGuiWindowState(windowState());
+	if (attached) {
+		if (isWindow() && m_shell != NULL) {
+			m_shell->updateGuiWindowState(windowState());
+		}
+	} else {
+		m_tabline->deleteLater();
+		m_tabline_bar->deleteLater();
 	}
 }
 
