@@ -12,7 +12,8 @@ MainWindow::MainWindow(NeovimConnector *c, ShellOptions opts, QWidget *parent)
 	m_shell_options(opts), m_neovim_requested_close(false)
 {
 	m_errorWidget = new ErrorWidget();
-        m_style = QStyleFactory::create("Fusion");
+    m_style = QStyleFactory::create("Fusion");
+    setStyle(m_style);
 	m_stack.addWidget(m_errorWidget);
 	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
 			this, &MainWindow::reconnectNeovim);
@@ -60,6 +61,11 @@ void MainWindow::init(NeovimConnector *c)
 	m_tree->hide();
 	m_window->addWidget(m_shell);
 
+    m_window->setStyle(m_style);
+    m_tree->setStyle(m_style);
+    m_tabline_bar->setStyle(m_style);
+    m_tabline->setStyle(m_style);
+
 	m_stack.insertWidget(1, m_window);
 	m_stack.setCurrentIndex(1);
 
@@ -100,40 +106,39 @@ void MainWindow::updateStyle()
 {
 
     //    //palette = m_tree->palette();
-    m_palette.setColor(QPalette::Window, /*QColor(53, 53, 53)*/m_shell->getBackground());
-    m_palette.setColor(QPalette::WindowText, /*Qt::white*/m_shell->getForeground());
-    //            m_palette.setColor(QPalette::Disabled, QPalette::WindowText,
-    //                             QColor(127, 127, 127));
-    m_palette.setColor(QPalette::Base, /*QColor(42, 42, 42)*/m_shell->getBackground());
-    //            m_palette.setColor(QPalette::AlternateBase, QColor(66, 66, 66));
-    //            m_palette.setColor(QPalette::ToolTipBase, Qt::white);
-    //            m_palette.setColor(QPalette::ToolTipText, QColor(53, 53, 53));
-    m_palette.setColor(QPalette::Text, m_shell->getForeground());
-    //            m_palette.setColor(QPalette::Disabled, QPalette::Text, QColor(127, 127, 127));
-    //            m_palette.setColor(QPalette::Dark, QColor(35, 35, 35));
-    //            m_palette.setColor(QPalette::Shadow, QColor(20, 20, 20));
-    //            m_palette.setColor(QPalette::Button, QColor(53, 53, 53));
-    //            m_palette.setColor(QPalette::ButtonText, Qt::white);
-    //            m_palette.setColor(QPalette::Disabled, QPalette::ButtonText,
-    //                             QColor(127, 127, 127));
-    //            m_palette.setColor(QPalette::BrightText, Qt::red);
-    //            m_palette.setColor(QPalette::Link, QColor(42, 130, 218));
-    //            m_palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-    //            m_palette.setColor(QPalette::Disabled, QPalette::Highlight, QColor(80, 80, 80));
-    //            m_palette.setColor(QPalette::HighlightedText, Qt::white);
-    //            m_palette.setColor(QPalette::Disabled, QPalette::HighlightedText,
-    //                             QColor(127, 127, 127));
+    auto bg_color = m_shell->getBackground();
+    auto fg_color = m_shell->getForeground();
 
-    m_window->setStyle(m_style);
+    m_palette.setColor(QPalette::Window, /*QColor(53, 53, 53)*//*m_shell->getBackground()*/bg_color);
+    m_palette.setColor(QPalette::WindowText, /*Qt::white*//*m_shell->getForeground()*/fg_color);
+               // m_palette.setColor(QPalette::Disabled, QPalette::WindowText,
+               //                  QColor(127, 127, 127));
+    m_palette.setColor(QPalette::Base, /*QColor(42, 42, 42)*//*m_shell->getBackground()*/bg_color);
+    m_palette.setColor(QPalette::AlternateBase, /*QColor(66, 66, 66)*/fg_color);
+               // m_palette.setColor(QPalette::ToolTipBase, Qt::white);
+               // m_palette.setColor(QPalette::ToolTipText, QColor(53, 53, 53));
+    m_palette.setColor(QPalette::Text, /*m_shell->getForeground()*/fg_color);
+               // m_palette.setColor(QPalette::Disabled, QPalette::Text, QColor(127, 127, 127));
+               m_palette.setColor(QPalette::Dark, /*QColor(35, 35, 35)*/Qt::white);
+               m_palette.setColor(QPalette::Shadow, /*QColor(20, 20, 20)*/Qt::white);
+               // m_palette.setColor(QPalette::Button, QColor(53, 53, 53));
+               // m_palette.setColor(QPalette::ButtonText, Qt::white);
+               // m_palette.setColor(QPalette::Disabled, QPalette::ButtonText,
+               //                  QColor(127, 127, 127));
+               // m_palette.setColor(QPalette::BrightText, Qt::red);
+               // m_palette.setColor(QPalette::Link, QColor(42, 130, 218));
+	m_palette.setColor(QPalette::Highlight, /*QColor(42, 130, 218)*/ /*fg_color*/);
+	//m_palette.setColor(QPalette::Disabled, QPalette::Highlight, QColor(80, 80, 80));
+	m_palette.setColor(QPalette::HighlightedText, /*Qt::white*//*bg_color*/);
+	//m_palette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127));
+
+    
     m_window->setPalette(m_palette);
-    m_tree->setStyle(m_style);
     m_tree->setPalette(m_palette);
-    m_tabline_bar->setStyle(m_style);
     m_tabline_bar->setPalette(m_palette);
-    m_tabline->setStyle(m_style);
     m_tabline->setPalette(m_palette);
-    this->setStyle(m_style);
-    this->setPalette(m_palette);
+    setPalette(m_palette);
+    m_tree->show();
 }
 
 bool MainWindow::neovimAttached() const
