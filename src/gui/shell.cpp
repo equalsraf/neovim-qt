@@ -523,7 +523,25 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		m_pum.hide();
 	} else if (name == "mode_info_set") {
 		// TODO
-	} else if (name == "default_colors_set") {
+        } else if (name == "default_colors_set") {
+
+        	//"default_colors_set" have 5 parameters
+        	// 0 - foreground (default = -1)
+        	// 1 - background (default = -1)
+        	//...
+
+        	//don't handle default 
+        	if(opargs.at(0) == -1 || opargs.at(1) == -1) {
+        		return;
+        	}
+
+            if (opargs.at(0).canConvert<quint64>() && opargs.at(1).canConvert<quint64>()) {
+                auto b_val = opargs.at(1).toLongLong();
+                auto f_val = opargs.at(0).toLongLong();
+                m_theme_background = QRgb(b_val);
+                m_theme_foreground = QRgb(f_val);
+            }
+
 		// TODO
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
@@ -1047,6 +1065,7 @@ void Shell::resizeNeovim(const QSize& newSize)
 {
 	int n_cols = newSize.width()/cellSize().width();
 	int n_rows = newSize.height()/cellSize().height();
+        qWarning() << m_theme_foreground << m_theme_background;
 	resizeNeovim(n_cols, n_rows);
 }
 
@@ -1155,7 +1174,17 @@ QColor Shell::color(qint64 color, const QColor& fallback)
 	if (color == -1) {
 		return fallback;
 	}
-	return QRgb(color);
+        return QRgb(color);
+}
+
+QColor Shell::getBackground()
+{
+    return m_theme_background;
+}
+
+QColor Shell::getForeground()
+{
+    return m_theme_foreground;
 }
 
 /*

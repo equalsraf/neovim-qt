@@ -50,6 +50,8 @@ public:
 	~Shell();
 	QSize sizeIncrement() const;
 	static QColor color(qint64 color, const QColor& fallback=QColor());
+    QColor getBackground();
+    QColor getForeground();
 	static bool isBadMonospace(const QFont& f);
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
@@ -160,6 +162,7 @@ private:
 	// use the values from above
 	QColor m_hg_foreground, m_hg_background, m_hg_special;
 	QColor m_cursor_color;
+    QColor m_theme_foreground, m_theme_background;
 
 	/// Cursor position in shell coordinates
 	QPoint m_cursor_pos;

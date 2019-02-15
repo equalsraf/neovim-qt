@@ -12,6 +12,7 @@ MainWindow::MainWindow(NeovimConnector *c, ShellOptions opts, QWidget *parent)
 	m_shell_options(opts), m_neovim_requested_close(false)
 {
 	m_errorWidget = new ErrorWidget();
+        m_style = QStyleFactory::create("Fusion");
 	m_stack.addWidget(m_errorWidget);
 	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
 			this, &MainWindow::reconnectNeovim);
@@ -92,7 +93,47 @@ void MainWindow::init(NeovimConnector *c)
 
 	if (m_nvim->errorCause()) {
 		neovimError(m_nvim->errorCause());
-	}
+        }
+}
+
+void MainWindow::updateStyle()
+{
+
+    //    //palette = m_tree->palette();
+    m_palette.setColor(QPalette::Window, /*QColor(53, 53, 53)*/m_shell->getBackground());
+    m_palette.setColor(QPalette::WindowText, /*Qt::white*/m_shell->getForeground());
+    //            m_palette.setColor(QPalette::Disabled, QPalette::WindowText,
+    //                             QColor(127, 127, 127));
+    m_palette.setColor(QPalette::Base, /*QColor(42, 42, 42)*/m_shell->getBackground());
+    //            m_palette.setColor(QPalette::AlternateBase, QColor(66, 66, 66));
+    //            m_palette.setColor(QPalette::ToolTipBase, Qt::white);
+    //            m_palette.setColor(QPalette::ToolTipText, QColor(53, 53, 53));
+    m_palette.setColor(QPalette::Text, m_shell->getForeground());
+    //            m_palette.setColor(QPalette::Disabled, QPalette::Text, QColor(127, 127, 127));
+    //            m_palette.setColor(QPalette::Dark, QColor(35, 35, 35));
+    //            m_palette.setColor(QPalette::Shadow, QColor(20, 20, 20));
+    //            m_palette.setColor(QPalette::Button, QColor(53, 53, 53));
+    //            m_palette.setColor(QPalette::ButtonText, Qt::white);
+    //            m_palette.setColor(QPalette::Disabled, QPalette::ButtonText,
+    //                             QColor(127, 127, 127));
+    //            m_palette.setColor(QPalette::BrightText, Qt::red);
+    //            m_palette.setColor(QPalette::Link, QColor(42, 130, 218));
+    //            m_palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+    //            m_palette.setColor(QPalette::Disabled, QPalette::Highlight, QColor(80, 80, 80));
+    //            m_palette.setColor(QPalette::HighlightedText, Qt::white);
+    //            m_palette.setColor(QPalette::Disabled, QPalette::HighlightedText,
+    //                             QColor(127, 127, 127));
+
+    m_window->setStyle(m_style);
+    m_window->setPalette(m_palette);
+    m_tree->setStyle(m_style);
+    m_tree->setPalette(m_palette);
+    m_tabline_bar->setStyle(m_style);
+    m_tabline_bar->setPalette(m_palette);
+    m_tabline->setStyle(m_style);
+    m_tabline->setPalette(m_palette);
+    this->setStyle(m_style);
+    this->setPalette(m_palette);
 }
 
 bool MainWindow::neovimAttached() const
@@ -154,9 +195,9 @@ void MainWindow::neovimWidgetResized()
 	// size, not the other way around.
 	if (isMaximized() || isFullScreen()) {
 		QSize size = geometry().size();
-        if (m_tabline_bar->isVisible()) {
-            size.setHeight(size.height() - m_tabline_bar->geometry().size().height());
-        }
+		if (m_tabline_bar->isVisible()) {
+			size.setHeight(size.height() - m_tabline_bar->geometry().size().height());
+		}
 		if (m_tree->isVisible()) {
 			size.scale(size.width() - m_tree->geometry().size().width(),
 				size.height(), Qt::IgnoreAspectRatio);
@@ -165,6 +206,8 @@ void MainWindow::neovimWidgetResized()
 	} else {
 		m_shell->resizeNeovim(m_shell->size());
 	}
+
+        updateStyle();
 }
 
 void MainWindow::neovimMaximized(bool set)
@@ -263,13 +306,8 @@ void MainWindow::showIfDelayed()
 void MainWindow::neovimAttachmentChanged(bool attached)
 {
 	emit neovimAttached(attached);
-	if (attached) {
-		if (isWindow() && m_shell != NULL) {
-			m_shell->updateGuiWindowState(windowState());
-		}
-	} else {
-		m_tabline->deleteLater();
-		m_tabline_bar->deleteLater();
+	if (isWindow() && m_shell != NULL) {
+		m_shell->updateGuiWindowState(windowState());
 	}
 }
 

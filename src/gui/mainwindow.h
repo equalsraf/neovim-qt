@@ -5,6 +5,8 @@
 #include <QStackedWidget>
 #include <QTabBar>
 #include <QSplitter>
+#include <QStyleFactory>
+#include <QPalette>
 #include "treeview.h"
 #include "neovimconnector.h"
 #include "errorwidget.h"
@@ -52,6 +54,7 @@ private slots:
 	void changeTab(int index);
 private:
 	void init(NeovimConnector *);
+        void updateStyle();
         NeovimConnector *m_nvim;
 	ErrorWidget *m_errorWidget;
 	QSplitter *m_window;
@@ -62,7 +65,9 @@ private:
 	QTabBar *m_tabline;
 	QToolBar *m_tabline_bar;
 	ShellOptions m_shell_options;
-	bool m_neovim_requested_close;
+        bool m_neovim_requested_close;
+        QStyle *m_style;
+        QPalette m_palette;
 };
 
 } // Namespace
