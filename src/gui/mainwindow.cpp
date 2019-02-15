@@ -207,7 +207,7 @@ void MainWindow::neovimWidgetResized()
 		m_shell->resizeNeovim(m_shell->size());
 	}
 
-        updateStyle();
+    updateStyle();
 }
 
 void MainWindow::neovimMaximized(bool set)
