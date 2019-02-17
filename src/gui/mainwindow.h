@@ -54,8 +54,8 @@ private slots:
 	void changeTab(int index);
 private:
 	void init(NeovimConnector *);
-        void updateStyle();
-        NeovimConnector *m_nvim;
+    void updateStyle();
+    NeovimConnector *m_nvim;
 	ErrorWidget *m_errorWidget;
 	QSplitter *m_window;
 	TreeView *m_tree;
@@ -65,9 +65,11 @@ private:
 	QTabBar *m_tabline;
 	QToolBar *m_tabline_bar;
 	ShellOptions m_shell_options;
-        bool m_neovim_requested_close;
-        QStyle *m_style;
-        QPalette m_palette;
+    bool m_neovim_requested_close;
+    QStyle *m_style;
+    QPalette m_palette;
+    QColor m_last_fg_color;
+    QColor m_last_bg_color;
 };
 
 } // Namespace
