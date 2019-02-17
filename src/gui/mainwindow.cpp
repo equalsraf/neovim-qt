@@ -124,27 +124,28 @@ void MainWindow::updateStyle()
 
     m_palette.setColor(QPalette::Window, bg_color);
     m_palette.setColor(QPalette::WindowText, fg_color);
-    m_palette.setColor(QPalette::Disabled, QPalette::WindowText, QColor(127, 127, 127));//Disable default color
+    m_palette.setColor(QPalette::Disabled, QPalette::WindowText, Qt::white);
 
     m_palette.setColor(QPalette::Base, bg_color);
     m_palette.setColor(QPalette::AlternateBase, fg_color);
     m_palette.setColor(QPalette::Text, fg_color);
-    m_palette.setColor(QPalette::Disabled, QPalette::Text, QColor(127, 127, 127)); //Disable default color
+    m_palette.setColor(QPalette::Disabled, QPalette::Text, Qt::white); 
 
 	m_palette.setColor(QPalette::Highlight, fg_color);
-	m_palette.setColor(QPalette::Disabled, QPalette::Highlight, QColor(80, 80, 80)); //Disable default color
+	m_palette.setColor(QPalette::Disabled, QPalette::Highlight, Qt::white);
 	m_palette.setColor(QPalette::HighlightedText, bg_color);
-	m_palette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127)); //Disable default color
+	m_palette.setColor(QPalette::Disabled, QPalette::HighlightedText, Qt::black);
 
     m_palette.setColor(QPalette::ToolTipBase, bg_color);
     m_palette.setColor(QPalette::ToolTipText, fg_color);
 
 	m_palette.setColor(QPalette::Button, bg_color);
 	m_palette.setColor(QPalette::ButtonText, fg_color);
-    m_palette.setColor(QPalette::Disabled, QPalette::ButtonText, QColor(127, 127, 127)); //Disable default
+    m_palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::white); 
 
-    m_palette.setColor(QPalette::BrightText, Qt::red); //defualt 
-    m_palette.setColor(QPalette::Link, QColor(42, 130, 218)); //default
+    m_palette.setColor(QPalette::BrightText, Qt::red); //defualt qt color
+    m_palette.setColor(QPalette::Link, Qt::blue); //default qt color
+    m_palette.setColor(QPalette::LinkVisited, Qt::magenta); //default qt color
 
     m_palette.setColor(QPalette::Dark, QColor(34, 34, 34));
     m_palette.setColor(QPalette::Shadow, QColor(21, 21, 21));
