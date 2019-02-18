@@ -52,9 +52,12 @@ private slots:
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
 	void extTablineSet(bool);
 	void changeTab(int index);
+	void neovimGuiColorsAdaptiveChanged(bool);
+	void neovimGuiFontAdaptiveChanged(bool);
 private:
 	void init(NeovimConnector *);
     void updateStyle();
+    void setNewPalette();
     NeovimConnector *m_nvim;
 	ErrorWidget *m_errorWidget;
 	QSplitter *m_window;
@@ -70,6 +73,10 @@ private:
     QPalette m_palette;
     QColor m_last_fg_color;
     QColor m_last_bg_color;
+    bool m_neovim_gui_style_requested_update;
+    bool m_neovim_gui_font_requested_update;
+    QFont m_default_font;
+    QPalette m_default_palette;
 };
 
 } // Namespace

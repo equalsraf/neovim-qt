@@ -91,6 +91,18 @@ function! s:GuiTabline(enable) abort
 endfunction
 command! -nargs=1 GuiTabline call s:GuiTabline(<args>)
 
+" Set Gui Colors adaptive for nvim colorscheme
+function! s:GuiColorsAdaptive(enable) abort
+	call rpcnotify(0, 'Gui', 'ColorsAdaptive', a:enable)
+endfunction
+command! -nargs=1 GuiColorsAdaptive call s:GuiColorsAdaptive(<args>)
+
+" Set Gui Font adaptive fot nvim font
+function! s:GuiFontAdaptive(enable) abort
+	call rpcnotify(0, 'Gui', 'FontAdaptive', a:enable)
+endfunction
+command! -nargs=1 GuiFontAdaptive call s:GuiFontAdaptive(<args>)
+
 function! s:GuiPopupmenu(enable) abort
 	call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', a:enable)
 endfunction

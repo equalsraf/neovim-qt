@@ -76,6 +76,8 @@ signals:
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
 	void neovimShowtablineSet(int);
 	void fontChanged();
+	void neovimGuiColorsAdaptiveEnabled(bool);
+	void neovimGuiFontAdaptiveEnabled(bool);
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);

@@ -752,6 +752,10 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 
 			qDebug() << "Neovim changed clipboard" << data << type << reg_name << clipboard;
 			QGuiApplication::clipboard()->setMimeData(clipData, clipboard);
+		} else if (guiEvName == "ColorsAdaptive" && args.size() >= 2) {
+			emit neovimGuiColorsAdaptiveEnabled(args.at(1).toBool());
+		} else if (guiEvName == "FontAdaptive" && args.size() >= 2) {
+			emit neovimGuiFontAdaptiveEnabled(args.at(1).toBool());
 		}
 		return;
 	} else if (name != "redraw") {

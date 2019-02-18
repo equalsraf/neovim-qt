@@ -9,7 +9,9 @@ namespace NeovimQt {
 MainWindow::MainWindow(NeovimConnector *c, ShellOptions opts, QWidget *parent)
 :QMainWindow(parent), m_nvim(0), m_errorWidget(0), m_shell(0),
 	m_delayedShow(DelayedShow::Disabled), m_tabline(0), m_tabline_bar(0),
-	m_shell_options(opts), m_neovim_requested_close(false)
+	m_shell_options(opts), m_neovim_requested_close(false), 
+	m_neovim_gui_style_requested_update(false), m_neovim_gui_font_requested_update (false),
+	m_default_font(font()), m_default_palette(palette())
 {
 	m_errorWidget = new ErrorWidget();
     m_style = QStyleFactory::create("Fusion");
@@ -98,6 +100,10 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimTablineUpdate);
 	connect(m_shell, &Shell::neovimShowtablineSet,
 			this, &MainWindow::neovimShowtablineSet);
+	connect(m_shell, SIGNAL(neovimGuiColorsAdaptiveEnabled(bool)), 
+			this, SLOT(neovimGuiColorsAdaptiveChanged(bool)));
+	connect(m_shell, SIGNAL(neovimGuiFontAdaptiveEnabled(bool)), 
+			this, SLOT(neovimGuiFontAdaptiveChanged(bool)));
 	m_shell->setFocus(Qt::OtherFocusReason);
 
 	if (m_nvim->errorCause()) {
@@ -107,7 +113,24 @@ void MainWindow::init(NeovimConnector *c)
 
 void MainWindow::updateStyle()
 {
+	//update font (if needed)
+	if (m_neovim_gui_font_requested_update) {
+		auto newFont = m_shell->font();
+		if (font() != newFont) {
+			setFont(newFont);
+		}
+	}
+	else if (font() != m_default_font) {
+			setFont(m_default_font);
+	}
 
+	if (!m_neovim_gui_style_requested_update) {
+		m_palette = m_default_palette;
+		m_last_bg_color = m_palette.color(QPalette::Window);
+        m_last_fg_color = m_palette.color(QPalette::WindowText);
+		setNewPalette();
+		return;
+	}
 
     auto bg_color = m_shell->getBackground();
     auto fg_color = m_shell->getForeground();
@@ -115,9 +138,9 @@ void MainWindow::updateStyle()
     if (bg_color == fg_color) //usually in the default theme: bug or feature?
     	return;
 
-    if (m_last_bg_color == bg_color && m_last_fg_color == fg_color)
+    if (m_last_bg_color == bg_color && m_last_fg_color == fg_color){
     	return;
-    else {
+    } else {
     	m_last_bg_color = bg_color;
     	m_last_fg_color = fg_color;
     }
@@ -150,8 +173,11 @@ void MainWindow::updateStyle()
     m_palette.setColor(QPalette::Dark, QColor(34, 34, 34));
     m_palette.setColor(QPalette::Shadow, QColor(21, 21, 21));
 
+    setNewPalette();
+}
 
-    
+void MainWindow::setNewPalette() {
+
     m_window->setPalette(m_palette);
     m_tree->setPalette(m_palette);
     m_tabline_bar->setPalette(m_palette);
@@ -416,4 +442,17 @@ void MainWindow::changeTab(int index)
 	int64_t tab = m_tabline->tabData(index).toInt();
 	m_nvim->api2()->nvim_set_current_tabpage(tab);
 }
+
+void MainWindow::neovimGuiColorsAdaptiveChanged(bool val)
+{
+	m_neovim_gui_style_requested_update = val;
+	updateStyle();
+}
+
+void MainWindow::neovimGuiFontAdaptiveChanged(bool val)
+{
+	m_neovim_gui_font_requested_update = val;
+	updateStyle();
+}
+
 }  // namespace NeovimQt
