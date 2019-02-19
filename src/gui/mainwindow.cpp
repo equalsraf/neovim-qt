@@ -318,6 +318,7 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 			m_tabline->setTabText(index, text);
 		}
 
+		m_tabline->setTabToolTip(index, text);
 		m_tabline->setTabData(index, QVariant::fromValue(tabs[index].tab));
 
 		if (curtab == tabs[index].tab) {
