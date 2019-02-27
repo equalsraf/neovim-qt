@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QUrl>
 #include <QList>
+#include <QMap>
 #include <QMenu>
 #include "neovimconnector.h"
 #include "shellwidget/shellwidget.h"
@@ -123,7 +124,7 @@ protected:
 	virtual void handleHighlightSet(const QVariantMap& args);
 	virtual void handleRedraw(const QByteArray& name, const QVariantList& args);
 	virtual void handleScroll(const QVariantList& args);
-	virtual void handleModeChange(const QString& mode);
+	virtual void handleModeChange(qint64 mode_index);
 	virtual void handleSetTitle(const QVariantList& opargs);
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 	virtual void handleBusy(bool);
@@ -159,12 +160,24 @@ private:
 	// highlight fg/bg - from redraw:highlightset - by default we
 	// use the values from above
 	QColor m_hg_foreground, m_hg_background, m_hg_special;
-	QColor m_cursor_color;
+	QColor m_cursor_foreground, m_cursor_background;
 
 	/// Cursor position in shell coordinates
 	QPoint m_cursor_pos;
-	bool m_cursor;
-	bool m_insertMode;
+	bool m_cursor_style_enabled;
+	QVariantList m_cursor_styles;
+	int m_cursor_horizontal, m_cursor_vertical;
+	QTimer m_cursor_blink_timer_;
+	enum class CursorBlinkState
+	{
+		Disabled,
+		Wait,
+		On,
+		Off,
+	} m_cursor_blink_state_;
+	qint64 m_cursor_blink_wait_;
+	qint64 m_cursor_blink_on_;
+	qint64 m_cursor_blink_off_;
 	bool m_resizing;
 	QSize m_resize_neovim_pending;
 	QLabel *m_tooltip;

@@ -10,7 +10,6 @@
 #include <QClipboard>
 #include "msgpackrequest.h"
 #include "input.h"
-#include "konsole_wcwidth.h"
 #include "util.h"
 #include "version.h"
 
@@ -21,7 +20,11 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false),
 	m_mouseHide(true),
 	m_hg_foreground(Qt::black), m_hg_background(Qt::white), m_hg_special(QColor()),
-	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
+	m_cursor_foreground(QColor::Invalid), m_cursor_background(QColor::Invalid), m_cursor_pos(0,0),
+	m_cursor_style_enabled(false), m_cursor_horizontal(100), m_cursor_vertical(100), m_cursor_blink_state_(CursorBlinkState::Disabled),
+	m_cursor_blink_wait_(0),
+	m_cursor_blink_on_(0),
+	m_cursor_blink_off_(0),
 	m_resizing(false),
 	m_mouse_wheel_delta_fraction(0, 0),
 	m_neovimBusy(false),
@@ -36,6 +39,28 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	m_mouseclick_timer.setSingleShot(true);
 	connect(&m_mouseclick_timer, &QTimer::timeout,
 			this, &Shell::mouseClickReset);
+
+	connect(&m_cursor_blink_timer_, &QTimer::timeout,
+		[this] {
+			switch (m_cursor_blink_state_) {
+				case CursorBlinkState::Wait:
+					m_cursor_blink_state_ = CursorBlinkState::Off;
+					m_cursor_blink_timer_.setInterval(m_cursor_blink_off_);
+					break;
+				case CursorBlinkState::Off:
+					m_cursor_blink_state_ = CursorBlinkState::On;
+					m_cursor_blink_timer_.setInterval(m_cursor_blink_on_);
+					break;
+				case CursorBlinkState::On:
+					m_cursor_blink_state_ = CursorBlinkState::Off;
+					m_cursor_blink_timer_.setInterval(m_cursor_blink_off_);
+					break;
+				case CursorBlinkState::Disabled:
+				default:
+					break;
+			}
+			update(neovimCursorRect());
+		});
 
 	// IM Tooltip
 	setAttribute(Qt::WA_InputMethodEnabled, true);
@@ -451,12 +476,13 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "mouse_off"){
 		handleMouse(false);
 	} else if (name == "mode_change"){
-		if (opargs.size() < 1 || !opargs.at(0).canConvert<QByteArray>()) {
+		if (opargs.size() < 2 || !opargs.at(0).canConvert<QByteArray>()
+			|| !opargs.at(1).canConvert<quint64>()) {
 			qWarning() << "Unexpected argument for change_mode:" << opargs;
 			return;
 		}
-		QString mode = m_nvim->decode(opargs.at(0).toByteArray());
-		handleModeChange(mode);
+		const auto mode_index = opargs.at(1).toLongLong();
+		handleModeChange(mode_index);
 	} else if (name == "cursor_on"){
 	} else if (name == "set_title"){
 		handleSetTitle(opargs);
@@ -522,7 +548,14 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "popupmenu_hide") {
 		m_pum.hide();
 	} else if (name == "mode_info_set") {
-		// TODO
+		if (opargs.size() < 2
+				|| !opargs.at(0).canConvert<bool>()
+				|| !opargs.at(1).canConvert<QVariantList>()) {
+			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
+			return;
+		}
+		m_cursor_style_enabled = opargs.at(0).toBool();
+		m_cursor_styles = opargs.at(1).value<QVariantList>();
 	} else if (name == "default_colors_set") {
 		// TODO
 	} else {
@@ -609,24 +642,68 @@ void Shell::handlePopupMenuSelect(int64_t selected)
 
 void Shell::setNeovimCursor(quint64 row, quint64 col)
 {
+	m_cursor_blink_timer_.setInterval(m_cursor_blink_wait_);
+	m_cursor_blink_state_ = CursorBlinkState::Wait;
 	update(neovimCursorRect());
 	m_cursor_pos = QPoint(col, row);
 	update(neovimCursorRect());
 }
 
-void Shell::handleModeChange(const QString& mode)
+void Shell::handleModeChange(qint64 mode_index)
 {
-	auto old = m_insertMode;
-
-	// TODO: Implement visual aids for other modes
-	if (mode == "insert") {
-		m_insertMode = true;
-	} else {
-		m_insertMode = false;
+	if (mode_index >= m_cursor_styles.size()) {
+		return;
 	}
 
-	// redraw the cursor
-	if (old != m_insertMode) {
+	const auto cursor_style = m_cursor_styles.at(mode_index).toMap();
+	const auto cursor_shape = cursor_style.value("cursor_shape");
+	const auto cell_percentage = cursor_style.value("cell_percentage");
+	if (!cell_percentage.isNull() && cell_percentage.canConvert<qint64>()
+		&& !cursor_shape.isNull() && cursor_shape.canConvert<QByteArray>()) {
+		QString cursor_shape_string = m_nvim->decode(cursor_shape.toByteArray());
+		m_cursor_horizontal = cursor_shape == "horizontal" ? cell_percentage.toLongLong() : 100;
+		m_cursor_vertical = cursor_shape == "vertical"   ? cell_percentage.toLongLong() : 100;
+	}
+
+	const auto blink_wait = cursor_style.value("blinkwait");
+	const auto blink_on = cursor_style.value("blinkon");
+	const auto blink_off = cursor_style.value("blinkoff");
+	if (!blink_wait.isNull() && blink_wait.canConvert<qint64>() && blink_wait.toLongLong() > 0
+		&& !blink_on.isNull() && blink_on.canConvert<qint64>() && blink_on.toLongLong() > 0
+		&& !blink_off.isNull() && blink_off.canConvert<qint64>() && blink_off.toLongLong() > 0) {
+		m_cursor_blink_wait_ = blink_wait.toLongLong();
+		m_cursor_blink_on_ = blink_on.toLongLong();
+		m_cursor_blink_off_ = blink_off.toLongLong();
+		m_cursor_blink_state_ = CursorBlinkState::Wait;
+		m_cursor_blink_timer_.setInterval(m_cursor_blink_wait_);
+		m_cursor_blink_timer_.start();
+	} else {
+		m_cursor_blink_state_ = CursorBlinkState::Disabled;
+		m_cursor_blink_timer_.stop();
+	}
+
+	const auto hl_id = cursor_style.value("hl_id");
+	if (!hl_id.isNull() && hl_id.canConvert<qint64>()) {
+		const auto req_cursor_hl = m_nvim->api3()->nvim_get_hl_by_id(hl_id.toLongLong(), true);
+		connect(req_cursor_hl, &MsgpackRequest::finished, m_nvim,
+			[this](quint32 msgid, quint64 f, const QVariant& r) {
+				const auto foreground = r.toMap().value("foreground");
+				if (!foreground.isNull()) {
+					m_cursor_foreground = foreground.toULongLong();
+				}
+				const auto background = r.toMap().value("background");
+				if (!background.isNull()) {
+					m_cursor_background = background.toULongLong();
+				}
+				update(neovimCursorRect());
+			});
+		connect(req_cursor_hl, &MsgpackRequest::error, m_nvim,
+			[this](quint32 msgid, quint64 f, const QVariant& err) {
+				m_cursor_foreground = QColor::Invalid;
+				m_cursor_background = QColor::Invalid;
+				update(neovimCursorRect());
+			});
+	} else {
 		update(neovimCursorRect());
 	}
 }
@@ -823,26 +900,63 @@ void Shell::paintEvent(QPaintEvent *ev)
 		return;
 	}
 
-	ShellWidget::paintEvent(ev);
+	const auto cursorVisible = m_cursor_blink_state_ != CursorBlinkState::Off
+		&& ev->region().contains(neovimCursorTopLeft());
+	if (!cursorVisible) {
+		ShellWidget::paintEvent(ev);
+		return;
+	}
 
-	// paint cursor - we are not actually using Neovim colors yet,
-	// just invert the shell colors by painting white with XoR
-	if (ev->region().contains(neovimCursorTopLeft())) {
-		bool wide = contents().constValue(m_cursor_pos.y(),
-						m_cursor_pos.x()).doubleWidth;
-		QRect cursorRect(neovimCursorTopLeft(), cellSize());
+	if (!m_cursor_style_enabled || !m_cursor_foreground.isValid() || !m_cursor_background.isValid()) {
+		ShellWidget::paintEvent(ev);
 
-		if (m_insertMode) {
-			cursorRect.setWidth(2);
-		} else if (wide) {
-			cursorRect.setWidth(cursorRect.width()*2);
-		}
+		// just invert the cell colors by painting white with XoR
 		QPainter painter(this);
-		painter.setPen(m_cursor_color);
+		QRect cursorRect(neovimCursorTopLeft(), cellSize());
 		painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
 		if (hasFocus()) {
-			painter.fillRect(cursorRect, m_cursor_color);
+			painter.fillRect(cursorRect, Qt::white);
 		} else {
+			painter.setPen(Qt::white);
+			painter.drawRect(cursorRect);
+		}
+		return;
+	}
+
+	auto& cursorCell = const_cast<Cell&>(contents().constValue(m_cursor_pos.y(), m_cursor_pos.x()));
+	if (hasFocus() && m_cursor_vertical == 100 && m_cursor_horizontal == 100) {
+		// Cursor fills the entire cell, so just temporarily change the cell's colors
+		const auto originalForegroundColor = cursorCell.foregroundColor;
+		const auto originalBackgroundColor = cursorCell.backgroundColor;
+		cursorCell.foregroundColor = m_cursor_foreground;
+		cursorCell.backgroundColor = m_cursor_background;
+
+		ShellWidget::paintEvent(ev);
+
+		cursorCell.foregroundColor = originalForegroundColor;
+		cursorCell.backgroundColor = originalBackgroundColor;
+	} else {
+		ShellWidget::paintEvent(ev);
+
+		// Cursor covers part of the cell, the foreground color isn't used
+		QPainter painter(this);
+		auto cursorSize = cellSize();
+		cursorSize.setWidth(cursorSize.width() * m_cursor_vertical / 100);
+		cursorSize.setHeight(cursorSize.height() * m_cursor_horizontal / 100);
+
+		auto cursorPoint = neovimCursorTopLeft();
+		cursorPoint.setY(cursorPoint.y() + cellSize().height() - cursorSize.height());
+
+		QRect cursorRect(cursorPoint, cursorSize);
+
+		if (cursorCell.doubleWidth) {
+			cursorRect.setWidth(cursorRect.width()*2);
+		}
+
+		if (hasFocus()) {
+			painter.fillRect(cursorRect, m_cursor_background);
+		} else {
+			painter.setPen(m_cursor_background);
 			painter.drawRect(cursorRect);
 		}
 	}
