@@ -838,8 +838,13 @@ void Shell::paintEvent(QPaintEvent *ev)
 			cursorRect.setWidth(cursorRect.width()*2);
 		}
 		QPainter painter(this);
+		painter.setPen(m_cursor_color);
 		painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
-		painter.fillRect(cursorRect, m_cursor_color);
+		if (hasFocus()) {
+			painter.fillRect(cursorRect, m_cursor_color);
+		} else {
+			painter.drawRect(cursorRect);
+		}
 	}
 }
 
