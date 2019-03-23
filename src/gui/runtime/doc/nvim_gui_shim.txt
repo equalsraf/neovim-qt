@@ -28,9 +28,13 @@ GuiFont		When called with no arguments this command display the
 
 		    :GuiFont Monaco:h13
 <
+		You can also use floating-point sizes:
+>
+		    :GuiFont Monaco:h13.5
+<
 		The following attributes are available
 
-			hXX - height is XX in points
+			hXX - height is XX in points (can be floating-point)
 			b   - bold weight
 			l   - light weight
 			i   - italic

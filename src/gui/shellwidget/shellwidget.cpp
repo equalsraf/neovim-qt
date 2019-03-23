@@ -37,9 +37,10 @@ void ShellWidget::setDefaultFont()
 	setShellFont(DEFAULT_FONT, 11, -1, false, true);
 }
 
-bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bool italic, bool force)
+bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, bool italic, bool force)
 {
-	QFont f(family, ptSize, weight, italic);
+	QFont f(family, -1, weight, italic);
+	f.setPointSizeF(ptSize);
 	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
 	f.setFixedPitch(true);
 	f.setKerning(false);
