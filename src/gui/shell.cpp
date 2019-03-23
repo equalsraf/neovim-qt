@@ -104,13 +104,13 @@ bool Shell::setGuiFont(const QString& fdesc, bool force)
 		return false;
 	}
 
-	int pointSize = font().pointSize();
+	qreal pointSize = font().pointSizeF();
 	int weight = -1;
 	bool italic = false;
 	foreach(QString attr, attrs) {
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok = false;
-			int height = attr.mid(1).toInt(&ok);
+			qreal height = attr.mid(1).toFloat(&ok);
 			if (!ok) {
 				m_nvim->api0()->vim_report_error("Invalid font height");
 				return false;
