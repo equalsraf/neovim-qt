@@ -355,9 +355,9 @@ QString ShellWidget::fontFamily() const
 {
 	return QFontInfo(font()).family();
 }
-int ShellWidget::fontSize() const
+qreal ShellWidget::fontSize() const
 {
-	return font().pointSize();
+	return font().pointSizeF();
 }
 
 int ShellWidget::rows() const
