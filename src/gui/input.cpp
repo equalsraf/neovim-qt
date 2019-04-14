@@ -214,7 +214,7 @@ QString InputConv::convertKey(const QString& text, int k, Qt::KeyboardModifiers 
 	QChar c;
 	// Escape < and backslash
 	if (text == "<") {
-		return QString("<lt>");
+		return QString("<%1%2>").arg(modPrefix(mod)).arg("lt");
 	} else if (text == "\\") {
 		return QString("<%1%2>").arg(modPrefix(mod)).arg("Bslash");
 	} else if (text.isEmpty()) {
