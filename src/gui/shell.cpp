@@ -876,6 +876,19 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 		return;
 	}
 
+	static bool isRightButtonDown = false;
+	if (ev->buttons() & Qt::RightButton)
+	{
+		isRightButtonDown = true;
+		return;
+	}
+	else if (isRightButtonDown && ev->type() == QEvent::MouseButtonRelease)
+	{
+		isRightButtonDown = false;
+		emit neovimShowContextMenu();
+		return;
+	}
+
 	QPoint pos(ev->x()/cellSize().width(),
 			ev->y()/cellSize().height());
 	QString inp;

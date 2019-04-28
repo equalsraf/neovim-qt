@@ -73,6 +73,7 @@ signals:
 	/// as seen in Tab::tab.
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
 	void neovimShowtablineSet(int);
+	void neovimShowContextMenu();
 	void fontChanged();
 
 public slots:
