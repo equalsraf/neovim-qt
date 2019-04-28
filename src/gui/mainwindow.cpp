@@ -17,6 +17,11 @@ MainWindow::MainWindow(NeovimConnector *c, ShellOptions opts, QWidget *parent)
 			this, &MainWindow::reconnectNeovim);
 	setCentralWidget(&m_stack);
 
+	m_actCut = new QAction(QIcon::fromTheme("edit-cut"), "Cut");
+	m_actCopy = new QAction(QIcon::fromTheme("edit-copy"), "Copy");
+	m_actPaste = new QAction(QIcon::fromTheme("edit-paste"), "Paste");
+	m_actSelectAll = new QAction(QIcon::fromTheme("edit-select-all"), "Select All");
+
 	init(c);
 }
 
@@ -88,6 +93,16 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimTablineUpdate);
 	connect(m_shell, &Shell::neovimShowtablineSet,
 			this, &MainWindow::neovimShowtablineSet);
+	connect(m_shell, &Shell::neovimShowContextMenu,
+			this, &MainWindow::neovimShowContextMenu);
+	connect(m_actCut, &QAction::triggered,
+			this, &MainWindow::neovimSendCut);
+	connect(m_actCopy, &QAction::triggered,
+			this, &MainWindow::neovimSendCopy);
+	connect(m_actPaste, &QAction::triggered,
+			this, &MainWindow::neovimSendPaste);
+	connect(m_actSelectAll, &QAction::triggered,
+			this, &MainWindow::neovimSendSelectAll);
 	m_shell->setFocus(Qt::OtherFocusReason);
 
 	if (m_nvim->errorCause()) {
@@ -336,6 +351,39 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 	}
 
 	Q_ASSERT(tabs.size() == m_tabline->count());
+}
+
+void MainWindow::neovimShowContextMenu()
+{
+	QMenu rightClickMenu;
+
+	rightClickMenu.addAction(m_actCut);
+	rightClickMenu.addAction(m_actCopy);
+	rightClickMenu.addAction(m_actPaste);
+	rightClickMenu.addSeparator();
+	rightClickMenu.addAction(m_actSelectAll);
+
+	rightClickMenu.exec(QCursor::pos());
+}
+
+void MainWindow::neovimSendCut()
+{
+	m_nvim->api0()->vim_feedkeys(R"("+x)", "m", true);
+}
+
+void MainWindow::neovimSendCopy()
+{
+	m_nvim->api0()->vim_feedkeys(R"("+y)", "m", true);
+}
+
+void MainWindow::neovimSendPaste()
+{
+	m_nvim->api0()->vim_feedkeys(R"("+gP)", "m", true);
+}
+
+void MainWindow::neovimSendSelectAll()
+{
+	m_nvim->api0()->vim_feedkeys("ggVG", "m", true);
 }
 
 void MainWindow::changeTab(int index)
