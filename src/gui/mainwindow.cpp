@@ -17,11 +17,6 @@ MainWindow::MainWindow(NeovimConnector *c, ShellOptions opts, QWidget *parent)
 			this, &MainWindow::reconnectNeovim);
 	setCentralWidget(&m_stack);
 
-	m_actCut = new QAction(QIcon::fromTheme("edit-cut"), "Cut");
-	m_actCopy = new QAction(QIcon::fromTheme("edit-copy"), "Copy");
-	m_actPaste = new QAction(QIcon::fromTheme("edit-paste"), "Paste");
-	m_actSelectAll = new QAction(QIcon::fromTheme("edit-select-all"), "Select All");
-
 	init(c);
 }
 
@@ -53,6 +48,18 @@ void MainWindow::init(NeovimConnector *c)
 
 	m_tabline_bar->addWidget(m_tabline);
 	m_tabline_bar->setVisible(m_shell_options.enable_ext_tabline);
+
+	// Context menu and actions for right-click
+	m_contextMenu = new QMenu();
+	m_actCut = new QAction(QIcon::fromTheme("edit-cut"), QString("Cut"));
+	m_actCopy = new QAction(QIcon::fromTheme("edit-copy"), QString("Copy"));
+	m_actPaste = new QAction(QIcon::fromTheme("edit-paste"), QString("Paste"));
+	m_actSelectAll = new QAction(QIcon::fromTheme("edit-select-all"), QString("Select All"));
+	m_contextMenu->addAction(m_actCut);
+	m_contextMenu->addAction(m_actCopy);
+	m_contextMenu->addAction(m_actPaste);
+	m_contextMenu->addSeparator();
+	m_contextMenu->addAction(m_actSelectAll);
 
 	m_nvim = c;
 
@@ -355,35 +362,27 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 
 void MainWindow::neovimShowContextMenu()
 {
-	QMenu rightClickMenu;
-
-	rightClickMenu.addAction(m_actCut);
-	rightClickMenu.addAction(m_actCopy);
-	rightClickMenu.addAction(m_actPaste);
-	rightClickMenu.addSeparator();
-	rightClickMenu.addAction(m_actSelectAll);
-
-	rightClickMenu.exec(QCursor::pos());
+	m_contextMenu->popup(QCursor::pos());
 }
 
 void MainWindow::neovimSendCut()
 {
-	m_nvim->api0()->vim_feedkeys(R"("+x)", "m", true);
+	m_nvim->api0()->vim_command_output(R"(normal! "+x)");
 }
 
 void MainWindow::neovimSendCopy()
 {
-	m_nvim->api0()->vim_feedkeys(R"("+y)", "m", true);
+	m_nvim->api0()->vim_command(R"(normal! "+y)");
 }
 
 void MainWindow::neovimSendPaste()
 {
-	m_nvim->api0()->vim_feedkeys(R"("+gP)", "m", true);
+	m_nvim->api0()->vim_command(R"(normal! "+gP)");
 }
 
 void MainWindow::neovimSendSelectAll()
 {
-	m_nvim->api0()->vim_feedkeys("ggVG", "m", true);
+	m_nvim->api0()->vim_command("normal! ggVG");
 }
 
 void MainWindow::changeTab(int index)

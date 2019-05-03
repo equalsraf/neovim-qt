@@ -206,3 +206,13 @@ endfunction
 command! GuiTreeviewToggle call <SID>TreeViewToggle()
 noremap <script> <Plug>GuiTreeviewToggle :call <SID>TreeViewToggle()
 anoremenu <script> Gui.Treeview.Toggle :call <SID>TreeViewShowToggle()
+
+" Show Right-Click ContextMenu
+function s:GuiShowContextMenu() range
+	call rpcnotify(0, 'Gui', 'ShowContextMenu')
+endfunction
+
+command! -range GuiShowContextMenu call s:GuiShowContextMenu()
+nnoremap <silent><RightMouse> :GuiShowContextMenu<CR>
+inoremap <silent><RightMouse> :GuiShowContextMenu<CR>
+vnoremap <silent><RightMouse> :GuiShowContextMenu<CR>gv
