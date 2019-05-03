@@ -68,6 +68,7 @@ private:
 	QToolBar *m_tabline_bar;
 	ShellOptions m_shell_options;
 	bool m_neovim_requested_close;
+	QMenu *m_contextMenu;
 	QAction *m_actCut;
 	QAction *m_actCopy;
 	QAction *m_actPaste;
