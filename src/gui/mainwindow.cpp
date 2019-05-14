@@ -51,10 +51,11 @@ void MainWindow::init(NeovimConnector *c)
 
 	// Context menu and actions for right-click
 	m_contextMenu = new QMenu();
-	m_actCut = new QAction(QIcon::fromTheme("edit-cut"), QString("Cut"));
-	m_actCopy = new QAction(QIcon::fromTheme("edit-copy"), QString("Copy"));
-	m_actPaste = new QAction(QIcon::fromTheme("edit-paste"), QString("Paste"));
-	m_actSelectAll = new QAction(QIcon::fromTheme("edit-select-all"), QString("Select All"));
+	m_actCut = new QAction(QIcon::fromTheme("edit-cut"), QString("Cut"), nullptr /*parent*/);
+	m_actCopy = new QAction(QIcon::fromTheme("edit-copy"), QString("Copy"), nullptr /*parent*/);
+	m_actPaste = new QAction(QIcon::fromTheme("edit-paste"), QString("Paste"), nullptr /*parent*/);
+	m_actSelectAll = new QAction(QIcon::fromTheme("edit-select-all"), QString("Select All"),
+		nullptr /*parent*/);
 	m_contextMenu->addAction(m_actCut);
 	m_contextMenu->addAction(m_actCopy);
 	m_contextMenu->addAction(m_actPaste);
