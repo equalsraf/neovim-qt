@@ -149,6 +149,14 @@ This can be used to check for a specific GUI in ginit.vim, e.g.
 
 This is a wrapper around |nvim_get_chan_info()|.
 
+							*GuiShowContextMenu()*
+Displays a Cut-Copy-Paste context menu at the current cursor position. This
+menu can be mapped to right click events in ginit.vim, e.g.
+>
+	nnoremap <silent><RightMouse> :call GuiShowContextMenu()<CR>
+	inoremap <silent><RightMouse> <Esc>:call GuiShowContextMenu()<CR>
+	vnoremap <silent><RightMouse> :call GuiShowContextMenu()<CR>gv
+
 ==============================================================================
 4. Internals
 
