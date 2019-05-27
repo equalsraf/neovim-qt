@@ -222,6 +222,10 @@ void Shell::init()
 	if (m_options.enable_ext_popupmenu) {
 		options.insert("ext_popupmenu", true);
 	}
+	if (m_options.enable_ext_linegrid) {
+		// Modern Grid UI API is optionally enabled via cmdline
+		options.insert("ext_linegrid", true);
+	}
 	options.insert("rgb", true);
 
 	MsgpackRequest *req;
@@ -523,9 +527,26 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		m_pum.hide();
 	} else if (name == "mode_info_set") {
 		// TODO
+	} else if (name == "flush") {
+		// Do Nothing, a notification that nvim is done redrawing.
+	} else if (name == "grid_resize") {
+		handleGridResize(opargs);
 	} else if (name == "default_colors_set") {
-		// TODO
-	} else {
+		handleDefaultColorsSet(opargs);
+	} else if (name == "hl_attr_define") {
+		handleHighlightAttributeDefine(opargs);
+	} else if (name == "grid_line") {
+		handleGridLine(opargs);
+	} else if (name == "grid_clear") {
+		clearShell(HighlightAttribute::GetDefaultBackgroundColor());
+	} else if (name == "grid_destroy") {
+		qDebug() << "Not implemented grid_destroy:" << opargs;
+	} else if (name == "grid_cursor_goto") {
+		handleGridCursorGoto(opargs);
+	} else if (name == "grid_scroll") {
+		handleGridScroll(opargs);
+	}
+	else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
 
@@ -806,6 +827,7 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 	} else if (name == "termguicolors") {
 	} else if (name == "ext_cmdline") {
 	} else if (name == "ext_wildmenu") {
+	} else if (name == "ext_linegrid") {
 	} else {
 		qDebug() << "Received unknown option" << name << value;
 	}
@@ -815,6 +837,210 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 void Shell::handleMouse(bool enabled)
 {
 	m_mouseEnabled = enabled;
+}
+
+void Shell::handleGridResize(const QVariantList& opargs)
+{
+	if (opargs.size() < 3
+		|| !opargs.at(0).canConvert<qint64>()
+		|| !opargs.at(1).canConvert<qint64>()
+		|| !opargs.at(2).canConvert<qint64>()) {
+		qWarning() << "Unexpected arguments for grid_resize:" << opargs;
+		return;
+	}
+
+	// Unused parameters:
+	//     "grid" = opargs.at(0).toULongLong()
+
+	const uint64_t width = opargs.at(1).toULongLong();
+	const uint64_t height = opargs.at(2).toULongLong();
+
+	handleResize(width, height);
+}
+
+void Shell::handleDefaultColorsSet(const QVariantList& opargs)
+{
+	if (opargs.size() < 5
+		|| !opargs.at(0).canConvert<qint64>()
+		|| !opargs.at(1).canConvert<qint64>()
+		|| !opargs.at(2).canConvert<qint64>()
+		|| !opargs.at(3).canConvert<qint64>()
+		|| !opargs.at(4).canConvert<qint64>()) {
+		qWarning() << "Unexpected arguments for default_colors_set:" << opargs;
+		return;
+	}
+
+	// Unused parameters:
+	//     "cterm_fg" = opargs.at(3).toULongLong()
+	//     "cterm_bg" = opargs.at(4).toULongLong()
+
+	const uint64_t rgb_fg = opargs.at(0).toULongLong();
+	const uint64_t rgb_bg = opargs.at(1).toULongLong();
+	const uint64_t rgb_sp = opargs.at(2).toULongLong();
+
+	const QColor foregroundColor = color(rgb_fg, QColor::Invalid);
+	const QColor backgroundColor = color(rgb_bg, QColor::Invalid);
+	const QColor specialColor = color(rgb_sp, QColor::Invalid);
+
+	// Set default background/foreground colors for "hl_attr_define"
+	HighlightAttribute::SetDefaultForegroundColor(foregroundColor);
+	HighlightAttribute::SetDefaultBackgroundColor(backgroundColor);
+	HighlightAttribute::SetDefaultSpecialColor(specialColor);
+
+	// Update shellwidget default colors
+	setForeground(foregroundColor);
+	setBackground(backgroundColor);
+	setSpecial(specialColor);
+}
+
+void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
+{
+	if (opargs.size() < 4
+		|| !opargs.at(0).canConvert<qint64>()
+		|| static_cast<QMetaType::Type>(opargs.at(1).type()) != QMetaType::QVariantMap
+		|| static_cast<QMetaType::Type>(opargs.at(2).type()) != QMetaType::QVariantMap) {
+		qWarning() << "Unexpected arguments for hl_attr_define:" << opargs;
+		return;
+	}
+
+	// Unused parameters:
+	//     "cterm_attr" = opargs.at(2).toMap()
+
+	const uint64_t id = opargs.at(0).toULongLong();
+	const auto& rgb_attr = opargs.at(1).toMap();
+
+	const QColor foregroundColor = (rgb_attr.contains("foreground")) ?
+		color(rgb_attr.value("foreground").toLongLong(), QColor::Invalid) :
+		QColor::Invalid;
+
+	const QColor backgroundColor = (rgb_attr.contains("background")) ?
+		color(rgb_attr.value("background").toLongLong(), QColor::Invalid) :
+		QColor::Invalid;
+
+	const QColor specialColor = rgb_attr.contains(("special")) ?
+		color(rgb_attr.value("special").toLongLong(), QColor::Invalid) :
+		QColor::Invalid;
+
+	HighlightAttribute hl_attr {
+		foregroundColor,
+		backgroundColor,
+		specialColor,
+		rgb_attr.contains("reverse"),
+		rgb_attr.contains("italic"),
+		rgb_attr.contains("bold"),
+		rgb_attr.contains("underline"),
+		rgb_attr.contains("undercurl") };
+
+	m_highlightMap.insert(id, hl_attr);
+}
+
+
+void Shell::handleGridLine(const QVariantList& opargs)
+{
+	if (opargs.size() < 4
+		|| !opargs.at(0).canConvert<qint64>()
+		|| !opargs.at(1).canConvert<qint64>()
+		|| !opargs.at(2).canConvert<qint64>()
+		|| static_cast<QMetaType::Type>(opargs.at(3).type()) != QMetaType::QVariantList) {
+		qWarning() << "Unexpected arguments for grid_line:" << opargs;
+		return;
+	}
+
+	// Unused parameters:
+	//     "grid" = opargs.at(0).toULongLong()
+
+	const uint64_t row = opargs.at(1).toULongLong();
+	const uint64_t col_start = opargs.at(2).toULongLong();
+	const QVariantList& cells = opargs.at(3).toList();
+
+	// Last used hl_attr, default ctor triggers default highlight/style.
+	HighlightAttribute hl_attr;
+
+	uint64_t col_next = col_start;
+	for (const auto& cell : cells) {
+		const QVariantList& cellPropertyList = cell.toList();
+
+		QString text = m_nvim->decode(cellPropertyList[0].toByteArray());
+
+		// Optional highlight style, default is the last hl_attr.
+		if (cellPropertyList.size() > 1) {
+			const uint64_t hl_id = cellPropertyList[1].toULongLong();
+
+			// Entry for 'hl_id == 0' is intentionally absent.
+			// Any unknown key triggers the default highlight/style.
+			hl_attr = m_highlightMap.value(hl_id);
+		}
+
+		// Optional repeat count, default is 1.
+		uint64_t repeat = 1;
+		if (cellPropertyList.size() > 2) {
+			repeat = cellPropertyList[2].toULongLong();
+		}
+
+		// Send GUI updates to 'ShellWidget'.
+		for (uint64_t i=0;i<repeat;i++)
+		{
+			put(text, row, col_next,
+				hl_attr.GetForegroundColor(),
+				hl_attr.GetBackgroundColor(),
+				hl_attr.GetSpecialColor(),
+				hl_attr.IsBold(),
+				hl_attr.IsItalic(),
+				hl_attr.IsUnderline(),
+				hl_attr.IsUndercurl());
+
+			col_next++;
+		}
+	}
+}
+
+void Shell::handleGridCursorGoto(const QVariantList& opargs)
+{
+	if (opargs.size() < 3
+		|| !opargs.at(1).canConvert<quint64>()
+		|| !opargs.at(2).canConvert<quint64>()) {
+		qWarning() << "Unexpected arguments for grid_cursor_goto:" << opargs;
+		return;
+	}
+
+	// Unused parameters:
+	//     "grid" = opargs.at(0).toULongLong()
+
+	const uint64_t row = opargs.at(1).toULongLong();
+	const uint64_t column = opargs.at(2).toULongLong();
+
+	setNeovimCursor(row, column);
+	qApp->inputMethod()->update(Qt::ImCursorRectangle);
+}
+
+void Shell::handleGridScroll(const QVariantList& opargs)
+{
+	if (opargs.size() < 7
+		|| !opargs.at(0).canConvert<quint64>()
+		|| !opargs.at(1).canConvert<quint64>()
+		|| !opargs.at(2).canConvert<quint64>()
+		|| !opargs.at(3).canConvert<quint64>()
+		|| !opargs.at(4).canConvert<quint64>()
+		|| !opargs.at(5).canConvert<quint64>()
+		|| !opargs.at(6).canConvert<quint64>()) {
+		qWarning() << "Unexpected arguments for grid_scroll:" << opargs;
+		return;
+	}
+
+	// Unused parameters:
+	//     "grid" = opargs.at(0).toULongLong()
+	//     "cols" = opargs.at(6).toULongLong()
+
+	const uint64_t top = opargs.at(1).toULongLong();
+	const uint64_t bot = opargs.at(2).toULongLong();
+	const uint64_t left = opargs.at(3).toULongLong();
+	const uint64_t right = opargs.at(4).toULongLong();
+	const uint64_t rows = opargs.at(5).toULongLong();
+
+	m_scroll_region = QRect(QPoint(left, top), QPoint(right, bot));
+
+	scrollShellRegion(m_scroll_region.top(), m_scroll_region.bottom(),
+		m_scroll_region.left(), m_scroll_region.right(), rows);
 }
 
 void Shell::paintEvent(QPaintEvent *ev)

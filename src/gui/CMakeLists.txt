@@ -22,6 +22,7 @@ add_subdirectory(shellwidget)
 include(GNUInstallDirs)
 set(RUNTIME_PATH )
 add_library(neovim-qt-gui shell.cpp input.cpp treeview.cpp errorwidget.cpp mainwindow.cpp app.cpp
+	highlight.cpp
 	popupmenumodel.cpp
 	popupmenu.cpp
 	${CMAKE_SOURCE_DIR}/third-party/konsole_wcwidth.cpp
