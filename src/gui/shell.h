@@ -12,6 +12,7 @@
 #include <QMenu>
 #include "neovimconnector.h"
 #include "shellwidget/shellwidget.h"
+#include "highlight.h"
 #include "popupmenu.h"
 #include "popupmenumodel.h"
 
@@ -30,14 +31,10 @@ public:
 
 class ShellOptions {
 public:
-	ShellOptions() {
-		enable_ext_tabline = true;
-		enable_ext_popupmenu = true;
-		nvim_show_tabline = 1;
-	}
-	bool enable_ext_tabline;
-	int nvim_show_tabline;
-	bool enable_ext_popupmenu;
+	bool enable_ext_tabline{ true };
+	bool enable_ext_popupmenu{ true };
+	bool enable_ext_linegrid{ false };
+	int nvim_show_tabline{ 1 };
 };
 
 class Shell: public ShellWidget
@@ -134,6 +131,14 @@ protected:
 	virtual void handlePopupMenuSelect(const QVariantList& opargs);
 	virtual void handleMouse(bool);
 
+	// Modern 'ext_linegrid' Grid UI Events
+	virtual void handleGridResize(const QVariantList& opargs);
+	virtual void handleDefaultColorsSet(const QVariantList& opargs);
+	virtual void handleHighlightAttributeDefine(const QVariantList& opargs);
+	virtual void handleGridLine(const QVariantList& opargs);
+	virtual void handleGridCursorGoto(const QVariantList& opargs);
+	virtual void handleGridScroll(const QVariantList& opargs);
+
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
@@ -160,6 +165,9 @@ private:
 	// use the values from above
 	QColor m_hg_foreground, m_hg_background, m_hg_special;
 	QColor m_cursor_color;
+
+	/// Modern 'ext_linegrid' highlight definition map
+	QMap<uint64_t, HighlightAttribute> m_highlightMap;
 
 	/// Cursor position in shell coordinates
 	QPoint m_cursor_pos;

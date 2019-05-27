@@ -91,6 +91,10 @@ void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
 		opts.enable_ext_tabline = false;
 	}
 
+	if (parser.isSet("ext-linegrid")) {
+		opts.enable_ext_linegrid = true;
+	}
+
 #ifdef NEOVIMQT_GUI_WIDGET
 	NeovimQt::Shell *win = new NeovimQt::Shell(c);
 	win->show();
@@ -142,6 +146,8 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 				QCoreApplication::translate("main", "Maximize the window on startup")));
 	parser.addOption(QCommandLineOption("no-ext-tabline",
 				QCoreApplication::translate("main", "Disable the external GUI tabline")));
+	parser.addOption(QCommandLineOption("ext-linegrid",
+				QCoreApplication::translate("main", "Enable the modern 'ext_linegrid' Neovim GUI API")));
 	parser.addOption(QCommandLineOption("fullscreen",
 				QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
 	parser.addOption(QCommandLineOption("embed",
