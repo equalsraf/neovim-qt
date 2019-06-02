@@ -130,9 +130,8 @@ protected:
 	virtual void handleBusy(bool);
 	virtual void handleSetOption(const QString& name, const QVariant& value);
 	void handleExtGuiOption(const QString& name, const QVariant& value);
-	virtual void handlePopupMenuShow(const QVariantList& items, int64_t selected,
-			int64_t row, int64_t col);
-	void handlePopupMenuSelect(int64_t selected);
+	virtual void handlePopupMenuShow(const QVariantList& opargs);
+	virtual void handlePopupMenuSelect(const QVariantList& opargs);
 	virtual void handleMouse(bool);
 
 	void neovimMouseEvent(QMouseEvent *ev);
@@ -180,7 +179,7 @@ private:
 	// Properties
 	bool m_neovimBusy;
 	ShellOptions m_options;
-	PopupMenu m_pum;
+	PopupMenu m_pum{ this };
 	bool m_mouseEnabled;
 };
 
