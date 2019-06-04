@@ -8,30 +8,52 @@
 struct Cell {
 public:
 
-
-	inline Cell(QChar c, QColor fgColor, QColor bgColor, QColor spColor, bool bold,
-			bool italic, bool underline, bool undercurl)
-	:foregroundColor(fgColor), backgroundColor(bgColor), specialColor(spColor),
-	bold(bold), italic(italic), underline(underline), undercurl(undercurl),
-	valid(true), doubleWidth(false) {
+	inline Cell(
+		QChar c,
+		QColor fgColor,
+		QColor bgColor,
+		QColor spColor,
+		bool bold,
+		bool italic,
+		bool underline,
+		bool undercurl) :
+		foregroundColor{ fgColor },
+		backgroundColor{ bgColor },
+		specialColor{ spColor },
+		bold{ bold },
+		italic{ italic },
+		underline{ underline },
+		undercurl{ undercurl },
+		valid{ true },
+		doubleWidth{ false } {
 		setChar(c);
-	}
+	};
 
 	/// Default cells are space characters using invalid colors
-	inline Cell()
-	:c(' '), foregroundColor(QColor()), backgroundColor(QColor()), specialColor(QColor()),
-	bold(false), italic(false), underline(false), undercurl(false),
-	valid(true), doubleWidth(false) {}
+	inline Cell() :
+		c(' '),
+		foregroundColor{ QColor::Invalid },
+		backgroundColor{ QColor::Invalid },
+		specialColor{ QColor::Invalid },
+		bold{ false },
+		italic{ false },
+		underline{ false },
+		undercurl{ false },
+		valid{ true },
+		doubleWidth{ false } {}
 
 	inline void reset() {
 		c = ' ';
-		foregroundColor = QColor();
-		backgroundColor = foregroundColor;
-		specialColor = foregroundColor;
-		bold = italic = underline = undercurl = doubleWidth = false;
+		foregroundColor = QColor::Invalid;
+		backgroundColor = QColor::Invalid;
+		specialColor = QColor::Invalid;
+		bold = false;
+		italic = false;
+		underline = false;
+		undercurl = false;
+		doubleWidth = false;
 		valid = true;
 	}
-
 
 	/// Create an empty Cell with a background color
 	static Cell bg(QColor bg) {
