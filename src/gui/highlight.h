@@ -30,29 +30,11 @@ public:
 	/// Creates safe object with default highlight/style, required for QMap.
 	HighlightAttribute() {};
 
-	static void SetDefaultForegroundColor(QColor foreground) {
-		m_defaultForeground = foreground;
-	}
-
-	static void SetDefaultBackgroundColor(QColor background) {
-		m_defaultBackground = background;
-	}
-
-	static void SetDefaultSpecialColor(QColor special) {
-		m_defaultSpecial = special;
-	}
-
-	static QColor GetDefaultForegroundColor() { return m_defaultForeground; }
-
-	static QColor GetDefaultBackgroundColor() { return m_defaultBackground; }
-
-	static QColor GetDefaultSpecialColor() { return m_defaultSpecial; }
-
 	QColor GetForegroundColor() const;
 
 	QColor GetBackgroundColor() const;
 
-	QColor GetSpecialColor() const;
+	QColor GetSpecialColor() const { return m_special; }
 
 	bool IsReverse() const { return m_reverse; }
 
@@ -65,10 +47,6 @@ public:
 	bool IsUndercurl() const { return m_undercurl; }
 
 private:
-	static QColor m_defaultForeground;
-	static QColor m_defaultBackground;
-	static QColor m_defaultSpecial;
-
 	QColor m_foreground{ QColor::Invalid };
 	QColor m_background{ QColor::Invalid };
 	QColor m_special{ QColor::Invalid };

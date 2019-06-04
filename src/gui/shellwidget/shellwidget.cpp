@@ -290,15 +290,6 @@ int ShellWidget::put(const QString& text, int row, int column,
 		QColor fg, QColor bg, QColor sp, bool bold, bool italic,
 		bool underline, bool undercurl)
 {
-	if (!fg.isValid()) {
-		fg = m_fgColor;
-	}
-	if (!bg.isValid()) {
-		bg = m_bgColor;
-	}
-	if (!sp.isValid()) {
-		sp = m_spColor;
-	}
 	int cols_changed = m_contents.put(text, row, column, fg, bg, sp,
 				bold, italic, underline, undercurl);
 	if (cols_changed > 0) {

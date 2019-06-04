@@ -45,7 +45,7 @@ public slots:
 			bool bold=false, bool italic=false,
 			bool underline=false, bool undercurl=false);
 	void clearRow(int row);
-	void clearShell(QColor bg);
+	void clearShell(QColor bg = QColor::Invalid);
 	void clearRegion(int row0, int col0, int row1, int col1);
 	void scrollShell(int rows);
 	void scrollShellRegion(int row0, int row1, int col0,

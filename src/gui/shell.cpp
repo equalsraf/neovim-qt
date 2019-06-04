@@ -519,7 +519,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "grid_line") {
 		handleGridLine(opargs);
 	} else if (name == "grid_clear") {
-		clearShell(HighlightAttribute::GetDefaultBackgroundColor());
+		clearShell();
 	} else if (name == "grid_destroy") {
 		qDebug() << "Not implemented grid_destroy:" << opargs;
 	} else if (name == "grid_cursor_goto") {
@@ -855,15 +855,13 @@ void Shell::handleDefaultColorsSet(const QVariantList& opargs)
 	const QColor backgroundColor = color(rgb_bg, QColor::Invalid);
 	const QColor specialColor = color(rgb_sp, QColor::Invalid);
 
-	// Set default background/foreground colors for "hl_attr_define"
-	HighlightAttribute::SetDefaultForegroundColor(foregroundColor);
-	HighlightAttribute::SetDefaultBackgroundColor(backgroundColor);
-	HighlightAttribute::SetDefaultSpecialColor(specialColor);
-
 	// Update shellwidget default colors
 	setForeground(foregroundColor);
 	setBackground(backgroundColor);
 	setSpecial(specialColor);
+
+	// Cells drawn with the default colors require a re-paint
+	update();
 }
 
 void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
