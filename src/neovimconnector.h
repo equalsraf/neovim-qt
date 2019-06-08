@@ -116,29 +116,29 @@ protected slots:
 	void msgpackError();
 
 private:
-	MsgpackIODevice *m_dev;
-	NeovimConnectorHelper *m_helper;
+	MsgpackIODevice *m_dev{ nullptr };
+	NeovimConnectorHelper *m_helper{ nullptr };
 	QString m_errorString;
-	NeovimError m_error;
+	NeovimError m_error{ NoError };
 
-	NeovimApi0 *m_api0;
-	NeovimApi1 *m_api1;
-	NeovimApi2 *m_api2;
-	NeovimApi3 *m_api3;
-	NeovimApi4 *m_api4;
-	NeovimApi6 *m_api6;
-	quint64 m_channel;
-	quint64 m_api_compat;
-	quint64 m_api_supported;
+	NeovimApi0 *m_api0{ nullptr };
+	NeovimApi1 *m_api1{ nullptr };
+	NeovimApi2 *m_api2{ nullptr };
+	NeovimApi3 *m_api3{ nullptr };
+	NeovimApi4 *m_api4{ nullptr };
+	NeovimApi6 *m_api6{ nullptr };
+	quint64 m_channel{ 0 };
+	quint64 m_api_compat{ 0 };
+	quint64 m_api_supported{ 0 };
 
 	// Store connection arguments for reconnect()
-	NeovimConnectionType m_ctype;
+	NeovimConnectionType m_ctype{ OtherConnection };
 	QStringList m_spawnArgs;
 	QString m_spawnExe;
 	QString m_connSocket, m_connHost;
 	int m_connPort;
-	bool m_ready;
-	int m_timeout;
+	bool m_ready{ false };
+	int m_timeout{ 20000 };
 };
 } // namespace NeovimQt
 Q_DECLARE_METATYPE(NeovimQt::NeovimConnector::NeovimError)
