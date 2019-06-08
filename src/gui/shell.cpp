@@ -514,13 +514,18 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 
 void Shell::handlePopupMenuShow(const QVariantList& opargs)
 {
-	if (opargs.size() < 5
+	// The 'popupmenu_show' API is not consistent across NeoVim versions!
+	// A 5th argument was introduced in neovim/neovim@16c3337
+	if (opargs.size() < 4
 		|| static_cast<QMetaType::Type>(opargs.at(0).type()) != QMetaType::QVariantList
 		|| !opargs.at(1).canConvert<int64_t>()
 		|| !opargs.at(2).canConvert<int64_t>()
-		|| !opargs.at(3).canConvert<int64_t>()
-		|| !opargs.at(4).canConvert<int64_t>()) {
+		|| !opargs.at(3).canConvert<int64_t>()) {
 		qWarning() << "Unexpected arguments for popupmenu_show:" << opargs;
+		return;
+	}
+	else if (opargs.size() >= 5 && !opargs.at(4).canConvert<int64_t>()) {
+		qWarning() << "Unexpected 5th argument for popupmenu_show:" << opargs.at(4);
 		return;
 	}
 
@@ -528,7 +533,7 @@ void Shell::handlePopupMenuShow(const QVariantList& opargs)
 	const int64_t selected = opargs.at(1).toULongLong();
 	const int64_t row = opargs.at(2).toULongLong();
 	const int64_t col = opargs.at(3).toULongLong();
-	//const int64_t grid = opargs.at(4).toULongLong();
+	//const int64_t grid = (opargs.size() < 5) ? 0 : opargs.at(4).toULongLong();
 
 	QList<PopupMenuItem> model;
 	for (const auto& v : items) {
