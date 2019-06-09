@@ -8,6 +8,7 @@ set(NEOVIM_QT_SOURCES
   auto/neovimapi2.cpp
   auto/neovimapi3.cpp
   auto/neovimapi4.cpp
+  auto/neovimapi5.cpp
   auto/neovimapi6.cpp
   function.cpp
   msgpackiodevice.cpp
