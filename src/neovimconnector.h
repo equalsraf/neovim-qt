@@ -98,6 +98,7 @@ public:
 
 	quint64 apiCompatibility();
 	quint64 apiLevel();
+	bool hasUIOption(const QByteArray& option);
 
 signals:
 	/** Emitted when Neovim is ready @see ready */
@@ -140,6 +141,7 @@ private:
 	QStringList m_spawnArgs;
 	QString m_spawnExe;
 	QString m_connSocket, m_connHost;
+	QVariantList m_uiOptions;
 	int m_connPort;
 	bool m_ready{ false };
 	int m_timeout{ 20000 };

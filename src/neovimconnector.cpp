@@ -461,10 +461,17 @@ quint64 NeovimConnector::apiCompatibility()
 {
 	return m_api_compat;
 }
+
 /** The maximum API level supported by this instance */
 quint64 NeovimConnector::apiLevel()
 {
 	return m_api_supported;
+}
+
+/** Inspect Neovim metadata for ui_option support */
+bool NeovimConnector::hasUIOption(const QByteArray &option)
+{
+	return m_uiOptions.contains(option);
 }
 
 /**

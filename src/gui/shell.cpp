@@ -222,7 +222,8 @@ void Shell::init()
 	if (m_options.enable_ext_popupmenu) {
 		options.insert("ext_popupmenu", true);
 	}
-	if (m_options.enable_ext_linegrid) {
+	if (m_options.enable_ext_linegrid
+		&& m_nvim->hasUIOption("ext_linegrid")) {
 		// Modern Grid UI API is optionally enabled via cmdline
 		options.insert("ext_linegrid", true);
 	}
