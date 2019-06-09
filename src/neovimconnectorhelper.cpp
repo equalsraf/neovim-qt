@@ -38,19 +38,20 @@ void NeovimConnectorHelper::handleMetadataError(quint32 msgid, quint64, const QV
 void NeovimConnectorHelper::handleMetadata(quint32 msgid, quint64, const QVariant& result)
 {
 	const QVariantList asList = result.toList();
-	if (asList.size() != 2 || 
-			!asList.at(0).canConvert<quint64>() ||
-			!asList.at(1).canConvert<QVariantMap>()) {
+	if (asList.size() != 2
+		|| !asList.at(0).canConvert<quint64>()
+		|| !asList.at(1).canConvert<QVariantMap>()) {
 		m_c->setError(NeovimConnector::UnexpectedMsg,
-				tr("Unable to unpack metadata response description, unexpected data type"));
+			tr("Unable to unpack metadata response description, unexpected data type"));
 	}
 
 	m_c->m_channel = asList.at(0).toUInt();
 	const QVariantMap metadata = asList.at(1).toMap();
 
-	int api_compat = metadata.value("version").toMap().value("api_compatible").toUInt();
-	int api_level = metadata.value("version").toMap().value("api_level").toUInt();
+	const int api_compat = metadata.value("version").toMap().value("api_compatible").toUInt();
+	const int api_level = metadata.value("version").toMap().value("api_level").toUInt();
 	qDebug() << "Neovim API version compatible with" << api_compat << "supported" << api_level;
+	m_c->m_uiOptions = metadata.value("ui_options").toList();
 	m_c->m_api_compat = api_compat;
 	m_c->m_api_supported = api_level;
 
