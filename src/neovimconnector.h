@@ -11,6 +11,7 @@
 #include "auto/neovimapi2.h"
 #include "auto/neovimapi3.h"
 #include "auto/neovimapi4.h"
+#include "auto/neovimapi5.h"
 #include "auto/neovimapi6.h"
 
 namespace NeovimQt {
@@ -25,6 +26,7 @@ class NeovimConnector: public QObject
 	friend class NeovimApi2;
 	friend class NeovimApi3;
 	friend class NeovimApi4;
+	friend class NeovimApi5;
 	friend class NeovimApi6;
 	friend class NeovimConnectorHelper;
 	Q_OBJECT
@@ -83,6 +85,7 @@ public:
 	NeovimApi2 * api2();
 	NeovimApi3 * api3();
 	NeovimApi4 * api4();
+	NeovimApi5 * api5();
 	NeovimApi6 * api6();
 	uint64_t channel();
 	QString decode(const QByteArray&);
@@ -126,6 +129,7 @@ private:
 	NeovimApi2 *m_api2{ nullptr };
 	NeovimApi3 *m_api3{ nullptr };
 	NeovimApi4 *m_api4{ nullptr };
+	NeovimApi5 *m_api5{ nullptr };
 	NeovimApi6 *m_api6{ nullptr };
 	quint64 m_channel{ 0 };
 	quint64 m_api_compat{ 0 };
