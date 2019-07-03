@@ -1,8 +1,9 @@
 #include "mainwindow.h"
 
 #include <QCloseEvent>
-#include <QToolBar>
 #include <QLayout>
+#include <QSettings>
+#include <QToolBar>
 
 namespace NeovimQt {
 
@@ -231,6 +232,8 @@ void MainWindow::reconnectNeovim()
 
 void MainWindow::closeEvent(QCloseEvent *ev)
 {
+	saveWindowGeometry();
+
 	if (m_neovim_requested_close) {
 		// If this was requested by nvim, shutdown
 		QWidget::closeEvent(ev);
@@ -273,6 +276,9 @@ void MainWindow::showIfDelayed()
 {
 	if (!isVisible()) {
 		if (m_delayedShow == DelayedShow::Normal) {
+			// Restore the last known window size/position.
+			loadWindowGeometry();
+
 			show();
 		} else if (m_delayedShow == DelayedShow::Maximized) {
 			showMaximized();
@@ -399,4 +405,19 @@ void MainWindow::changeTab(int index)
 	int64_t tab = m_tabline->tabData(index).toInt();
 	m_nvim->api2()->nvim_set_current_tabpage(tab);
 }
+
+void MainWindow::saveWindowGeometry()
+{
+	QSettings settings{ "nvim-qt", "window-geometry" };
+	settings.setValue("window_geometry", saveGeometry());
+	settings.setValue("window_state", saveState());
+}
+
+void MainWindow::loadWindowGeometry()
+{
+	QSettings settings{ "nvim-qt", "window-geometry" };
+	restoreGeometry(settings.value("window_geometry").toByteArray());
+	restoreState(settings.value("window_state").toByteArray());
+}
+
 }  // namespace NeovimQt
