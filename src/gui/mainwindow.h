@@ -55,6 +55,8 @@ private slots:
 	void neovimSendSelectAll();
 	void extTablineSet(bool);
 	void changeTab(int index);
+	void saveWindowGeometry();
+	void loadWindowGeometry();
 private:
 	void init(NeovimConnector *);
 	NeovimConnector *m_nvim;
