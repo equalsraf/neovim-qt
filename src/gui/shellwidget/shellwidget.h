@@ -17,13 +17,13 @@ class ShellWidget: public QWidget
 	Q_PROPERTY(QSize cellSize READ cellSize)
 public:
 	ShellWidget(QWidget *parent=0);
-	bool setShellFont(const QString& family, int ptSize, int weight = -1, bool italic = false, bool force = false);
+	bool setShellFont(const QString& family, qreal ptSize, int weight = -1, bool italic = false, bool force = false);
 
 	QColor background() const;
 	QColor foreground() const;
 	QColor special() const;
 	QString fontFamily() const;
-	int fontSize() const;
+	qreal fontSize() const;
 	static ShellWidget* fromFile(const QString& path);
 
 	int rows() const;

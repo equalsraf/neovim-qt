@@ -56,6 +56,19 @@ void MainWindow::init(NeovimConnector *c)
 	m_tabline_bar->addWidget(m_tabline);
 	m_tabline_bar->setVisible(m_shell_options.enable_ext_tabline);
 
+	// Context menu and actions for right-click
+	m_contextMenu = new QMenu();
+	m_actCut = new QAction(QIcon::fromTheme("edit-cut"), QString("Cut"), nullptr /*parent*/);
+	m_actCopy = new QAction(QIcon::fromTheme("edit-copy"), QString("Copy"), nullptr /*parent*/);
+	m_actPaste = new QAction(QIcon::fromTheme("edit-paste"), QString("Paste"), nullptr /*parent*/);
+	m_actSelectAll = new QAction(QIcon::fromTheme("edit-select-all"), QString("Select All"),
+		nullptr /*parent*/);
+	m_contextMenu->addAction(m_actCut);
+	m_contextMenu->addAction(m_actCopy);
+	m_contextMenu->addAction(m_actPaste);
+	m_contextMenu->addSeparator();
+	m_contextMenu->addAction(m_actSelectAll);
+
 	m_nvim = c;
 
 	m_tree = new TreeView(c);
@@ -100,6 +113,16 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimTablineUpdate);
 	connect(m_shell, &Shell::neovimShowtablineSet,
 			this, &MainWindow::neovimShowtablineSet);
+	connect(m_shell, &Shell::neovimShowContextMenu,
+			this, &MainWindow::neovimShowContextMenu);
+	connect(m_actCut, &QAction::triggered,
+			this, &MainWindow::neovimSendCut);
+	connect(m_actCopy, &QAction::triggered,
+			this, &MainWindow::neovimSendCopy);
+	connect(m_actPaste, &QAction::triggered,
+			this, &MainWindow::neovimSendPaste);
+	connect(m_actSelectAll, &QAction::triggered,
+			this, &MainWindow::neovimSendSelectAll);
 	connect(m_shell, SIGNAL(neovimGuiColorsAdaptiveEnabled(bool)), 
 			this, SLOT(neovimGuiColorsAdaptiveChanged(bool)));
 	connect(m_shell, SIGNAL(neovimGuiFontAdaptiveEnabled(bool)), 
@@ -410,6 +433,7 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 			m_tabline->setTabText(index, text);
 		}
 
+		m_tabline->setTabToolTip(index, text);
 		m_tabline->setTabData(index, QVariant::fromValue(tabs[index].tab));
 
 		if (curtab == tabs[index].tab) {
@@ -427,6 +451,31 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 	}
 
 	Q_ASSERT(tabs.size() == m_tabline->count());
+}
+
+void MainWindow::neovimShowContextMenu()
+{
+	m_contextMenu->popup(QCursor::pos());
+}
+
+void MainWindow::neovimSendCut()
+{
+	m_nvim->api0()->vim_command_output(R"(normal! "+x)");
+}
+
+void MainWindow::neovimSendCopy()
+{
+	m_nvim->api0()->vim_command(R"(normal! "+y)");
+}
+
+void MainWindow::neovimSendPaste()
+{
+	m_nvim->api0()->vim_command(R"(normal! "+gP)");
+}
+
+void MainWindow::neovimSendSelectAll()
+{
+	m_nvim->api0()->vim_command("normal! ggVG");
 }
 
 void MainWindow::changeTab(int index)

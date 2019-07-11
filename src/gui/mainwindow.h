@@ -50,15 +50,22 @@ private slots:
 	void neovimIsUnsupported();
 	void neovimShowtablineSet(int);
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
+	void neovimShowContextMenu();
+	void neovimSendCut();
+	void neovimSendCopy();
+	void neovimSendPaste();
+	void neovimSendSelectAll();
 	void extTablineSet(bool);
 	void changeTab(int index);
 	void neovimGuiColorsAdaptiveChanged(bool);
 	void neovimGuiFontAdaptiveChanged(bool);
 private:
 	void init(NeovimConnector *);
-    void updateStyle();
-    void setNewPalette();
-    NeovimConnector *m_nvim;
+  void updateStyle();
+  void setNewPalette();
+
+	NeovimConnector *m_nvim;
+
 	ErrorWidget *m_errorWidget;
 	QSplitter *m_window;
 	TreeView *m_tree;
@@ -68,15 +75,22 @@ private:
 	QTabBar *m_tabline;
 	QToolBar *m_tabline_bar;
 	ShellOptions m_shell_options;
-    bool m_neovim_requested_close;
-    QStyle *m_style;
-    QPalette m_palette;
-    QColor m_last_fg_color;
-    QColor m_last_bg_color;
-    bool m_neovim_gui_style_requested_update;
-    bool m_neovim_gui_font_requested_update;
-    QFont m_default_font;
-    QPalette m_default_palette;
+
+	bool m_neovim_requested_close;
+	QMenu *m_contextMenu;
+	QAction *m_actCut;
+	QAction *m_actCopy;
+	QAction *m_actPaste;
+	QAction *m_actSelectAll;
+
+  QStyle *m_style;
+  QPalette m_palette;
+  QColor m_last_fg_color;
+  QColor m_last_bg_color;
+  bool m_neovim_gui_style_requested_update;
+  bool m_neovim_gui_font_requested_update;
+  QFont m_default_font;
+  QPalette m_default_palette;
 };
 
 } // Namespace

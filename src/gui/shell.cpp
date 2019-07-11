@@ -104,13 +104,13 @@ bool Shell::setGuiFont(const QString& fdesc, bool force)
 		return false;
 	}
 
-	int pointSize = font().pointSize();
+	qreal pointSize = font().pointSizeF();
 	int weight = -1;
 	bool italic = false;
 	foreach(QString attr, attrs) {
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok = false;
-			int height = attr.mid(1).toInt(&ok);
+			qreal height = attr.mid(1).toFloat(&ok);
 			if (!ok) {
 				m_nvim->api0()->vim_report_error("Invalid font height");
 				return false;
@@ -497,28 +497,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 			emit neovimSuspend();
 		}
 	} else if (name == "popupmenu_show") {
-    // The 5th argument was added to popupmenu_show in neovim/neovim@16c3337.
-    // Since neovim-qt does not use this argument, it checks that the argument
-    // is 4 or more.
-    if (opargs.size() < 4
-				|| !opargs.at(1).canConvert<qint64>()
-				|| !opargs.at(2).canConvert<qint64>()
-				|| !opargs.at(3).canConvert<qint64>()) {
-			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
-			return;
-		}
-
-		handlePopupMenuShow(opargs.at(0).toList(),
-				opargs.at(1).toLongLong(),
-				opargs.at(2).toLongLong(),
-				opargs.at(3).toLongLong());
+		handlePopupMenuShow(opargs);
 	} else if (name == "popupmenu_select") {
-		if (opargs.size() != 1 || !opargs.at(0).canConvert<qint64>()) {
-			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
-			return;
-		}
-		// Neovim uses -1 for 'no selection' and so does Qt
-		handlePopupMenuSelect(opargs.at(0).toLongLong());
+		handlePopupMenuSelect(opargs);
 	} else if (name == "popupmenu_hide") {
 		m_pum.hide();
 	} else if (name == "mode_info_set") {
@@ -549,80 +530,69 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 
 }
 
-/// Show the pum, with the given items, selecting the given item (idx)
-/// and place the pum at the given row/col
-void Shell::handlePopupMenuShow(const QVariantList& items,
-			int64_t selected, int64_t row, int64_t col)
+void Shell::handlePopupMenuShow(const QVariantList& opargs)
 {
+	// The 'popupmenu_show' API is not consistent across NeoVim versions!
+	// A 5th argument was introduced in neovim/neovim@16c3337
+	if (opargs.size() < 4
+		|| static_cast<QMetaType::Type>(opargs.at(0).type()) != QMetaType::QVariantList
+		|| !opargs.at(1).canConvert<int64_t>()
+		|| !opargs.at(2).canConvert<int64_t>()
+		|| !opargs.at(3).canConvert<int64_t>()) {
+		qWarning() << "Unexpected arguments for popupmenu_show:" << opargs;
+		return;
+	}
+	else if (opargs.size() >= 5 && !opargs.at(4).canConvert<int64_t>()) {
+		qWarning() << "Unexpected 5th argument for popupmenu_show:" << opargs.at(4);
+		return;
+	}
+
+	const QVariantList items = opargs.at(0).toList();
+	const int64_t selected = opargs.at(1).toULongLong();
+	const int64_t row = opargs.at(2).toULongLong();
+	const int64_t col = opargs.at(3).toULongLong();
+	//const int64_t grid = (opargs.size() < 5) ? 0 : opargs.at(4).toULongLong();
+
 	QList<PopupMenuItem> model;
-	foreach(const QVariant& v, items) {
+	for (const auto& v : items) {
 		QVariantList item = v.toList();
-		/// Item is (text, kind, extra, info)
+		// Item is (text, kind, extra, info)
 		QString text = item.value(0).toString();
-		if (item.isEmpty() || item.value(0).toString().isEmpty()
-				|| item.size() != 4) {
-			model.append({"", "", "", ""
-					});
-		} else {
-			model.append({
-					item.value(0).toString(),
-					item.value(1).toString(),
-					item.value(2).toString(),
-					item.value(3).toString()
-					});
+		if (item.size() < 4
+			|| item.isEmpty()
+			|| item.value(0).toString().isEmpty()) {
+
+			// Usually faster/smaller to init strings with {} instead of ""
+			model.append({ QString{}, QString{}, QString{}, QString{} });
+			continue;
 		}
+
+		model.append({
+			item.value(0).toString(),
+			item.value(1).toString(),
+			item.value(2).toString(),
+			item.value(3).toString() });
 	}
 
 	m_pum.setModel(new PopupMenuModel(model));
 
-	handlePopupMenuSelect(selected);
+	m_pum.setSelectedIndex(selected);
 
-	// By default the menu is as large as needed to fit all entries
-	int pum_width = m_pum.sizeHint().width();
-	int anchor_x = col*cellSize().width();
-
-	// If the menu width is larger than half the shell, make it half width
-	if (pum_width >= width()/2) {
-		pum_width = columns()/2*cellSize().width();
-		anchor_x = (columns()-1)/2*cellSize().width();
-	}
-
-	// If the menu still does not fit move the anchor to the left
-	if (pum_width > (columns()*cellSize().width()-anchor_x)) {
-		anchor_x = columns()*cellSize().width() - pum_width;
-	}
-
-	int pum_height = m_pum.sizeHint().height();
-	// By default the menu goes bellow the row
-	int anchor_y = (row+1)*cellSize().height();
-	if (row > rows() / 2) {
-		// TODO: leave a couple lines above/below?
-		if (pum_height > row*cellSize().height()) {
-			// The pum height is too large, move it to the top
-			anchor_y = 0;
-			pum_height = row*cellSize().height()-1;
-		} else {
-			// Display menu above the anchor row
-			anchor_y = row*cellSize().height()-pum_height-1;
-		}
-	} else {
-		// Display menu below anchor
-		if (pum_height > (rows()-row-1)*cellSize().height()) {
-			// Resize popupmenu to fit
-			pum_height = height() - anchor_y;
-		}
-	}
-
-	m_pum.setGeometry(anchor_x, anchor_y, pum_width, pum_height);
+	m_pum.setAnchor(row, col);
 	m_pum.updateGeometry();
 	m_pum.show();
 }
 
-void Shell::handlePopupMenuSelect(int64_t selected)
+void Shell::handlePopupMenuSelect(const QVariantList& opargs)
 {
-	auto idx = m_pum.model()->index(selected, 0);
-	m_pum.setCurrentIndex(idx);
-	m_pum.scrollTo(idx);
+	if (opargs.size() < 1
+		|| !opargs.at(0).canConvert<int64_t>()) {
+		qWarning() << "Unexpected arguments for popupmenu_select:" << opargs;
+		return;
+	}
+
+	// Neovim and Qt both use -1 for 'no selection'.
+	m_pum.setSelectedIndex(opargs.at(0).toLongLong());
 }
 
 void Shell::setNeovimCursor(quint64 row, quint64 col)
@@ -752,11 +722,15 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 
 			qDebug() << "Neovim changed clipboard" << data << type << reg_name << clipboard;
 			QGuiApplication::clipboard()->setMimeData(clipData, clipboard);
+
+		} else if (guiEvName == "ShowContextMenu") {
+			emit neovimShowContextMenu();
 		} else if (guiEvName == "ColorsAdaptive" && args.size() >= 2) {
 			emit neovimGuiColorsAdaptiveEnabled(args.at(1).toBool());
 		} else if (guiEvName == "FontAdaptive" && args.size() >= 2) {
 			emit neovimGuiFontAdaptiveEnabled(args.at(1).toBool());
 		}
+    
 		return;
 	} else if (name != "redraw") {
 		return;
@@ -860,8 +834,13 @@ void Shell::paintEvent(QPaintEvent *ev)
 			cursorRect.setWidth(cursorRect.width()*2);
 		}
 		QPainter painter(this);
+		painter.setPen(m_cursor_color);
 		painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
-		painter.fillRect(cursorRect, m_cursor_color);
+		if (hasFocus()) {
+			painter.fillRect(cursorRect, m_cursor_color);
+		} else {
+			painter.drawRect(cursorRect);
+		}
 	}
 }
 
