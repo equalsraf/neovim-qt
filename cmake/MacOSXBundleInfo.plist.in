@@ -15,17 +15,17 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>CFBundleIdentifier</key>
-	<string>${APPLE_GUI_IDENTIFIER}</string>
+	<string>${CMAKE_PROJECT_NAME}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>
-	<string>${APPLE_GUI_LONG_VERSION_STRING}</string>
+	<string>${CMAKE_PROJECT_VERSION}</string>
 	<key>CFBundleName</key>
 	<string>Neovim</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>${APPLE_GUI_SHORT_VERSION_STRING}</string>
+	<string>${CMAKE_PROJECT_VERSION}</string>
 	<key>CFBundleVersion</key>
 	<string>${APPLE_GUI_BUNDLE_VERSION}</string>
 	<key>CSResourcesFileMapped</key>
