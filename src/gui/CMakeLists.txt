@@ -1,6 +1,6 @@
 set(QTLIBS Qt5::Network Qt5::Widgets)
 
-include_directories(..)
+include_directories(.. shellwidget)
 qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
 if(WIN32)
 	if (USE_STATIC_QT)
@@ -25,7 +25,6 @@ add_library(neovim-qt-gui shell.cpp input.cpp treeview.cpp errorwidget.cpp mainw
 	highlight.cpp
 	popupmenumodel.cpp
 	popupmenu.cpp
-	${CMAKE_SOURCE_DIR}/third-party/konsole_wcwidth.cpp
 	${NEOVIM_RCC_SOURCES})
 target_link_libraries(neovim-qt-gui qshellwidget neovim-qt)
 
