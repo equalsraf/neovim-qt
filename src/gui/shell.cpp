@@ -613,6 +613,9 @@ void Shell::handleSetTitle(const QVariantList& opargs)
 
 void Shell::handleBusy(bool busy)
 {
+	if (busy != m_neovimBusy) {
+		update(neovimCursorRect());
+	}
 	m_neovimBusy = busy;
 	if (busy) {
 		this->setCursor(Qt::WaitCursor);
@@ -799,7 +802,7 @@ void Shell::paintEvent(QPaintEvent *ev)
 
 	// paint cursor - we are not actually using Neovim colors yet,
 	// just invert the shell colors by painting white with XoR
-	if (ev->region().contains(neovimCursorTopLeft())) {
+	if (!m_neovimBusy && ev->region().contains(neovimCursorTopLeft())) {
 		bool wide = contents().constValue(m_cursor_pos.y(),
 						m_cursor_pos.x()).doubleWidth;
 		QRect cursorRect(neovimCursorTopLeft(), cellSize());
