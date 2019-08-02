@@ -12,7 +12,7 @@ class Test: public QObject
 private slots:
 	void cellDefault() {
 		Cell c;
-		QCOMPARE(c.c, QChar(' '));
+		QCOMPARE(c.c, ' ');
 		// Default colors are invalid
 		QCOMPARE(c.foregroundColor, QColor());
 		QCOMPARE(c.backgroundColor, QColor());
@@ -42,7 +42,7 @@ private slots:
 	void cellWidth() {
 		Cell c;
 		QCOMPARE(c.doubleWidth, false);
-		c.setChar(QChar(27721));
+		c.setChar(27721);
 		QCOMPARE(c.doubleWidth, true);
 	}
 

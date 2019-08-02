@@ -229,8 +229,10 @@ int ShellContents::put(const QString& str, int row, int column,
 		return 0;
 	}
 	
+	auto vec = str.toUcs4();
+
 	int pos = column;
-	foreach(const QChar chr, str) {
+	foreach(const uint chr, vec) {
 		Cell& c = value(row, pos);
 		c = Cell(chr, fg, bg, sp, bold, italic, underline, undercurl);
 		if (c.doubleWidth) {
