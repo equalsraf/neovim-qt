@@ -320,6 +320,13 @@ void Shell::handlePut(const QVariantList& args)
 	}
 
 	QString text = m_nvim->decode(args.at(0).toByteArray());
+	if (text.isEmpty() && m_cursor_pos.x() > 0 &&
+	    contents().constValue(m_cursor_pos.y(), m_cursor_pos.x() - 1).doubleWidth) {
+		// nvim will seek to the second cell of a wide char and put "",
+		// expecting the cursor position and cell style to be updated properly.
+		// Handle this case.
+		text = ' ';
+	}
 
 	if (!text.isEmpty()) {
 		int cols = put(text, m_cursor_pos.y(), m_cursor_pos.x(),
@@ -327,11 +334,8 @@ void Shell::handlePut(const QVariantList& args)
 				m_font_bold, m_font_italic,
 				m_font_underline, m_font_undercurl);
 		// Move cursor ahead
-		update(neovimCursorRect());
 		setNeovimCursor(m_cursor_pos.y(), m_cursor_pos.x()+cols);
-		update(neovimCursorRect());
 	}
-
 }
 
 /**
