@@ -162,7 +162,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 
 					// Draw chars at the baseline
 					QPoint pos(r.left(), r.top()+m_ascent+(m_lineSpace / 2));
-					p.drawText(pos, QString(cell.c));
+					p.drawText(pos, QString::fromUcs4(&cell.c, 1));
 				}
 
 				// Draw "undercurl" at the bottom of the cell

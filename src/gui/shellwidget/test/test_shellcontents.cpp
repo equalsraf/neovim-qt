@@ -20,7 +20,7 @@ public:
 		ShellContents s(rows,cols);
 		for (int i=0; i<rows; i++) {
 			for (int j=0; j<cols; j++) {
-				s.value(i, j).c = QChar('a'+j);
+				s.value(i, j).c = 'a'+j;
 			}
 		}
 		return s;
@@ -54,7 +54,7 @@ public:
 		ShellContents s(rows,cols);
 		for (int i=0; i<rows; i++) {
 			for (int j=0; j<cols; j++) {
-				s.value(i, j).c = QChar('a'+i);
+				s.value(i, j).c = 'a'+i;
 			}
 		}
 		return s;
@@ -63,7 +63,7 @@ public:
 		for (int i=0; i<s.rows(); i++) {
 			for (int j=0; j<s.columns(); j++) {
 				QChar c = s.constValue(i, j).c;
-				if (c != QChar('a'+i)) {
+				if (c != 'a'+i) {
 					return false;
 				}
 			}

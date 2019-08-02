@@ -2,14 +2,13 @@
 #define QSHELLWIDGET2_CELL
 
 #include <QColor>
-#include <QChar>
 #include "konsole_wcwidth.h"
 
 struct Cell {
 public:
 
 	inline Cell(
-		QChar c,
+		uint c,
 		QColor fgColor,
 		QColor bgColor,
 		QColor spColor,
@@ -62,9 +61,9 @@ public:
 		return c;
 	}
 
-	inline void setChar(const QChar& chr) {
+	inline void setChar(const uint& chr) {
 		c = chr;
-		doubleWidth = (konsole_wcwidth(c.unicode()) > 1);
+		doubleWidth = (konsole_wcwidth(c) > 1);
 	}
 
 	static inline Cell invalid() {
@@ -73,7 +72,7 @@ public:
 		return c;
 	}
 
-	QChar c;
+	uint c;
 	QColor foregroundColor, backgroundColor, specialColor;
 	bool bold, italic, underline, undercurl;
 	bool valid;

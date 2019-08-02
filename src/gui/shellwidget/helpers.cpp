@@ -29,7 +29,7 @@ bool saveShellContents(const ShellContents& s, const QString& filename)
 			if (cell.backgroundColor.isValid()) {
 				p.fillRect(r, cell.backgroundColor);
 			}
-			p.drawText(r, cell.c);
+			p.drawText(r, QString::fromUcs4(&cell.c, 1));
 		}
 	}
 	p.end();
