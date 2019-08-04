@@ -165,14 +165,16 @@ function GuiClipboard()
           \   },
           \ }
 
-	" When the clipboard provider is sourced it short circuits if it cannot
-	" find a working clipboard - this behaviour is used internally by nvim to
-	" check if the provider is available, by checking for
-	" provider#clipboard#Call which is not defined if no clipboard is
-	" available.
+	" We need to reload the neovim clipboard provider here so it picks up on
+	" g:clipboard. In older versions of neovim (<=0.3.8) the provider would
+	" short circuit if a working clipboard was not available. After 0.3.8
+	" the provider should not short circuit, andunsetting
+	" g:loaded_clipboard_provider will enable a full reload of the provider.
 	"
-	" TLDR; we need to source this to reinitialize the clipboard provider
-	runtime autoload/provider/clipboard.vim
+	" TLDR; source this to reinitialize the clipboard provider, this may not
+	" work
+    unlet! g:loaded_clipboard_provider
+    runtime autoload/provider/clipboard.vim
 endfunction
 
 " Directory autocommands for Treeview
