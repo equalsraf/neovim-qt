@@ -3,7 +3,7 @@ if (POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif (POLICY CMP0048)
 
-project(neovim-qt VERSION 0.2.12.0)
+project(neovim-qt VERSION 0.2.13.0)
 
 INCLUDE(CPack)
 
