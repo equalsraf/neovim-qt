@@ -9,9 +9,9 @@ project(neovim-qt-deps)
 #
 # Get Msgpack
 #
-set(MSGPACK_VERSION 3.0.1)
+set(MSGPACK_VERSION 3.2.0)
 set(MSGPACK_URL https://github.com/msgpack/msgpack-c/archive/cpp-${MSGPACK_VERSION}.tar.gz)
-set(MSGPACK_SHA256 1b834ab0b5b41da1dbfb96dd4a673f6de7e79dbd7f212f45a553ff9cc54abf3b)
+set(MSGPACK_SHA256 ff865a36bad5c72b8e7ebc4b7cf5f27a820fce4faff9c571c1791e3728355a39)
 
 message(STATUS "Downloading Msgpack...")
 set(MSGPACK_TARBALL msgpack-${MSGPACK_VERSION}.tar.gz)
