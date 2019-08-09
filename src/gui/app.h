@@ -6,6 +6,7 @@
 #include <QUrl>
 #include <QList>
 #include <QCommandLineParser>
+#include "shell.h"
 
 namespace NeovimQt {
 
@@ -19,6 +20,9 @@ public:
 	void showUi(NeovimConnector *c, const QCommandLineParser&);
 	static void processCliOptions(QCommandLineParser& p, const QStringList& arguments);
 	static NeovimConnector* createConnector(const QCommandLineParser& p);
+
+private:
+	static ShellOptions GetShellOptionsFromQSettings();
 
 signals:
 	void openFilesTriggered(const QList<QUrl>);

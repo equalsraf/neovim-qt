@@ -1,9 +1,10 @@
 #include "app.h"
 
-#include <QFileOpenEvent>
-#include <QTextStream>
-#include <QFileInfo>
 #include <QDir>
+#include <QFileInfo>
+#include <QFileOpenEvent>
+#include <QSettings>
+#include <QTextStream>
 #include "mainwindow.h"
 
 namespace NeovimQt {
@@ -86,13 +87,10 @@ bool App::event(QEvent *event)
 
 void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
 {
-	auto opts = ShellOptions();
+	ShellOptions opts{ GetShellOptionsFromQSettings() };
+
 	if (parser.isSet("no-ext-tabline")) {
 		opts.enable_ext_tabline = false;
-	}
-
-	if (parser.isSet("ext-linegrid")) {
-		opts.enable_ext_linegrid = true;
 	}
 
 #ifdef NEOVIMQT_GUI_WIDGET
@@ -146,8 +144,6 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 				QCoreApplication::translate("main", "Maximize the window on startup")));
 	parser.addOption(QCommandLineOption("no-ext-tabline",
 				QCoreApplication::translate("main", "Disable the external GUI tabline")));
-	parser.addOption(QCommandLineOption("ext-linegrid",
-				QCoreApplication::translate("main", "Enable the modern 'ext_linegrid' Neovim GUI API")));
 	parser.addOption(QCommandLineOption("fullscreen",
 				QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
 	parser.addOption(QCommandLineOption("embed",
@@ -253,5 +249,31 @@ NeovimConnector* App::createConnector(const QCommandLineParser& parser)
 	}
 }
 
+/*static*/ ShellOptions App::GetShellOptionsFromQSettings()
+{
+	ShellOptions opts{};
+	QSettings settings("nvim-qt", "nvim-qt");
 
-} // Namespace
+	QVariant ext_linegrid{ settings.value("ext_linegrid", opts.enable_ext_linegrid) };
+	QVariant ext_popupmenu{ settings.value("ext_popupmenu", opts.enable_ext_popupmenu) };
+	QVariant ext_tabline{ settings.value("ext_tabline", opts.enable_ext_popupmenu) };
+
+	if (ext_linegrid.canConvert<bool>())
+	{
+		opts.enable_ext_linegrid = ext_linegrid.toBool();
+	}
+
+	if (ext_popupmenu.canConvert<bool>())
+	{
+		opts.enable_ext_popupmenu = ext_popupmenu.toBool();
+	}
+
+	if (ext_tabline.canConvert<bool>())
+	{
+		opts.enable_ext_tabline= ext_tabline.toBool();
+	}
+
+	return opts;
+}
+
+} // namespace NeovimQt
