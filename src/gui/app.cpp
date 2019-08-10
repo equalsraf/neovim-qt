@@ -109,6 +109,17 @@ void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
 	QObject::connect(instance(), SIGNAL(openFilesTriggered(const QList<QUrl>)),
 		win->shell(), SLOT(openFiles(const QList<QUrl>)));
 
+	// Window geometry should be restored only when the user does not specify
+	// one of the following command line arguments. Argument "maximized" can
+	// be safely ignored, as the loaded geometry only takes effect after the
+	// user un-maximizes the window; this behavior is desirable.
+	if (!parser.isSet("fullscreen") &&
+		!parser.isSet("geometry") &&
+		!parser.isSet("qwindowgeometry"))
+	{
+		win->restoreWindowGeometry();
+	}
+
 	if (parser.isSet("fullscreen")) {
 		win->delayedShow(NeovimQt::MainWindow::DelayedShow::FullScreen);
 	} else if (parser.isSet("maximized")) {
