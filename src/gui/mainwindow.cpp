@@ -232,7 +232,11 @@ void MainWindow::reconnectNeovim()
 
 void MainWindow::closeEvent(QCloseEvent *ev)
 {
-	saveWindowGeometry();
+	// Do not save window geometry in '--fullscreen' mode. If saved, all
+	// subsequent Neovim-Qt sessions would default to fullscreen mode.
+	if (!isFullScreen()) {
+		saveWindowGeometry();
+	}
 
 	if (m_neovim_requested_close) {
 		// If this was requested by nvim, shutdown
@@ -276,9 +280,6 @@ void MainWindow::showIfDelayed()
 {
 	if (!isVisible()) {
 		if (m_delayedShow == DelayedShow::Normal) {
-			// Restore the last known window size/position.
-			loadWindowGeometry();
-
 			show();
 		} else if (m_delayedShow == DelayedShow::Maximized) {
 			showMaximized();
@@ -413,7 +414,7 @@ void MainWindow::saveWindowGeometry()
 	settings.setValue("window_state", saveState());
 }
 
-void MainWindow::loadWindowGeometry()
+void MainWindow::restoreWindowGeometry()
 {
 	QSettings settings{ "nvim-qt", "window-geometry" };
 	restoreGeometry(settings.value("window_geometry").toByteArray());

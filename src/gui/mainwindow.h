@@ -26,6 +26,7 @@ public:
 	MainWindow(NeovimConnector *, ShellOptions opts, QWidget *parent=0);
 	bool neovimAttached() const;
 	Shell* shell();
+	void restoreWindowGeometry();
 public slots:
 	void delayedShow(DelayedShow type=DelayedShow::Normal);
 signals:
@@ -56,7 +57,6 @@ private slots:
 	void extTablineSet(bool);
 	void changeTab(int index);
 	void saveWindowGeometry();
-	void loadWindowGeometry();
 private:
 	void init(NeovimConnector *);
 	NeovimConnector *m_nvim;
