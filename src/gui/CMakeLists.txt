@@ -59,7 +59,7 @@ if(NOT APPLE)
 	install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 	install(FILES ${CMAKE_SOURCE_DIR}/third-party/neovim.png
 			RENAME nvim-qt.png
-			DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps/)
+			DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/192x192/apps/)
 endif()
 
 if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
