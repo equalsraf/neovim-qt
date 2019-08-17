@@ -55,7 +55,7 @@ bool getLoginEnvironment(const QString& path)
 App::App(int &argc, char ** argv) noexcept
 :QApplication(argc, argv)
 {
-	setWindowIcon(QIcon(":/neovim.png"));
+	setWindowIcon(QIcon(":/neovim.svg"));
 	setApplicationDisplayName("Neovim");
 
 #ifdef Q_OS_MAC

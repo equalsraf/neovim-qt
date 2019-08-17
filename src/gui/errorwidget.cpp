@@ -11,8 +11,8 @@ ErrorWidget::ErrorWidget(QWidget *parent)
 	m_errorLabel = new QLabel();
 	m_closeButton = new QPushButton(tr("Retry"));
 
-	m_image = new QLabel();
-	m_image->setPixmap(QPixmap(":/neovim.png").scaled(64, 64, Qt::KeepAspectRatio));
+	m_image = new QSvgWidget(":/neovim.svg");
+	m_image->setFixedSize(64, 64);
 
 	connect(m_closeButton, &QPushButton::clicked,
 			this, &ErrorWidget::reconnectNeovim);

@@ -1,4 +1,4 @@
-set(QTLIBS Qt5::Network Qt5::Widgets)
+set(QTLIBS Qt5::Network Qt5::Svg Qt5::Widgets)
 
 include_directories(.. shellwidget)
 qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
