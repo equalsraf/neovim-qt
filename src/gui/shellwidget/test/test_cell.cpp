@@ -12,7 +12,7 @@ class Test: public QObject
 private slots:
 	void cellDefault() {
 		Cell c;
-		QCOMPARE(c.c, ' ');
+		QCOMPARE(c.c, uint(' '));
 		// Default colors are invalid
 		QCOMPARE(c.foregroundColor, QColor());
 		QCOMPARE(c.backgroundColor, QColor());
