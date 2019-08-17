@@ -852,6 +852,11 @@ void Shell::handleDefaultColorsSet(const QVariantList& opargs)
 	const uint64_t rgb_bg = opargs.at(1).toULongLong();
 	const uint64_t rgb_sp = opargs.at(2).toULongLong();
 
+	MsgpackRequest* getBackgroundMode{
+		m_nvim->api0()->vim_get_option(QString{ "background" }.toLatin1()) };
+
+	connect(getBackgroundMode, &MsgpackRequest::finished, this, &Shell::handleGetBackgroundOption);
+
 	const QColor foregroundColor = color(rgb_fg, QColor::Invalid);
 	const QColor backgroundColor = color(rgb_bg, QColor::Invalid);
 	const QColor specialColor = color(rgb_sp, QColor::Invalid);
@@ -1653,4 +1658,18 @@ void Shell::handleShimError(quint32 msgid, quint64 fun, const QVariant& err)
 	qDebug() << "GUI shim error " << err;
 }
 
-} // Namespace
+void Shell::handleGetBackgroundOption(quint32 msgid, quint64 fun, const QVariant& val)
+{
+	const QString mode{ val.toString() };
+
+	if (mode == "dark" && getBackgroundType() != Background::Dark) {
+		setBackgroundType(Background::Dark);
+		update();
+	}
+	else if (mode == "light" && getBackgroundType() != Background::Light) {
+		setBackgroundType(Background::Light);
+		update();
+	}
+}
+
+} // namespace NeovimQt
