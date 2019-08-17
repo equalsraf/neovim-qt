@@ -138,7 +138,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					if (cell.backgroundColor.isValid()) {
 						p.fillRect(r, cell.backgroundColor);
 					} else {
-						p.fillRect(r, m_bgColor);
+						p.fillRect(r, background());
 					}
 
 					if (cell.c == ' ') {
@@ -148,7 +148,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					if (cell.foregroundColor.isValid()) {
 						p.setPen(cell.foregroundColor);
 					} else {
-						p.setPen(m_fgColor);
+						p.setPen(foreground());
 					}
 
 					if (cell.bold || cell.italic) {
@@ -171,18 +171,18 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					if (cell.undercurl) {
 						if (cell.specialColor.isValid()) {
 							pen.setColor(cell.specialColor);
-						} else if (m_spColor.isValid()) {
-							pen.setColor(m_spColor);
+						} else if (special().isValid()) {
+							pen.setColor(special());
 						} else if (cell.foregroundColor.isValid()) {
 							pen.setColor(cell.foregroundColor);
 						} else {
-							pen.setColor(m_fgColor);
+							pen.setColor(foreground());
 						}
 					} else if (cell.underline) {
 						if (cell.foregroundColor.isValid()) {
 							pen.setColor(cell.foregroundColor);
 						} else {
-							pen.setColor(m_fgColor);
+							pen.setColor(foreground());
 						}
 					}
 
@@ -212,7 +212,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 				m_contents.rows(), m_contents.columns());
 	QRegion margins = QRegion(rect()).subtracted(shellArea);
 	foreach(QRect margin, margins.intersected(ev->region()).rects()) {
-		p.fillRect(margin, m_bgColor);
+		p.fillRect(margin, background());
 	}
 
 #if 0
@@ -267,6 +267,24 @@ void ShellWidget::setBackground(const QColor& color)
 
 QColor ShellWidget::background() const
 {
+	// See 'default_colors_set' in Neovim ':help ui-linegrid'.
+	// QColor::Invalid indicates the default color (-1), which should be
+	// rendered as white or black based on Neovim 'background'.
+	if (!m_bgColor.isValid())
+	{
+		switch (m_background)
+		{
+			case Background::Light:
+				return Qt::white;
+
+			case Background::Dark:
+				return Qt::black;
+
+			default:
+				return Qt::black;
+		}
+	}
+
 	return m_bgColor;
 }
 
@@ -277,6 +295,22 @@ void ShellWidget::setForeground(const QColor& color)
 
 QColor ShellWidget::foreground() const
 {
+	// See ShellWidget::background() for more details.
+	if (!m_bgColor.isValid())
+	{
+		switch (m_background)
+		{
+			case Background::Light:
+				return Qt::black;
+
+			case Background::Dark:
+				return Qt::white;
+
+			default:
+				return Qt::white;
+		}
+	}
+
 	return m_fgColor;
 }
 

@@ -17,6 +17,15 @@ class ShellWidget: public QWidget
 	Q_PROPERTY(QSize cellSize READ cellSize)
 public:
 	ShellWidget(QWidget *parent=0);
+
+	/// Represents Neovim 'background' option. Used for rendering default theme colors (-1).
+	/// See 'default_colors_set' in Neovim ':help ui-linegrid' for more details.
+	enum class Background : int
+	{
+		Dark,
+		Light
+	};
+
 	bool setShellFont(const QString& family, qreal ptSize, int weight = -1, bool italic = false, bool force = false);
 
 	QColor background() const;
@@ -31,6 +40,11 @@ public:
 	QSize cellSize() const;
 	const ShellContents& contents() const;
 	QSize sizeHint() const Q_DECL_OVERRIDE;
+
+	Background getBackgroundType() const { return m_background; }
+
+	void setBackgroundType(Background type) { m_background = type; }
+
 signals:
 	void shellFontChanged();
 	void fontError(const QString& msg);
@@ -66,6 +80,8 @@ private:
 	int m_ascent;
 	QColor m_bgColor, m_fgColor, m_spColor;
 	int m_lineSpace;
+
+	Background m_background{ Background::Dark };
 };
 
 #endif
