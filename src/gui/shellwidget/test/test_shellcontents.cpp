@@ -30,7 +30,7 @@ public:
 	void checkInitShell(const ShellContents& s) {
 		for (int i=0; i<s.rows(); i++) {
 			for (int j=0; j<s.columns(); j++) {
-				QCOMPARE(s.constValue(i, j).c, QChar('a'+j));
+				QCOMPARE(s.constValue(i, j).c, uint('a'+j));
 			}
 		}
 	}
@@ -38,8 +38,8 @@ public:
 	bool checkClear(const ShellContents& s) {
 		for (int i=0; i<s.rows(); i++) {
 			for (int j=0; j<s.columns(); j++) {
-				QChar c = s.constValue(i, j).c;
-				if (c != QChar(' ')) {
+				uint c = s.constValue(i, j).c;
+				if (c != uint(' ')) {
 					return false;
 				}
 			}
@@ -62,8 +62,8 @@ public:
 	bool checkScrollShell(const ShellContents& s) {
 		for (int i=0; i<s.rows(); i++) {
 			for (int j=0; j<s.columns(); j++) {
-				QChar c = s.constValue(i, j).c;
-				if (c != 'a'+i) {
+				uint c = s.constValue(i, j).c;
+				if (c != uint('a'+i)) {
 					return false;
 				}
 			}
@@ -78,12 +78,12 @@ private slots:
 		ShellContents s(rows,cols);
 		for (int i=0; i<rows; i++) {
 			for (int j=0; j<cols; j++) {
-				QCOMPARE(s.value(i, j).c, QChar(' '));
+				QCOMPARE(s.value(i, j).c, uint(' '));
 			}
 		}
 
 		// invalid cells are initialized as red X
-		QCOMPARE(s.value(-1, -1).c, QChar('X'));
+		QCOMPARE(s.value(-1, -1).c, uint('X'));
 		QCOMPARE(s.value(-1, -1).backgroundColor, QColor(Qt::red));
 
 		QBENCHMARK {
@@ -110,7 +110,7 @@ private slots:
 		s.resize(20, 20);
 		for (int i=0; i<20; i++) {
 			for (int j=0; j<20; j++) {
-				QCOMPARE(s.value(i, j).c, QChar('a'+j));
+				QCOMPARE(s.value(i, j).c, uint('a'+j));
 			}
 		}
 
@@ -118,12 +118,12 @@ private slots:
 		s.resize(30, 30);
 		for (int i=0; i<20; i++) {
 			for (int j=0; j<20; j++) {
-				QCOMPARE(s.value(i, j).c, QChar('a'+j));
+				QCOMPARE(s.value(i, j).c, uint('a'+j));
 			}
 		}
 		for (int i=20; i<30; i++) {
 			for (int j=20; j<30; j++) {
-				QCOMPARE(s.value(i, j).c, QChar(' '));
+				QCOMPARE(s.value(i, j).c, uint(' '));
 			}
 		}
 
@@ -149,11 +149,11 @@ private slots:
 		for (int i=0; i<rows; i++) {
 			if (i == 3) {
 				for (int j=0; j<cols; j++) {
-					QCOMPARE(s.value(i, j).c, QChar(' '));
+					QCOMPARE(s.value(i, j).c, uint(' '));
 				}
 			} else {
 				for (int j=0; j<cols; j++) {
-					QCOMPARE(s.value(i, j).c, QChar('a'+j));
+					QCOMPARE(s.value(i, j).c, uint('a'+j));
 				}
 			}
 		}
@@ -164,9 +164,9 @@ private slots:
 		for (int i=0; i<rows; i++) {
 			for (int j=0; j<cols; j++) {
 				if (i == 20 && j >= 10) {
-					QCOMPARE(s1.value(i, j).c, QChar(' '));
+					QCOMPARE(s1.value(i, j).c, uint(' '));
 				} else {
-					QCOMPARE(s1.value(i, j).c, QChar('a'+j));
+					QCOMPARE(s1.value(i, j).c, uint('a'+j));
 				}
 			}
 		}
@@ -258,13 +258,13 @@ private slots:
 		s2.scroll(10);
 		for (int i=0; i<rows-10; i++) {
 			for (int j=0; j<cols; j++) {
-				QCOMPARE(s2.value(i, j).c, QChar('a'+i+10));
+				QCOMPARE(s2.value(i, j).c, uint('a'+i+10));
 			}
 		}
 		for (int i=rows-10; i<rows; i++) {
 			for (int j=0; j<cols; j++) {
 				// The bottom region is empty
-				QCOMPARE(s2.value(i, j).c, QChar(' '));
+				QCOMPARE(s2.value(i, j).c, uint(' '));
 			}
 		}
 
@@ -273,13 +273,13 @@ private slots:
 		s3.scroll(-10);
 		for (int i=10; i<rows; i++) {
 			for (int j=0; j<cols; j++) {
-				QCOMPARE(s3.value(i, j).c, QChar('a'+i-10));
+				QCOMPARE(s3.value(i, j).c, uint('a'+i-10));
 			}
 		}
 		for (int i=0; i<10; i++) {
 			for (int j=0; j<cols; j++) {
 				// The top region is empty
-				QCOMPARE(s3.value(i, j).c, QChar(' '));
+				QCOMPARE(s3.value(i, j).c, uint(' '));
 			}
 		}
 	}
@@ -313,29 +313,29 @@ private slots:
 		ShellContents s0(rows, cols);
 		s0.put("HelloWorld", 0, 0);
 
-		QCOMPARE(s0.value(0, 0).c, QChar('H'));
-		QCOMPARE(s0.value(0, 1).c, QChar('e'));
-		QCOMPARE(s0.value(0, 2).c, QChar('l'));
-		QCOMPARE(s0.value(0, 3).c, QChar('l'));
-		QCOMPARE(s0.value(0, 4).c, QChar('o'));
-		QCOMPARE(s0.value(0, 5).c, QChar('W'));
-		QCOMPARE(s0.value(0, 6).c, QChar('o'));
-		QCOMPARE(s0.value(0, 7).c, QChar('r'));
-		QCOMPARE(s0.value(0, 8).c, QChar('l'));
-		QCOMPARE(s0.value(0, 9).c, QChar('d'));
+		QCOMPARE(s0.value(0, 0).c, uint('H'));
+		QCOMPARE(s0.value(0, 1).c, uint('e'));
+		QCOMPARE(s0.value(0, 2).c, uint('l'));
+		QCOMPARE(s0.value(0, 3).c, uint('l'));
+		QCOMPARE(s0.value(0, 4).c, uint('o'));
+		QCOMPARE(s0.value(0, 5).c, uint('W'));
+		QCOMPARE(s0.value(0, 6).c, uint('o'));
+		QCOMPARE(s0.value(0, 7).c, uint('r'));
+		QCOMPARE(s0.value(0, 8).c, uint('l'));
+		QCOMPARE(s0.value(0, 9).c, uint('d'));
 
 		s0.put("HelloWorld", 5, 5);
 		saveShellContents(s0, "shell.jpg");
-		QCOMPARE(s0.value(5, 0).c, QChar(' '));
-		QCOMPARE(s0.value(5, 1).c, QChar(' '));
-		QCOMPARE(s0.value(5, 2).c, QChar(' '));
-		QCOMPARE(s0.value(5, 3).c, QChar(' '));
-		QCOMPARE(s0.value(5, 4).c, QChar(' '));
-		QCOMPARE(s0.value(5, 5).c, QChar('H'));
-		QCOMPARE(s0.value(5, 6).c, QChar('e'));
-		QCOMPARE(s0.value(5, 7).c, QChar('l'));
-		QCOMPARE(s0.value(5, 8).c, QChar('l'));
-		QCOMPARE(s0.value(5, 9).c, QChar('o'));
+		QCOMPARE(s0.value(5, 0).c, uint(' '));
+		QCOMPARE(s0.value(5, 1).c, uint(' '));
+		QCOMPARE(s0.value(5, 2).c, uint(' '));
+		QCOMPARE(s0.value(5, 3).c, uint(' '));
+		QCOMPARE(s0.value(5, 4).c, uint(' '));
+		QCOMPARE(s0.value(5, 5).c, uint('H'));
+		QCOMPARE(s0.value(5, 6).c, uint('e'));
+		QCOMPARE(s0.value(5, 7).c, uint('l'));
+		QCOMPARE(s0.value(5, 8).c, uint('l'));
+		QCOMPARE(s0.value(5, 9).c, uint('o'));
 	}
 
 	// Grab test cases from ../test/shellcontents
