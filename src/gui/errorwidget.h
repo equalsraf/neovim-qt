@@ -1,16 +1,17 @@
 #ifndef NEOVIM_QT_ERRORWIDGET
 #define NEOVIM_QT_ERRORWIDGET
 
-#include <QWidget>
-#include <QPushButton>
 #include <QLabel>
+#include <QPushButton>
+#include <QtSvg/QSvgWidget>
+#include <QWidget>
 
 namespace NeovimQt {
 
 class ErrorWidget: public QWidget {
 	Q_OBJECT
 public:
-	ErrorWidget(QWidget *parent=0);
+	ErrorWidget(QWidget *parent = nullptr);
 public slots:
 	void setText(const QString& text);
 	void showReconnect(bool);
@@ -19,7 +20,7 @@ signals:
 
 private:
 	QLabel *m_errorLabel;
-	QLabel *m_image;
+	QSvgWidget *m_image;
 	QPushButton *m_closeButton;
 };
 
