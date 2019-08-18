@@ -14,7 +14,7 @@ jobs:
           command: sudo apt-get update
       - run:
           name: Install dependencies
-          command: sudo apt-get install -y neovim python3-pip python3-dev python3-msgpack python3-jinja2 cmake qt5-default
+          command: sudo apt-get install -y cmake libqt5svg5 libqt5svg5-dev neovim python3-dev python3-jinja2 python3-msgpack python3-pip qt5-default
       - run:
           name: build
           command: |
