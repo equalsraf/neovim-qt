@@ -52,8 +52,7 @@ add_library(neovim-qt-gui
 	treeview.cpp
 	${SRCS_PLATFORM}
 	${NEOVIM_RCC_SOURCES})
-
-target_link_libraries(neovim-qt-gui qshellwidget neovim-qt)
+target_link_libraries(neovim-qt-gui ${QTLIBS} qshellwidget neovim-qt)
 
 if(NOT APPLE)
 	set_property(SOURCE app_runtime.cpp PROPERTY COMPILE_DEFINITIONS
