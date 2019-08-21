@@ -41,19 +41,6 @@ public:
 		valid{ true },
 		doubleWidth{ false } {}
 
-	inline void reset() {
-		c = ' ';
-		foregroundColor = QColor::Invalid;
-		backgroundColor = QColor::Invalid;
-		specialColor = QColor::Invalid;
-		bold = false;
-		italic = false;
-		underline = false;
-		undercurl = false;
-		doubleWidth = false;
-		valid = true;
-	}
-
 	/// Create an empty Cell with a background color
 	static Cell bg(QColor bg) {
 		Cell c;
