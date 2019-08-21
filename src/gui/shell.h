@@ -11,8 +11,8 @@
 #include <QList>
 #include <QMenu>
 #include "neovimconnector.h"
+#include "shellwidget/highlight.h"
 #include "shellwidget/shellwidget.h"
-#include "highlight.h"
 #include "popupmenu.h"
 #include "popupmenumodel.h"
 

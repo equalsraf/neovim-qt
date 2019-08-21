@@ -35,7 +35,6 @@ set(RUNTIME_PATH )
 add_library(neovim-qt-gui
 	app.cpp
 	errorwidget.cpp
-	highlight.cpp
 	input.cpp
 	mainwindow.cpp
 	popupmenu.cpp
