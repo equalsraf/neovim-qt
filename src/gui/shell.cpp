@@ -191,7 +191,7 @@ QRect Shell::neovimCursorRect() const
 QRect Shell::neovimCursorRect(QPoint at) const
 {
 	const Cell& c = contents().constValue(at.y(), at.x());
-	bool wide = c.doubleWidth;
+	bool wide = c.IsDoubleWidth();
 	QRect r(neovimCursorTopLeft(), cellSize());
 	if (wide) {
 		r.setWidth(r.width()*2);
@@ -321,7 +321,7 @@ void Shell::handlePut(const QVariantList& args)
 
 	QString text = m_nvim->decode(args.at(0).toByteArray());
 	if (text.isEmpty() && m_cursor_pos.x() > 0 &&
-	    contents().constValue(m_cursor_pos.y(), m_cursor_pos.x() - 1).doubleWidth) {
+	    contents().constValue(m_cursor_pos.y(), m_cursor_pos.x() - 1).IsDoubleWidth()) {
 		// nvim will seek to the second cell of a wide char and put "",
 		// expecting the cursor position and cell style to be updated properly.
 		// Handle this case.
@@ -1039,7 +1039,7 @@ void Shell::paintEvent(QPaintEvent *ev)
 	// just invert the shell colors by painting white with XoR
 	if (!m_neovimBusy && ev->region().contains(neovimCursorTopLeft())) {
 		bool wide = contents().constValue(m_cursor_pos.y(),
-						m_cursor_pos.x()).doubleWidth;
+						m_cursor_pos.x()).IsDoubleWidth();
 		QRect cursorRect(neovimCursorTopLeft(), cellSize());
 
 		if (m_insertMode) {

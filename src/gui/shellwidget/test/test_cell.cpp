@@ -12,14 +12,14 @@ class Test: public QObject
 private slots:
 	void cellDefault() {
 		Cell c;
-		QCOMPARE(c.c, uint(' '));
+		QCOMPARE(c.GetCharacter(), uint(' '));
 		// Default colors are invalid
-		QCOMPARE(c.foregroundColor, QColor());
-		QCOMPARE(c.backgroundColor, QColor());
-		QCOMPARE(c.specialColor, QColor());
-		QVERIFY(!c.foregroundColor.isValid());
-		QVERIFY(!c.backgroundColor.isValid());
-		QVERIFY(!c.specialColor.isValid());
+		QCOMPARE(c.GetForegroundColor(), QColor());
+		QCOMPARE(c.GetBackgroundColor(), QColor());
+		QCOMPARE(c.GetSpecialColor(), QColor());
+		QVERIFY(!c.GetForegroundColor().isValid());
+		QVERIFY(!c.GetBackgroundColor().isValid());
+		QVERIFY(!c.GetSpecialColor().isValid());
 
 		QBENCHMARK {
 			Cell c;
@@ -41,18 +41,18 @@ private slots:
 
 	void cellWidth() {
 		Cell c;
-		QCOMPARE(c.doubleWidth, false);
-		c.setChar(27721);
-		QCOMPARE(c.doubleWidth, true);
+		QCOMPARE(c.IsDoubleWidth(), false);
+		c.SetCharacter(27721);
+		QCOMPARE(c.IsDoubleWidth(), true);
 	}
 
 	void cellBg() {
 		Cell c0;
-		Cell c1 = Cell::bg(QColor());
+		Cell c1 = Cell{ QColor::Invalid };
 		QCOMPARE(c0, c1);
 
-		Cell c2 = Cell::bg(Qt::red);
-		QCOMPARE(c2.backgroundColor, QColor(Qt::red));
+		Cell c2 = Cell{ QColor{ Qt::red } };
+		QCOMPARE(c2.GetBackgroundColor(), QColor{ Qt::red });
 	}
 };
 

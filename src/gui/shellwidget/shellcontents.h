@@ -1,18 +1,17 @@
-#ifndef QSHELLWIDGET2_SHELLCONTENTS
-#define QSHELLWIDGET2_SHELLCONTENTS
+#pragma once
+
+#include "cell.h"
 
 /// A class to hold the contents of the shell / i.e. a grid of characters. This
 /// class is meant to hold state about shell contents, but no more - e.g. cursor
 /// information should be stored somewhere else.
-#include "cell.h"
-
 class ShellContents
 {
 public:
 	ShellContents(int rows, int columns);
 	~ShellContents();
 	ShellContents(const ShellContents& other);
-	
+
 	inline int columns() const {
 		return _columns;
 	}
@@ -49,5 +48,3 @@ private:
 
 	ShellContents& operator=(const ShellContents& other);
 };
-
-#endif

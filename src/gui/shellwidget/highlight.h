@@ -1,9 +1,6 @@
-#ifndef NEOVIM_QT_HIGHLIGHT
-#define NEOVIM_QT_HIGHLIGHT
+#pragma once
 
 #include <QColor>
-
-namespace NeovimQt {
 
 class HighlightAttribute {
 public:
@@ -46,6 +43,8 @@ public:
 
 	bool IsUndercurl() const { return m_undercurl; }
 
+	bool operator==(const HighlightAttribute& other) const;
+
 private:
 	QColor m_foreground{ QColor::Invalid };
 	QColor m_background{ QColor::Invalid };
@@ -57,7 +56,3 @@ private:
 	bool m_underline{ false };
 	bool m_undercurl{ false };
 };
-
-} // namespace NeovimQt
-
-#endif // NEOVIM_QT_HIGHLIGHT

@@ -138,35 +138,35 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 			for (int j=end_col; j>=start_col; j--) {
 
 				const Cell& cell = m_contents.constValue(i,j);
-				int chars = cell.doubleWidth ? 2 : 1;
+				int chars = cell.IsDoubleWidth() ? 2 : 1;
 				QRect r = absoluteShellRect(i, j, 1, chars);
 				QRect ovflw = absoluteShellRect(i, j, 1, chars + 1);
 
 				p.setClipRegion(ovflw);
 
-				if (j <= 0 || !contents().constValue(i, j-1).doubleWidth) {
+				if (j <= 0 || !contents().constValue(i, j-1).IsDoubleWidth()) {
 					// Only paint bg/fg if this is not the second cell
 					// of a wide char
-					if (cell.backgroundColor.isValid()) {
-						p.fillRect(r, cell.backgroundColor);
+					if (cell.GetBackgroundColor().isValid()) {
+						p.fillRect(r, cell.GetBackgroundColor());
 					} else {
 						p.fillRect(r, background());
 					}
 
-					if (cell.c == ' ') {
+					if (cell.GetCharacter() == ' ') {
 						continue;
 					}
 
-					if (cell.foregroundColor.isValid()) {
-						p.setPen(cell.foregroundColor);
+					if (cell.GetForegroundColor().isValid()) {
+						p.setPen(cell.GetForegroundColor());
 					} else {
 						p.setPen(foreground());
 					}
 
-					if (cell.bold || cell.italic) {
+					if (cell.IsBold() || cell.IsItalic()) {
 						QFont f = p.font();
-						f.setBold(cell.bold);
-						f.setItalic(cell.italic);
+						f.setBold(cell.IsBold());
+						f.setItalic(cell.IsItalic());
 						p.setFont(f);
 					} else {
 						p.setFont(font());
@@ -174,25 +174,26 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 
 					// Draw chars at the baseline
 					QPoint pos(r.left(), r.top()+m_ascent+(m_lineSpace / 2));
-					p.drawText(pos, QString::fromUcs4(&cell.c, 1));
+					uint character = cell.GetCharacter();
+					p.drawText(pos, QString::fromUcs4(&character, 1));
 				}
 
 				// Draw "undercurl" at the bottom of the cell
-				if (cell.underline || cell.undercurl) {
+				if (cell.IsUnderline()|| cell.IsUndercurl()) {
 					QPen pen = QPen();
-					if (cell.undercurl) {
-						if (cell.specialColor.isValid()) {
-							pen.setColor(cell.specialColor);
+					if (cell.IsUndercurl()) {
+						if (cell.GetSpecialColor().isValid()) {
+							pen.setColor(cell.GetSpecialColor());
 						} else if (special().isValid()) {
 							pen.setColor(special());
-						} else if (cell.foregroundColor.isValid()) {
-							pen.setColor(cell.foregroundColor);
+						} else if (cell.GetForegroundColor().isValid()) {
+							pen.setColor(cell.GetForegroundColor());
 						} else {
 							pen.setColor(foreground());
 						}
-					} else if (cell.underline) {
-						if (cell.foregroundColor.isValid()) {
-							pen.setColor(cell.foregroundColor);
+					} else if (cell.IsUnderline()) {
+						if (cell.GetForegroundColor().isValid()) {
+							pen.setColor(cell.GetForegroundColor());
 						} else {
 							pen.setColor(foreground());
 						}
@@ -202,9 +203,9 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					QPoint start = r.bottomLeft();
 					QPoint end = r.bottomRight();
 					start.ry()--; end.ry()--;
-					if (cell.underline) {
+					if (cell.IsUnderline()) {
 						p.drawLine(start, end);
-					} else if (cell.undercurl) {
+					} else if (cell.IsUndercurl()) {
 						static const int val[8] = {1, 0, 0, 1, 1, 2, 2, 2};
 						QPainterPath path(start);
 						for (int i = start.x() + 1; i <= end.x(); i++) {

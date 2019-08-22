@@ -3,7 +3,7 @@
 #include "shellcontents.h"
 #include "konsole_wcwidth.h"
 
-Cell ShellContents::invalidCell = Cell::invalid();;
+/*static*/ Cell ShellContents::invalidCell{ Cell::MakeInvalidCell() };
 
 /// Build shell contents from file, each line in the
 /// file is a shell line.
@@ -65,7 +65,7 @@ void ShellContents::clearAll(QColor bg)
 {
 	for (int i=0; i<_rows; i++) {
 		for (int j=0; j<_columns; j++) {
-			_data[i*_columns+j] = Cell::bg(bg);
+			_data[i*_columns+j] = Cell{ bg };
 		}
 	}
 }
@@ -118,7 +118,7 @@ void ShellContents::clearRegion(int row0, int col0, int row1, int col1,
 
 	for (int i=row0; i<row1; i++) {
 		for (int j=col0; j<col1; j++) {
-			_data[i*_columns + j] = Cell::bg(bg);
+			_data[i*_columns + j] = Cell{ bg };
 		}
 	}
 }
@@ -228,14 +228,14 @@ int ShellContents::put(const QString& str, int row, int column,
 	if (row < 0 || row >= _rows || column < 0 || column >= _columns) {
 		return 0;
 	}
-	
+
 	auto vec = str.toUcs4();
 
 	int pos = column;
 	foreach(const uint chr, vec) {
 		Cell& c = value(row, pos);
 		c = Cell(chr, fg, bg, sp, bold, italic, underline, undercurl);
-		if (c.doubleWidth) {
+		if (c.IsDoubleWidth()) {
 			value(row, pos+1) = Cell();
 			pos += 2;
 		} else {
@@ -244,5 +244,3 @@ int ShellContents::put(const QString& str, int row, int column,
 	}
 	return pos - column;
 }
-
-
