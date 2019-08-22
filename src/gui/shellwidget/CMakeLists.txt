@@ -16,6 +16,7 @@ if (WIN32 AND USE_STATIC_QT)
 endif ()
 
 set(SOURCES
+  cell.cpp
   highlight.cpp
   helpers.cpp
   konsole_wcwidth.cpp

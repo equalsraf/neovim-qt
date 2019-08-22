@@ -25,11 +25,12 @@ bool saveShellContents(const ShellContents& s, const QString& filename)
 		for (int j=0; j<s.columns(); j++) {
 			QRect r(j*w, i*h, w, h);
 			const Cell& cell = s.constValue(i,j);
-			p.setPen(cell.foregroundColor);
-			if (cell.backgroundColor.isValid()) {
-				p.fillRect(r, cell.backgroundColor);
+			p.setPen(cell.GetForegroundColor());
+			if (cell.GetBackgroundColor().isValid()) {
+				p.fillRect(r, cell.GetBackgroundColor());
 			}
-			p.drawText(r, QString::fromUcs4(&cell.c, 1));
+			const uint character{ cell.GetCharacter() };
+			p.drawText(r, QString::fromUcs4(&character, 1));
 		}
 	}
 	p.end();
