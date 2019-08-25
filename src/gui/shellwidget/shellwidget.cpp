@@ -40,6 +40,10 @@ void ShellWidget::setDefaultFont()
 bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, bool italic, bool force)
 {
 	QFont f(family, -1, weight, italic);
+	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
+	// but we want to match the family name with the bold/italic attributes.
+	f.setStyleName(QStringLiteral(""));
+
 	f.setPointSizeF(ptSize);
 	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
 	f.setFixedPitch(true);
