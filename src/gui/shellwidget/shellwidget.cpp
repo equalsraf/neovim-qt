@@ -151,20 +151,11 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 						p.setPen(foreground());
 					}
 
-					// We must specify the style to force bold/italic fonts
 					if (cell.bold || cell.italic) {
 						QFont f = p.font();
-						if (cell.bold && cell.italic) {
-							f.setBold(true);
-							f.setItalic(true);
-							f.setStyleName(QStringLiteral("BoldItalic"));
-						} else if (cell.bold) {
-							f.setBold(true);
-							f.setStyleName(QStringLiteral("Bold"));
-						} else /* cell.italic */ {
-							f.setItalic(true);
-							f.setStyleName(QStringLiteral("Italic"));
-						}
+                                                f.setStyleName(QStringLiteral(""));
+                                                f.setBold(cell.bold);
+                                                f.setItalic(cell.italic);
 						p.setFont(f);
 					} else {
 						p.setFont(font());
