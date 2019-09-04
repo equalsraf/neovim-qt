@@ -93,6 +93,10 @@ void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
 		opts.enable_ext_tabline = false;
 	}
 
+	if (parser.isSet("no-ext-popupmenu")) {
+		opts.enable_ext_popupmenu = false;
+	}
+
 #ifdef NEOVIMQT_GUI_WIDGET
 	NeovimQt::Shell *win = new NeovimQt::Shell(c);
 	win->show();
@@ -155,6 +159,8 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 				QCoreApplication::translate("main", "Maximize the window on startup")));
 	parser.addOption(QCommandLineOption("no-ext-tabline",
 				QCoreApplication::translate("main", "Disable the external GUI tabline")));
+	parser.addOption(QCommandLineOption("no-ext-popupmenu",
+				QCoreApplication::translate("main", "Disable the external GUI popup menu")));
 	parser.addOption(QCommandLineOption("fullscreen",
 				QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
 	parser.addOption(QCommandLineOption("embed",
