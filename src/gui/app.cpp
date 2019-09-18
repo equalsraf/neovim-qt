@@ -6,6 +6,7 @@
 #include <QSettings>
 #include <QTextStream>
 #include "mainwindow.h"
+#include "arguments.h"
 
 namespace NeovimQt {
 
@@ -116,10 +117,12 @@ void App::showUi(NeovimConnector *c, const QCommandLineParser& parser)
 	// Window geometry should be restored only when the user does not specify
 	// one of the following command line arguments. Argument "maximized" can
 	// be safely ignored, as the loaded geometry only takes effect after the
-	// user un-maximizes the window; this behavior is desirable.
+	// user un-maximizes the window; this behavior is desirable. Function
+	// `isSet` will issue qWarning() messages if the argument doesn't exist.
+	// Do not call isSet(...) for arguments which may not exist.
 	if (!parser.isSet("fullscreen") &&
-		!parser.isSet("geometry") &&
-		!parser.isSet("qwindowgeometry"))
+		(!hasGeometryArg() || !parser.isSet("geometry")) &&
+		(!hasQWindowGeometryArg() || !parser.isSet("qwindowgeometry")))
 	{
 		win->restoreWindowGeometry();
 	}
@@ -149,9 +152,20 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 				QCoreApplication::translate("main", "Error if nvim does not responde after count milliseconds"),
 				QCoreApplication::translate("main", "ms"),
 				"20000"));
-	parser.addOption(QCommandLineOption("geometry",
-				QCoreApplication::translate("main", "Initial window geometry"),
-				QCoreApplication::translate("main", "geometry")));
+
+	// Some platforms use --qwindowgeometry, while other platforms use the --geometry.
+	// Make the correct help message is displayed.
+	if (hasGeometryArg()) {
+		parser.addOption(QCommandLineOption("geometry",
+			QCoreApplication::translate("main", "Set initial window geometry"),
+			QCoreApplication::translate("main", "width>x<height")));
+	}
+	if (hasQWindowGeometryArg()) {
+		parser.addOption(QCommandLineOption("qwindowgeometry",
+			QCoreApplication::translate("main", "Set initial window geometry"),
+			QCoreApplication::translate("main", "width>x<height")));
+	}
+
 	parser.addOption(QCommandLineOption("stylesheet",
 				QCoreApplication::translate("main", "Apply qss stylesheet from file"),
 				QCoreApplication::translate("main", "stylesheet")));
