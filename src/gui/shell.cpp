@@ -527,6 +527,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		handleGridCursorGoto(opargs);
 	} else if (name == "grid_scroll") {
 		handleGridScroll(opargs);
+	} else if (name == "hl_group_set") {
 	}
 	else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
