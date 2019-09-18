@@ -93,11 +93,17 @@ QString Shell::fontDesc()
 	return fdesc;
 }
 
-/**
- * Set the GUI font, or display the current font
- */
-bool Shell::setGuiFont(const QString& fdesc, bool force)
+/// Set the GUI font, or display the current font
+///
+/// @param updateOption controls update of the guifont option, which should not
+/// be updated when the user calls from 'set guifont=...'.
+bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 {
+	// Exit early if the font description does not change, prevent loops.
+	if (fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
+		return false;
+	}
+
 	QStringList attrs = fdesc.split(':');
 	if (attrs.size() < 1) {
 		m_nvim->api0()->vim_report_error("Invalid font");
@@ -127,7 +133,15 @@ bool Shell::setGuiFont(const QString& fdesc, bool force)
 	bool ok = setShellFont(attrs.at(0), pointSize, weight, italic, force);
 	if (ok && m_attached) {
 		resizeNeovim(size());
+
 		m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
+
+		// Updating guifont when the user has already called 'set guifont=...' may cause
+		// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
+		if (updateOption) {
+			qDebug() << "Update guifont option!";
+			m_nvim->api0()->vim_set_option("guifont", fontDesc());
+		}
 	}
 
 	return ok;
@@ -145,7 +159,10 @@ void Shell::setAttached(bool attached)
 	m_attached = attached;
 	if (attached) {
 		updateWindowId();
+
 		m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
+		m_nvim->api0()->vim_set_option("guifont", fontDesc());
+
 		if (isWindow()) {
 			updateGuiWindowState(windowState());
 		}
@@ -654,13 +671,7 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 	if (name == "Gui" && args.size() > 0) {
 		QString guiEvName = m_nvim->decode(args.at(0).toByteArray());
 		if (guiEvName == "Font") {
-			if (args.size() == 2) {
-				QString fdesc = m_nvim->decode(args.at(1).toByteArray());
-				setGuiFont(fdesc);
-			} else if (args.size() == 3) {
-				QString fdesc = m_nvim->decode(args.at(1).toByteArray());
-				setGuiFont(fdesc, args.at(2) == 1);
-			}
+			handleGuiFontFunction(args);
 		} else if (guiEvName == "Foreground" && args.size() == 1) {
 			activateWindow();
 			raise();
@@ -782,7 +793,7 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 void Shell::handleSetOption(const QString& name, const QVariant& value)
 {
 	if (name == "guifont") {
-		setGuiFont(value.toString());
+		setGuiFont(value.toString(), false /*force*/, false /*setOption*/);
 	} else if (name == "guifontset") {
 	} else if (name == "guifontwide") {
 	} else if (name == "linespace") {
@@ -812,6 +823,18 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 void Shell::handleMouse(bool enabled)
 {
 	m_mouseEnabled = enabled;
+}
+
+void Shell::handleGuiFontFunction(const QVariantList& args)
+{
+	if (args.size() == 2) {
+		QString fdesc = m_nvim->decode(args.at(1).toByteArray());
+		setGuiFont(fdesc, false /*force*/, true /*setOption*/);
+	} else if (args.size() == 3) {
+		QString fdesc = m_nvim->decode(args.at(1).toByteArray());
+		const bool force = args.at(2) == 1;
+		setGuiFont(fdesc, force, true /*setOption*/);
+	}
 }
 
 void Shell::handleGridResize(const QVariantList& opargs)
