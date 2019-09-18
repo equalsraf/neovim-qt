@@ -1,5 +1,6 @@
 #include "shell.h"
 
+#include <QFontDialog>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QDebug>
@@ -104,47 +105,71 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 		return false;
 	}
 
-	QStringList attrs = fdesc.split(':');
-	if (attrs.size() < 1) {
-		m_nvim->api0()->vim_report_error("Invalid font");
+	bool setShellFontSuccess{ false };
+	const bool isGuiDialogRequest{ fdesc == "*" };
+
+	if (isGuiDialogRequest) {
+		bool fontDialogSuccess = false;
+		QFont font{ QFontDialog::getFont(&fontDialogSuccess, QWidget::font(), this, {},
+			QFontDialog::MonospacedFonts) };
+
+		// The font selection dialog was canceled by the user.
+		if (!fontDialogSuccess) {
+			return false;
+		}
+
+		setShellFontSuccess = setShellFont(font.family(), font.pointSize(), font.weight(),
+			font.italic(), force);
+	}
+	else {
+		QStringList attrs = fdesc.split(':');
+		if (attrs.size() < 1) {
+			m_nvim->api0()->vim_report_error("Invalid font");
+			return false;
+		}
+
+		qreal pointSize = font().pointSizeF();
+		int weight = -1;
+		bool italic = false;
+		for (const auto& attr : attrs) {
+			if (attr.size() >= 2 && attr[0] == 'h') {
+				bool ok{ false };
+				qreal height = attr.mid(1).toFloat(&ok);
+				if (!ok) {
+					m_nvim->api0()->vim_report_error("Invalid font height");
+					return false;
+				}
+				pointSize = height;
+			} else if (attr == "b") {
+				weight = QFont::Bold;
+			} else if (attr == "l") {
+				weight = QFont::Light;
+			} else if (attr == "i") {
+				italic = true;
+			}
+		}
+
+		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force);
+	}
+
+	// Only update the ShellWidget when font changes.
+	if (!setShellFontSuccess || !m_attached) {
 		return false;
 	}
 
-	qreal pointSize = font().pointSizeF();
-	int weight = -1;
-	bool italic = false;
-	foreach(QString attr, attrs) {
-		if (attr.size() >= 2 && attr[0] == 'h') {
-			bool ok = false;
-			qreal height = attr.mid(1).toFloat(&ok);
-			if (!ok) {
-				m_nvim->api0()->vim_report_error("Invalid font height");
-				return false;
-			}
-			pointSize = height;
-		} else if (attr == "b") {
-			weight = QFont::Bold;
-		} else if (attr == "l") {
-			weight = QFont::Light;
-		} else if (attr == "i") {
-			italic = true;
-		}
-	}
-	bool ok = setShellFont(attrs.at(0), pointSize, weight, italic, force);
-	if (ok && m_attached) {
-		resizeNeovim(size());
+	// Font changed: trigger resize to update the ShellWidget, and update font variables.
+	resizeNeovim(size());
 
-		m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
+	m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
 
-		// Updating guifont when the user has already called 'set guifont=...' may cause
-		// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
-		if (updateOption) {
-			qDebug() << "Update guifont option!";
-			m_nvim->api0()->vim_set_option("guifont", fontDesc());
-		}
+	// Updating guifont when the user has already called 'set guifont=...' may cause
+	// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
+	if (isGuiDialogRequest || updateOption) {
+		qDebug() << "Update guifont option!";
+		m_nvim->api0()->vim_set_option("guifont", fontDesc());
 	}
 
-	return ok;
+	return true;
 }
 
 Shell::~Shell()
