@@ -77,7 +77,7 @@ public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
 	void resizeNeovim(int n_cols, int n_rows);
-	bool setGuiFont(const QString& fdesc, bool force = false);
+	bool setGuiFont(const QString& fdesc, bool force, bool updateOption);
 	void updateGuiWindowState(Qt::WindowStates state);
 	void openFiles(const QList<QUrl> url);
 
@@ -131,6 +131,7 @@ protected:
 	virtual void handlePopupMenuShow(const QVariantList& opargs);
 	virtual void handlePopupMenuSelect(const QVariantList& opargs);
 	virtual void handleMouse(bool);
+	virtual void handleGuiFontFunction(const QVariantList& args);
 
 	// Modern 'ext_linegrid' Grid UI Events
 	virtual void handleGridResize(const QVariantList& opargs);
