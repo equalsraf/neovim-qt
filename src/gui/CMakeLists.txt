@@ -3,6 +3,9 @@ set(QTLIBS Qt5::Network Qt5::Widgets)
 include_directories(.. shellwidget)
 qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
 if(WIN32)
+	set(SRCS_PLATFORM
+		arguments_qwindowgeometry.cpp
+		)
 	if (USE_STATIC_QT)
 		add_definitions(-DUSE_STATIC_QT)
 		link_directories(${CMAKE_PREFIX_PATH}/share/qt5/plugins/platforms)
@@ -11,21 +14,37 @@ if(WIN32)
 	set(RES_FILE "data.rc")
 	enable_language(RC)
 elseif(APPLE)
+	set(SRCS_PLATFORM
+		arguments_qwindowgeometry.cpp
+		)
 	set(ICON_PATH ${PROJECT_SOURCE_DIR}/third-party/neovim.icns)
 	set_source_files_properties(${ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
 	set(MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in)
+else()
+	set(SRCS_PLATFORM
+		arguments_geometry.cpp
+		)
 endif()
 
 add_subdirectory(shellwidget)
 
 include(GNUInstallDirs)
 set(RUNTIME_PATH )
-add_library(neovim-qt-gui shell.cpp input.cpp treeview.cpp errorwidget.cpp mainwindow.cpp app.cpp
+
+add_library(neovim-qt-gui
+	app.cpp
+	errorwidget.cpp
 	highlight.cpp
-	popupmenumodel.cpp
+	input.cpp
+	mainwindow.cpp
 	popupmenu.cpp
+	popupmenumodel.cpp
+	shell.cpp
+	treeview.cpp
+	${SRCS_PLATFORM}
 	${NEOVIM_RCC_SOURCES})
+
 target_link_libraries(neovim-qt-gui qshellwidget neovim-qt)
 
 if(NOT APPLE)
