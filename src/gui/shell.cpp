@@ -1351,8 +1351,8 @@ void Shell::closeEvent(QCloseEvent *ev)
 void Shell::focusInEvent(QFocusEvent *ev)
 {
 	if (m_attached) {
-		// See neovim-qt/issues/329 the FocusGained key no longer exists, use autocmd instead
-		m_nvim->api0()->vim_command("if exists('#FocusGained') | doautocmd FocusGained | endif");
+		// Issue #329: The <FocusGained> key no longer exists, use autocmd instead.
+		m_nvim->api0()->vim_command("if exists('#FocusGained') | doautocmd <nomodeline> FocusGained | endif");
 	}
 	QWidget::focusInEvent(ev);
 }
@@ -1360,7 +1360,8 @@ void Shell::focusInEvent(QFocusEvent *ev)
 void Shell::focusOutEvent(QFocusEvent *ev)
 {
 	if (m_attached) {
-		m_nvim->api0()->vim_command("if exists('#FocusLost') | doautocmd FocusLost | endif");
+		// Issue #591: Option <nomodeline> prevents unwanted interaction, consistent with nvim.
+		m_nvim->api0()->vim_command("if exists('#FocusLost') | doautocmd <nomodeline> FocusLost | endif");
 	}
 	QWidget::focusOutEvent(ev);
 }
