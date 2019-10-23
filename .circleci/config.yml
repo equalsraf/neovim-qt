@@ -14,13 +14,15 @@ jobs:
           command: sudo apt-get update
       - run:
           name: Install dependencies
-          command: sudo apt-get install -y neovim python-pip python-dev cmake qt5-default
+          command: sudo apt-get install -y neovim python3-pip python3-dev python3-msgpack python3-jinja2 cmake qt5-default
       - run:
           name: build
           command: |
+            pyenv global system
             mkdir build
             cd build
-            cmake -DCMAKE_BUILD_TYPE=Debug -DUSE_GCOV=ON ..
+            cmake -DCMAKE_BUILD_TYPE=Debug -DUSE_GCOV=ON -DPYTHON_EXECUTABLE=/usr/bin/python3 ..
+            cmake --build . --target bindings -- VERBOSE=1
             cmake --build . -- VERBOSE=1
       - run:
           name: test
