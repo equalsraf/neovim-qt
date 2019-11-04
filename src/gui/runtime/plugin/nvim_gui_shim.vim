@@ -96,6 +96,11 @@ function! s:GuiPopupmenu(enable) abort
 endfunction
 command! -nargs=1 GuiPopupmenu call s:GuiPopupmenu(<args>)
 
+function! s:GuiRenderLigatures(enable) abort
+	call rpcnotify(0, 'Gui', 'Option', 'RenderLigatures', a:enable)
+endfunction
+command! -nargs=1 GuiRenderLigatures call s:GuiRenderLigatures(<args>)
+
 " GuiDrop('file1', 'file2', ...) is similar to :drop file1 file2 ...
 " but it calls fnameescape() over all arguments
 function GuiDrop(...)

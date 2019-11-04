@@ -773,6 +773,9 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 		m_nvim->api2()->nvim_ui_set_option("ext_popupmenu", value.toBool());
 	} else if (name == "Cmdline") {
 	} else if (name == "Wildmenu") {
+	} else if (name == "RenderLigatures"){
+		setLigatureMode(value.toBool());
+		qDebug() << "Text rendering mode changed";
 	} else {
 		qDebug() << "Unknown GUI Option" << name << value;
 	}

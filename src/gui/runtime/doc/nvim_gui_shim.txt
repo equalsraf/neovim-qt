@@ -55,6 +55,9 @@ GuiTabline	Enable or disable the external GUI tabline
 								*GuiPopupmenu*
 GuiPopupmenu	Enable or disable the external GUI popup menu
 
+								*GuiRenderLigatures*
+GuiRenderLigatures	Enable or disable rendering ligatures
+
 
 ==============================================================================
 2. GUI variables

@@ -6,7 +6,8 @@
 
 ShellWidget::ShellWidget(QWidget *parent)
 :QWidget(parent), m_contents(0,0), m_bgColor(Qt::white),
-	m_fgColor(Qt::black), m_spColor(QColor()), m_lineSpace(0)
+	m_fgColor(Qt::black), m_spColor(QColor()), m_lineSpace(0),
+	m_ligatureMode(false)
 {
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_KeyCompression, false);
@@ -21,8 +22,11 @@ ShellWidget::ShellWidget(QWidget *parent)
 ShellWidget* ShellWidget::fromFile(const QString& path)
 {
 	ShellWidget *w = new ShellWidget();
-	w->m_contents.fromFile(path);
-	return w;
+	if (w->m_contents.fromFile(path)) {
+		return w;
+	} else {
+		return NULL;
+	}
 }
 
 void ShellWidget::setDefaultFont()
@@ -133,88 +137,95 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 			end_row = m_contents.rows() - 1;
 		}
 
-		// end_col/row is inclusive
-		for (int i=start_row; i<=end_row; i++) {
-			for (int j=end_col; j>=start_col; j--) {
+		QChar *rowStr = nullptr;
+		if(m_ligatureMode){
+			start_col = 0;
+			end_col = m_contents.columns() - 1;
+			rowStr = new QChar[m_contents.columns()];
+		}
 
-				const Cell& cell = m_contents.constValue(i,j);
-				int chars = cell.doubleWidth ? 2 : 1;
-				QRect r = absoluteShellRect(i, j, 1, chars);
-				QRect ovflw = absoluteShellRect(i, j, 1, chars + 1);
+		// end_row is inclusive
+		for (int i=start_row; i<=end_row && i < m_contents.rows(); i++) {
+			for (int j=end_col; j>=start_col && j >= 0;) {
+				const Cell& firstCell = m_contents.constValue(i,j);
+				const QColor &currentForeground = firstCell.foregroundColor.isValid()?firstCell.foregroundColor:m_fgColor;
+				const QColor &currentBackground = firstCell.backgroundColor.isValid()?firstCell.backgroundColor:m_bgColor;
+				QColor nextForeground, nextBackground;
+				int startIndex = j;
+				const Cell* cell = &firstCell;
+				do {
+					QRect r = absoluteShellRect(i,j,1,cell->doubleWidth?2:1);
+					p.setClipRect(r);
+					p.fillRect(r,currentBackground);
 
-				p.setClipRegion(ovflw);
-
-				if (j <= 0 || !contents().constValue(i, j-1).doubleWidth) {
-					// Only paint bg/fg if this is not the second cell
-					// of a wide char
-					if (cell.backgroundColor.isValid()) {
-						p.fillRect(r, cell.backgroundColor);
-					} else {
-						p.fillRect(r, background());
-					}
-
-					if (cell.c == ' ') {
-						continue;
-					}
-
-					if (cell.foregroundColor.isValid()) {
-						p.setPen(cell.foregroundColor);
-					} else {
-						p.setPen(foreground());
-					}
-
-					if (cell.bold || cell.italic) {
-						QFont f = p.font();
-						f.setBold(cell.bold);
-						f.setItalic(cell.italic);
-						p.setFont(f);
-					} else {
-						p.setFont(font());
-					}
-
-					// Draw chars at the baseline
-					QPoint pos(r.left(), r.top()+m_ascent+(m_lineSpace / 2));
-					p.drawText(pos, QString::fromUcs4(&cell.c, 1));
-				}
-
-				// Draw "undercurl" at the bottom of the cell
-				if (cell.underline || cell.undercurl) {
-					QPen pen = QPen();
-					if (cell.undercurl) {
-						if (cell.specialColor.isValid()) {
-							pen.setColor(cell.specialColor);
-						} else if (special().isValid()) {
-							pen.setColor(special());
-						} else if (cell.foregroundColor.isValid()) {
-							pen.setColor(cell.foregroundColor);
-						} else {
-							pen.setColor(foreground());
+					// Draw "undercurl" at the bottom of the cell
+					if (cell->underline || cell->undercurl) {
+						if (cell->undercurl) {
+							if (cell->specialColor.isValid()) {
+								p.setPen(cell->specialColor);
+							} else if (m_spColor.isValid()) {
+								p.setPen(m_spColor);
+							} else if (cell->foregroundColor.isValid()) {
+								p.setPen(cell->foregroundColor);
+							} else {
+								p.setPen(foreground());
+							}
+						} else if (cell->underline) {
+							if (cell->foregroundColor.isValid()) {
+								p.setPen(cell->foregroundColor);
+							} else {
+								p.setPen(foreground());
+							}
 						}
-					} else if (cell.underline) {
-						if (cell.foregroundColor.isValid()) {
-							pen.setColor(cell.foregroundColor);
-						} else {
-							pen.setColor(foreground());
+
+						QPoint start = r.bottomLeft();
+						QPoint end = r.bottomRight();
+						start.ry()--; end.ry()--;
+						if (cell->underline) {
+							p.drawLine(start, end);
+						} else if (cell->undercurl) {
+							static const int val[8] = {1, 0, 0, 1, 1, 2, 2, 2};
+							QPainterPath path(start);
+							for (int i = start.x() + 1; i <= end.x(); i++) {
+								int offset = val[i % 8];
+								path.lineTo(QPoint(i, start.y() - offset));
+							}
+							p.drawPath(path);
 						}
 					}
-
-					p.setPen(pen);
-					QPoint start = r.bottomLeft();
-					QPoint end = r.bottomRight();
-					start.ry()--; end.ry()--;
-					if (cell.underline) {
-						p.drawLine(start, end);
-					} else if (cell.undercurl) {
-						static const int val[8] = {1, 0, 0, 1, 1, 2, 2, 2};
-						QPainterPath path(start);
-						for (int i = start.x() + 1; i <= end.x(); i++) {
-							int offset = val[i % 8];
-							path.lineTo(QPoint(i, start.y() - offset));
-						}
-						p.drawPath(path);
+					if(m_ligatureMode){
+						rowStr[j]=cell->c;
 					}
+					j--;
+					cell = &m_contents.constValue(i,j);
+					nextForeground = cell->foregroundColor.isValid()?cell->foregroundColor:foreground();
+					nextBackground = cell->backgroundColor.isValid()?cell->backgroundColor:background();
+				} while ( m_ligatureMode &&
+						!(cell->bold!=firstCell.bold || cell->italic!=firstCell.italic ||
+						currentForeground != nextForeground ||
+						currentBackground != nextBackground ||
+						m_contents.constValue(i,j).doubleWidth ||
+						m_contents.constValue(i,j).c>0x7f ||
+						j == 0));
+				QRect r = absoluteShellRect(i, j+1, 1, startIndex-j);
+				QRect ovflw = absoluteShellRect(i, j+1, 1, startIndex-j+1);
+				p.setClipRect(ovflw);
+
+				p.setPen(currentForeground);
+				QFont f = p.font();
+				f.setBold(firstCell.bold);
+				f.setItalic(firstCell.italic);
+				p.setFont(f);
+				QPoint pos(r.left(), r.top()+m_ascent+(m_lineSpace / 2));
+				if(m_ligatureMode){
+					p.drawText(pos, QString(rowStr+j+1,startIndex-j));
+				} else {
+					p.drawText(pos, QString(m_contents.constValue(i,j+1).c));
 				}
 			}
+		}
+		if(rowStr){
+			delete[] rowStr;
 		}
 	}
 
@@ -339,7 +350,9 @@ int ShellWidget::put(const QString& text, int row, int column,
 	int cols_changed = m_contents.put(text, row, column, fg, bg, sp,
 				bold, italic, underline, undercurl);
 	if (cols_changed > 0) {
-		QRect rect = absoluteShellRect(row, column, 1, cols_changed);
+	int rectWidth = m_ligatureMode?m_contents.columns():cols_changed;
+	int rectStart = m_ligatureMode?0:column;
+		QRect rect = absoluteShellRect(row, rectStart, 1, rectWidth);
 		update(rect);
 	}
 	return cols_changed;
@@ -411,4 +424,15 @@ int ShellWidget::rows() const
 int ShellWidget::columns() const
 {
 	return m_contents.columns();
+}
+
+void ShellWidget::setLigatureMode(bool ligatureMode)
+{
+	m_ligatureMode = ligatureMode;
+	update();
+}
+
+bool ShellWidget::ligatureMode() const
+{
+	return m_ligatureMode;
 }
