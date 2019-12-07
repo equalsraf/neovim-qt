@@ -1,4 +1,3 @@
-
 include_directories(${CMAKE_SOURCE_DIR}/src)
 add_definitions(-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
 if (WIN32 AND USE_STATIC_QT)
@@ -6,9 +5,10 @@ if (WIN32 AND USE_STATIC_QT)
 endif ()
 
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+
 function(add_xtest SOURCE_NAME)
 	add_executable(${SOURCE_NAME} ${SOURCE_NAME}.cpp ${ARGV1} ${ARGV2})
-	target_link_libraries(${SOURCE_NAME} Qt5::Network Qt5::Test ${MSGPACK_LIBRARIES} neovim-qt)
+	target_link_libraries(${SOURCE_NAME} Qt5::Network Qt5::Test Qt5::Widgets ${MSGPACK_LIBRARIES} neovim-qt)
 	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME})
 	add_dependencies(check ${SOURCE_NAME})
 endfunction()
@@ -22,10 +22,41 @@ function(add_xtest_gui SOURCE_NAME)
 	add_dependencies(check ${SOURCE_NAME})
 endfunction()
 
+function(add_shared_test SOURCE_NAME)
+	add_executable(${SOURCE_NAME} ${ARGV1} ${ARGV2} ${ARGV3})
+	target_link_libraries(${SOURCE_NAME} Qt5::Network Qt5::Test Qt5::Widgets ${MSGPACK_LIBRARIES} neovim-qt)
+	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME})
+	add_dependencies(check ${SOURCE_NAME})
+endfunction()
+
 add_xtest(tst_neovimobject)
 add_xtest(tst_neovimconnector)
 add_xtest(tst_callallmethods)
 add_xtest(tst_encoding)
 add_xtest(tst_msgpackiodevice)
-add_xtest(tst_input ${CMAKE_SOURCE_DIR}/src/gui/input.cpp)
 add_xtest_gui(tst_shell)
+
+# Platform Specific Input Tests
+add_xtest(tst_input_mac
+	${CMAKE_SOURCE_DIR}/src/gui/input.cpp
+	${CMAKE_SOURCE_DIR}/src/gui/input_mac.cpp)
+add_xtest(tst_input_unix
+	${CMAKE_SOURCE_DIR}/src/gui/input.cpp
+	${CMAKE_SOURCE_DIR}/src/gui/input_unix.cpp)
+add_xtest(tst_input_win32
+	${CMAKE_SOURCE_DIR}/src/gui/input.cpp
+	${CMAKE_SOURCE_DIR}/src/gui/input_win32.cpp)
+
+# Platform Agnostic Input Tests
+add_shared_test(tst_input_common_mac
+	tst_input_common.cpp
+	${CMAKE_SOURCE_DIR}/src/gui/input.cpp
+	${CMAKE_SOURCE_DIR}/src/gui/input_mac.cpp)
+add_shared_test(tst_input_common_unix
+	tst_input_common.cpp
+	${CMAKE_SOURCE_DIR}/src/gui/input.cpp
+	${CMAKE_SOURCE_DIR}/src/gui/input_unix.cpp)
+add_shared_test(tst_input_common_win32
+	tst_input_common.cpp
+	${CMAKE_SOURCE_DIR}/src/gui/input.cpp
+	${CMAKE_SOURCE_DIR}/src/gui/input_win32.cpp)
