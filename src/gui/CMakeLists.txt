@@ -6,6 +6,7 @@ if(WIN32)
 	set(SRCS_PLATFORM
 		app_runtime.cpp
 		arguments_qwindowgeometry.cpp
+		input_win32.cpp
 		printinfo_msgbox.cpp
 		)
 	if (USE_STATIC_QT)
@@ -19,6 +20,7 @@ elseif(APPLE)
 	set(SRCS_PLATFORM
 		app_runtime_mac.cpp
 		arguments_qwindowgeometry.cpp
+		input_mac.cpp
 		printinfo_stdout.cpp
 		)
 	set(ICON_PATH ${PROJECT_SOURCE_DIR}/third-party/neovim.icns)
@@ -29,6 +31,7 @@ else()
 	set(SRCS_PLATFORM
 		app_runtime.cpp
 		arguments_geometry.cpp
+		input_unix.cpp
 		printinfo_stdout.cpp
 		)
 endif()

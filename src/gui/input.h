@@ -1,53 +1,51 @@
-#ifndef NEOVIM_QT_INPUT
-#define NEOVIM_QT_INPUT
+#pragma once
 
-#include <QHash>
-#include <QString>
 #include <QEvent>
+#include <QKeyEvent>
+#include <QMap>
 #include <QPoint>
+#include <QString>
 
-namespace NeovimQt {
+namespace NeovimQt { namespace Input {
 
-class InputConv {
-public:
-	InputConv();
+/// Returns the QMap of all NeoVim-recognized special keys.
+const QMap<int, QString>& GetSpecialKeysMap() noexcept;
 
-	QString convertKey(const QString& text, int key, Qt::KeyboardModifiers mod);
-	QString modPrefix(Qt::KeyboardModifiers mod);
+/// Convert Qt key input into Neovim key-notation. See QKeyEvent.
+QString convertKey(const QKeyEvent& ev) noexcept;
 
-	QHash<int, QString> specialKeys;
-	QHash<QString, QString> replaceKeys;
-	QString convertMouse(Qt::MouseButton bt, QEvent::Type type, Qt::KeyboardModifiers mod, QPoint pos, short clicksCount);
+/// Return keyboard modifier prefix. Ex) "C-", "A-" or "C-S-A-"
+///
+/// NOTE: On Win32 Ctrl+Alt are never passed together, since we can't distinguish
+/// between Ctrl+Alt and AltGr (see Vim/os_win32.c).
+QString GetModifierPrefix(Qt::KeyboardModifiers mod) noexcept;
 
-protected:
-	// define our own key and modifier modifier constants to abstract
-	// OS-specific issues
-#ifdef Q_OS_MAC
-	const Qt::KeyboardModifiers ControlModifier = Qt::MetaModifier;
-	const Qt::KeyboardModifiers CmdModifier = Qt::ControlModifier;
-	const Qt::KeyboardModifiers MetaModifier  = Qt::AltModifier;
-	const Qt::Key Key_Control = Qt::Key_Meta;
-	const Qt::Key Key_Cmd = Qt::Key_Control;
-#else
-	const Qt::KeyboardModifiers ControlModifier = Qt::ControlModifier;
-# ifdef Q_OS_UNIX
-	const Qt::KeyboardModifiers CmdModifier = Qt::MetaModifier;
-	const Qt::Key Key_Cmd = Qt::Key_Meta;;
-# else
-	const Qt::KeyboardModifiers CmdModifier = (Qt::KeyboardModifiers)0;
-	const Qt::Key Key_Cmd = (Qt::Key)0;
-# endif
-	const Qt::KeyboardModifiers MetaModifier  = Qt::MetaModifier;
-	const Qt::Key Key_Control = Qt::Key_Control;
-#endif
-	const Qt::KeyboardModifiers ShiftModifier = Qt::ShiftModifier;
-	const Qt::KeyboardModifiers AltModifier   = Qt::AltModifier;
-	const Qt::KeyboardModifiers NoModifier    = Qt::NoModifier;
-	const Qt::Key Key_Alt = Qt::Key_Alt;
-};
+/// Convert mouse event information into Neovim key notation. See QMouseEvent.
+///
+/// @type is one of the Qt mouse event types
+/// @pos is in Neovim Coordinates
+/// @clickCount is the number of consecutive mouse clicks
+///   1 for a single click, 2 for a double click, up to 4.
+///   This value is only used for LeftMouse events.
+///
+/// @return The Neovim event string, or an empty string if the event is invalid.
+QString convertMouse(
+	Qt::MouseButton bt,
+	QEvent::Type type,
+	Qt::KeyboardModifiers mod,
+	QPoint pos,
+	int clicksCount) noexcept;
 
-extern InputConv Input;
+/// Platform specific Qt key modifier bitmask for 'Control'.
+Qt::KeyboardModifiers ControlModifier() noexcept;
 
-} //Namespace
+/// Platform specific Qt::Key used as 'Control'.
+Qt::Key Key_Control() noexcept;
 
-#endif
+/// Platform specific Qt key modifier bitmask for 'Cmd'/'Meta'.
+Qt::KeyboardModifiers CmdModifier() noexcept;
+
+/// Platform specific Qt::Key used as 'Cmd'/'Meta'.
+Qt::Key Key_Cmd() noexcept;
+
+} } // namespace NeovimQt:Input
