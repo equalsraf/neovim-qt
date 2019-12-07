@@ -182,13 +182,15 @@ QString convertKey(const QKeyEvent& ev) noexcept
 			return {};
 		}
 
-		// Ignore Ctrl, Alt, and Cmd key combos by themselves.
-		if (key == Key_Control() || key == Qt::Key_Alt || key == Key_Cmd()) {
-			return {};
-		}
-
-		// Issue #344: Ignore Ctrl-Shift, C-S- being treated as C-Space
-		if (mod & Qt::ShiftModifier) {
+		// Ignore all modifier-only key events.
+		//   Issue #344: Ignore Ctrl-Shift, C-S- being treated as C-Space
+		//   Issue#593: Pressing Control + Super inserts ^S
+		if (key == Qt::Key::Key_Alt
+			|| key == Qt::Key::Key_Control
+			|| key == Qt::Key::Key_Meta
+			|| key == Qt::Key::Key_Shift
+			|| key == Qt::Key::Key_Super_L
+			|| key == Qt::Key::Key_Super_R) {
 			return {};
 		}
 	}
