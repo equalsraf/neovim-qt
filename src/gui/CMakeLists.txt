@@ -5,6 +5,7 @@ qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
 if(WIN32)
 	set(SRCS_PLATFORM
 		arguments_qwindowgeometry.cpp
+		input_win32.cpp
 		)
 	if (USE_STATIC_QT)
 		add_definitions(-DUSE_STATIC_QT)
@@ -16,6 +17,7 @@ if(WIN32)
 elseif(APPLE)
 	set(SRCS_PLATFORM
 		arguments_qwindowgeometry.cpp
+		input_mac.cpp
 		)
 	set(ICON_PATH ${PROJECT_SOURCE_DIR}/third-party/neovim.icns)
 	set_source_files_properties(${ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
@@ -24,6 +26,7 @@ elseif(APPLE)
 else()
 	set(SRCS_PLATFORM
 		arguments_geometry.cpp
+		input_unix.cpp
 		)
 endif()
 

@@ -1070,7 +1070,7 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 		this->setCursor(Qt::BlankCursor);
 	}
 
-	QString inp = Input.convertKey(ev->text(), ev->key(), ev->modifiers());
+	const QString inp = Input::convertKey(ev->text(), ev->key(), ev->modifiers());
 	if (inp.isEmpty()) {
 		QWidget::keyPressEvent(ev);
 		return;
@@ -1100,9 +1100,9 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 		} else {
 			return;
 		}
-		inp = Input.convertMouse(bt, ev->type(), ev->modifiers(), pos, 0);
+		inp = Input::convertMouse(bt, ev->type(), ev->modifiers(), pos, 0);
 	} else {
-		inp = Input.convertMouse(ev->button(), ev->type(), ev->modifiers(), pos,
+		inp = Input::convertMouse(ev->button(), ev->type(), ev->modifiers(), pos,
 						m_mouseclick_count);
 	}
 	if (inp.isEmpty()) {
@@ -1196,13 +1196,13 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	QString inp;
 	if (vert != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
-			.arg(Input.modPrefix(ev->modifiers()))
+			.arg(Input::GetModifierPrefix(ev->modifiers()))
 			.arg(vert > 0 ? "Up" : "Down")
 			.arg(pos.x()).arg(pos.y());
 	}
 	if (horiz != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
-			.arg(Input.modPrefix(ev->modifiers()))
+			.arg(Input::GetModifierPrefix(ev->modifiers()))
 			.arg(horiz > 0 ? "Left" : "Right")
 			.arg(pos.x()).arg(pos.y());
 	}
