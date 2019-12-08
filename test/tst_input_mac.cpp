@@ -7,8 +7,21 @@ class TestInputMac : public QObject
 	Q_OBJECT
 
 private slots:
+	void LessThanModifierKeys() noexcept;
 	void SpecialKeys() noexcept;
 };
+
+void TestInputMac::LessThanModifierKeys() noexcept
+{
+	QKeyEvent evLessThanControl{ QEvent::KeyPress, Qt::Key::Key_Less, Qt::ShiftModifier | Qt::ControlModifier, "<" };
+	QCOMPARE(NeovimQt::Input::convertKey(evLessThanControl), QString{ "<D-lt>" });
+
+	QKeyEvent evLessThanAlt{ QEvent::KeyPress, Qt::Key::Key_Less, Qt::ShiftModifier | Qt::AltModifier, "<" };
+	QCOMPARE(NeovimQt::Input::convertKey(evLessThanAlt), QString{ "<A-lt>" });
+
+	QKeyEvent evLessThanMeta{ QEvent::KeyPress, Qt::Key::Key_Less, Qt::ShiftModifier | Qt::MetaModifier, "<" };
+	QCOMPARE(NeovimQt::Input::convertKey(evLessThanMeta), QString{ "<C-lt>" });
+}
 
 void TestInputMac::SpecialKeys() noexcept
 {

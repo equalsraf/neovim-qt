@@ -7,8 +7,16 @@ class TestInputCommon : public QObject
 	Q_OBJECT
 
 private slots:
+	void LessThanKey() noexcept;
 	void ModifierOnlyKeyEventsIgnored() noexcept;
 };
+
+void TestInputCommon::LessThanKey() noexcept
+{
+	// Issue#607: Shift is implied with "<", send "<lt>" instead.
+	QKeyEvent evIssue607{ QEvent::KeyPress, Qt::Key::Key_Less, Qt::KeyboardModifier::ShiftModifier, "<" };
+	QCOMPARE(NeovimQt::Input::convertKey(evIssue607), QString{ "<lt>" });
+}
 
 void TestInputCommon::ModifierOnlyKeyEventsIgnored() noexcept
 {
@@ -22,20 +30,20 @@ void TestInputCommon::ModifierOnlyKeyEventsIgnored() noexcept
 	QCOMPARE(NeovimQt::Input::convertKey(alt), QString{});
 
 	const QList<Qt::Key> modifierKeyList {
-		Qt::Key::Key_Super_L,
-		Qt::Key::Key_Super_R,
+		Qt::Key::Key_Alt,
 		Qt::Key::Key_Control,
 		Qt::Key::Key_Meta,
-		Qt::Key::Key_Alt,
 		Qt::Key::Key_Shift,
+		Qt::Key::Key_Super_L,
+		Qt::Key::Key_Super_R,
 	};
 
 	const QList<Qt::KeyboardModifier> keyboardModifierList {
 		Qt::KeyboardModifier::NoModifier,
-		Qt::KeyboardModifier::ShiftModifier,
-		Qt::KeyboardModifier::ControlModifier,
 		Qt::KeyboardModifier::AltModifier,
+		Qt::KeyboardModifier::ControlModifier,
 		Qt::KeyboardModifier::MetaModifier,
+		Qt::KeyboardModifier::ShiftModifier,
 	};
 
 	for (const auto& key : modifierKeyList) {
