@@ -168,8 +168,11 @@ QString convertKey(const QKeyEvent& ev) noexcept
 		return ToKeyString(GetModifierPrefix(mod), specialKeys.value(key));
 	}
 
+	// The key "<" should be sent as "<lt>"
+	//   Issue#607: Remove ShiftModifier from "<", shift is implied
 	if (text == "<") {
-		return ToKeyString(GetModifierPrefix(mod), "lt");
+		const Qt::KeyboardModifiers modNoShift { mod & ~Qt::KeyboardModifier::ShiftModifier };
+		return ToKeyString(GetModifierPrefix(modNoShift), "lt");
 	}
 
 	if (text == "\\") {

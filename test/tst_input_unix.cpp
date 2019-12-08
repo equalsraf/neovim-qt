@@ -7,8 +7,21 @@ class TestInputUnix : public QObject
 	Q_OBJECT
 
 private slots:
+	void LessThanModifierKeys() noexcept;
 	void SpecialKeys() noexcept;
 };
+
+void TestInputUnix::LessThanModifierKeys() noexcept
+{
+	QKeyEvent evLessThanControl{ QEvent::KeyPress, Qt::Key::Key_Less, Qt::ShiftModifier | Qt::ControlModifier, "<" };
+	QCOMPARE(NeovimQt::Input::convertKey(evLessThanControl), QString{ "<C-lt>" });
+
+	QKeyEvent evLessThanAlt{ QEvent::KeyPress, Qt::Key::Key_Less, Qt::ShiftModifier | Qt::AltModifier, "<" };
+	QCOMPARE(NeovimQt::Input::convertKey(evLessThanAlt), QString{ "<A-lt>" });
+
+	QKeyEvent evLessThanMeta{ QEvent::KeyPress, Qt::Key::Key_Less, Qt::ShiftModifier | Qt::MetaModifier, "<" };
+	QCOMPARE(NeovimQt::Input::convertKey(evLessThanMeta), QString{ "<D-lt>" });
+}
 
 void TestInputUnix::SpecialKeys() noexcept
 {
