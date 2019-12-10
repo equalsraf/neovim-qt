@@ -20,6 +20,7 @@ public:
 	void showUi(NeovimConnector *c, const QCommandLineParser&);
 	static void processCliOptions(QCommandLineParser& p, const QStringList& arguments);
 	static NeovimConnector* createConnector(const QCommandLineParser& p);
+	static void showVersionInfo(const QCommandLineParser& parser) noexcept;
 
 private:
 	static ShellOptions GetShellOptionsFromQSettings();

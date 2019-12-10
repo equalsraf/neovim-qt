@@ -5,8 +5,10 @@
 #include <QFileOpenEvent>
 #include <QSettings>
 #include <QTextStream>
-#include "mainwindow.h"
+
 #include "arguments.h"
+#include "mainwindow.h"
+#include "version.h"
 
 namespace NeovimQt {
 
@@ -184,6 +186,9 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 				QCoreApplication::translate("main", "addr")));
 	parser.addOption(QCommandLineOption("spawn",
 				QCoreApplication::translate("main", "Treat positional arguments as the nvim argv")));
+	parser.addOption(QCommandLineOption({ "v", "version" },
+				QCoreApplication::translate("main", "Displays version information.")));
+
 	parser.addHelpOption();
 
 #ifdef Q_OS_UNIX
@@ -199,6 +204,11 @@ void App::processCliOptions(QCommandLineParser &parser, const QStringList& argum
 
 	if (parser.isSet("help")) {
 		parser.showHelp();
+	}
+
+	if (parser.isSet("version")) {
+		showVersionInfo(parser);
+		::exit(0);
 	}
 
 	int exclusive = parser.isSet("server") + parser.isSet("embed") + parser.isSet("spawn");
@@ -305,6 +315,35 @@ NeovimConnector* App::createConnector(const QCommandLineParser& parser)
 	}
 
 	return opts;
+}
+
+static QString GetNeovimVersionInfo(const QString& nvim) noexcept
+{
+	QProcess nvimproc;
+	nvimproc.start(nvim, { "--version" });
+	if (!nvimproc.waitForFinished(2000 /*msec*/)) {
+		return "Neovim Not Found!";
+	}
+
+	return nvimproc.readAllStandardOutput();
+}
+
+/*static*/ void App::showVersionInfo(const QCommandLineParser& parser) noexcept
+{
+	QTextStream out{ stdout };
+
+	const QString nvimExecutable { (parser.isSet("nvim")) ?
+		parser.value("nvim") : "nvim" };
+
+	out << "NVIM-QT v" << PROJECT_VERSION << endl;
+	out << "Build type: " << CMAKE_BUILD_TYPE << endl;
+	out << "Compilation:" << CMAKE_CXX_FLAGS << endl;
+	out << "Environment: " << endl;
+	out << "  nvim: " << nvimExecutable << endl;
+
+	out << endl;
+
+	out << GetNeovimVersionInfo(nvimExecutable) << endl;
 }
 
 } // namespace NeovimQt
