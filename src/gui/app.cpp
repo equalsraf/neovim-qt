@@ -253,67 +253,49 @@ void App::setupRequestTimeout() noexcept
 	m_connector->setRequestTimeout(m_parser.value("timeout").toInt());
 }
 
+QStringList App::getNeovimArgs() noexcept
+{
+	QStringList neovimArgs{ "--cmd","set termguicolors" };
+
+	QString runtimePath{ getRuntimePath() };
+	if (runtimePath.isEmpty()) {
+		return { "--cmd","set termguicolors" };
+	}
+
+	return { "--cmd", QString{ "let &rtp.=',%1'" }.arg(runtimePath),
+		"--cmd","set termguicolors" };
+}
+
 void App::connectToRemoteNeovim() noexcept
 {
 	if (m_parser.isSet("embed")) {
 		m_connector = std::unique_ptr<NeovimConnector>{ NeovimQt::NeovimConnector::fromStdinOut() };
 		setupRequestTimeout();
 		return;
-	} else if (m_parser.isSet("server")) {
+	}
+
+	if (m_parser.isSet("server")) {
 		QString server = m_parser.value("server");
 		m_connector = std::unique_ptr<NeovimConnector>{ NeovimQt::NeovimConnector::connectToNeovim(server) };
 		setupRequestTimeout();
 		return;
-	} else if (m_parser.isSet("spawn") && !m_parser.positionalArguments().isEmpty()) {
+	}
+
+	if (m_parser.isSet("spawn") && !m_parser.positionalArguments().isEmpty()) {
 		const QStringList& args = m_parser.positionalArguments();
 		m_connector = std::unique_ptr<NeovimConnector> { NeovimQt::NeovimConnector::spawn(args.mid(1), args.at(0)) };
 		setupRequestTimeout();
 		return;
-	} else {
-		QStringList neovimArgs;
-		neovimArgs << "--cmd";
-		neovimArgs << "set termguicolors";
-		auto path = qgetenv("NVIM_QT_RUNTIME_PATH");
-		if (QFileInfo(path).isDir()) {
-			neovimArgs.insert(0, "--cmd");
-			neovimArgs.insert(1, QString("let &rtp.=',%1'")
-					.arg(QString::fromLocal8Bit(path)));
-		}
-#ifdef NVIM_QT_RUNTIME_PATH
-		else if (QFileInfo(NVIM_QT_RUNTIME_PATH).isDir()) {
-			neovimArgs.insert(0, "--cmd");
-			neovimArgs.insert(1, QString("let &rtp.=',%1'")
-					.arg(NVIM_QT_RUNTIME_PATH));
-		} else
-#endif
-		{
-			// Look for the runtime relative to the nvim-qt binary
-			QDir d = QFileInfo(QCoreApplication::applicationDirPath()).dir();
-#ifdef Q_OS_MAC
-			// within the bundle at ../Resources/runtime
-			d.cd("Resources");
-			d.cd("runtime");
-#else
-			// ../share/nvim-qt/runtime
-			d.cd("share");
-			d.cd("nvim-qt");
-			d.cd("runtime");
-#endif
-
-			if (d.exists()) {
-				neovimArgs.insert(0, "--cmd");
-				neovimArgs.insert(1, QString("let &rtp.=',%1'")
-						.arg(d.path()));
-			}
-		}
-
-		// Pass positional file arguments to Neovim
-		neovimArgs.append(m_parser.positionalArguments());
-
-		m_connector = std::unique_ptr<NeovimConnector>{  NeovimQt::NeovimConnector::spawn(neovimArgs, m_parser.value("nvim")) };
-		setupRequestTimeout();
-		return;
 	}
+
+	QStringList neovimArgs{ getNeovimArgs() };
+
+	// Append positional file arguments to nvim.
+	neovimArgs.append(m_parser.positionalArguments());
+
+	m_connector = std::unique_ptr<NeovimConnector>{  NeovimQt::NeovimConnector::spawn(neovimArgs, m_parser.value("nvim")) };
+	setupRequestTimeout();
+	return;
 }
 
 static ShellOptions GetShellOptionsFromQSettings() noexcept
@@ -348,7 +330,7 @@ static QString GetNeovimVersionInfo(const QString& nvim) noexcept
 	QProcess nvimproc;
 	nvimproc.start(nvim, { "--version" });
 	if (!nvimproc.waitForFinished(2000 /*msec*/)) {
-		return "Neovim Not Found!";
+		return QCoreApplication::translate("main", "Neovim Not Found!");
 	}
 
 	return nvimproc.readAllStandardOutput();
@@ -366,6 +348,8 @@ void App::showVersionInfo() noexcept
 	out << "Compilation:" << CMAKE_CXX_FLAGS << endl;
 	out << "Environment: " << endl;
 	out << "  nvim: " << nvimExecutable << endl;
+	out << "  args: " << getNeovimArgs().join(" ") << endl;
+	out << "  runtime: " << getRuntimePath() << endl;
 
 	out << endl;
 

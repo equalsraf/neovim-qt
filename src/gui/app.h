@@ -24,6 +24,8 @@ public:
 	void checkArgumentsMayTerminate() noexcept;
 
 private:
+	QString getRuntimePath() noexcept;
+	QStringList getNeovimArgs() noexcept;
 	void processCommandlineOptions() noexcept;
 	void setupRequestTimeout() noexcept;
 	void showVersionInfo() noexcept;

@@ -5,6 +5,7 @@ qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
 if(WIN32)
 	set(SRCS_PLATFORM
 		arguments_qwindowgeometry.cpp
+		app_runtime.cpp
 		)
 	if (USE_STATIC_QT)
 		add_definitions(-DUSE_STATIC_QT)
@@ -16,6 +17,7 @@ if(WIN32)
 elseif(APPLE)
 	set(SRCS_PLATFORM
 		arguments_qwindowgeometry.cpp
+		app_runtime_mac.cpp
 		)
 	set(ICON_PATH ${PROJECT_SOURCE_DIR}/third-party/neovim.icns)
 	set_source_files_properties(${ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
@@ -24,6 +26,7 @@ elseif(APPLE)
 else()
 	set(SRCS_PLATFORM
 		arguments_geometry.cpp
+		app_runtime.cpp
 		)
 endif()
 
@@ -47,7 +50,7 @@ add_library(neovim-qt-gui
 target_link_libraries(neovim-qt-gui qshellwidget neovim-qt)
 
 if(NOT APPLE)
-	set_property(SOURCE app.cpp PROPERTY COMPILE_DEFINITIONS
+	set_property(SOURCE app_runtime.cpp PROPERTY COMPILE_DEFINITIONS
 		NVIM_QT_RUNTIME_PATH="${CMAKE_INSTALL_FULL_DATADIR}/nvim-qt/runtime")
 endif()
 
