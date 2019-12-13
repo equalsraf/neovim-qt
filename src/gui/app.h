@@ -1,11 +1,13 @@
 #ifndef NEOVIM_QT_APP
 #define NEOVIM_QT_APP
 
+#include <memory>
 #include <QApplication>
-#include <QEvent>
-#include <QUrl>
-#include <QList>
 #include <QCommandLineParser>
+#include <QEvent>
+#include <QList>
+#include <QUrl>
+
 #include "shell.h"
 
 namespace NeovimQt {
@@ -15,20 +17,24 @@ class App: public QApplication
 {
 	Q_OBJECT
 public:
-	App(int &argc, char ** argv);
-	bool event(QEvent *event);
-	void showUi(NeovimConnector *c, const QCommandLineParser&);
-	static void processCliOptions(QCommandLineParser& p, const QStringList& arguments);
-	static NeovimConnector* createConnector(const QCommandLineParser& p);
-	static void showVersionInfo(const QCommandLineParser& parser) noexcept;
+	App(int &argc, char ** argv) noexcept;
+	bool event(QEvent *event) noexcept;
+	void showUi() noexcept;
+	void connectToRemoteNeovim() noexcept;
+	void checkArgumentsMayTerminate() noexcept;
 
 private:
-	static ShellOptions GetShellOptionsFromQSettings();
+	void processCommandlineOptions() noexcept;
+	void setupRequestTimeout() noexcept;
+	void showVersionInfo() noexcept;
+
+	QCommandLineParser m_parser;
+	std::shared_ptr<NeovimConnector> m_connector;
 
 signals:
 	void openFilesTriggered(const QList<QUrl>);
 };
 
-} // Namespace
+} // Namespace NeovimQt
 
 #endif

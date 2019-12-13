@@ -30,31 +30,30 @@ int ui_main(int argc, char **argv)
 
 	NeovimQt::App app(argc, argv);
 
-	QCommandLineParser parser;
-	NeovimQt::App::processCliOptions(parser, app.arguments());
+	app.checkArgumentsMayTerminate();
 
-	int timeout = parser.value("timeout").toInt();
-	auto c = app.createConnector(parser);
-	c->setRequestTimeout(timeout);
-	app.showUi(c, parser);
+	app.connectToRemoteNeovim();
+
+	app.showUi();
 	return app.exec();
 }
 
 int cli_main(int argc, char **argv)
 {
-	QCoreApplication app(argc, argv);
+	NeovimQt::App app(argc, argv);
 
-	QCommandLineParser parser;
-	NeovimQt::App::processCliOptions(parser, app.arguments());
+	app.checkArgumentsMayTerminate();
 
-	QStringList new_args = app.arguments().mid(1);
+	// Get existing arguments, drop executable, append --nofork.
+	QStringList new_args{ app.arguments().mid(1) };
 	new_args.insert(0, "--nofork");
-	if (QProcess::startDetached(app.applicationFilePath(), new_args)) {
-		return 0;
-	} else {
+
+	if (!QProcess::startDetached(app.applicationFilePath(), new_args)) {
 		qWarning() << "Unable to fork into background";
 		return -1;
 	}
+
+	return 0;
 }
 
 int main(int argc, char **argv)
