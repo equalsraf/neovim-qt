@@ -153,29 +153,27 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 						p.fillRect(r, background());
 					}
 
-					if (cell.GetCharacter() == ' ') {
-						continue;
-					}
+					if (cell.GetCharacter() != ' ') {
+						if (cell.GetForegroundColor().isValid()) {
+							p.setPen(cell.GetForegroundColor());
+						} else {
+							p.setPen(foreground());
+						}
 
-					if (cell.GetForegroundColor().isValid()) {
-						p.setPen(cell.GetForegroundColor());
-					} else {
-						p.setPen(foreground());
-					}
+						if (cell.IsBold() || cell.IsItalic()) {
+							QFont f = p.font();
+							f.setBold(cell.IsBold());
+							f.setItalic(cell.IsItalic());
+							p.setFont(f);
+						} else {
+							p.setFont(font());
+						}
 
-					if (cell.IsBold() || cell.IsItalic()) {
-						QFont f = p.font();
-						f.setBold(cell.IsBold());
-						f.setItalic(cell.IsItalic());
-						p.setFont(f);
-					} else {
-						p.setFont(font());
+						// Draw chars at the baseline
+						QPoint pos(r.left(), r.top()+m_ascent+(m_lineSpace / 2));
+						uint character = cell.GetCharacter();
+						p.drawText(pos, QString::fromUcs4(&character, 1));
 					}
-
-					// Draw chars at the baseline
-					QPoint pos(r.left(), r.top()+m_ascent+(m_lineSpace / 2));
-					uint character = cell.GetCharacter();
-					p.drawText(pos, QString::fromUcs4(&character, 1));
 				}
 
 				// Draw "undercurl" at the bottom of the cell
