@@ -8,6 +8,7 @@
 
 #include "arguments.h"
 #include "mainwindow.h"
+#include "printinfo.h"
 #include "version.h"
 
 namespace NeovimQt {
@@ -338,7 +339,8 @@ static QString GetNeovimVersionInfo(const QString& nvim) noexcept
 
 void App::showVersionInfo() noexcept
 {
-	QTextStream out{ stdout };
+	QString versionInfo;
+	QTextStream out{ &versionInfo };
 
 	const QString nvimExecutable { (m_parser.isSet("nvim")) ?
 		m_parser.value("nvim") : "nvim" };
@@ -354,6 +356,8 @@ void App::showVersionInfo() noexcept
 	out << endl;
 
 	out << GetNeovimVersionInfo(nvimExecutable) << endl;
+
+	PrintInfo(versionInfo);
 }
 
 } // namespace NeovimQt
