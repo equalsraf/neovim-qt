@@ -59,7 +59,8 @@ private slots:
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
 		QVERIFY(onError.isValid());
 
-		SPYWAIT(onError);
+		// Pull Request #612: On MacOS, this test can fail without a long timeout value.
+		QVERIFY(SPYWAIT(onError, 120000 /*msec*/));
 
 		QCOMPARE(c->errorCause(), NeovimConnector::SocketError);
 		c->deleteLater();
@@ -72,7 +73,7 @@ private slots:
 		QVERIFY(onError.isValid());
 
 		// Test Performance: timeout expected, set value carefully.
-		SPYWAIT(onError, 5000 /*msec*/);
+		QVERIFY(!SPYWAIT(onError, 5000 /*msec*/));
 
 		QCOMPARE(c->errorCause(), NeovimConnector::SocketError);
 		c->deleteLater();
