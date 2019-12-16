@@ -87,7 +87,9 @@ void TestCallAllMethods::callAll()
 			qDebug() << "Skipping" << meth.methodSignature();
 		}
 	}
-	QVERIFY2(!SPYWAIT(neovimErrors), "Fatal errors");
+
+	// Test Performance: timeout expected, set value carefully.
+	QVERIFY2(!SPYWAIT(neovimErrors, 2500 /*msec*/), "Fatal errors");
 }
 
 /// vim_call_functions() was the first API function
