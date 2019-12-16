@@ -54,12 +54,11 @@ private slots:
 	}
 
 	void connectToNeovimTCP() {
-		// These 2 cases WILL FAIL because there is no Neovim instance running
 		NeovimConnector *c = NeovimConnector::connectToNeovim("127.0.0.1:64999");
 		QCOMPARE(c->connectionType(), NeovimConnector::HostConnection);
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
 		QVERIFY(onError.isValid());
-		// The signal might be emited before we get to connect
+
 		SPYWAIT(onError);
 
 		QCOMPARE(c->errorCause(), NeovimConnector::SocketError);
@@ -71,8 +70,9 @@ private slots:
 		QCOMPARE(c->connectionType(), NeovimConnector::SocketConnection);
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
 		QVERIFY(onError.isValid());
-		// The signal might be emited before we get to connect
-		SPYWAIT(onError);
+
+		// Test Performance: timeout expected, set value carefully.
+		SPYWAIT(onError, 5000 /*msec*/);
 
 		QCOMPARE(c->errorCause(), NeovimConnector::SocketError);
 		c->deleteLater();
@@ -99,9 +99,15 @@ private slots:
 			QString("%1:%2")
 				.arg(server->serverAddress().toString())
 				.arg(server->serverPort()));
+
+		// Test Performance: timeout expected, set value carefully.
+		c->setRequestTimeout(1000 /*msec*/);
+
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
 		QVERIFY(onError.isValid());
-		QVERIFY(SPYWAIT2(onError));
+
+		QVERIFY(SPYWAIT(onError, 5000 /*msec*/));
+
 		QCOMPARE(c->errorCause(), NeovimConnector::RuntimeMsgpackError);
 		c->deleteLater();
 	}

@@ -8,9 +8,4 @@ bool SPYWAIT(QSignalSpy &spy, int timeout=30000)
 	return spy.count()>0||spy.wait(timeout);
 }
 
-bool SPYWAIT2(QSignalSpy &spy, int timeout=30000)
-{
-	return spy.count()>0||spy.wait(timeout);
-}
-
 #endif

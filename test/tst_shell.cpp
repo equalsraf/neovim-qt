@@ -153,7 +153,10 @@ private slots:
 		QVERIFY(SPYWAIT(cmd_gf));
 
 		QSignalSpy spy_fontchange(s->shell(), &Shell::fontChanged);
-		SPYWAIT(spy_fontchange);
+
+		// Test Performance: timeout occurs often, set value carefully.
+		SPYWAIT(spy_fontchange, 2500 /*msec*/);
+
 #ifdef Q_OS_MAC
 		QCOMPARE(s->shell()->fontDesc(), QString("Monaco:h14"));
 #else
@@ -170,7 +173,10 @@ private slots:
 		QVERIFY(SPYWAIT(cmd_gf2));
 
 		QSignalSpy spy_fontchange2(s->shell(), &Shell::fontChanged);
-		SPYWAIT(spy_fontchange2);
+
+		// Test Performance: timeout occurs often, set value carefully.
+		SPYWAIT(spy_fontchange2, 2500 /*msec*/);
+
 #ifdef Q_OS_MAC
 		QCOMPARE(s->shell()->fontDesc(), QString("Monaco:h14:l"));
 #else
@@ -180,13 +186,6 @@ private slots:
 		// GuiTabline
 		QSignalSpy onOptionSet(s->shell(), &Shell::neovimExtTablineSet);
 		QVERIFY(onOptionSet.isValid());
-
-//		QSignalSpy cmd_gtab(c->neovimObject()->vim_command_output(c->encode("GuiTabline 0")), &MsgpackRequest::finished);
-//		QVERIFY(cmd_gtab.isValid());
-//		QVERIFY(SPYWAIT2(cmd_gtab));
-//
-//		QVERIFY(SPYWAIT(onOptionSet));
-//		qDebug() << onOptionSet << onOptionSet.size();
 	}
 
 	void GetClipboard_data() {
