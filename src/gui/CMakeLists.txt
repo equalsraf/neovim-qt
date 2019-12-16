@@ -4,8 +4,9 @@ include_directories(.. shellwidget)
 qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
 if(WIN32)
 	set(SRCS_PLATFORM
-		arguments_qwindowgeometry.cpp
 		app_runtime.cpp
+		arguments_qwindowgeometry.cpp
+		printinfo_msgbox.cpp
 		)
 	if (USE_STATIC_QT)
 		add_definitions(-DUSE_STATIC_QT)
@@ -16,8 +17,9 @@ if(WIN32)
 	enable_language(RC)
 elseif(APPLE)
 	set(SRCS_PLATFORM
-		arguments_qwindowgeometry.cpp
 		app_runtime_mac.cpp
+		arguments_qwindowgeometry.cpp
+		printinfo_stdout.cpp
 		)
 	set(ICON_PATH ${PROJECT_SOURCE_DIR}/third-party/neovim.icns)
 	set_source_files_properties(${ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
@@ -25,8 +27,9 @@ elseif(APPLE)
 	set(MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in)
 else()
 	set(SRCS_PLATFORM
-		arguments_geometry.cpp
 		app_runtime.cpp
+		arguments_geometry.cpp
+		printinfo_stdout.cpp
 		)
 endif()
 
