@@ -348,6 +348,7 @@ void App::showVersionInfo() noexcept
 	out << "NVIM-QT v" << PROJECT_VERSION << endl;
 	out << "Build type: " << CMAKE_BUILD_TYPE << endl;
 	out << "Compilation:" << CMAKE_CXX_FLAGS << endl;
+	out << "Qt Version: " << QT_VERSION_STR << endl;
 	out << "Environment: " << endl;
 	out << "  nvim: " << nvimExecutable << endl;
 	out << "  args: " << getNeovimArgs().join(" ") << endl;
