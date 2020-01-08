@@ -131,9 +131,9 @@ QString ToKeyString(const QString& modPrefix, const QString& key) noexcept
 
 QString convertKey(const QKeyEvent& ev) noexcept
 {
-	const QString text{ ev.text() };
+	QString text{ ev.text() };
 	Qt::KeyboardModifiers mod{ ev.modifiers() };
-	const int key{ ev.key() };
+	int key{ ev.key() };
 
 	static const QMap<int, QString> keypadKeys {
 		{ Qt::Key_Home, "<%1kHome>" },
@@ -196,10 +196,12 @@ QString convertKey(const QKeyEvent& ev) noexcept
 			|| key == Qt::Key::Key_Super_R) {
 			return {};
 		}
+
+		// If QKeyEvent does not provide text, then use the value of key
+		text = QChar{ key };
 	}
 
-	// key code will be the value of the char (hopefully)
-	const QChar c{ (text.isEmpty()) ? key : text.at(0) };
+	const QChar c{ text.at(0) };
 
 	// Remove Shift
 	if (c.unicode() >= 0x80 || (!c.isLetterOrNumber() && c.isPrint())) {
@@ -211,13 +213,16 @@ QString convertKey(const QKeyEvent& ev) noexcept
 		mod &= ~ControlModifier();
 	}
 
+	// Perform any platform specific QKeyEvent modifications
+	QKeyEvent evNormalized{ CreatePlatformNormalizedKeyEvent(ev.type(), key, mod, text) };
+
 	// Format with prefix if necessary
-	const QString prefix{ GetModifierPrefix(mod) };
+	const QString prefix{ GetModifierPrefix(evNormalized.modifiers()) };
 	if (!prefix.isEmpty()) {
-		return ToKeyString(prefix, c);
+		return ToKeyString(prefix, evNormalized.text());
 	}
 
-	return { c };
+	return evNormalized.text();
 }
 
 } } // namespace NeovimQt::Input

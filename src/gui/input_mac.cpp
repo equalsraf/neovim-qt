@@ -42,4 +42,21 @@ QString GetModifierPrefix(Qt::KeyboardModifiers mod) noexcept
 	return modprefix;
 }
 
+QKeyEvent CreatePlatformNormalizedKeyEvent(
+	QEvent::Type type,
+	int key,
+	Qt::KeyboardModifiers mod,
+	const QString& text) noexcept
+{
+	if (!text.isEmpty())
+	{
+		const QChar c{ text.at(0) };
+		if (c.unicode() >= 0x80 && c.isPrint()) {
+			mod &= ~Qt::AltModifier;
+		}
+	}
+
+	return { type, key, mod, text };
+}
+
 } } // namespace NeovimQt::Input
