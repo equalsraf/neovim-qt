@@ -7,9 +7,23 @@ class TestInputMac : public QObject
 	Q_OBJECT
 
 private slots:
+	void AltSpecialCharacters() noexcept;
 	void LessThanModifierKeys() noexcept;
 	void SpecialKeys() noexcept;
 };
+
+void TestInputMac::AltSpecialCharacters() noexcept
+{
+	// Issue#510: MacOS Alt special key input does not work.
+	QKeyEvent evAltA{ QEvent::KeyPress, Qt::Key_A, Qt::AltModifier, "å" };
+	QCOMPARE(NeovimQt::Input::convertKey(evAltA), QString{ "å" });
+
+	QKeyEvent evShiftAltA{ QEvent::KeyPress, Qt::Key_A, Qt::ShiftModifier | Qt::AltModifier, "Å" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftAltA), QString{ "Å" });
+
+	QKeyEvent evShiftAltL{ QEvent::KeyPress, Qt::Key_L, Qt::ShiftModifier | Qt::AltModifier, "Ò" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftAltL), QString{ "Ò" });
+}
 
 void TestInputMac::LessThanModifierKeys() noexcept
 {

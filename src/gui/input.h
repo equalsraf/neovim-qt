@@ -48,4 +48,11 @@ Qt::KeyboardModifiers CmdModifier() noexcept;
 /// Platform specific Qt::Key used as 'Cmd'/'Meta'.
 Qt::Key Key_Cmd() noexcept;
 
+/// Modify QKeyEvent parameters specific to the current platform.
+QKeyEvent CreatePlatformNormalizedKeyEvent(
+	QEvent::Type type,
+	int key,
+	Qt::KeyboardModifiers mod,
+	const QString& text) noexcept;
+
 } } // namespace NeovimQt:Input
