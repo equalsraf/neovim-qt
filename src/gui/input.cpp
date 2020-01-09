@@ -180,11 +180,6 @@ QString convertKey(const QKeyEvent& ev) noexcept
 	}
 
 	if (text.isEmpty()) {
-		if (!(mod & ControlModifier()) && !(mod & CmdModifier())) {
-			// This is a special key we can't handle
-			return {};
-		}
-
 		// Ignore all modifier-only key events.
 		//   Issue #344: Ignore Ctrl-Shift, C-S- being treated as C-Space
 		//   Issue#593: Pressing Control + Super inserts ^S
@@ -198,7 +193,12 @@ QString convertKey(const QKeyEvent& ev) noexcept
 		}
 
 		// If QKeyEvent does not provide text, then use the value of key
+		//   Issue#579: Cannot map <A-...> on MacOS
 		text = QChar{ key };
+		if (!(mod & Qt::ShiftModifier))
+		{
+			text = text.toLower();
+		}
 	}
 
 	const QChar c{ text.at(0) };
