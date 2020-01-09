@@ -10,6 +10,7 @@ private slots:
 	void AltSpecialCharacters() noexcept;
 	void LessThanModifierKeys() noexcept;
 	void SpecialKeys() noexcept;
+	void KeyboardLayoutUnicodeHexInput() noexcept;
 };
 
 void TestInputMac::AltSpecialCharacters() noexcept
@@ -55,6 +56,23 @@ void TestInputMac::SpecialKeys() noexcept
 				keyEvent.second.arg(specialKeys.value(k)));
 		}
 	}
+}
+
+void TestInputMac::KeyboardLayoutUnicodeHexInput() noexcept
+{
+	// Issue#579: Cannot map <A-...> on MacOS
+	QKeyEvent evAltA{ QEvent::KeyPress, Qt::Key_A, Qt::AltModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evAltA), QString{ "<A-a>" });
+
+	QKeyEvent evAltShiftA{ QEvent::KeyPress, Qt::Key_A, Qt::AltModifier | Qt::ShiftModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evAltShiftA), QString{ "<A-A>" });
+
+	QKeyEvent evCtrlAltA{ QEvent::KeyPress, Qt::Key_A, Qt::MetaModifier | Qt::AltModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlAltA), QString{ "<C-A-a>" });
+
+	QKeyEvent evCtrlAltShiftA{ QEvent::KeyPress, Qt::Key_A,
+		Qt::MetaModifier | Qt::AltModifier | Qt::ShiftModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlAltShiftA), QString{ "<C-A-A>" });
 }
 
 #include "tst_input_mac.moc"
