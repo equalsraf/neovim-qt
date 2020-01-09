@@ -204,7 +204,7 @@ QString convertKey(const QKeyEvent& ev) noexcept
 	const QChar c{ text.at(0) };
 
 	// Remove Shift
-	if (c.unicode() >= 0x80 || (!c.isLetterOrNumber() && c.isPrint())) {
+	if (c.unicode() >= 0x80 || c.isPrint()) {
 		mod &= ~Qt::ShiftModifier;
 	}
 
