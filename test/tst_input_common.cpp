@@ -9,6 +9,7 @@ class TestInputCommon : public QObject
 private slots:
 	void LessThanKey() noexcept;
 	void ModifierOnlyKeyEventsIgnored() noexcept;
+	void ShiftKeyEventWellFormed() noexcept;
 };
 
 void TestInputCommon::LessThanKey() noexcept
@@ -60,6 +61,27 @@ void TestInputCommon::ModifierOnlyKeyEventsIgnored() noexcept
 	// Issue#593: Pressing Control + Super inserts ^S
 	QKeyEvent evIssue593{ QEvent::KeyPress, Qt::Key::Key_Super_L, Qt::KeyboardModifier::ControlModifier};
 	QCOMPARE(NeovimQt::Input::convertKey(evIssue593), QString{});
+}
+
+void TestInputCommon::ShiftKeyEventWellFormed() noexcept
+{
+	QKeyEvent evShiftBracket{ QEvent::KeyPress, Qt::Key_BraceRight, Qt::ShiftModifier, "}" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftBracket), QString{ "}" });
+
+	QKeyEvent evShiftQuote{ QEvent::KeyPress, Qt::Key_QuoteDbl, Qt::ShiftModifier, "\"" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftQuote), QString{ "\"" });
+
+	QKeyEvent evShiftColon{ QEvent::KeyPress, Qt::Key_Colon, Qt::ShiftModifier, ":" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftColon), QString{ ":" });
+
+	QKeyEvent evShiftA{ QEvent::KeyPress, Qt::Key_A, Qt::ShiftModifier, "A" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftA), QString{ "A" });
+
+	QKeyEvent evShiftB{ QEvent::KeyPress, Qt::Key_B, Qt::ShiftModifier, "B" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftB), QString{ "B" });
+
+	QKeyEvent evShiftC{ QEvent::KeyPress, Qt::Key_C, Qt::ShiftModifier, "C" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftC), QString{ "C" });
 }
 
 #include "tst_input_common.moc"
