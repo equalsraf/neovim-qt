@@ -57,7 +57,7 @@ const QMap<int, QString>& GetSpecialKeysMap() noexcept
 
 static QVariant GetButtonName(
 	Qt::MouseButton bt,
-	int clickCount) noexcept
+	uint8_t clickCount) noexcept
 {
 	// NOTE: In practice Neovim only supports the clickcount for Left
 	// mouse presses, even if our shell can support other buttons
@@ -109,7 +109,7 @@ QString convertMouse(
 	QEvent::Type type,
 	Qt::KeyboardModifiers mod,
 	QPoint pos,
-	int clickCount) noexcept
+	uint8_t clickCount) noexcept
 {
 	const QVariant varButtonName{ GetButtonName(bt, clickCount) };
 	if (!varButtonName.isValid() || !varButtonName.canConvert<QString>()) {

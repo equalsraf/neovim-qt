@@ -153,43 +153,47 @@ private slots:
         void setAttached(bool attached=true);
 
 private:
-	bool m_attached;
-
-	NeovimConnector *m_nvim;
+	bool m_attached{ false };
+	NeovimConnector* m_nvim{ nullptr };
 
 	QList<QUrl> m_deferredOpen;
 
 	QRect m_scroll_region;
-	bool m_font_bold, m_font_italic, m_font_underline, m_font_undercurl;
-	bool m_mouseHide;
+	bool m_font_bold{ false };
+	bool m_font_italic{ false };
+	bool m_font_underline{ false };
+	bool m_font_undercurl{ false };
+	bool m_mouseHide{ true };
 
 	// highlight fg/bg - from redraw:highlightset - by default we
 	// use the values from above
-	QColor m_hg_foreground, m_hg_background, m_hg_special;
-	QColor m_cursor_color;
+	QColor m_hg_foreground{ Qt::black };
+	QColor m_hg_background{ Qt:: white };
+	QColor m_hg_special;
+	QColor m_cursor_color{ Qt::white };
 
 	/// Modern 'ext_linegrid' highlight definition map
 	QMap<uint64_t, HighlightAttribute> m_highlightMap;
 
 	/// Cursor position in shell coordinates
 	QPoint m_cursor_pos;
-	bool m_insertMode;
-	bool m_resizing;
+	bool m_insertMode{ false };
+	bool m_resizing{ false };
 	QSize m_resize_neovim_pending;
-	QLabel *m_tooltip;
+	QLabel* m_tooltip{ nullptr };
 	QPoint m_mouse_pos;
 	// 2/3/4 mouse click tracking
 	QTimer m_mouseclick_timer;
-	short m_mouseclick_count;
+	uint8_t m_mouseclick_count{ 0 };
 	Qt::MouseButton m_mouseclick_pending;
 	// Accumulates remainder of steppy scroll
 	QPoint m_mouse_wheel_delta_fraction;
 
 	// Properties
-	bool m_neovimBusy;
+	bool m_neovimBusy{ false };
 	ShellOptions m_options;
 	PopupMenu m_pum{ this };
-	bool m_mouseEnabled;
+	bool m_mouseEnabled{ true };
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler

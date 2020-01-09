@@ -18,16 +18,9 @@
 namespace NeovimQt {
 
 Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
-:ShellWidget(parent), m_attached(false), m_nvim(nvim),
-	m_font_bold(false), m_font_italic(false), m_font_underline(false), m_font_undercurl(false),
-	m_mouseHide(true),
-	m_hg_foreground(Qt::black), m_hg_background(Qt::white), m_hg_special(QColor()),
-	m_cursor_color(Qt::white), m_cursor_pos(0,0), m_insertMode(false),
-	m_resizing(false),
-	m_mouse_wheel_delta_fraction(0, 0),
-	m_neovimBusy(false),
-	m_options(opts),
-	m_mouseEnabled(true)
+	: ShellWidget{ parent }
+	, m_nvim{ nvim }
+	, m_options{ opts }
 {
 	setAttribute(Qt::WA_KeyCompression, false);
 
@@ -50,7 +43,7 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	m_pum.setParent(this);
 	m_pum.hide();
 
-	if (m_nvim == NULL) {
+	if (!m_nvim) {
 		qWarning() << "Received NULL as Neovim Connector";
 		return;
 	}
