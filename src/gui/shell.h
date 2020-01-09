@@ -173,7 +173,6 @@ private:
 
 	/// Cursor position in shell coordinates
 	QPoint m_cursor_pos;
-	bool m_cursor;
 	bool m_insertMode;
 	bool m_resizing;
 	QSize m_resize_neovim_pending;
