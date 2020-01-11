@@ -42,6 +42,8 @@ The binaries will be under build/bin/. The GUI binary is called nvim-qt. Run mak
 
 	$ NVIM_QT_RUNTIME_PATH=../src/gui/runtime bin/nvim-qt
 
+See the [wiki](https://github.com/equalsraf/neovim-qt/wiki/Build) for detailed build instructions.
+
 ## Using the GUI
 
 Run **nvim-qt**, the **nvim** binary must be in your $PATH. Check `nvim-qt --help` for additional options.
