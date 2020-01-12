@@ -216,20 +216,13 @@ QPoint Shell::neovimCursorTopLeft() const
 /// Get the area filled by the cursor
 QRect Shell::neovimCursorRect() const
 {
-	return neovimCursorRect(m_cursor_pos);
-}
+	const Cell& cell{ contents().constValue(m_cursor_pos.y(), m_cursor_pos.x()) };
 
-/// Get the area filled by the cursor at an arbitrary
-/// position
-QRect Shell::neovimCursorRect(QPoint at) const
-{
-	const Cell& c = contents().constValue(at.y(), at.x());
-	bool wide = c.IsDoubleWidth();
-	QRect r(neovimCursorTopLeft(), cellSize());
-	if (wide) {
-		r.setWidth(r.width()*2);
+	QRect cursor{ neovimCursorTopLeft(), cellSize() };
+	if (cell.IsDoubleWidth()) {
+		cursor.setWidth(cursor.width() * 2);
 	}
-	return r;
+	return cursor;
 }
 
 void Shell::init()
