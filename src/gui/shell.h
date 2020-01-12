@@ -103,7 +103,6 @@ protected:
 
 	QPoint neovimCursorTopLeft() const;
 	QRect neovimCursorRect() const;
-	QRect neovimCursorRect(QPoint at) const;
 	void setNeovimCursor(quint64 col, quint64 row);
 
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
