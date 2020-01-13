@@ -4,9 +4,8 @@
 #include "shellwidget.h"
 #include "helpers.h"
 
-ShellWidget::ShellWidget(QWidget *parent)
-:QWidget(parent), m_contents(0,0), m_bgColor(Qt::white),
-	m_fgColor(Qt::black), m_spColor(QColor()), m_lineSpace(0)
+ShellWidget::ShellWidget(QWidget* parent)
+	: QWidget(parent)
 {
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_KeyCompression, false);
