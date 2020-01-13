@@ -75,11 +75,13 @@ protected:
 private:
 	void setFont(const QFont&);
 
-	ShellContents m_contents;
+	ShellContents m_contents{ 0, 0 };
 	QSize m_cellSize;
 	int m_ascent;
-	QColor m_bgColor, m_fgColor, m_spColor;
-	int m_lineSpace;
+	QColor m_bgColor{ Qt::white };
+	QColor m_fgColor{ Qt::black };
+	QColor m_spColor;
+	int m_lineSpace{ 0 };
 
 	Background m_background{ Background::Dark };
 };
