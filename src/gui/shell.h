@@ -101,10 +101,6 @@ protected:
 	virtual void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
 	virtual bool event(QEvent *event) Q_DECL_OVERRIDE;
 
-	QPoint neovimCursorTopLeft() const;
-	QRect neovimCursorRect() const;
-	void setNeovimCursor(quint64 col, quint64 row);
-
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
 	virtual void keyPressEvent(QKeyEvent *ev) Q_DECL_OVERRIDE;
         void paintLogo(QPainter&);
@@ -174,8 +170,6 @@ private:
 	/// Modern 'ext_linegrid' highlight definition map
 	QMap<uint64_t, HighlightAttribute> m_highlightMap;
 
-	/// Cursor position in shell coordinates
-	QPoint m_cursor_pos;
 	bool m_insertMode{ false };
 	bool m_resizing{ false };
 	QSize m_resize_neovim_pending;

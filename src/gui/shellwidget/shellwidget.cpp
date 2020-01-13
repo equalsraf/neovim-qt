@@ -406,7 +406,34 @@ int ShellWidget::rows() const
 {
 	return m_contents.rows();
 }
+
 int ShellWidget::columns() const
 {
 	return m_contents.columns();
 }
+
+void ShellWidget::setNeovimCursor(uint64_t row, uint64_t col)
+{
+	update(neovimCursorRect());
+	m_cursor_pos = QPoint(col, row);
+	update(neovimCursorRect());
+}
+
+QPoint ShellWidget::neovimCursorTopLeft() const
+{
+	const int xPixels{ m_cursor_pos.x() * cellSize().width() };
+	const int yPixels{ m_cursor_pos.y() * cellSize().height() };
+	return { xPixels, yPixels };
+}
+
+QRect ShellWidget::neovimCursorRect() const
+{
+	const Cell& cell{ contents().constValue(m_cursor_pos.y(), m_cursor_pos.x()) };
+
+	QRect cursor{ neovimCursorTopLeft(), cellSize() };
+	if (cell.IsDoubleWidth()) {
+		cursor.setWidth(cursor.width() * 2);
+	}
+	return cursor;
+}
+

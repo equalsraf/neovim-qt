@@ -206,25 +206,6 @@ void Shell::setAttached(bool attached)
 	update();
 }
 
-/// The top left corner position (pixel) for the cursor
-QPoint Shell::neovimCursorTopLeft() const
-{
-	return QPoint(m_cursor_pos.x()*cellSize().width(),
-			m_cursor_pos.y()*cellSize().height());
-}
-
-/// Get the area filled by the cursor
-QRect Shell::neovimCursorRect() const
-{
-	const Cell& cell{ contents().constValue(m_cursor_pos.y(), m_cursor_pos.x()) };
-
-	QRect cursor{ neovimCursorTopLeft(), cellSize() };
-	if (cell.IsDoubleWidth()) {
-		cursor.setWidth(cursor.width() * 2);
-	}
-	return cursor;
-}
-
 void Shell::init()
 {
 	// Make sure the connector provides us with an api object
@@ -624,13 +605,6 @@ void Shell::handlePopupMenuSelect(const QVariantList& opargs)
 
 	// Neovim and Qt both use -1 for 'no selection'.
 	m_pum.setSelectedIndex(opargs.at(0).toLongLong());
-}
-
-void Shell::setNeovimCursor(quint64 row, quint64 col)
-{
-	update(neovimCursorRect());
-	m_cursor_pos = QPoint(col, row);
-	update(neovimCursorRect());
 }
 
 void Shell::handleModeChange(const QString& mode)

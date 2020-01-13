@@ -66,6 +66,18 @@ public slots:
 			int col1, int rows);
 	void setLineSpace(int height);
 protected:
+	/// Cursor position in shell coordinates
+	QPoint m_cursor_pos;
+
+	/// The top left corner position (pixel) for the cursor
+	QPoint neovimCursorTopLeft() const;
+
+	/// Get the area filled by the cursor
+	QRect neovimCursorRect() const;
+
+	/// Move the neovim cursor for text insertion and display
+	void setNeovimCursor(uint64_t col, uint64_t row);
+
 	virtual void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
 
