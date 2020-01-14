@@ -9,10 +9,13 @@
 #include <QTimer>
 #include <QUrl>
 #include <QList>
+#include <QMap>
 #include <QMenu>
+
 #include "neovimconnector.h"
 #include "shellwidget/highlight.h"
 #include "shellwidget/shellwidget.h"
+#include "shellwidget/cursor.h"
 #include "popupmenu.h"
 #include "popupmenumodel.h"
 
@@ -117,7 +120,8 @@ protected:
 	virtual void handleHighlightSet(const QVariantMap& args);
 	virtual void handleRedraw(const QByteArray& name, const QVariantList& args);
 	virtual void handleScroll(const QVariantList& args);
-	virtual void handleModeChange(const QString& mode);
+	virtual void handleModeChange(const QVariantList& opargs);
+	virtual void handleModeInfoSet(const QVariantList& opargs);
 	virtual void handleSetTitle(const QVariantList& opargs);
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 	virtual void handleBusy(bool);
@@ -169,6 +173,9 @@ private:
 
 	/// Modern 'ext_linegrid' highlight definition map
 	QMap<uint64_t, HighlightAttribute> m_highlightMap;
+
+	/// Neovim mode descriptions from "mode_change", used by guicursor
+	QVariantList m_modeInfo;
 
 	bool m_insertMode{ false };
 	bool m_resizing{ false };
