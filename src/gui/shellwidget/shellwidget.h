@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "shellcontents.h"
+#include "cursor.h"
 
 class ShellWidget: public QWidget
 {
@@ -69,14 +70,17 @@ protected:
 	/// Cursor position in shell coordinates
 	QPoint m_cursor_pos;
 
+	/// Abstraction for guicursor options and styles
+	Cursor m_cursor;
+
 	/// The top left corner position (pixel) for the cursor
-	QPoint neovimCursorTopLeft() const;
+	QPoint neovimCursorTopLeft() const noexcept;
 
 	/// Get the area filled by the cursor
-	QRect neovimCursorRect() const;
+	QRect neovimCursorRect() const noexcept;
 
 	/// Move the neovim cursor for text insertion and display
-	void setNeovimCursor(uint64_t col, uint64_t row);
+	void setNeovimCursor(uint64_t col, uint64_t row) noexcept;
 
 	virtual void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
@@ -86,6 +90,10 @@ protected:
 
 private:
 	void setFont(const QFont&);
+	void handleCursorChanged();
+	QRect getNeovimCursorRect(QRect cellRect) noexcept;
+	void paintNeovimCursorBackground(QPainter& p, QRect cellRect) noexcept;
+	void paintNeovimCursorForeground(QPainter& p, QRect cellRect, QPoint pos, QChar character) noexcept;
 
 	ShellContents m_contents{ 0, 0 };
 	QSize m_cellSize;

@@ -17,6 +17,7 @@ endif ()
 
 set(SOURCES
   cell.cpp
+  cursor.cpp
   highlight.cpp
   helpers.cpp
   konsole_wcwidth.cpp

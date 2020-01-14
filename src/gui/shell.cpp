@@ -463,12 +463,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "mouse_off"){
 		handleMouse(false);
 	} else if (name == "mode_change"){
-		if (opargs.size() < 1 || !opargs.at(0).canConvert<QByteArray>()) {
-			qWarning() << "Unexpected argument for change_mode:" << opargs;
-			return;
-		}
-		QString mode = m_nvim->decode(opargs.at(0).toByteArray());
-		handleModeChange(mode);
+		handleModeChange(opargs);
 	} else if (name == "cursor_on"){
 	} else if (name == "set_title"){
 		handleSetTitle(opargs);
@@ -515,7 +510,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "popupmenu_hide") {
 		m_pum.hide();
 	} else if (name == "mode_info_set") {
-		// TODO
+		handleModeInfoSet(opargs);
 	} else if (name == "flush") {
 		// Do Nothing, a notification that nvim is done redrawing.
 	} else if (name == "grid_resize") {
@@ -607,8 +602,77 @@ void Shell::handlePopupMenuSelect(const QVariantList& opargs)
 	m_pum.setSelectedIndex(opargs.at(0).toLongLong());
 }
 
-void Shell::handleModeChange(const QString& mode)
+void Shell::handleModeChange(const QVariantList& opargs)
 {
+	if (opargs.size() < 2
+		|| !opargs.at(0).canConvert<QByteArray>()
+		|| !opargs.at(1).canConvert<uint64_t>()) {
+		qWarning() << "Unexpected arguments for mode_change:" << opargs;
+		return;
+	}
+
+	const QString mode{ m_nvim->decode(opargs.at(0).toByteArray()) };
+	const uint64_t modeIndex{ opargs.at(1).toULongLong() };
+
+	const uint32_t sizeModeInfo{ static_cast<uint32_t>(m_modeInfo.size()) };
+	if (modeIndex >= sizeModeInfo) {
+		return;
+	}
+
+	const QVariantMap modePropertyMap{ m_modeInfo.at(modeIndex).toMap() };
+
+	Cursor::Shape cursorShape{ Cursor::Shape::Block };
+	const QVariant cursor_shape{ modePropertyMap.value("cursor_shape") };
+	if (!cursor_shape.isNull() && cursor_shape.canConvert<QByteArray>()) {
+		const QString cursor_shape{ modePropertyMap.value("cursor_shape").toByteArray() };
+		if (cursor_shape == "block") {
+			cursorShape = Cursor::Shape::Block;
+		}
+		else if (cursor_shape == "horizontal") {
+			cursorShape = Cursor::Shape::Horizontal;
+		}
+		else if (cursor_shape == "vertical") {
+			cursorShape = Cursor::Shape::Vertical;
+		}
+	}
+
+	uint64_t cellPercentage{ 100 };
+	const QVariant cell_percentage{ modePropertyMap.value("cell_percentage") };
+	if (!cell_percentage.isNull() && cell_percentage.canConvert<uint32_t>()) {
+		const uint32_t cell_percentage{ modePropertyMap.value("cell_percentage").toUInt() };
+		if (cell_percentage > 0 && cell_percentage < 100) {
+			cellPercentage = cell_percentage;
+		}
+	}
+
+	uint64_t blinkWaitTime{ 0 };
+	const QVariant blinkwait{ modePropertyMap.value("blinkwait") };
+	if (!blinkwait.isNull() && blinkwait.canConvert<uint32_t>()) {
+		blinkWaitTime = blinkwait.toUInt();
+	}
+
+	uint64_t blinkOffTime{ 0 };
+	const QVariant blinkoff{ modePropertyMap.value("blinkoff") };
+	if (!blinkoff.isNull() && blinkoff.canConvert<uint32_t>()) {
+		blinkOffTime = blinkoff.toUInt();
+	}
+
+	uint64_t blinkOnTime{ 0 };
+	const QVariant blinkon{ modePropertyMap.value("blinkon") };
+	if (!blinkon.isNull() && blinkon.canConvert<uint32_t>()) {
+		blinkOnTime = blinkon.toUInt();
+	}
+
+	const QVariant attr_id{ modePropertyMap.value("attr_id") };
+	HighlightAttribute highlight;
+	if (!attr_id.isNull() && attr_id.canConvert<uint32_t>()) {
+		highlight = m_highlightMap.value(attr_id.toUInt());
+	}
+
+	m_cursor.SetColor(highlight);
+	m_cursor.SetStyle(cursorShape, cellPercentage);
+	m_cursor.SetTimer(blinkWaitTime, blinkOnTime, blinkOffTime);
+
 	auto old = m_insertMode;
 
 	// TODO: Implement visual aids for other modes
@@ -622,6 +686,30 @@ void Shell::handleModeChange(const QString& mode)
 	if (old != m_insertMode) {
 		update(neovimCursorRect());
 	}
+}
+
+void Shell::handleModeInfoSet(const QVariantList& opargs)
+{
+	if (opargs.size() < 2
+		|| !opargs.at(0).canConvert<bool>()
+		|| static_cast<QMetaType::Type>(opargs.at(1).type()) != QMetaType::QVariantList) {
+		qWarning() << "Unexpected arguments for mode_info_set:" << opargs;
+		return;
+	}
+
+	const bool cursor_style_enabled{ opargs.at(0).toBool() };
+	const QVariantList mode_info{ opargs.at(1) };
+
+	// Neovim sends mode_info with an extra list container. We should extract this list so that
+	// lower levels do not need to handle the extra type checks.
+	if (mode_info.size() < 1
+		|| static_cast<QMetaType::Type>(mode_info.at(0).type()) != QMetaType::QVariantList) {
+		qWarning() << "Unexpected format for mode_info";
+		return;
+	}
+
+	m_cursor.SetIsEnabled(cursor_style_enabled);
+	m_modeInfo = mode_info.at(0).toList();
 }
 
 void Shell::handleSetTitle(const QVariantList& opargs)
@@ -1023,6 +1111,13 @@ void Shell::paintEvent(QPaintEvent *ev)
 	if (!m_attached) {
 		QPainter painter(this);
 		painter.fillRect(rect(), palette().window());
+		return;
+	}
+
+	// Option guicursor can be disabled with `:set guicursor=`.
+	if (m_cursor.IsEnabled())
+	{
+		ShellWidget::paintEvent(ev);
 		return;
 	}
 

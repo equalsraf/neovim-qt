@@ -15,6 +15,9 @@ ShellWidget::ShellWidget(QWidget* parent)
 	setMouseTracking(true);
 
 	setDefaultFont();
+
+	// Blinking Cursor Timer
+	connect(&m_cursor, &Cursor::CursorChanged, this, &ShellWidget::handleCursorChanged);
 }
 
 ShellWidget* ShellWidget::fromFile(const QString& path)
@@ -112,6 +115,96 @@ QSize ShellWidget::cellSize() const
 	return m_cellSize;
 }
 
+QRect ShellWidget::getNeovimCursorRect(QRect cellRect) noexcept
+{
+	QRect cursorRect{ cellRect };
+	switch (m_cursor.GetShape())
+	{
+		case Cursor::Shape::Block:
+			break;
+
+		case Cursor::Shape::Horizontal:
+		{
+			const int height{ cursorRect.height() * m_cursor.GetPercentage() / 100 };
+			const int verticalOffset{ cursorRect.height() - height };
+			cursorRect.adjust(0, verticalOffset, 0, verticalOffset);
+			cursorRect.setHeight(height);
+		}
+		break;
+
+		case Cursor::Shape::Vertical:
+		{
+			cursorRect.setWidth(cursorRect.width() * m_cursor.GetPercentage() / 100);
+		}
+		break;
+	}
+
+	return cursorRect;
+}
+
+void ShellWidget::paintNeovimCursorBackground(QPainter& p, QRect cellRect) noexcept
+{
+	const QRect cursorRect{ getNeovimCursorRect(cellRect) };
+
+	QColor cursorBackgroundColor{ m_cursor.GetBackgroundColor() };
+	if (!cursorBackgroundColor.isValid()) {
+		// Neovim can send QColor::Invalid, indicating the default colors with
+		// an inverted foreground/background.
+		cursorBackgroundColor = foreground();
+	}
+
+	// If the window does not have focus, draw an outline around the cursor cell.
+	if (!hasFocus()) {
+		QRect noFocusCursorRect{ cellRect };
+		noFocusCursorRect.adjust(-1, -1, -1, -1);
+
+		QPen pen{ cursorBackgroundColor };
+		pen.setWidth(2);
+
+		p.setPen(pen);
+		p.drawRect(cellRect);
+		return;
+	}
+
+	p.fillRect(cursorRect, cursorBackgroundColor);
+}
+
+void ShellWidget::paintNeovimCursorForeground(
+	QPainter& p,
+	QRect cellRect,
+	QPoint pos,
+	QChar character) noexcept
+{
+	// No focus: cursor is outline with default foreground color.
+	if (!hasFocus()) {
+		return;
+	}
+
+	const QRect cursorRect{ getNeovimCursorRect(cellRect) };
+
+	QColor cursorForegroundColor{ m_cursor.GetForegroundColor() };
+	if (!cursorForegroundColor.isValid()) {
+		// Neovim can send QColor::Invalid, indicating the default colors with
+		// an inverted foreground/background.
+		cursorForegroundColor = background();
+	}
+
+	// Painting the cursor requires setting the clipping region. This is used
+	// to paint only the part of text within the cursor region. Save the active
+	// clipping settings, and restore them after the paint operation.
+	const QRegion oldClippingRegion{ p.clipRegion() };
+	const bool oldClippingSetting{ p.hasClipping() };
+
+	p.setClipping(true);
+	p.setClipRect(cursorRect) ;
+
+	p.setPen(cursorForegroundColor);
+	p.drawText(pos, character);
+
+	p.setClipRegion(oldClippingRegion);
+	p.setClipping(oldClippingSetting);
+}
+
 void ShellWidget::paintEvent(QPaintEvent *ev)
 {
 	QPainter p(this);
@@ -146,18 +239,25 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 				if (j <= 0 || !contents().constValue(i, j-1).IsDoubleWidth()) {
 					// Only paint bg/fg if this is not the second cell
 					// of a wide char
-					if (cell.GetBackgroundColor().isValid()) {
-						p.fillRect(r, cell.GetBackgroundColor());
-					} else {
-						p.fillRect(r, background());
+					QColor bgColor{ cell.GetBackgroundColor() };
+					if (!bgColor.isValid()) {
+						bgColor = background();
+					}
+					p.fillRect(r, bgColor);
+
+					const QPoint curPos{ j, i };
+					const bool isCursorVisibleAtCell{ m_cursor.IsVisible() && m_cursor_pos == curPos };
+
+					if (isCursorVisibleAtCell) {
+						paintNeovimCursorBackground(p, r);
 					}
 
 					if (cell.GetCharacter() != ' ') {
-						if (cell.GetForegroundColor().isValid()) {
-							p.setPen(cell.GetForegroundColor());
-						} else {
-							p.setPen(foreground());
+						QColor fgColor{ cell.GetForegroundColor() };
+						if (!fgColor.isValid()) {
+							fgColor = foreground();
 						}
+						p.setPen(fgColor);
 
 						if (cell.IsBold() || cell.IsItalic()) {
 							QFont f = p.font();
@@ -169,9 +269,15 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 						}
 
 						// Draw chars at the baseline
-						QPoint pos(r.left(), r.top()+m_ascent+(m_lineSpace / 2));
-						uint character = cell.GetCharacter();
+						const int cellTextOffset{ m_ascent + (m_lineSpace / 2) };
+						const QPoint pos{ r.left(), r.top() + cellTextOffset};
+						const uint character{ cell.GetCharacter() };
+
 						p.drawText(pos, QString::fromUcs4(&character, 1));
+
+						if (isCursorVisibleAtCell) {
+							paintNeovimCursorForeground(p, r, pos, character);
+						}
 					}
 				}
 
@@ -385,7 +491,7 @@ void ShellWidget::scrollShellRegion(int row0, int row1, int col0,
 }
 
 /// Convert Area in row/col coordinates into pixel coordinates
-/// 
+///
 /// (row0, col0) is the start position and rowcount/colcount the size
 QRect ShellWidget::absoluteShellRect(int row0, int col0, int rowcount, int colcount)
 {
@@ -412,28 +518,43 @@ int ShellWidget::columns() const
 	return m_contents.columns();
 }
 
-void ShellWidget::setNeovimCursor(uint64_t row, uint64_t col)
+void ShellWidget::setNeovimCursor(uint64_t row, uint64_t col) noexcept
 {
+	// Clear the stale cursor
 	update(neovimCursorRect());
+
+	// Update cursor position, draw at new location
 	m_cursor_pos = QPoint(col, row);
+	m_cursor.ResetTimer();
 	update(neovimCursorRect());
 }
 
-QPoint ShellWidget::neovimCursorTopLeft() const
+/// The top left corner position (pixel) for the cursor
+QPoint ShellWidget::neovimCursorTopLeft() const noexcept
 {
-	const int xPixels{ m_cursor_pos.x() * cellSize().width() };
-	const int yPixels{ m_cursor_pos.y() * cellSize().height() };
+	const QSize cSize{ cellSize() };
+	const int xPixels{ m_cursor_pos.x() * cSize.width() };
+	const int yPixels{ m_cursor_pos.y() * cSize.height() };
+
 	return { xPixels, yPixels };
 }
 
-QRect ShellWidget::neovimCursorRect() const
+/// Get the area filled by the cursor
+QRect ShellWidget::neovimCursorRect() const noexcept
 {
-	const Cell& cell{ contents().constValue(m_cursor_pos.y(), m_cursor_pos.x()) };
-
 	QRect cursor{ neovimCursorTopLeft(), cellSize() };
+
+	const Cell& cell{ contents().constValue(m_cursor_pos.y(), m_cursor_pos.x()) };
 	if (cell.IsDoubleWidth()) {
 		cursor.setWidth(cursor.width() * 2);
 	}
+
 	return cursor;
 }
+
+void ShellWidget::handleCursorChanged()
+{
+	update(neovimCursorRect());
+}
+
 
