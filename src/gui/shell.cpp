@@ -165,7 +165,6 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 	// Updating guifont when the user has already called 'set guifont=...' may cause
 	// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
 	if (isGuiDialogRequest || updateOption) {
-		qDebug() << "Update guifont option!";
 		m_nvim->api0()->vim_set_option("guifont", fontDesc());
 	}
 
@@ -186,7 +185,6 @@ void Shell::setAttached(bool attached)
 		updateWindowId();
 
 		m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
-		m_nvim->api0()->vim_set_option("guifont", fontDesc());
 
 		if (isWindow()) {
 			updateGuiWindowState(windowState());
@@ -852,14 +850,21 @@ void Shell::handleMouse(bool enabled)
 
 void Shell::handleGuiFontFunction(const QVariantList& args)
 {
-	if (args.size() == 2) {
-		QString fdesc = m_nvim->decode(args.at(1).toByteArray());
-		setGuiFont(fdesc, false /*force*/, true /*setOption*/);
-	} else if (args.size() == 3) {
-		QString fdesc = m_nvim->decode(args.at(1).toByteArray());
-		const bool force = args.at(2) == 1;
-		setGuiFont(fdesc, force, true /*setOption*/);
+	if (args.size() < 2
+		|| !args.at(1).canConvert<QByteArray>())
+	{
+		return;
 	}
+
+	const QString fdesc{ m_nvim->decode(args.at(1).toByteArray()) };
+
+	bool force{ false };
+	if (args.size() >= 3 && args.at(2).canConvert<bool>())
+	{
+		force = args.at(2).toBool();
+	}
+
+	setGuiFont(fdesc, force, true /*setOption*/);
 }
 
 void Shell::handleGridResize(const QVariantList& opargs)
