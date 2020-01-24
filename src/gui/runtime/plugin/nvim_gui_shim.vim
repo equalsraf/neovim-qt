@@ -178,15 +178,12 @@ function GuiClipboard()
 endfunction
 
 " Directory autocommands for Treeview
-" TODO : for the time being, the chdir events are broadcasted to all
-"        UIs. Being able to select a "correct" UI would be an improvement.
-"        But what is "the correct UI" ?
 augroup guiDirEvents
     autocmd!
     autocmd DirChanged * call rpcnotify(0, 'Dir', getcwd())
     autocmd WinEnter * call rpcnotify(0, 'Dir', getcwd())
+    autocmd VimEnter * call rpcnotify(0, 'Dir', getcwd())
 augroup END
-
 
 " Notifies the TreeView widget of a Show or Hide event
 function! s:TreeViewShowHide(show)
