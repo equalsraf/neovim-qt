@@ -10,6 +10,7 @@ private slots:
 	void LessThanKey() noexcept;
 	void ModifierOnlyKeyEventsIgnored() noexcept;
 	void ShiftKeyEventWellFormed() noexcept;
+	void CapsLockIgnored() noexcept;
 };
 
 void TestInputCommon::LessThanKey() noexcept
@@ -82,6 +83,19 @@ void TestInputCommon::ShiftKeyEventWellFormed() noexcept
 
 	QKeyEvent evShiftC{ QEvent::KeyPress, Qt::Key_C, Qt::ShiftModifier, "C" };
 	QCOMPARE(NeovimQt::Input::convertKey(evShiftC), QString{ "C" });
+}
+
+void TestInputCommon::CapsLockIgnored() noexcept
+{
+	// Issue#199: Pressing Control + CapsLock inserts $
+	QKeyEvent evCapsLock{ QEvent::KeyPress, Qt::Key_CapsLock, Qt::NoModifier};
+	QCOMPARE(NeovimQt::Input::convertKey(evCapsLock), QString{ "" });
+
+	QKeyEvent evCtrlCapsLock{ QEvent::KeyPress, Qt::Key_CapsLock, Qt::ControlModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlCapsLock), QString{ "" });
+
+	QKeyEvent evMetaCapsLock{ QEvent::KeyPress, Qt::Key_CapsLock, Qt::MetaModifier};
+	QCOMPARE(NeovimQt::Input::convertKey(evMetaCapsLock), QString{ "" });
 }
 
 #include "tst_input_common.moc"
