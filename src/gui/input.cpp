@@ -181,9 +181,11 @@ QString convertKey(const QKeyEvent& ev) noexcept
 
 	if (text.isEmpty()) {
 		// Ignore all modifier-only key events.
-		//   Issue #344: Ignore Ctrl-Shift, C-S- being treated as C-Space
+		//   Issue#344: Ignore Ctrl-Shift, C-S- being treated as C-Space
 		//   Issue#593: Pressing Control + Super inserts ^S
+		//   Issue#199: Pressing Control + CapsLock inserts $
 		if (key == Qt::Key::Key_Alt
+			|| key == Qt::Key::Key_CapsLock
 			|| key == Qt::Key::Key_Control
 			|| key == Qt::Key::Key_Meta
 			|| key == Qt::Key::Key_Shift
