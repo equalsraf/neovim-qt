@@ -185,6 +185,7 @@ QString convertKey(const QKeyEvent& ev) noexcept
 		//   Issue#593: Pressing Control + Super inserts ^S
 		//   Issue#199: Pressing Control + CapsLock inserts $
 		if (key == Qt::Key::Key_Alt
+			|| key == Qt::Key::Key_AltGr
 			|| key == Qt::Key::Key_CapsLock
 			|| key == Qt::Key::Key_Control
 			|| key == Qt::Key::Key_Meta

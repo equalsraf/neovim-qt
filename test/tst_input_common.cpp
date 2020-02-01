@@ -11,6 +11,8 @@ private slots:
 	void ModifierOnlyKeyEventsIgnored() noexcept;
 	void ShiftKeyEventWellFormed() noexcept;
 	void CapsLockIgnored() noexcept;
+	void AltGrAloneIgnored() noexcept;
+	void AltGrKeyEventWellFormed() noexcept;
 };
 
 void TestInputCommon::LessThanKey() noexcept
@@ -33,6 +35,7 @@ void TestInputCommon::ModifierOnlyKeyEventsIgnored() noexcept
 
 	const QList<Qt::Key> modifierKeyList {
 		Qt::Key::Key_Alt,
+		Qt::Key::Key_AltGr,
 		Qt::Key::Key_Control,
 		Qt::Key::Key_Meta,
 		Qt::Key::Key_Shift,
@@ -46,6 +49,7 @@ void TestInputCommon::ModifierOnlyKeyEventsIgnored() noexcept
 		Qt::KeyboardModifier::ControlModifier,
 		Qt::KeyboardModifier::MetaModifier,
 		Qt::KeyboardModifier::ShiftModifier,
+		Qt::KeyboardModifier::GroupSwitchModifier,
 	};
 
 	for (const auto& key : modifierKeyList) {
@@ -62,6 +66,19 @@ void TestInputCommon::ModifierOnlyKeyEventsIgnored() noexcept
 	// Issue#593: Pressing Control + Super inserts ^S
 	QKeyEvent evIssue593{ QEvent::KeyPress, Qt::Key::Key_Super_L, Qt::KeyboardModifier::ControlModifier};
 	QCOMPARE(NeovimQt::Input::convertKey(evIssue593), QString{});
+}
+
+void TestInputCommon::AltGrAloneIgnored() noexcept
+{
+	// Issue#510: Pressing AltGr inserts weird char
+	QKeyEvent event{ QEvent::KeyPress, Qt::Key::Key_AltGr, Qt::KeyboardModifier::GroupSwitchModifier};
+	QCOMPARE(NeovimQt::Input::convertKey(event), QString{});
+}
+
+void TestInputCommon::AltGrKeyEventWellFormed() noexcept
+{
+	QKeyEvent event{ QEvent::KeyPress, Qt::Key::Key_AsciiTilde, Qt::KeyboardModifier::GroupSwitchModifier};
+	QCOMPARE(NeovimQt::Input::convertKey(event), QString{ "~" });
 }
 
 void TestInputCommon::ShiftKeyEventWellFormed() noexcept
