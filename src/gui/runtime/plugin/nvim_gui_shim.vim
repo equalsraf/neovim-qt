@@ -210,3 +210,20 @@ anoremenu <script> Gui.Treeview.Toggle :call <SID>TreeViewShowToggle()
 function GuiShowContextMenu() range
 	call rpcnotify(0, 'Gui', 'ShowContextMenu')
 endfunction
+
+" Notify Gui of any cursor movement, used by GuiScrollBar
+function s:GuiCursorMovedUpdateScrollBar()
+	let l:minLineVisible = line('w0')
+	let l:bufferSize = line('$')
+	let l:windowHeight = winheight(winnr())
+	call rpcnotify(0, 'Gui', 'CursorMovedUpdateScrollBar', l:minLineVisible, l:bufferSize, l:windowHeight)
+endfunction
+
+autocmd CursorMoved,CursorMovedI,VimResized * call <SID>GuiCursorMovedUpdateScrollBar()
+
+" Show/Hide the Gui ScrollBar
+function! s:GuiScrollBar(enable) abort
+	call rpcnotify(0, 'Gui', 'SetScrollBarVisible', a:enable)
+endfunction
+
+command! -nargs=1 GuiScrollBar call s:GuiScrollBar(<args>)

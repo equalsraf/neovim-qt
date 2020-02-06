@@ -76,6 +76,12 @@ signals:
 	void neovimShowContextMenu();
 	void fontChanged();
 
+	// GuiScrollBar Signals
+	void neovimCursorMovedUpdateScrollBar(
+		uint64_t minLineVisible, uint64_t bufferSize, uint64_t windowHeight);
+	void neovimScrollEvent(int64_t rows);
+	void setGuiScrollBarVisible(bool isVisible);
+
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
@@ -83,6 +89,9 @@ public slots:
 	bool setGuiFont(const QString& fdesc, bool force, bool updateOption);
 	void updateGuiWindowState(Qt::WindowStates state);
 	void openFiles(const QList<QUrl> url);
+
+	/// Update the Neovim buffer position after a gui-triggered scrollbar event
+	void handleScrollBarChanged(int position);
 
 protected slots:
 	void neovimError(NeovimConnector::NeovimError);
@@ -140,6 +149,10 @@ protected:
 	virtual void handleGridCursorGoto(const QVariantList& opargs);
 	virtual void handleGridScroll(const QVariantList& opargs);
 
+	// GuiScrollBar Slots
+	virtual void handleCursorMovedUpdateScrollBar(const QVariantList& opargs) noexcept;
+	virtual void handleSetScrollBarVisible(const QVariantList& opargs) noexcept;
+
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
@@ -194,6 +207,9 @@ private:
 	ShellOptions m_options;
 	PopupMenu m_pum{ this };
 	bool m_mouseEnabled{ true };
+
+	/// GuiScrollBar last known position: used to compute scroll line delta.
+	int m_lastScrollBarPosition{ 0 };
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler

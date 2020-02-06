@@ -356,11 +356,13 @@ void Shell::handlePut(const QVariantList& args)
  */
 void Shell::handleScroll(const QVariantList& args)
 {
-	if (!args.at(0).canConvert<qint64>()) {
+	if (args.size() < 1
+		|| !args.at(0).canConvert<int64_t>()) {
 		qWarning() << "Unexpected arguments for redraw:scroll" << args;
 		return;
 	}
-	qint64 count = args.at(0).toULongLong();
+
+	const int64_t count{ args.at(0).toLongLong() };
 
 	if (m_scroll_region.contains(m_cursor_pos)) {
 		// Schedule cursor region to be repainted
@@ -370,6 +372,8 @@ void Shell::handleScroll(const QVariantList& args)
 	scrollShellRegion(m_scroll_region.top(), m_scroll_region.bottom(),
 			m_scroll_region.left(), m_scroll_region.right(),
 			count);
+
+	emit neovimScrollEvent(count);
 }
 
 void Shell::handleSetScrollRegion(const QVariantList& opargs)
@@ -814,6 +818,10 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			QGuiApplication::clipboard()->setMimeData(clipData, clipboard);
 		} else if (guiEvName == "ShowContextMenu") {
 			emit neovimShowContextMenu();
+		} else if (guiEvName == "CursorMovedUpdateScrollBar") {
+			handleCursorMovedUpdateScrollBar(args);
+		} else if (guiEvName == "SetScrollBarVisible") {
+			handleSetScrollBarVisible(args);
 		}
 		return;
 	} else if (name != "redraw") {
@@ -1074,13 +1082,13 @@ void Shell::handleGridCursorGoto(const QVariantList& opargs)
 void Shell::handleGridScroll(const QVariantList& opargs)
 {
 	if (opargs.size() < 7
-		|| !opargs.at(0).canConvert<quint64>()
-		|| !opargs.at(1).canConvert<quint64>()
-		|| !opargs.at(2).canConvert<quint64>()
-		|| !opargs.at(3).canConvert<quint64>()
-		|| !opargs.at(4).canConvert<quint64>()
-		|| !opargs.at(5).canConvert<quint64>()
-		|| !opargs.at(6).canConvert<quint64>()) {
+		|| !opargs.at(0).canConvert<uint64_t>()
+		|| !opargs.at(1).canConvert<uint64_t>()
+		|| !opargs.at(2).canConvert<uint64_t>()
+		|| !opargs.at(3).canConvert<uint64_t>()
+		|| !opargs.at(4).canConvert<uint64_t>()
+		|| !opargs.at(5).canConvert<uint64_t>()
+		|| !opargs.at(6).canConvert<int64_t>()) {
 		qWarning() << "Unexpected arguments for grid_scroll:" << opargs;
 		return;
 	}
@@ -1089,11 +1097,11 @@ void Shell::handleGridScroll(const QVariantList& opargs)
 	//     "grid" = opargs.at(0).toULongLong()
 	//     "cols" = opargs.at(6).toULongLong()
 
-	const uint64_t top = opargs.at(1).toULongLong();
-	const uint64_t bot = opargs.at(2).toULongLong();
-	const uint64_t left = opargs.at(3).toULongLong();
-	const uint64_t right = opargs.at(4).toULongLong();
-	const uint64_t rows = opargs.at(5).toULongLong();
+	const uint64_t top{ opargs.at(1).toULongLong() };
+	const uint64_t bot{ opargs.at(2).toULongLong() };
+	const uint64_t left{ opargs.at(3).toULongLong() };
+	const uint64_t right{ opargs.at(4).toULongLong() };
+	const int64_t rows{ opargs.at(5).toLongLong() };
 
 	m_scroll_region = QRect(QPoint(left, top), QPoint(right, bot));
 
@@ -1104,6 +1112,39 @@ void Shell::handleGridScroll(const QVariantList& opargs)
 
 	scrollShellRegion(m_scroll_region.top(), m_scroll_region.bottom(),
 		m_scroll_region.left(), m_scroll_region.right(), rows);
+
+	emit neovimScrollEvent(rows);
+}
+
+void Shell::handleCursorMovedUpdateScrollBar(const QVariantList& opargs) noexcept
+{
+	if (opargs.size() < 4
+		|| !opargs.at(1).canConvert<uint64_t>()
+		|| !opargs.at(2).canConvert<uint64_t>()
+		|| !opargs.at(3).canConvert<uint64_t>()) {
+		qWarning() << "Unexpected arguments for CursorMovedUpdateScrollBar:" << opargs;
+		return;
+	}
+
+	const uint64_t minLineVisible{ opargs.at(1).toULongLong() };
+	const uint64_t bufferSize{ opargs.at(2).toULongLong() };
+	const uint64_t windowHeight{ opargs.at(3).toULongLong() };
+
+	m_lastScrollBarPosition = minLineVisible;
+
+	emit neovimCursorMovedUpdateScrollBar(minLineVisible, bufferSize, windowHeight);
+}
+
+void Shell::handleSetScrollBarVisible(const QVariantList& opargs) noexcept
+{
+	if (opargs.size() < 2
+		|| !opargs.at(1).canConvert<bool>()) {
+		qWarning() << "Unexpected arguments for SetScrollBarVisible:" << opargs;
+		return;
+	}
+
+	const bool isVisible{ opargs.at(1).toBool() };
+	emit setGuiScrollBarVisible(isVisible);
 }
 
 void Shell::paintEvent(QPaintEvent *ev)
@@ -1641,6 +1682,35 @@ void Shell::openFiles(QList<QUrl> urls)
 		// Neovim cannot open urls now. Store them to open later.
 		m_deferredOpen.append(urls);
 	}
+}
+
+void Shell::handleScrollBarChanged(int position)
+{
+	if (m_lastScrollBarPosition == position) {
+		return;
+	}
+
+	const int delta{ m_lastScrollBarPosition - position };
+
+	if (delta == 0) {
+		return;
+	}
+
+	// Scroll Up: normal! {Control + Y}
+	if (delta > 0) {
+		m_nvim->api0()->vim_command(
+			QStringLiteral("normal! %1\031").arg(delta).toLatin1());
+	}
+
+	// Scroll Down normal! {Control + E}
+	if (delta < 0) {
+		m_nvim->api0()->vim_command(
+			QStringLiteral("normal! %1\005").arg(delta).toLatin1());
+	}
+
+	// NOTE: MSVC cannot parse the unescaped sequences above: `^E` and `^Y`.
+
+	m_lastScrollBarPosition = position;
 }
 
 // If neovim is blocked waiting for input, attempt to bailout from
