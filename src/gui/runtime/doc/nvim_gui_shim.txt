@@ -51,6 +51,9 @@ GuiLinespace	When called with no arguments this command displays the
 		linespace, the number of extra pixels each line will have.
                 A single argument is accepted as the new linespace height.
 
+								*GuiScrollBar*
+GuiScrollBar	Enable or disable the external GUI scrollbar
+
 								*GuiTabline*
 GuiTabline	Enable or disable the external GUI tabline
 
