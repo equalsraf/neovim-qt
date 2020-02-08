@@ -43,6 +43,11 @@ find_package(Qt5Svg REQUIRED)
 find_package(Qt5Test REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
+
+if(Qt5Core_VERSION VERSION_LESS 5.5)
+	message(FATAL_ERROR "The minimum required Qt version is 5.5")
+endif()
+
 # msgpack
 option(USE_SYSTEM_MSGPACK "Use system msgpack libraries " OFF)
 if(USE_SYSTEM_MSGPACK)

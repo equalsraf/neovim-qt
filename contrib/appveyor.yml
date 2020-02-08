@@ -17,6 +17,10 @@ environment:
     QTPATH: C:\Qt\5.11\msvc2015
     GENERATOR: Visual Studio 14
     ARCHI: x86
+# Build against the minimum supported Qt
+  - PlatformToolset: mingw-w64
+    QTPATH: C:\Qt\5.5\mingw53_32
+    GENERATOR: MinGW Makefiles
 configuration:
 - RelWithDebInfo
 matrix:
