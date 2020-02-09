@@ -21,6 +21,7 @@ environment:
   - PlatformToolset: mingw-w64
     QTPATH: C:\Qt\5.5\mingw53_32
     GENERATOR: MinGW Makefiles
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
 configuration:
 - RelWithDebInfo
 matrix:
