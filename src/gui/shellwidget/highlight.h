@@ -12,7 +12,7 @@ public:
 		bool italic,
 		bool bold,
 		bool underline,
-		bool undercurl) :
+		bool undercurl) noexcept :
 		m_foreground{ foreground },
 		m_background{ background },
 		m_special{ special },
@@ -25,25 +25,25 @@ public:
 	}
 
 	/// Creates safe object with default highlight/style, required for QMap.
-	HighlightAttribute() {};
+	HighlightAttribute() noexcept {};
 
-	QColor GetForegroundColor() const;
+	QColor GetForegroundColor() const noexcept;
 
-	QColor GetBackgroundColor() const;
+	QColor GetBackgroundColor() const noexcept;
 
-	QColor GetSpecialColor() const { return m_special; }
+	QColor GetSpecialColor() const noexcept { return m_special; }
 
-	bool IsReverse() const { return m_reverse; }
+	bool IsReverse() const noexcept { return m_reverse; }
 
-	bool IsItalic() const { return m_italic; }
+	bool IsItalic() const noexcept { return m_italic; }
 
-	bool IsBold() const { return m_bold; }
+	bool IsBold() const noexcept { return m_bold; }
 
-	bool IsUnderline() const { return m_underline; }
+	bool IsUnderline() const noexcept { return m_underline; }
 
-	bool IsUndercurl() const { return m_undercurl; }
+	bool IsUndercurl() const noexcept { return m_undercurl; }
 
-	bool operator==(const HighlightAttribute& other) const;
+	bool operator==(const HighlightAttribute& other) const noexcept;
 
 private:
 	QColor m_foreground{ QColor::Invalid };
