@@ -1,6 +1,6 @@
 #include "highlight.h"
 
-QColor HighlightAttribute::GetForegroundColor() const {
+QColor HighlightAttribute::GetForegroundColor() const noexcept {
 	if (IsReverse()) {
 		return m_background;
 	}
@@ -8,7 +8,7 @@ QColor HighlightAttribute::GetForegroundColor() const {
 	return m_foreground;
 }
 
-QColor HighlightAttribute::GetBackgroundColor() const {
+QColor HighlightAttribute::GetBackgroundColor() const noexcept {
 	if (IsReverse()) {
 		return m_foreground;
 	}
@@ -16,7 +16,7 @@ QColor HighlightAttribute::GetBackgroundColor() const {
 	return m_background;
 }
 
-bool HighlightAttribute::operator==(const HighlightAttribute& other) const {
+bool HighlightAttribute::operator==(const HighlightAttribute& other) const noexcept {
 	return
 		m_foreground == other.m_foreground &&
 		m_background == other.m_background &&
