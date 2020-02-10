@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QColor>
+#include <QVariantMap>
 
 class HighlightAttribute {
 public:
@@ -23,6 +24,9 @@ public:
 		m_undercurl{ undercurl }
 	{
 	}
+
+	/// Creates a HighlightAttribute from the Neovim-MsgPack-Map format.
+	HighlightAttribute(const QVariantMap& map) noexcept;
 
 	/// Creates safe object with default highlight/style, required for QMap.
 	HighlightAttribute() noexcept {};

@@ -898,30 +898,9 @@ void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
 	//     "cterm_attr" = opargs.at(2).toMap()
 
 	const uint64_t id = opargs.at(0).toULongLong();
-	const auto& rgb_attr = opargs.at(1).toMap();
+	const QVariantMap rgb_attr = opargs.at(1).toMap();
 
-	const QColor foregroundColor = (rgb_attr.contains("foreground")) ?
-		color(rgb_attr.value("foreground").toLongLong(), QColor::Invalid) :
-		QColor::Invalid;
-
-	const QColor backgroundColor = (rgb_attr.contains("background")) ?
-		color(rgb_attr.value("background").toLongLong(), QColor::Invalid) :
-		QColor::Invalid;
-
-	const QColor specialColor = rgb_attr.contains(("special")) ?
-		color(rgb_attr.value("special").toLongLong(), QColor::Invalid) :
-		QColor::Invalid;
-
-	HighlightAttribute hl_attr {
-		foregroundColor,
-		backgroundColor,
-		specialColor,
-		rgb_attr.contains("reverse"),
-		rgb_attr.contains("italic"),
-		rgb_attr.contains("bold"),
-		rgb_attr.contains("underline"),
-		rgb_attr.contains("undercurl") };
-
+	HighlightAttribute hl_attr{ rgb_attr };
 	m_highlightMap.insert(id, hl_attr);
 }
 
