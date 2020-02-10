@@ -1,5 +1,31 @@
 #include "highlight.h"
 
+static QColor GetQColorFromVariant(const QVariant& color) noexcept
+{
+	if (color.isNull()) {
+		return QColor{};
+	}
+
+	if (!color.canConvert<uint32_t>()) {
+		return QColor{};
+	}
+
+	return QColor{ color.toUInt() };
+}
+
+HighlightAttribute::HighlightAttribute(const QVariantMap& rgb_attr) noexcept
+{
+	m_foreground = GetQColorFromVariant(rgb_attr.value("foreground"));
+	m_background = GetQColorFromVariant(rgb_attr.value("background"));
+	m_special = GetQColorFromVariant(rgb_attr.value("special"));
+
+	m_reverse = rgb_attr.contains("reverse");
+	m_italic = rgb_attr.contains("italic");
+	m_bold = rgb_attr.contains("bold");
+	m_underline = rgb_attr.contains("underline");
+	m_undercurl = rgb_attr.contains("undercurl");
+}
+
 QColor HighlightAttribute::GetForegroundColor() const noexcept {
 	if (IsReverse()) {
 		return m_background;
