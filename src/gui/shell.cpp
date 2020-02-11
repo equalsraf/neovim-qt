@@ -76,10 +76,14 @@ void Shell::fontError(const QString& msg)
 QString Shell::fontDesc()
 {
 	QString fdesc = QString("%1:h%2").arg(fontFamily()).arg(fontSize());
-	if (font().bold()) {
+	if (font().weight() == QFont::Bold) {
 		fdesc += ":b";
 	} else if (font().weight() == QFont::Light) {
 		fdesc += ":l";
+	} else if (font().weight() == QFont::DemiBold) {
+		fdesc += ":sb";
+	} else if (font().weight() != QFont::Normal) {
+		fdesc += ":w" + QString::number(font().weight());
 	}
 	if (font().italic()) {
 		fdesc += ":i";
@@ -137,6 +141,10 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 				weight = QFont::Bold;
 			} else if (attr == "l") {
 				weight = QFont::Light;
+			} else if (attr == "sb") {
+				weight = QFont::DemiBold;
+			} else if (attr.length() > 0 && attr.at(0) == 'w') {
+				weight = (attr.right(attr.length()-1)).toInt();
 			} else if (attr == "i") {
 				italic = true;
 			}
