@@ -83,7 +83,7 @@ void Shell::fontError(const QString& msg)
 QString Shell::fontDesc()
 {
 	QString fdesc = QString("%1:h%2").arg(fontFamily()).arg(fontSize());
-	if (font().bold()) {
+	if (font().weight() == QFont::Bold) {
 		fdesc += ":b";
 	} else if (font().weight() == QFont::Light) {
 		fdesc += ":l";
