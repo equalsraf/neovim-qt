@@ -808,9 +808,13 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			m_mouseHide = variant_not_zero(args.at(1));
 			int val = m_mouseHide ? 1 : 0;
 			m_nvim->api0()->vim_set_var("GuiMousehide", val);
-		} else if (guiEvName == "Close" && args.size() == 1) {
+		} else if (guiEvName == "Close" && args.size() == 2) {
 			qDebug() << "Neovim requested a GUI close";
-			emit neovimGuiCloseRequest();
+			// retrieve current exit status
+			bool ok;
+			int status = args.at(1).toInt(&ok);
+			if (!ok) status = 1;
+			emit neovimGuiCloseRequest(status);
 		} else if (guiEvName == "Option" && args.size() >= 3) {
 			QString option = m_nvim->decode(args.at(1).toByteArray());
 			handleExtGuiOption(option, args.at(2));
