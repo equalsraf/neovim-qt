@@ -226,9 +226,10 @@ void MainWindow::neovimFullScreen(bool set)
 	}
 }
 
-void MainWindow::neovimGuiCloseRequest()
+void MainWindow::neovimGuiCloseRequest(int status)
 {
 	m_neovim_requested_close = true;
+	m_exitStatus = status;
 	QMainWindow::close();
 	m_neovim_requested_close = false;
 }
@@ -251,10 +252,12 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 
 	if (m_neovim_requested_close) {
 		// If this was requested by nvim, shutdown
-		QWidget::closeEvent(ev);
+		emit closing(m_exitStatus);
+		ev->accept();
 	} else if (m_shell->close()) {
 		// otherwise only if the Neovim shell closes too
-		QWidget::closeEvent(ev);
+		emit closing(m_exitStatus);
+		ev->accept();
 	} else {
 		ev->ignore();
 	}

@@ -18,7 +18,7 @@ endfunction
 
 " Close the GUI
 function! GuiClose() abort
-  call rpcnotify(0, 'Gui', 'Close')
+  call rpcnotify(0, 'Gui', 'Close', v:exiting)
 endfunction
 
 " Notify the GUI when exiting Neovim
