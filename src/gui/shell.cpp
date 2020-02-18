@@ -290,20 +290,19 @@ void Shell::handleResize(uint64_t n_cols, uint64_t n_rows)
 void Shell::handleHighlightSet(const QVariantMap& attrs)
 {
 	if (attrs.contains("foreground")) {
-		// TODO: When does Neovim send -1
-		m_hg_foreground = color(attrs.value("foreground").toLongLong(), foreground());
+		m_hg_foreground = QColor{ attrs.value("foreground").toUInt() };
 	} else {
 		m_hg_foreground = foreground();
 	}
 
 	if (attrs.contains("background")) {
-		m_hg_background = color(attrs.value("background").toLongLong(), background());
+		m_hg_background = QColor{ attrs.value("background").toUInt() };
 	} else {
 		m_hg_background = background();
 	}
 
 	if (attrs.contains(("special"))) {
-		m_hg_special = color(attrs.value("special").toLongLong(), special());
+		m_hg_special = QColor{ attrs.value("special").toUInt() };
 	} else {
 		m_hg_special = special();
 	}
@@ -945,18 +944,18 @@ void Shell::handleDefaultColorsSet(const QVariantList& opargs)
 	//     "cterm_fg" = opargs.at(3).toULongLong()
 	//     "cterm_bg" = opargs.at(4).toULongLong()
 
-	const uint64_t rgb_fg = opargs.at(0).toULongLong();
-	const uint64_t rgb_bg = opargs.at(1).toULongLong();
-	const uint64_t rgb_sp = opargs.at(2).toULongLong();
+	const uint32_t rgb_fg{ opargs.at(0).toUInt() };
+	const uint32_t rgb_bg{ opargs.at(1).toUInt() };
+	const uint32_t rgb_sp{ opargs.at(2).toUInt() };
 
 	MsgpackRequest* getBackgroundMode{
 		m_nvim->api0()->vim_get_option(QString{ "background" }.toLatin1()) };
 
 	connect(getBackgroundMode, &MsgpackRequest::finished, this, &Shell::handleGetBackgroundOption);
 
-	const QColor foregroundColor = color(rgb_fg, QColor::Invalid);
-	const QColor backgroundColor = color(rgb_bg, QColor::Invalid);
-	const QColor specialColor = color(rgb_sp, QColor::Invalid);
+	const QColor foregroundColor{ rgb_fg };
+	const QColor backgroundColor{ rgb_bg };
+	const QColor specialColor{ rgb_sp };
 
 	// Update shellwidget default colors
 	setForeground(foregroundColor);
@@ -1452,14 +1451,6 @@ void Shell::focusOutEvent(QFocusEvent *ev)
 		m_nvim->api0()->vim_command("if exists('#FocusLost') | doautocmd <nomodeline> FocusLost | endif");
 	}
 	QWidget::focusOutEvent(ev);
-}
-
-QColor Shell::color(qint64 color, const QColor& fallback)
-{
-	if (color == -1) {
-		return fallback;
-	}
-	return QRgb(color);
 }
 
 /*
