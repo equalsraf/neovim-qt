@@ -49,7 +49,6 @@ public:
 	Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent=0);
 	~Shell();
 	QSize sizeIncrement() const;
-	static QColor color(qint64 color, const QColor& fallback=QColor());
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
 	bool neovimAttached() const;
