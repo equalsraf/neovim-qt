@@ -140,6 +140,7 @@ protected:
 	virtual void handlePopupMenuSelect(const QVariantList& opargs);
 	virtual void handleMouse(bool);
 	virtual void handleGuiFontFunction(const QVariantList& args);
+	virtual void handleCloseEvent(const QVariantList &args);
 
 	// Modern 'ext_linegrid' Grid UI Events
 	virtual void handleGridResize(const QVariantList& opargs);
