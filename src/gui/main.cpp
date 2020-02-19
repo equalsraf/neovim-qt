@@ -40,15 +40,22 @@ int ui_main(int argc, char **argv)
 
 int cli_main(int argc, char **argv)
 {
+	// Issue#641: geometry arguments are truncated by NeovimQt::App(...).
+	//
+	// Arguments recognized by QApplication are removed from the argument list.
+	// All arguments need to be forwarded to the --nofork call. Save any arguments
+	// before calling the App CTOR, which may remove arguments.
+	QStringList argsNoFork{ "--nofork" };
+	for (int i = 1; i < argc; i++)
+	{
+		argsNoFork << argv[i];
+	}
+
 	NeovimQt::App app(argc, argv);
 
 	app.checkArgumentsMayTerminate();
 
-	// Get existing arguments, drop executable, append --nofork.
-	QStringList new_args{ app.arguments().mid(1) };
-	new_args.insert(0, "--nofork");
-
-	if (!QProcess::startDetached(app.applicationFilePath(), new_args)) {
+	if (!QProcess::startDetached(app.applicationFilePath(), argsNoFork)) {
 		qWarning() << "Unable to fork into background";
 		return -1;
 	}
