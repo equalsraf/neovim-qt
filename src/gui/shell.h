@@ -64,7 +64,7 @@ signals:
 	void neovimMaximized(bool);
 	void neovimSuspend();
 	void neovimFullScreen(bool);
-	void neovimGuiCloseRequest(int);
+	void neovimGuiCloseRequest(int status = 0);
 	/// This signal is emmited if the running neovim version is unsupported by the GUI
 	void neovimIsUnsupported();
 	void neovimExtTablineSet(bool);
