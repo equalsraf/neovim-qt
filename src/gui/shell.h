@@ -167,6 +167,7 @@ protected:
 	virtual void handleGuiFontFunction(const QVariantList& args);
 	virtual void handleGuiFontWide(const QVariant& value) noexcept;
 	virtual void handleLineSpace(const QVariant& value) noexcept;
+	virtual void handleCloseEvent(const QVariantList &args) noexcept;
 
 	// Modern 'ext_linegrid' Grid UI Events
 	virtual void handleGridResize(const QVariantList& opargs);
