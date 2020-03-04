@@ -36,17 +36,35 @@ void ShellWidget::setDefaultFont()
 #else
 #  define DEFAULT_FONT "Monospace"
 #endif
-	setShellFont(DEFAULT_FONT, 11, -1, false, true);
+	setShellFont(DEFAULT_FONT, 11, -1, -1, -1, false, true);
 }
 
-bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, bool italic, bool force)
+bool ShellWidget::setShellFont(
+	const QString& family,
+	qreal ptSize,
+	int weight,
+	int pxSize,
+	int stretch,
+	bool italic,
+	bool force) noexcept
 {
 	QFont f(family, -1, weight, italic);
 	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
 	// but we want to match the family name with the bold/italic attributes.
 	f.setStyleName(QStringLiteral(""));
 
-	f.setPointSizeF(ptSize);
+	// FIXME Ugly Code... Write this more eloquently!
+	if (pxSize > 0) {
+		f.setPixelSize(pxSize);
+	} else {
+		f.setPointSize(ptSize);
+	}
+
+	qDebug() << "Stretch:" << stretch;
+	if (stretch > 0 && stretch <= 200) {
+		f.setStretch(stretch);
+	}
+
 	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
 	f.setFixedPitch(true);
 	f.setKerning(false);

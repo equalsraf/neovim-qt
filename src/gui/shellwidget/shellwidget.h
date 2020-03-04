@@ -27,7 +27,15 @@ public:
 		Light
 	};
 
-	bool setShellFont(const QString& family, qreal ptSize, int weight = -1, bool italic = false, bool force = false);
+	/// FIXME Doxygen comment!
+	bool setShellFont(
+		const QString& family,
+		qreal ptSize,
+		int weight,
+		int pxSize,
+		int stretch,
+		bool italic,
+		bool force) noexcept;
 
 	QColor background() const;
 	QColor foreground() const;

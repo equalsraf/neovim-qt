@@ -83,9 +83,26 @@ QString Shell::fontDesc()
 	} else if (font().weight() == QFont::DemiBold) {
 		fdesc += ":sb";
 	}
+
 	if (font().italic()) {
 		fdesc += ":i";
 	}
+
+	qDebug() << font().stretch();
+	if (font().stretch() > 0)
+	{
+		fdesc += QString{ ":s%1" }.arg(font().stretch());
+	}
+
+	if (font().pixelSize() > 10)
+	{
+		fdesc += QString{ ":p%1" }.arg(font().pixelSize());
+	}
+
+	qDebug() << "Font Stretch" << font().stretch();
+	qDebug() << "Font Pixel Size" << font().pixelSize();
+	qDebug() << "Font Point Size" << font().pixelSize();
+
 	return fdesc;
 }
 
@@ -113,8 +130,8 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 			return false;
 		}
 
-		setShellFontSuccess = setShellFont(font.family(), font.pointSize(), font.weight(),
-			font.italic(), force);
+		setShellFontSuccess = setShellFont( font.family(), font.pointSize(),
+			font.weight(), -1 /*stretch*/, -1 /*pxSize*/, font.italic(), force);
 	}
 	else {
 		QStringList attrs = fdesc.split(':');
@@ -124,8 +141,13 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 		}
 
 		qreal pointSize = font().pointSizeF();
+		int stretch{ -1 };
+		int pixelSize{ -1 };
 		int weight = -1;
 		bool italic = false;
+
+		// FIXME Duplicate code!
+		// :h/:s/:p should really use a lambda or helper function!
 		for (const auto& attr : attrs) {
 			if (attr.size() >= 2 && attr[0] == 'h') {
 				bool ok{ false };
@@ -135,6 +157,23 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 					return false;
 				}
 				pointSize = height;
+
+			} else if (attr.size() >= 2 && attr[0] == 's') {
+				bool ok{ false };
+				int stretchPercent = attr.mid(1).toInt(&ok);
+				if (!ok || stretchPercent <= 0 || stretchPercent > 100) {
+					m_nvim->api0()->vim_report_error("Invalid font stretch");
+					return false;
+				}
+				stretch = stretchPercent;
+			} else if (attr.size() >= 2 && attr[0] == 'p') {
+				bool ok{ false };
+				int pixelHeight = attr.mid(1).toInt(&ok);
+				if (!ok) {
+					m_nvim->api0()->vim_report_error("Invalid font pixel height");
+					return false;
+				}
+				pixelSize = pixelHeight;
 			} else if (attr == "b") {
 				weight = QFont::Bold;
 			} else if (attr == "l") {
@@ -146,7 +185,8 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 			}
 		}
 
-		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force);
+		qDebug() << "setFontStretch:" << stretch;
+		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, pixelSize, stretch, italic, force);
 	}
 
 	// Only update the ShellWidget when font changes.
