@@ -36,6 +36,7 @@ GuiFont		When called with no arguments this command display the
 
 			hXX - height is XX in points (can be floating-point)
 			b   - bold weight
+			sb  - semibold weight
 			l   - light weight
 			i   - italic
 
