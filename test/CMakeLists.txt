@@ -2,6 +2,7 @@ set(QTLIBS Qt5::Network Qt5::Svg Qt5::Test)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 add_definitions(-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
+add_definitions(-DNVIM_QT_BINARY=\"$<TARGET_FILE:nvim-qt>\")
 if (WIN32 AND USE_STATIC_QT)
 	add_definitions(-DUSE_STATIC_QT)
 endif ()

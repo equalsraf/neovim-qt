@@ -188,6 +188,77 @@ private slots:
 		QVERIFY(onOptionSet.isValid());
 	}
 
+	void CloseEvent_data() {
+		// The status code as carried via msgpack
+		QTest::addColumn<int>("event_status");
+		// The expected process exit status
+		QTest::addColumn<int>("exit_status");
+		// q/cq command
+		QTest::addColumn<QByteArray>("command");
+
+		QTest::newRow("q")
+			<< 0 << 0 << QByteArray("q");
+		QTest::newRow("cq")
+			<< 1 << 1 << QByteArray("cq");
+		QTest::newRow("2cq")
+			<< 2 << 2 << QByteArray("2cq");
+		QTest::newRow("255cq")
+			<< 255 << 255 << QByteArray("255cq");
+		// Overflow, this generates an exit code 0, but the
+		// original count is passed to us
+		QTest::newRow("256cq")
+			<< 256 << 0 << QByteArray("256cq");
+		// a bit of corner case, but nvim exits with
+		// status 0 and provides us count 0 - calling it with nvim -c
+		// actually causes an error with an invalid range, so it can not run
+//		QTest::newRow("-1cq")
+//			<< 0 << QByteArray("-1cq");
+	}
+
+	void CloseEvent() {
+		QFETCH(int, event_status);
+		QFETCH(int, exit_status);
+		QFETCH(QByteArray, command);
+
+		QString path_to_src_runtime(CMAKE_SOURCE_DIR);
+		path_to_src_runtime.append("/src/gui/runtime");
+		QFileInfo fi = QFileInfo(path_to_src_runtime);
+		QVERIFY2(fi.exists(), "Unable to find GUI runtime");
+		QStringList args = {"-u", "NONE",
+			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
+
+		NeovimConnector *c = NeovimConnector::spawn(args);
+		MainWindow *s = new MainWindow(c, ShellOptions());
+		s->show();
+		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QVERIFY(onAttached.isValid());
+		QVERIFY(SPYWAIT(onAttached));
+		QVERIFY(s->neovimAttached());
+
+		// GUI shim Close event
+		QSignalSpy onClose(s->shell(), &Shell::neovimGuiCloseRequest);
+		QVERIFY(onClose.isValid());
+
+		QSignalSpy onWindowClosing(s, &MainWindow::closing);
+		QVERIFY(onWindowClosing.isValid());
+
+		c->api0()->vim_command(c->encode(command));
+
+		QVERIFY(SPYWAIT(onClose));
+		QCOMPARE(onClose.takeFirst().at(0), event_status);
+
+		QVERIFY(SPYWAIT(onWindowClosing));
+		QCOMPARE(onWindowClosing.takeFirst().at(0), event_status);
+
+		// and finally a call to nvim-qt
+#if defined(Q_OS_WIN32)
+		int actual_exit_status = QProcess::execute(NVIM_QT_BINARY, {NVIM_QT_BINARY, "--",  "-c", command});
+#else
+		int actual_exit_status = QProcess::execute(NVIM_QT_BINARY, {NVIM_QT_BINARY, "--nofork", "--",  "-c", command});
+#endif
+		QCOMPARE(actual_exit_status, exit_status);
+	}
+
 	void GetClipboard_data() {
 		// * or +
 		QTest::addColumn<char>("reg");
