@@ -161,7 +161,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 			} else if (attr.size() >= 2 && attr[0] == 's') {
 				bool ok{ false };
 				int stretchPercent = attr.mid(1).toInt(&ok);
-				if (!ok || stretchPercent <= 0 || stretchPercent > 100) {
+				if (!ok || stretchPercent <= 0 || stretchPercent > 200) {
 					m_nvim->api0()->vim_report_error("Invalid font stretch");
 					return false;
 				}
