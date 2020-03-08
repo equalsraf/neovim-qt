@@ -970,15 +970,12 @@ void Shell::handleLineSpace(const QVariant& value) noexcept
 
 void Shell::handleCloseEvent(const QVariantList &args) noexcept
 {
-	if (args.size() == 2 && !args.at(1).canConvert<int>()) {
+	qDebug() << "Neovim requested a GUI close";
+
+	if (args.size() >= 2 && !args.at(1).canConvert<int>()) {
 		qWarning() << "Unexpected exit status for close:" << args.at(1);
 		return;
-	} else if (args.size() >= 3) {
-		qWarning() << "Unexpected arguments for close:" << args;
-		return;
 	}
-
-	qDebug() << "Neovim requested a GUI close";
 
 	// Decide exit status.  If there is an argument, the exit status is
 	// specified by the argument.
