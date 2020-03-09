@@ -245,10 +245,10 @@ private slots:
 		c->api0()->vim_command(c->encode(command));
 
 		QVERIFY(SPYWAIT(onClose));
-		QCOMPARE(onClose.takeFirst().at(0), event_status);
+		QCOMPARE(onClose.takeFirst().at(0).toInt(), event_status);
 
 		QVERIFY(SPYWAIT(onWindowClosing));
-		QCOMPARE(onWindowClosing.takeFirst().at(0), event_status);
+		QCOMPARE(onWindowClosing.takeFirst().at(0).toInt(), event_status);
 
 		// and finally a call to nvim-qt
 #if defined(Q_OS_WIN32)
