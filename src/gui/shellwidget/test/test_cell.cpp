@@ -29,13 +29,13 @@ private slots:
 	void cellValue() {
 		QBENCHMARK {
 			Cell c('z', Qt::black, Qt::white, QColor(),
-					false, false, false, false);
+					false, false, false, false, false);
 		}
 	}
 	void cellValueRgb() {
 		QBENCHMARK {
 			Cell c('z', QRgb(33), QRgb(66), QColor(),
-					false, false, false, false);
+					false, false, false, false, false);
 		}
 	}
 

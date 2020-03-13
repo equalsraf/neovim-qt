@@ -241,7 +241,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					// of a wide char
 					QColor bgColor{ cell.GetBackgroundColor() };
 					if (!bgColor.isValid()) {
-						bgColor = background();
+						bgColor = (cell.IsReverse()) ? foreground() : background();
 					}
 					p.fillRect(r, bgColor);
 
@@ -255,7 +255,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					if (cell.GetCharacter() != ' ') {
 						QColor fgColor{ cell.GetForegroundColor() };
 						if (!fgColor.isValid()) {
-							fgColor = foreground();
+							fgColor = (cell.IsReverse()) ? background() : foreground();
 						}
 						p.setPen(fgColor);
 
@@ -436,12 +436,21 @@ const ShellContents& ShellWidget::contents() const
 }
 
 /// Put text in position, returns the amount of colums used
-int ShellWidget::put(const QString& text, int row, int column,
-		QColor fg, QColor bg, QColor sp, bool bold, bool italic,
-		bool underline, bool undercurl)
+int ShellWidget::put(
+	const QString& text,
+	int row,
+	int column,
+	QColor fg,
+	QColor bg,
+	QColor sp,
+	bool bold,
+	bool italic,
+	bool underline,
+	bool undercurl,
+	bool reverse)
 {
 	int cols_changed = m_contents.put(text, row, column, fg, bg, sp,
-				bold, italic, underline, undercurl);
+				bold, italic, underline, undercurl, reverse);
 	if (cols_changed > 0) {
 		QRect rect = absoluteShellRect(row, column, 1, cols_changed);
 		update(rect);

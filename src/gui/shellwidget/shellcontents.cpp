@@ -221,25 +221,35 @@ const Cell& ShellContents::constValue(int row, int column) const
 }
 
 /// Writes content to the shell, returns the number of columns written
-int ShellContents::put(const QString& str, int row, int column,
-		QColor fg, QColor bg, QColor sp, bool bold, bool italic,
-		bool underline, bool undercurl)
+int ShellContents::put(
+	const QString& str,
+	int row,
+	int column,
+	QColor fg,
+	QColor bg,
+	QColor sp,
+	bool bold,
+	bool italic,
+	bool underline,
+	bool undercurl,
+	bool reverse) noexcept
 {
 	if (row < 0 || row >= _rows || column < 0 || column >= _columns) {
 		return 0;
 	}
 
-	auto vec = str.toUcs4();
+	const QVector<uint> vec{ str.toUcs4() };
 
 	int pos = column;
-	foreach(const uint chr, vec) {
-		Cell& c = value(row, pos);
-		c = Cell(chr, fg, bg, sp, bold, italic, underline, undercurl);
-		if (c.IsDoubleWidth()) {
-			value(row, pos+1) = Cell();
-			pos += 2;
-		} else {
-			pos += 1;
+	for(const uint chr : vec) {
+		Cell& cell{ value(row, pos) };
+		cell = { chr, fg, bg, sp, bold, italic, underline, undercurl, reverse };
+		pos++;
+
+		// Clear neighboring character for double-width cell.
+		if (cell.IsDoubleWidth()) {
+			value(row, pos) = {};
+			pos++;
 		}
 	}
 	return pos - column;

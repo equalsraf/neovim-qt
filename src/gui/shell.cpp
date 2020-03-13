@@ -1053,7 +1053,8 @@ void Shell::handleGridLine(const QVariantList& opargs)
 				hl_attr.IsBold(),
 				hl_attr.IsItalic(),
 				hl_attr.IsUnderline(),
-				hl_attr.IsUndercurl());
+				hl_attr.IsUndercurl(),
+				hl_attr.IsReverse());
 
 			col_next++;
 		}

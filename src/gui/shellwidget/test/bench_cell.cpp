@@ -12,7 +12,7 @@ class Test: public QObject
 private slots:
 	void benchCell() {
 		QBENCHMARK {
-			Cell c('1', Qt::red, Qt::blue, QColor(), false, false, false, false);
+			Cell c('1', Qt::red, Qt::blue, QColor(), false, false, false, false, false);
 		}
 	}
 };
