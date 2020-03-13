@@ -15,7 +15,8 @@ public:
 		bool bold,
 		bool italic,
 		bool underline,
-		bool undercurl);
+		bool undercurl,
+		bool reverse);
 
 	/// Create an empty Cell with a background color
 	Cell(QColor bgColor)

@@ -8,9 +8,9 @@ Cell::Cell(
 	bool bold,
 	bool italic,
 	bool underline,
-	bool undercurl)
-	: m_highlight{ fgColor, bgColor, spColor, false /*reverse*/,
-		italic, bold, underline, undercurl }
+	bool undercurl,
+	bool reverse)
+	: m_highlight{ fgColor, bgColor, spColor, reverse, italic, bold, underline, undercurl }
 {
 	SetCharacter(character);
 };
