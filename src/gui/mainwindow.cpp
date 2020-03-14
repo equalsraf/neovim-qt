@@ -353,6 +353,7 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 
 		if (curtab == tabs[index].tab) {
 			m_tabline->setCurrentIndex(index);
+			setWindowTitle(m_tabline->tabText(index));
 		}
 	}
 
@@ -364,6 +365,7 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 	} else {
 		m_tabline_bar->setVisible(tabs.size() > 1);
 	}
+
 
 	Q_ASSERT(tabs.size() == m_tabline->count());
 }
@@ -405,6 +407,8 @@ void MainWindow::changeTab(int index)
 
 	int64_t tab = m_tabline->tabData(index).toInt();
 	m_nvim->api2()->nvim_set_current_tabpage(tab);
+
+	setWindowTitle(m_tabline->tabText(index));
 }
 
 void MainWindow::saveWindowGeometry()
