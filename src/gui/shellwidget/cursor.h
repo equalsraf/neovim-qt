@@ -46,14 +46,19 @@ public:
 		m_styleEnabled = isStyleEnabled;
 	}
 
+	void SetIsBusy(bool isBusy) noexcept
+	{
+		m_isBusy = isBusy;
+	}
+
 	bool IsEnabled() const noexcept
 	{
-		return m_styleEnabled;
+		return m_styleEnabled && !m_isBusy;
 	}
 
 	bool IsVisible() const noexcept
 	{
-		return m_styleEnabled && (m_blinkState != BlinkState::Off);
+		return IsEnabled() && (m_blinkState != BlinkState::Off);
 	}
 
 	QColor GetBackgroundColor() const noexcept
@@ -100,6 +105,7 @@ private:
 	BlinkState m_blinkState{ BlinkState::Disabled };
 
 	bool m_styleEnabled{ false };
+	bool m_isBusy{ false };
 
 	uint8_t m_percentage{ 100 };
 
