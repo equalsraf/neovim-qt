@@ -1114,13 +1114,16 @@ void Shell::handleGridScroll(const QVariantList& opargs)
 
 	m_scroll_region = QRect(QPoint(left, top), QPoint(right, bot));
 
+	// Remove old cursor
 	if (m_scroll_region.contains(m_cursor_pos)) {
-		// Schedule cursor region to be repainted
 		update(neovimCursorRect());
 	}
 
 	scrollShellRegion(m_scroll_region.top(), m_scroll_region.bottom(),
 		m_scroll_region.left(), m_scroll_region.right(), rows);
+
+	// Draw new cursor
+	update(neovimCursorRect());
 
 	emit neovimScrollEvent(rows);
 }
