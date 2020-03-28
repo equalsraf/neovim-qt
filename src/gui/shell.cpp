@@ -736,6 +736,8 @@ void Shell::handleSetTitle(const QVariantList& opargs)
 
 void Shell::handleBusy(bool busy)
 {
+	m_cursor.SetIsBusy(busy);
+
 	if (busy != m_neovimBusy) {
 		update(neovimCursorRect());
 	}
