@@ -1,4 +1,5 @@
 #include <QPainter>
+#include <QPainterPath>
 #include <QPaintEvent>
 #include <QDebug>
 #include "shellwidget.h"
