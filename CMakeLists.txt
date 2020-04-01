@@ -3,7 +3,9 @@ if (POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif (POLICY CMP0048)
 
-project(neovim-qt VERSION 0.2.14.0)
+# Neovim-Qt Version, used by --version update before release
+# 9999 = Development Pre-Release
+project(neovim-qt VERSION 0.2.16.9999)
 
 INCLUDE(CPack)
 
