@@ -131,7 +131,10 @@ Replaces |'linespace'|.
 							*GuiDrop()*
 GuiDrop(...) is a wrapper around |:drop| it escapes all given arguments
 using |fnameescape()| and then passes them to :drop. This is useful if
-the GUI is requesting Neovim to open additional files.
+the GUI is requesting Neovim to open additional files. A custom implementation
+may be provided to override the default behavior, GuiDropCustom.
+GuiDropCustomHandler should accept an arbitrary number of file paths as arguments.
+Each argument should be processed, escaped, and passed to :drop.
 
 							*GuiMousehide()*
 GuiMousehide(enabled) enables mouse hiding while typing. If enabled is

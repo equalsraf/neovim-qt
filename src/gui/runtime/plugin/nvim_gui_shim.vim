@@ -99,6 +99,11 @@ command! -nargs=1 GuiPopupmenu call s:GuiPopupmenu(<args>)
 " GuiDrop('file1', 'file2', ...) is similar to :drop file1 file2 ...
 " but it calls fnameescape() over all arguments
 function GuiDrop(...)
+	" Check for user defined handler function
+	if exists('*GuiDropCustomHandler')
+		return call("GuiDropCustomHandler", a:000)
+	endif
+
 	let l:fnames = deepcopy(a:000)
 	let l:args = map(l:fnames, 'fnameescape(v:val)')
 	exec 'drop '.join(l:args, ' ')
