@@ -390,6 +390,11 @@ void MainWindow::setGuiScrollBarVisible(bool isEnabled)
 
 void MainWindow::neovimCursorMovedUpdateScrollBar(uint64_t minLineVisible, uint64_t bufferSize, uint64_t windowHeight)
 {
+	if (!m_rightScrollBar->isVisible())
+	{
+		return;
+	}
+
 	m_rightScrollBar->setMaximum(bufferSize);
 	m_rightScrollBar->setPageStep(windowHeight);
 
@@ -405,6 +410,11 @@ void MainWindow::neovimCursorMovedUpdateScrollBar(uint64_t minLineVisible, uint6
 
 void MainWindow::neovimScrollEvent(int64_t rows)
 {
+	if (!m_rightScrollBar->isVisible())
+	{
+		return;
+	}
+
 	// Prevent double-registration of scroll event. See m_scrollbarLastDelta for details.
 	if (rows == m_scrollbarLastDelta)
 	{
