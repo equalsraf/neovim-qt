@@ -195,6 +195,14 @@ QString convertKey(const QKeyEvent& ev) noexcept
 			return {};
 		}
 
+		// Ignore special keys
+		//   Issue#671: `q`/`p`/`r` key is sent by Mute/Volume DOWN/Volume UP
+		if (key == Qt::Key::Key_VolumeDown
+			|| key == Qt::Key::Key_VolumeMute
+			|| key == Qt::Key::Key_VolumeUp) {
+			return {};
+		}
+
 		// If QKeyEvent does not provide text, then use the value of key
 		//   Issue#579: Cannot map <A-...> on MacOS
 		text = QChar{ key };
