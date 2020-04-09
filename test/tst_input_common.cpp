@@ -9,6 +9,7 @@ class TestInputCommon : public QObject
 private slots:
 	void LessThanKey() noexcept;
 	void ModifierOnlyKeyEventsIgnored() noexcept;
+	void VolumeKeysIgnored() noexcept;
 	void ShiftKeyEventWellFormed() noexcept;
 	void CapsLockIgnored() noexcept;
 	void AltGrAloneIgnored() noexcept;
@@ -66,6 +67,19 @@ void TestInputCommon::ModifierOnlyKeyEventsIgnored() noexcept
 	// Issue#593: Pressing Control + Super inserts ^S
 	QKeyEvent evIssue593{ QEvent::KeyPress, Qt::Key::Key_Super_L, Qt::KeyboardModifier::ControlModifier};
 	QCOMPARE(NeovimQt::Input::convertKey(evIssue593), QString{});
+}
+
+void TestInputCommon::VolumeKeysIgnored() noexcept
+{
+	const QList<Qt::Key> volumeKeysList {
+		Qt::Key::Key_VolumeDown,
+		Qt::Key::Key_VolumeMute,
+		Qt::Key::Key_VolumeUp,
+	};
+	for (const auto &key : volumeKeysList) {
+		QKeyEvent keyEvent{ QEvent::KeyPress, key, Qt::KeyboardModifier::NoModifier };
+		QCOMPARE(NeovimQt::Input::convertKey(keyEvent), QString{});
+	}
 }
 
 void TestInputCommon::AltGrAloneIgnored() noexcept
