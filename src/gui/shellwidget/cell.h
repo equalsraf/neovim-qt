@@ -7,6 +7,13 @@
 
 class Cell {
 public:
+	/// Create a cell having a specified HighlightAttribute
+	Cell(uint character, const HighlightAttribute& attribute) noexcept :
+		m_highlight(attribute)
+	{
+		SetCharacter(character);
+	}
+
 	Cell(
 		uint character,
 		QColor fgColor,
@@ -16,12 +23,18 @@ public:
 		bool italic,
 		bool underline,
 		bool undercurl,
-		bool reverse);
+		bool reverse) noexcept :
+		Cell{
+			character,
+			{ fgColor, bgColor, spColor, reverse, italic, bold, underline, undercurl } }
+	{
+	}
 
 	/// Create an empty Cell with a background color
-	Cell(QColor bgColor)
-		: m_highlight{ QColor::Invalid, bgColor, QColor::Invalid,
-			false, false, false, false, false }
+	Cell(QColor bgColor) noexcept :
+		Cell{
+			' ',
+			{ QColor::Invalid, bgColor, QColor::Invalid, false, false, false, false, false } }
 	{
 	}
 
