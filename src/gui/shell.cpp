@@ -788,6 +788,9 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			int val = m_mouseHide ? 1 : 0;
 			m_nvim->api0()->vim_set_var("GuiMousehide", val);
 		} else if (guiEvName == "Close") {
+			// Previously this was supported as a notification but it is
+			// preferable to use a synchronous request otherwise it may be
+			// missed
 			handleCloseEvent(args);
 		} else if (guiEvName == "Option" && args.size() >= 3) {
 			QString option = m_nvim->decode(args.at(1).toByteArray());
@@ -1763,7 +1766,7 @@ void Shell::bailoutIfinputBlocking()
 }
 
 ShellRequestHandler::ShellRequestHandler(Shell *parent)
-:QObject(parent)
+:QObject(parent), m_shell(parent)
 {
 }
 
@@ -1818,6 +1821,10 @@ void ShellRequestHandler::handleRequest(MsgpackIODevice* dev, quint32 msgid, con
 
 			qDebug() << "Neovim requested clipboard contents" << args << mode << "->" << result;
 			dev->sendResponse(msgid, QVariant(), result);
+			return;
+		} else if (ctx == "Close" && args.size() > 1) {
+			m_shell->handleCloseEvent(args);
+			dev->sendResponse(msgid, QVariant(), QVariant());
 			return;
 		}
 	}

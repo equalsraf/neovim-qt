@@ -42,6 +42,7 @@ public:
 
 class Shell: public ShellWidget
 {
+	friend class ShellRequestHandler;
 	Q_OBJECT
 	Q_PROPERTY(bool neovimBusy READ neovimBusy() NOTIFY neovimBusy())
 	Q_PROPERTY(bool neovimAttached READ neovimAttached() NOTIFY neovimAttached())
@@ -219,6 +220,8 @@ class ShellRequestHandler: public QObject, public MsgpackRequestHandler
 public:
 	ShellRequestHandler(Shell *parent);
 	virtual void handleRequest(MsgpackIODevice* dev, quint32 msgid, const QByteArray& method, const QVariantList& args);
+private:
+	Shell *m_shell;
 };
 
 

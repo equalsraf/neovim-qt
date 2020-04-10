@@ -18,7 +18,10 @@ endfunction
 
 " Close the GUI
 function! GuiClose() abort
-  call rpcnotify(0, 'Gui', 'Close', v:exiting)
+  let uis = nvim_list_uis()
+  for ui in uis
+    call rpcrequest(ui.chan, 'Gui', 'Close', v:exiting)
+  endfor
 endfunction
 
 " Notify the GUI when exiting Neovim
