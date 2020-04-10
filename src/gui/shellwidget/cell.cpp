@@ -1,20 +1,5 @@
 #include "cell.h"
 
-Cell::Cell(
-	uint character,
-	QColor fgColor,
-	QColor bgColor,
-	QColor spColor,
-	bool bold,
-	bool italic,
-	bool underline,
-	bool undercurl,
-	bool reverse)
-	: m_highlight{ fgColor, bgColor, spColor, reverse, italic, bold, underline, undercurl }
-{
-	SetCharacter(character);
-};
-
 /*static*/ Cell Cell::MakeInvalidCell()
 {
 	Cell invalidCell;
