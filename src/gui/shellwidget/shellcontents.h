@@ -30,14 +30,7 @@ public:
 		const QString& str,
 		int row,
 		int column,
-		QColor fg = {},
-		QColor bg = {},
-		QColor sp = {},
-		bool bold = false,
-		bool italic = false,
-		bool underline = false,
-		bool undercurl = false,
-		bool reverse = false) noexcept;
+		const HighlightAttribute& hl_attr = {}) noexcept;
 
 	void clearAll(QColor bg=QColor());
 	void clearRow(int r, int startCol=0);

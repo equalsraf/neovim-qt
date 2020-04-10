@@ -69,6 +69,12 @@ public slots:
 		bool undercurl = false,
 		bool reverse = false);
 
+	int put(
+		const QString& text,
+		int row,
+		int column,
+		const HighlightAttribute& hl_attr);
+
 	void clearRow(int row);
 	void clearShell(QColor bg = QColor::Invalid);
 	void clearRegion(int row0, int col0, int row1, int col1);
