@@ -1056,16 +1056,7 @@ void Shell::handleGridLine(const QVariantList& opargs)
 		// Send GUI updates to 'ShellWidget'.
 		for (uint64_t i=0;i<repeat;i++)
 		{
-			put(text, row, col_next,
-				hl_attr.GetForegroundColor(),
-				hl_attr.GetBackgroundColor(),
-				hl_attr.GetSpecialColor(),
-				hl_attr.IsBold(),
-				hl_attr.IsItalic(),
-				hl_attr.IsUnderline(),
-				hl_attr.IsUndercurl(),
-				hl_attr.IsReverse());
-
+			put(text, row, col_next, hl_attr);
 			col_next++;
 		}
 	}
