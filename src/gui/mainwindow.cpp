@@ -160,6 +160,10 @@ void MainWindow::neovimExited(int status)
 		m_errorWidget->setText(m_nvim->errorString());
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
 		m_stack.setCurrentIndex(0);
+	} else if (status == m_exitStatus) {
+		// Neovim exited with an error code, but a matching exit code
+		// was set via Gui Close request, treat this as a normal close
+		close();
 	} else if (status != 0) {
 		m_errorWidget->setText(QString("Neovim exited with status code (%1)").arg(status));
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
