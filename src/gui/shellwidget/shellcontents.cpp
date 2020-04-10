@@ -225,14 +225,7 @@ int ShellContents::put(
 	const QString& str,
 	int row,
 	int column,
-	QColor fg,
-	QColor bg,
-	QColor sp,
-	bool bold,
-	bool italic,
-	bool underline,
-	bool undercurl,
-	bool reverse) noexcept
+	const HighlightAttribute& hl_attr) noexcept
 {
 	if (row < 0 || row >= _rows || column < 0 || column >= _columns) {
 		return 0;
@@ -243,7 +236,7 @@ int ShellContents::put(
 	int pos = column;
 	for(const uint chr : vec) {
 		Cell& cell{ value(row, pos) };
-		cell = { chr, fg, bg, sp, bold, italic, underline, undercurl, reverse };
+		cell = { chr, hl_attr };
 		pos++;
 
 		// Clear neighboring character for double-width cell.

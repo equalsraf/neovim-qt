@@ -450,8 +450,18 @@ int ShellWidget::put(
 	bool undercurl,
 	bool reverse)
 {
-	int cols_changed = m_contents.put(text, row, column, fg, bg, sp,
-				bold, italic, underline, undercurl, reverse);
+	HighlightAttribute hl_attr = { fg, bg, sp,
+		reverse, italic, bold, underline, undercurl };
+	return put(text, row, column, hl_attr);
+}
+
+int ShellWidget::put(
+	const QString& text,
+	int row,
+	int column,
+	const HighlightAttribute& hl_attr)
+{
+	int cols_changed = m_contents.put(text, row, column, hl_attr);
 	if (cols_changed > 0) {
 		QRect rect = absoluteShellRect(row, column, 1, cols_changed);
 		update(rect);
