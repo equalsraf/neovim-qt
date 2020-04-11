@@ -4,11 +4,11 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QTabBar>
-#include <QScrollBar>
 #include <QSplitter>
 #include "treeview.h"
 #include "neovimconnector.h"
 #include "errorwidget.h"
+#include "scrollbar.h"
 #include "shell.h"
 
 namespace NeovimQt {
@@ -58,10 +58,6 @@ private slots:
 	void extTablineSet(bool);
 	void changeTab(int index);
 	void saveWindowGeometry();
-	void setGuiScrollBarVisible(bool isVisible);
-	void neovimCursorMovedUpdateScrollBar(
-		uint64_t minLineVisible, uint64_t bufferSize, uint64_t windowHeigt);
-	void neovimScrollEvent(int64_t rows);
 
 private:
 	void init(NeovimConnector *);
@@ -81,12 +77,7 @@ private:
 	QAction *m_actCopy;
 	QAction *m_actPaste;
 	QAction *m_actSelectAll;
-	QScrollBar *m_rightScrollBar;
-
-	/// The scrollbar updates on cursor movement and GUI paint/scroll events.
-	/// In cases where the scroll event triggers cursor movement, this can result
-	/// in double registration. Detect and ignore this double registration.
-	int m_scrollbarLastDelta{ 0 };
+	ScrollBar *m_scrollbar;
 };
 
 } // Namespace

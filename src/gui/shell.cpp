@@ -380,8 +380,6 @@ void Shell::handleScroll(const QVariantList& args)
 	scrollShellRegion(m_scroll_region.top(), m_scroll_region.bottom(),
 			m_scroll_region.left(), m_scroll_region.right(),
 			count);
-
-	emit neovimScrollEvent(count);
 }
 
 void Shell::handleSetScrollRegion(const QVariantList& opargs)
@@ -542,8 +540,8 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "grid_scroll") {
 		handleGridScroll(opargs);
 	} else if (name == "hl_group_set") {
-	}
-	else {
+	} else if (name == "win_viewport") {
+	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
 
@@ -826,41 +824,13 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			QGuiApplication::clipboard()->setMimeData(clipData, clipboard);
 		} else if (guiEvName == "ShowContextMenu") {
 			emit neovimShowContextMenu();
-		} else if (guiEvName == "CursorMovedUpdateScrollBar") {
-			handleCursorMovedUpdateScrollBar(args);
-		} else if (guiEvName == "SetScrollBarVisible") {
-			handleSetScrollBarVisible(args);
 		}
 		return;
 	} else if (name != "redraw") {
 		return;
 	}
 
-	foreach(const QVariant& update_item, args) {
-		if ((QMetaType::Type)update_item.type() != QMetaType::QVariantList) {
-			qWarning() << "Received unexpected redraw operation" << update_item;
-			continue;
-		}
-
-		const QVariantList& redrawupdate = update_item.toList();
-		if (redrawupdate.size() < 2) {
-			qWarning() << "Received unexpected redraw operation" << update_item;
-			continue;
-		}
-
-		const QByteArray& name = redrawupdate.at(0).toByteArray();
-		const QVariantList& update_args = redrawupdate.mid(1);
-
-		foreach (const QVariant& opargs_var, update_args) {
-			if ((QMetaType::Type)opargs_var.type() != QMetaType::QVariantList) {
-				qWarning() << "Received unexpected redraw arguments, expecting list" << opargs_var;
-				continue;
-			}
-
-			const QVariantList& opargs = opargs_var.toList();
-			handleRedraw(name, opargs);
-		}
-	}
+	DispatchRedrawNotifications(this, args);
 }
 
 void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
@@ -1115,39 +1085,6 @@ void Shell::handleGridScroll(const QVariantList& opargs)
 
 	// Draw new cursor
 	update(neovimCursorRect());
-
-	emit neovimScrollEvent(rows);
-}
-
-void Shell::handleCursorMovedUpdateScrollBar(const QVariantList& opargs) noexcept
-{
-	if (opargs.size() < 4
-		|| !opargs.at(1).canConvert<uint64_t>()
-		|| !opargs.at(2).canConvert<uint64_t>()
-		|| !opargs.at(3).canConvert<uint64_t>()) {
-		qWarning() << "Unexpected arguments for CursorMovedUpdateScrollBar:" << opargs;
-		return;
-	}
-
-	const uint64_t minLineVisible{ opargs.at(1).toULongLong() };
-	const uint64_t bufferSize{ opargs.at(2).toULongLong() };
-	const uint64_t windowHeight{ opargs.at(3).toULongLong() };
-
-	m_lastScrollBarPosition = minLineVisible;
-
-	emit neovimCursorMovedUpdateScrollBar(minLineVisible, bufferSize, windowHeight);
-}
-
-void Shell::handleSetScrollBarVisible(const QVariantList& opargs) noexcept
-{
-	if (opargs.size() < 2
-		|| !opargs.at(1).canConvert<bool>()) {
-		qWarning() << "Unexpected arguments for SetScrollBarVisible:" << opargs;
-		return;
-	}
-
-	const bool isVisible{ opargs.at(1).toBool() };
-	emit setGuiScrollBarVisible(isVisible);
 }
 
 void Shell::paintEvent(QPaintEvent *ev)
@@ -1696,35 +1633,6 @@ void Shell::openFiles(QList<QUrl> urls)
 		// Neovim cannot open urls now. Store them to open later.
 		m_deferredOpen.append(urls);
 	}
-}
-
-void Shell::handleScrollBarChanged(int position)
-{
-	if (m_lastScrollBarPosition == position) {
-		return;
-	}
-
-	const int delta{ m_lastScrollBarPosition - position };
-
-	if (delta == 0) {
-		return;
-	}
-
-	// Scroll Up: normal! {Control + Y}
-	if (delta > 0) {
-		m_nvim->api0()->vim_command(
-			QStringLiteral("normal! %1\031").arg(delta).toLatin1());
-	}
-
-	// Scroll Down normal! {Control + E}
-	if (delta < 0) {
-		m_nvim->api0()->vim_command(
-			QStringLiteral("normal! %1\005").arg(delta).toLatin1());
-	}
-
-	// NOTE: MSVC cannot parse the unescaped sequences above: `^E` and `^Y`.
-
-	m_lastScrollBarPosition = position;
 }
 
 // If neovim is blocked waiting for input, attempt to bailout from

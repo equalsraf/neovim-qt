@@ -48,6 +48,7 @@ add_library(neovim-qt-gui
 	mainwindow.cpp
 	popupmenu.cpp
 	popupmenumodel.cpp
+	scrollbar.cpp
 	shell.cpp
 	treeview.cpp
 	${SRCS_PLATFORM}
