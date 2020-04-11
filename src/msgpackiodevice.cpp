@@ -914,4 +914,8 @@ bool MsgpackIODevice::checkVariant(const QVariant& var)
 	return true;
 }
 
+void MsgpackIODevice::close() {
+	m_dev->close();
+}
+
 } // Namespace NeovimQt

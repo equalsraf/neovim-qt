@@ -67,6 +67,7 @@ public:
 	void registerExtType(int8_t type, msgpackExtDecoder);
 
 	QList<quint32> pendingRequests() const;
+	void close();
 signals:
 	void error(MsgpackError);
 	/** A notification with the given name and arguments was received */

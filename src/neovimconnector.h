@@ -99,6 +99,7 @@ public:
 	quint64 apiCompatibility();
 	quint64 apiLevel();
 	bool hasUIOption(const QByteArray& option);
+	void close();
 
 signals:
 	/** Emitted when Neovim is ready @see ready */

@@ -50,6 +50,10 @@ void NeovimConnector::setRequestTimeout(int ms)
  */
 void NeovimConnector::setError(NeovimError err, const QString& msg)
 {
+	if (!m_ready) {
+		return;
+	}
+
 	m_ready = false;
 	if (m_error == NoError && err != NoError) {
 		m_error = err;
@@ -472,6 +476,12 @@ quint64 NeovimConnector::apiLevel()
 bool NeovimConnector::hasUIOption(const QByteArray &option)
 {
 	return m_uiOptions.contains(option);
+}
+
+void NeovimConnector::close()
+{
+	m_ready = false;
+	m_dev->close();
 }
 
 /**

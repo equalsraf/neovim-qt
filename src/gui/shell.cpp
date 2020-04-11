@@ -952,7 +952,9 @@ void Shell::handleCloseEvent(const QVariantList &args)
 	}
 
 	emit neovimGuiCloseRequest(status);
+	// FIXME this might be wrong
 	setAttached(false);
+	m_nvim->close();
 }
 
 void Shell::handleGridResize(const QVariantList& opargs)
