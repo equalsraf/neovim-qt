@@ -46,6 +46,9 @@ GuiFont		When called with no arguments this command display the
 >
 		    :GuiFont! <An invalid font>
 <
+							*Guifontwide* *GuiFontWide*
+GuiFontWide		Similar to GuiFont buf for wide font.
+
 								*GuiLinespace*
 GuiLinespace	When called with no arguments this command displays the
 		linespace, the number of extra pixels each line will have.

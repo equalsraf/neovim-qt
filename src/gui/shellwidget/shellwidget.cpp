@@ -32,15 +32,19 @@ void ShellWidget::setDefaultFont()
 {
 #if defined(Q_OS_MAC)
 #  define DEFAULT_FONT "Courier New"
+#  define DEFAULT_FONT_WIDE "Courier New"
 #elif defined(Q_OS_WIN)
 #  define DEFAULT_FONT "Consolas"
+#  define DEFAULT_FONT_WIDE "Consolas"
 #else
 #  define DEFAULT_FONT "Monospace"
+#  define DEFAULT_FONT_WIDE "Monospace"
 #endif
-	setShellFont(DEFAULT_FONT, 11, -1, false, true);
+	setShellFont(DEFAULT_FONT, 11, -1, false, true, false);
+	setShellFont(DEFAULT_FONT_WIDE, 11, -1, false, true, true);
 }
 
-bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, bool italic, bool force)
+bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, bool italic, bool force, bool wide)
 {
 	QFont f(family, -1, weight, italic);
 	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
@@ -77,16 +81,21 @@ bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, 
 		}
 	}
 
-	setFont(f);
+	setFont(f, wide);
 	setCellSize();
 	emit shellFontChanged();
 	return true;
 }
 
 /// Don't used this, use setShellFont instead;
-void ShellWidget::setFont(const QFont& f)
+void ShellWidget::setFont(const QFont& f, bool wide)
 {
-	QWidget::setFont(f);
+	if (wide)
+		this->m_fontWide = f;
+	else {
+		this->m_font = f;
+		QWidget::setFont(f);
+	}
 }
 
 void ShellWidget::setLineSpace(int height)
@@ -260,14 +269,12 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 						}
 						p.setPen(fgColor);
 
+						QFont f(cell.IsDoubleWidth() ? this->m_fontWide : this->m_font);
 						if (cell.IsBold() || cell.IsItalic()) {
-							QFont f = p.font();
 							f.setBold(cell.IsBold());
 							f.setItalic(cell.IsItalic());
-							p.setFont(f);
-						} else {
-							p.setFont(font());
 						}
+						p.setFont(f);
 
 						// Draw chars at the baseline
 						const int cellTextOffset{ m_ascent + (m_lineSpace / 2) };

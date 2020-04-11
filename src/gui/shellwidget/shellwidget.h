@@ -27,7 +27,7 @@ public:
 		Light
 	};
 
-	bool setShellFont(const QString& family, qreal ptSize, int weight = -1, bool italic = false, bool force = false);
+	bool setShellFont(const QString& family, qreal ptSize, int weight = -1, bool italic = false, bool force = false, bool wide = false);
 
 	QColor background() const;
 	QColor foreground() const;
@@ -99,7 +99,7 @@ protected:
 	QRect absoluteShellRect(int row0, int col0, int rowcount, int colcount);
 
 private:
-	void setFont(const QFont&);
+	void setFont(const QFont&, bool wide);
 	void handleCursorChanged();
 	QRect getNeovimCursorRect(QRect cellRect) noexcept;
 	void paintNeovimCursorBackground(QPainter& p, QRect cellRect) noexcept;
@@ -112,7 +112,8 @@ private:
 	QColor m_fgColor{ Qt::black };
 	QColor m_spColor;
 	int m_lineSpace{ 0 };
-
+	QFont m_font;
+	QFont m_fontWide;
 	Background m_background{ Background::Dark };
 };
 

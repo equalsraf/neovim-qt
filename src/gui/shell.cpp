@@ -95,7 +95,7 @@ QString Shell::fontDesc()
 ///
 /// @param updateOption controls update of the guifont option, which should not
 /// be updated when the user calls from 'set guifont=...'.
-bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
+bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption, bool wide)
 {
 	// Exit early if the font description does not change, prevent loops.
 	if (fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
@@ -116,7 +116,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 		}
 
 		setShellFontSuccess = setShellFont(font.family(), font.pointSize(), font.weight(),
-			font.italic(), force);
+			font.italic(), force, wide);
 	}
 	else {
 		QStringList attrs = fdesc.split(':');
@@ -150,7 +150,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 			}
 		}
 
-		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force);
+		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force, wide);
 	}
 
 	// Only update the ShellWidget when font changes.
@@ -756,7 +756,9 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 	if (name == "Gui" && args.size() > 0) {
 		QString guiEvName = m_nvim->decode(args.at(0).toByteArray());
 		if (guiEvName == "Font") {
-			handleGuiFontFunction(args);
+			handleGuiFontFunction(args, false);
+		} else if (guiEvName == "FontWide") {
+			handleGuiFontFunction(args, true);
 		} else if (guiEvName == "Foreground" && args.size() == 1) {
 			activateWindow();
 			raise();
@@ -882,9 +884,10 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 void Shell::handleSetOption(const QString& name, const QVariant& value)
 {
 	if (name == "guifont") {
-		setGuiFont(value.toString(), false /*force*/, false /*setOption*/);
+		setGuiFont(value.toString(), false /*force*/, false /*setOption*/, false);
 	} else if (name == "guifontset") {
 	} else if (name == "guifontwide") {
+		setGuiFont(value.toString(), false /*force*/, false /*setOption*/, true);
 	} else if (name == "linespace") {
 		// The conversion to string and then to int happens because of http://doc.qt.io/qt-5/qvariant.html#toUInt
 		// toUint() fails to detect an overflow i.e. it converts to ulonglong and then returns a MAX UINT
@@ -914,7 +917,7 @@ void Shell::handleMouse(bool enabled)
 	m_mouseEnabled = enabled;
 }
 
-void Shell::handleGuiFontFunction(const QVariantList& args)
+void Shell::handleGuiFontFunction(const QVariantList& args, bool wide)
 {
 	if (args.size() < 2
 		|| !args.at(1).canConvert<QByteArray>())
@@ -930,7 +933,7 @@ void Shell::handleGuiFontFunction(const QVariantList& args)
 		force = args.at(2).toBool();
 	}
 
-	setGuiFont(fdesc, force, true /*setOption*/);
+	setGuiFont(fdesc, force, true /*setOption*/, wide);
 }
 
 void Shell::handleGridResize(const QVariantList& opargs)

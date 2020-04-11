@@ -48,6 +48,12 @@ function! GuiFont(fname, ...) abort
   call rpcnotify(0, 'Gui', 'Font', a:fname, force)
 endfunction
 
+" Set GUI font wide
+function! GuiFontWide(fname, ...) abort
+  let force = get(a:000, 0, 0)
+  call rpcnotify(0, 'Gui', 'FontWide', a:fname, force)
+endfunction
+
 " Set additional linespace
 function! GuiLinespace(height) abort
   call rpcnotify(0, 'Gui', 'Linespace', a:height)
@@ -70,8 +76,21 @@ function s:GuiFontCommand(fname, bang) abort
     call GuiFont(a:fname, a:bang ==# '!')
   endif
 endfunction
+function s:GuiFontWideCommand(fname, bang) abort
+  if a:fname ==# ''
+    if exists('g:GuiFontWide')
+      echo g:GuiFontWide
+    else
+      echo 'No GuiFontWide is set'
+    endif
+  else
+    call GuiFontWide(a:fname, a:bang ==# '!')
+  endif
+endfunction
 command! -nargs=? -bang Guifont call s:GuiFontCommand("<args>", "<bang>")
 command! -nargs=? -bang GuiFont call s:GuiFontCommand("<args>", "<bang>")
+command! -nargs=? -bang Guifontwide call s:GuiFontWideCommand("<args>", "<bang>")
+command! -nargs=? -bang GuiFontWide call s:GuiFontWideCommand("<args>", "<bang>")
 
 function s:GuiLinespaceCommand(height) abort
   if a:height ==# ''
