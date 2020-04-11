@@ -217,14 +217,14 @@ function GuiShowContextMenu() range
 endfunction
 
 " Notify Gui of any cursor movement, used by GuiScrollBar
-function s:GuiCursorMovedUpdateScrollBar()
+function s:GuiCursorMoved()
 	let l:minLineVisible = line('w0')
 	let l:bufferSize = line('$')
 	let l:windowHeight = winheight(winnr())
-	call rpcnotify(0, 'Gui', 'CursorMovedUpdateScrollBar', l:minLineVisible, l:bufferSize, l:windowHeight)
+	call rpcnotify(0, 'Gui', 'CursorMoved', l:minLineVisible, l:bufferSize, l:windowHeight)
 endfunction
 
-autocmd CursorMoved,CursorMovedI,VimResized * call <SID>GuiCursorMovedUpdateScrollBar()
+autocmd CursorMoved,CursorMovedI,VimResized * call <SID>GuiCursorMoved()
 
 " Show/Hide the Gui ScrollBar
 function! s:GuiScrollBar(enable) abort

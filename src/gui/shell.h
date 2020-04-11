@@ -56,6 +56,11 @@ public:
 	bool neovimAttached() const;
 	QString fontDesc();
 
+	/// Dispatches Neovim redraw notifications to T::handleRedraw
+	template <class T>
+	static void DispatchRedrawNotifications(
+		T* pThis, const QVariantList& args) noexcept;
+
 signals:
 	void neovimTitleChanged(const QString &title);
 	void neovimBusy(bool);
@@ -76,12 +81,6 @@ signals:
 	void neovimShowContextMenu();
 	void fontChanged();
 
-	// GuiScrollBar Signals
-	void neovimCursorMovedUpdateScrollBar(
-		uint64_t minLineVisible, uint64_t bufferSize, uint64_t windowHeight);
-	void neovimScrollEvent(int64_t rows);
-	void setGuiScrollBarVisible(bool isVisible);
-
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
@@ -89,9 +88,6 @@ public slots:
 	bool setGuiFont(const QString& fdesc, bool force, bool updateOption);
 	void updateGuiWindowState(Qt::WindowStates state);
 	void openFiles(const QList<QUrl> url);
-
-	/// Update the Neovim buffer position after a gui-triggered scrollbar event
-	void handleScrollBarChanged(int position);
 
 protected slots:
 	void neovimError(NeovimConnector::NeovimError);
@@ -149,10 +145,6 @@ protected:
 	virtual void handleGridCursorGoto(const QVariantList& opargs);
 	virtual void handleGridScroll(const QVariantList& opargs);
 
-	// GuiScrollBar Slots
-	virtual void handleCursorMovedUpdateScrollBar(const QVariantList& opargs) noexcept;
-	virtual void handleSetScrollBarVisible(const QVariantList& opargs) noexcept;
-
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
@@ -207,9 +199,6 @@ private:
 	ShellOptions m_options;
 	PopupMenu m_pum{ this };
 	bool m_mouseEnabled{ true };
-
-	/// GuiScrollBar last known position: used to compute scroll line delta.
-	int m_lastScrollBarPosition{ 0 };
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler
@@ -220,6 +209,34 @@ public:
 	virtual void handleRequest(MsgpackIODevice* dev, quint32 msgid, const QByteArray& method, const QVariantList& args);
 };
 
+template <class T>
+/*static*/ void Shell::DispatchRedrawNotifications(T* pThis, const QVariantList& args) noexcept
+{
+	for(const auto& update_item : args) {
+		if (!update_item.canConvert<QVariantList>()) {
+			qWarning() << "Received unexpected redraw operation" << update_item;
+			continue;
+		}
+
+		const QVariantList& redrawupdate{ update_item.toList() };
+		if (redrawupdate.size() < 2) {
+			qWarning() << "Received unexpected redraw operation" << update_item;
+			continue;
+		}
+
+		const QByteArray& name{ redrawupdate.at(0).toByteArray() };
+		const QVariantList& update_args{ redrawupdate.mid(1) };
+
+		for(const auto& opargs_var : update_args) {
+			if (!opargs_var.canConvert<QVariantList>()) {
+				qWarning() << "Received unexpected redraw arguments, expecting list" << opargs_var;
+				continue;
+			}
+
+			pThis->handleRedraw(name, opargs_var.toList());
+		}
+	}
+}
 
 } // Namespace
 #endif

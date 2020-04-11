@@ -3,7 +3,6 @@
 #include <QCloseEvent>
 #include <QLayout>
 #include <QSettings>
-#include <QSignalBlocker>
 #include <QToolBar>
 
 namespace NeovimQt {
@@ -70,9 +69,7 @@ void MainWindow::init(NeovimConnector *c)
 	m_shell = new Shell(c, m_shell_options);
 
 	// GuiScrollBar
-	m_rightScrollBar = new QScrollBar{};
-	m_rightScrollBar->setVisible(false);
-	m_rightScrollBar->setMinimum(1);
+	m_scrollbar = new ScrollBar{ m_nvim };
 
 	// ShellWidget + GuiScrollBar Layout
 	// QSplitter does not allow layouts directly: QWidget { HLayout { ShellWidget, QScrollBar } }
@@ -81,7 +78,7 @@ void MainWindow::init(NeovimConnector *c)
 	layout->setSpacing(0);
 	layout->setMargin(0);
 	layout->addWidget(m_shell);
-	layout->addWidget(m_rightScrollBar);
+	layout->addWidget(m_scrollbar);
 	shellScrollable->setLayout(layout);
 
 	m_window = new QSplitter();
@@ -128,17 +125,6 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimSendPaste);
 	connect(m_actSelectAll, &QAction::triggered,
 			this, &MainWindow::neovimSendSelectAll);
-
-	// GuiScrollBar Signal/Slot Connections
-	connect(m_shell, &Shell::setGuiScrollBarVisible,
-			this, &MainWindow::setGuiScrollBarVisible);
-	connect(m_shell, &Shell::neovimCursorMovedUpdateScrollBar,
-			this, &MainWindow::neovimCursorMovedUpdateScrollBar);
-	connect(m_shell, &Shell::neovimScrollEvent,
-			this, &MainWindow::neovimScrollEvent);
-	connect(m_rightScrollBar, &QScrollBar::valueChanged,
-			m_shell, &Shell::handleScrollBarChanged);
-
 	m_shell->setFocus(Qt::OtherFocusReason);
 
 	if (m_nvim->errorCause()) {
@@ -381,53 +367,6 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 void MainWindow::neovimShowContextMenu()
 {
 	m_contextMenu->popup(QCursor::pos());
-}
-
-void MainWindow::setGuiScrollBarVisible(bool isEnabled)
-{
-	m_rightScrollBar->setVisible(isEnabled);
-}
-
-void MainWindow::neovimCursorMovedUpdateScrollBar(uint64_t minLineVisible, uint64_t bufferSize, uint64_t windowHeight)
-{
-	if (!m_rightScrollBar->isVisible())
-	{
-		return;
-	}
-
-	m_rightScrollBar->setMaximum(bufferSize);
-	m_rightScrollBar->setPageStep(windowHeight);
-
-	m_scrollbarLastDelta = minLineVisible - m_rightScrollBar->sliderPosition();
-
-	// Block valueChanged signals for scroll events triggered by Neovim.
-	// Do not be echoed back scroll events, only GUI events should be sent.
-	{
-		QSignalBlocker blockValueChanged{ m_rightScrollBar };
-		m_rightScrollBar->setSliderPosition(minLineVisible);
-	}
-}
-
-void MainWindow::neovimScrollEvent(int64_t rows)
-{
-	if (!m_rightScrollBar->isVisible())
-	{
-		return;
-	}
-
-	// Prevent double-registration of scroll event. See m_scrollbarLastDelta for details.
-	if (rows == m_scrollbarLastDelta)
-	{
-		return;
-	}
-	m_scrollbarLastDelta = 0;
-
-	// Block valueChanged signals for scroll events triggered by Neovim.
-	// Do not be echoed back scroll events, only GUI events should be sent.
-	{
-		QSignalBlocker blockValueChanged{ m_rightScrollBar };
-		m_rightScrollBar->setSliderPosition(m_rightScrollBar->sliderPosition() + rows);
-	}
 }
 
 void MainWindow::neovimSendCut()
