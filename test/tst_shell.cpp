@@ -252,11 +252,21 @@ private slots:
 		QCOMPARE(onWindowClosing.takeFirst().at(0).toInt(), event_status);
 
 		// and finally a call to nvim-qt
+		QProcess p;
+		p.setProgram(NVIM_QT_BINARY);
+		QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+		env.insert("NVIM_QT_RUNTIME_PATH", path_to_src_runtime);
+		p.setProcessEnvironment(env);
 #if defined(Q_OS_WIN32)
-		int actual_exit_status = QProcess::execute(NVIM_QT_BINARY, {NVIM_QT_BINARY, "--",  "-c", command});
+		p.setArguments({NVIM_QT_BINARY, "--",  "-c", command});
 #else
-		int actual_exit_status = QProcess::execute(NVIM_QT_BINARY, {NVIM_QT_BINARY, "--nofork", "--",  "-c", command});
+		p.setArguments({NVIM_QT_BINARY, "--nofork", "--",  "-c", command});
 #endif
+		p.start();
+		p.waitForFinished(-1);
+		QCOMPARE(p.exitStatus(), QProcess::NormalExit);
+		int actual_exit_status = p.exitCode();
+
 		QCOMPARE(actual_exit_status, exit_status);
 	}
 
