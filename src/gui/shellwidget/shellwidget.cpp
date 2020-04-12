@@ -32,16 +32,13 @@ void ShellWidget::setDefaultFont()
 {
 #if defined(Q_OS_MAC)
 #  define DEFAULT_FONT "Courier New"
-#  define DEFAULT_FONT_WIDE "Courier New"
 #elif defined(Q_OS_WIN)
 #  define DEFAULT_FONT "Consolas"
-#  define DEFAULT_FONT_WIDE "Consolas"
 #else
 #  define DEFAULT_FONT "Monospace"
-#  define DEFAULT_FONT_WIDE "Monospace"
 #endif
 	setShellFont(DEFAULT_FONT, 11, -1, false, true, false);
-	setShellFont(DEFAULT_FONT_WIDE, 11, -1, false, true, true);
+	setShellFont(DEFAULT_FONT, 11, -1, false, true, true);
 }
 
 bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, bool italic, bool force, bool wide)
