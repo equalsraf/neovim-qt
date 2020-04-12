@@ -84,9 +84,6 @@ void ScrollBar::setIsVisible(bool isVisible)
 
 void ScrollBar::setAbsolutePosition(uint64_t minLine, uint64_t bufferSize, uint64_t windowHeight)
 {
-	setMaximum(bufferSize);
-	setPageStep(windowHeight);
-
 	m_lineScrollLockout -= m_lastKnownPosition - minLine;
 
 	m_lastKnownPosition = minLine;
@@ -96,6 +93,9 @@ void ScrollBar::setAbsolutePosition(uint64_t minLine, uint64_t bufferSize, uint6
 	// Block valueChanged signals for scroll events triggered by Neovim.
 	{
 		QSignalBlocker blockValueChanged{ this };
+
+		setMaximum(bufferSize);
+		setPageStep(windowHeight);
 		setSliderPosition(minLine);
 	}
 }
@@ -107,6 +107,7 @@ void ScrollBar::setRelativePosition(int64_t rowCount)
 	// Block valueChanged signals for scroll events triggered by Neovim.
 	{
 		QSignalBlocker blockValueChanged{ this };
+
 		setSliderPosition(sliderPosition() + rowCount);
 	}
 }
