@@ -11,8 +11,6 @@ class ShellWidget: public QWidget
 	Q_OBJECT
 	Q_PROPERTY(QColor background READ background WRITE setBackground)
 	Q_PROPERTY(QColor foreground READ foreground WRITE setForeground)
-	Q_PROPERTY(QString fontFamily READ fontFamily)
-	Q_PROPERTY(int fontSize READ fontSize)
 	Q_PROPERTY(int rows READ rows)
 	Q_PROPERTY(int columns READ columns)
 	Q_PROPERTY(QSize cellSize READ cellSize)
@@ -32,9 +30,8 @@ public:
 	QColor background() const;
 	QColor foreground() const;
 	QColor special() const;
-	QString fontFamily() const;
-	qreal fontSize() const;
 	static ShellWidget* fromFile(const QString& path);
+	QString fontDesc(bool wide = false);
 
 	int rows() const;
 	int columns() const;

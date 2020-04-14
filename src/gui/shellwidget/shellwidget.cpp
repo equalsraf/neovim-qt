@@ -513,13 +513,23 @@ QRect ShellWidget::absoluteShellRect(int row0, int col0, int rowcount, int colco
 			colcount*m_cellSize.width(), rowcount*m_cellSize.height());
 }
 
-QString ShellWidget::fontFamily() const
+QString ShellWidget::fontDesc(bool wide)
 {
-	return QFontInfo(font()).family();
-}
-qreal ShellWidget::fontSize() const
-{
-	return font().pointSizeF();
+	const QFont& f = wide ? this->m_fontWide : this->m_font;
+	QString fdesc = QString("%1:h%2").arg(QFontInfo(f).family()).arg(f.pointSizeF());
+	if (f.weight() == QFont::Bold) {
+		fdesc += ":b";
+	} else if (f.weight() == QFont::Light) {
+		fdesc += ":l";
+	} else if (f.weight() == QFont::DemiBold) {
+		fdesc += ":sb";
+	} else if (f.weight() != QFont::Normal) {
+		fdesc += ":w" + QString::number(f.weight());
+	}
+	if (f.italic()) {
+		fdesc += ":i";
+	}
+	return fdesc;
 }
 
 int ShellWidget::rows() const

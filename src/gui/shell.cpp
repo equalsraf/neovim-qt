@@ -73,32 +73,14 @@ void Shell::fontError(const QString& msg)
 	}
 }
 
-QString Shell::fontDesc()
-{
-	QString fdesc = QString("%1:h%2").arg(fontFamily()).arg(fontSize());
-	if (font().weight() == QFont::Bold) {
-		fdesc += ":b";
-	} else if (font().weight() == QFont::Light) {
-		fdesc += ":l";
-	} else if (font().weight() == QFont::DemiBold) {
-		fdesc += ":sb";
-	} else if (font().weight() != QFont::Normal) {
-		fdesc += ":w" + QString::number(font().weight());
-	}
-	if (font().italic()) {
-		fdesc += ":i";
-	}
-	return fdesc;
-}
-
 /// Set the GUI font, or display the current font
 ///
 /// @param updateOption controls update of the guifont option, which should not
 /// be updated when the user calls from 'set guifont=...'.
-bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption, bool wide)
+bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 {
 	// Exit early if the font description does not change, prevent loops.
-	if (fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
+	if (fdesc.compare(fontDesc(false), Qt::CaseInsensitive) == 0) {
 		return false;
 	}
 
@@ -116,7 +98,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption, bool
 		}
 
 		setShellFontSuccess = setShellFont(font.family(), font.pointSize(), font.weight(),
-			font.italic(), force, wide);
+			font.italic(), force, false);
 	}
 	else {
 		QStringList attrs = fdesc.split(':');
@@ -150,7 +132,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption, bool
 			}
 		}
 
-		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force, wide);
+		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force, false);
 	}
 
 	// Only update the ShellWidget when font changes.
@@ -161,12 +143,96 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption, bool
 	// Font changed: trigger resize to update the ShellWidget, and update font variables.
 	resizeNeovim(size());
 
-	m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
+	m_nvim->api0()->vim_set_var("GuiFont", fontDesc(false));
 
 	// Updating guifont when the user has already called 'set guifont=...' may cause
 	// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
 	if (isGuiDialogRequest || updateOption) {
-		m_nvim->api0()->vim_set_option("guifont", fontDesc());
+		m_nvim->api0()->vim_set_option("guifont", fontDesc(false));
+	}
+
+	return true;
+}
+
+bool Shell::setGuiFontWide(const QString& fdesc, bool force, bool updateOption)
+{
+	bool setShellFontSuccess{ false };
+	const bool isGuiDialogRequest{ fdesc == "*" };
+
+	if (isGuiDialogRequest) {
+		bool fontDialogSuccess = false;
+		QFont font{ QFontDialog::getFont(&fontDialogSuccess, QWidget::font(), this, {},
+			QFontDialog::MonospacedFonts) };
+
+		// The font selection dialog was canceled by the user.
+		if (!fontDialogSuccess) {
+			return false;
+		}
+
+		setShellFontSuccess = setShellFont(font.family(), font.pointSize(), font.weight(),
+			font.italic(), force, true);
+	}
+	else {
+		const QStringList wideFontList{ fdesc.split(',') };
+		for (const auto& wfdesc : wideFontList)
+		{
+			// Exit early if the font description does not change, prevent loops.
+			if (wfdesc.compare(fontDesc(true), Qt::CaseInsensitive) == 0) {
+				return false;
+			}
+
+			QStringList attrs = fdesc.split(':');
+			if (attrs.size() < 1) {
+				m_nvim->api0()->vim_report_error("Invalid wide font");
+				return false;
+			}
+
+			// Use pointSizeF of non-wide font by default
+			qreal pointSize = font().pointSizeF();
+			int weight = -1;
+			bool italic = false;
+			for (const auto& attr : attrs) {
+				if (attr.size() >= 2 && attr[0] == 'h') {
+					bool ok{ false };
+					qreal height = attr.mid(1).toFloat(&ok);
+					if (!ok) {
+						m_nvim->api0()->vim_report_error("Invalid wide font height");
+						return false;
+					}
+					pointSize = height;
+				} else if (attr == "b") {
+					weight = QFont::Bold;
+				} else if (attr == "l") {
+					weight = QFont::Light;
+				} else if (attr == "sb") {
+					weight = QFont::DemiBold;
+				} else if (attr.length() > 0 && attr.at(0) == 'w') {
+					weight = (attr.right(attr.length()-1)).toInt();
+				} else if (attr == "i") {
+					italic = true;
+				}
+			}
+
+			setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force, true);
+			if (setShellFontSuccess)
+				break;
+		}
+	}
+
+	// Only update the ShellWidget when font changes.
+	if (!setShellFontSuccess || !m_attached) {
+		return false;
+	}
+
+	// Font changed: trigger resize to update the ShellWidget, and update font variables.
+	resizeNeovim(size());
+
+	m_nvim->api0()->vim_set_var("GuiFontWide", fontDesc(true));
+
+	// Updating guifontwide when the user has already called 'set guifont=...' may cause
+	// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
+	if (isGuiDialogRequest || updateOption) {
+		m_nvim->api0()->vim_set_option("guifontwide", fontDesc(true));
 	}
 
 	return true;
@@ -185,7 +251,8 @@ void Shell::setAttached(bool attached)
 	if (attached) {
 		updateWindowId();
 
-		m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
+		m_nvim->api0()->vim_set_var("GuiFont", fontDesc(false));
+		m_nvim->api0()->vim_set_var("GuiFontWide", fontDesc(true));
 
 		if (isWindow()) {
 			updateGuiWindowState(windowState());
@@ -884,10 +951,10 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 void Shell::handleSetOption(const QString& name, const QVariant& value)
 {
 	if (name == "guifont") {
-		setGuiFont(value.toString(), false /*force*/, false /*setOption*/, false);
+		setGuiFont(value.toString(), false /*force*/, false /*setOption*/);
 	} else if (name == "guifontset") {
 	} else if (name == "guifontwide") {
-		setGuiFont(value.toString(), false /*force*/, false /*setOption*/, true);
+		setGuiFontWide(value.toString(), false /*force*/, false /*setOption*/);
 	} else if (name == "linespace") {
 		// The conversion to string and then to int happens because of http://doc.qt.io/qt-5/qvariant.html#toUInt
 		// toUint() fails to detect an overflow i.e. it converts to ulonglong and then returns a MAX UINT
@@ -933,7 +1000,10 @@ void Shell::handleGuiFontFunction(const QVariantList& args, bool wide)
 		force = args.at(2).toBool();
 	}
 
-	setGuiFont(fdesc, force, true /*setOption*/, wide);
+	if (wide)
+		setGuiFontWide(fdesc, force, true /*setOption*/);
+	else
+		setGuiFont(fdesc, force, true /*setOption*/);
 }
 
 void Shell::handleGridResize(const QVariantList& opargs)
