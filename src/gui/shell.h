@@ -54,7 +54,7 @@ public:
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
 	bool neovimAttached() const;
-	bool parseFontDesc(const QString& fdesc, QString& family, qreal& pointSize, int& weight, bool& italic);
+	bool getFontFromDesc(const QString& fdesc, QFont& f, bool force);
 
 signals:
 	void neovimTitleChanged(const QString &title);

@@ -37,13 +37,15 @@ void ShellWidget::setDefaultFont()
 #else
 #  define DEFAULT_FONT "Monospace"
 #endif
-	setShellFont(DEFAULT_FONT, 11, -1, false, true, false);
-	setShellFont(DEFAULT_FONT, 11, -1, false, true, true);
+	QFont f;
+	createShellFont(f, DEFAULT_FONT, 11, -1, false, true);
+	setShellFont(f);
+	this->m_fontWideList.append(f);
 }
 
-bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, bool italic, bool force, bool wide)
+bool ShellWidget::createShellFont(QFont& f, const QString& family, qreal ptSize, int weight, bool italic, bool force)
 {
-	QFont f(family, -1, weight, italic);
+	f = QFont(family, -1, weight, italic);
 	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
 	// but we want to match the family name with the bold/italic attributes.
 	f.setStyleName(QStringLiteral(""));
@@ -78,21 +80,28 @@ bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, 
 		}
 	}
 
-	setFont(f, wide);
+	return true;
+}
+
+bool ShellWidget::setShellFont(const QFont& font)
+{
+	setFont(font);
 	setCellSize();
 	emit shellFontChanged();
 	return true;
 }
 
-/// Don't used this, use setShellFont instead;
-void ShellWidget::setFont(const QFont& f, bool wide)
+bool ShellWidget::setShellFontWide(const QVector<QFont>& font)
 {
-	if (wide)
-		this->m_fontWide = f;
-	else {
-		this->m_font = f;
-		QWidget::setFont(f);
-	}
+	this->m_fontWideList = font;
+	return true;
+}
+
+/// Don't used this, use setShellFont instead;
+void ShellWidget::setFont(const QFont& f)
+{
+	this->m_font = f;
+	QWidget::setFont(f);
 }
 
 void ShellWidget::setLineSpace(int height)
@@ -266,7 +275,17 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 						}
 						p.setPen(fgColor);
 
-						QFont f(cell.IsDoubleWidth() ? this->m_fontWide : this->m_font);
+						QFont f;
+						if (cell.IsDoubleWidth()) {
+							for (const auto& fw : m_fontWideList) {
+								if (QFontMetrics(fw).inFontUcs4(cell.GetCharacter())) {
+									f = QFont(fw);
+									break;
+								}
+							}
+						} else {
+							f = QFont(this->m_font);
+						}
 						if (cell.IsBold() || cell.IsItalic()) {
 							f.setBold(cell.IsBold());
 							f.setItalic(cell.IsItalic());
@@ -515,20 +534,34 @@ QRect ShellWidget::absoluteShellRect(int row0, int col0, int rowcount, int colco
 
 QString ShellWidget::fontDesc(bool wide)
 {
-	const QFont& f = wide ? this->m_fontWide : this->m_font;
-	QString fdesc = QString("%1:h%2").arg(QFontInfo(f).family()).arg(f.pointSizeF());
-	if (f.weight() == QFont::Bold) {
-		fdesc += ":b";
-	} else if (f.weight() == QFont::Light) {
-		fdesc += ":l";
-	} else if (f.weight() == QFont::DemiBold) {
-		fdesc += ":sb";
-	} else if (f.weight() != QFont::Normal) {
-		fdesc += ":w" + QString::number(f.weight());
-	}
-	if (f.italic()) {
-		fdesc += ":i";
-	}
+	int k = 0;
+	const QFont* f = &this->m_font;
+	QString fdesc("");
+
+	do {
+		if (wide)
+			f = (k < this->m_fontWideList.size()) ? &m_fontWideList.at(k++) : Q_NULLPTR;
+		if (f) {
+			if (!fdesc.isEmpty())
+				fdesc += ',';
+			QString fdesc = QString("%1:h%2").arg(QFontInfo(*f).family()).arg((*f).pointSizeF());
+			if ((*f).weight() == QFont::Bold) {
+				fdesc += ":b";
+			} else if ((*f).weight() == QFont::Light) {
+				fdesc += ":l";
+			} else if ((*f).weight() == QFont::DemiBold) {
+				fdesc += ":sb";
+			} else if ((*f).weight() != QFont::Normal) {
+				fdesc += ":w" + QString::number((*f).weight());
+			}
+			if ((*f).italic()) {
+				fdesc += ":i";
+			}
+			f = Q_NULLPTR;
+		} else
+			break;
+	} while (true);
+
 	return fdesc;
 }
 
