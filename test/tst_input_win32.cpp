@@ -9,6 +9,7 @@ class TestInputWin32 : public QObject
 private slots:
 	void LessThanModifierKeys() noexcept;
 	void SpecialKeys() noexcept;
+	void CtrlCaretWellFormed() noexcept;
 };
 
 void TestInputWin32::LessThanModifierKeys() noexcept
@@ -41,6 +42,15 @@ void TestInputWin32::SpecialKeys() noexcept
 				keyEvent.second.arg(specialKeys.value(k)));
 		}
 	}
+}
+
+void TestInputWin32::CtrlCaretWellFormed() noexcept
+{
+	QKeyEvent evCtrl6{ QEvent::KeyPress, Qt::Key_6, Qt::ControlModifier, { "6" } };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrl6), QString{ "<C-^>" });
+
+	QKeyEvent evCtrlShift6{ QEvent::KeyPress, Qt::Key_AsciiCircum, Qt::ControlModifier | Qt::ShiftModifier, { "\u001E" } };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShift6), QString{ "<C-^>" });
 }
 
 #include "tst_input_win32.moc"
