@@ -157,66 +157,50 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 bool Shell::setGuiFontWide(const QString& fdesc, bool force, bool updateOption)
 {
 	bool setShellFontSuccess{ false };
-	const bool isGuiDialogRequest{ fdesc == "*" };
 
-	if (isGuiDialogRequest) {
-		bool fontDialogSuccess = false;
-		QFont font{ QFontDialog::getFont(&fontDialogSuccess, QWidget::font(), this, {},
-			QFontDialog::MonospacedFonts) };
-
-		// The font selection dialog was canceled by the user.
-		if (!fontDialogSuccess) {
+	const QStringList wideFontList{ fdesc.split(',') };
+	for (const auto& wfdesc : wideFontList)
+	{
+		// Exit early if the font description does not change, prevent loops.
+		if (wfdesc.compare(fontDesc(true), Qt::CaseInsensitive) == 0) {
 			return false;
 		}
 
-		setShellFontSuccess = setShellFont(font.family(), font.pointSize(), font.weight(),
-			font.italic(), force, true);
-	}
-	else {
-		const QStringList wideFontList{ fdesc.split(',') };
-		for (const auto& wfdesc : wideFontList)
-		{
-			// Exit early if the font description does not change, prevent loops.
-			if (wfdesc.compare(fontDesc(true), Qt::CaseInsensitive) == 0) {
-				return false;
-			}
-
-			QStringList attrs = fdesc.split(':');
-			if (attrs.size() < 1) {
-				m_nvim->api0()->vim_report_error("Invalid wide font");
-				return false;
-			}
-
-			// Use pointSizeF of non-wide font by default
-			qreal pointSize = font().pointSizeF();
-			int weight = -1;
-			bool italic = false;
-			for (const auto& attr : attrs) {
-				if (attr.size() >= 2 && attr[0] == 'h') {
-					bool ok{ false };
-					qreal height = attr.mid(1).toFloat(&ok);
-					if (!ok) {
-						m_nvim->api0()->vim_report_error("Invalid wide font height");
-						return false;
-					}
-					pointSize = height;
-				} else if (attr == "b") {
-					weight = QFont::Bold;
-				} else if (attr == "l") {
-					weight = QFont::Light;
-				} else if (attr == "sb") {
-					weight = QFont::DemiBold;
-				} else if (attr.length() > 0 && attr.at(0) == 'w') {
-					weight = (attr.right(attr.length()-1)).toInt();
-				} else if (attr == "i") {
-					italic = true;
-				}
-			}
-
-			setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force, true);
-			if (setShellFontSuccess)
-				break;
+		QStringList attrs = fdesc.split(':');
+		if (attrs.size() < 1) {
+			m_nvim->api0()->vim_report_error("Invalid wide font");
+			return false;
 		}
+
+		// Use pointSizeF of non-wide font by default
+		qreal pointSize = font().pointSizeF();
+		int weight = -1;
+		bool italic = false;
+		for (const auto& attr : attrs) {
+			if (attr.size() >= 2 && attr[0] == 'h') {
+				bool ok{ false };
+				qreal height = attr.mid(1).toFloat(&ok);
+				if (!ok) {
+					m_nvim->api0()->vim_report_error("Invalid wide font height");
+					return false;
+				}
+				pointSize = height;
+			} else if (attr == "b") {
+				weight = QFont::Bold;
+			} else if (attr == "l") {
+				weight = QFont::Light;
+			} else if (attr == "sb") {
+				weight = QFont::DemiBold;
+			} else if (attr.length() > 0 && attr.at(0) == 'w') {
+				weight = (attr.right(attr.length()-1)).toInt();
+			} else if (attr == "i") {
+				italic = true;
+			}
+		}
+
+		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force, true);
+		if (setShellFontSuccess)
+			break;
 	}
 
 	// Only update the ShellWidget when font changes.
