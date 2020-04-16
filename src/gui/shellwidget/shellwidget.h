@@ -25,6 +25,7 @@ public:
 		Light
 	};
 
+	bool setShellFont(const QString& family, qreal ptSize, int weight = -1, bool italic = false, bool force = false);
 	bool setShellFont(const QFont& font);
 	bool setShellFontWide(const QVector<QFont>& font);
 	bool createShellFont(QFont& f, const QString& family, qreal ptSize, int weight = -1, bool italic = false, bool force = false);

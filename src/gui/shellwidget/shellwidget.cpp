@@ -83,6 +83,14 @@ bool ShellWidget::createShellFont(QFont& f, const QString& family, qreal ptSize,
 	return true;
 }
 
+bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, bool italic, bool force)
+{
+	QFont f;
+	if (!createShellFont(f, family, ptSize, weight, italic, force))
+		return false;
+	return setShellFont(f);
+}
+
 bool ShellWidget::setShellFont(const QFont& font)
 {
 	setFont(font);
