@@ -101,38 +101,14 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 			font.italic(), force, false);
 	}
 	else {
-		QStringList attrs = fdesc.split(':');
-		if (attrs.size() < 1) {
-			m_nvim->api0()->vim_report_error("Invalid font");
+		QString family;
+		qreal pointSize;
+		int weight;
+		bool italic;
+		if (!parseFontDesc(fdesc, family, pointSize, weight, italic))
 			return false;
-		}
 
-		qreal pointSize = font().pointSizeF();
-		int weight = -1;
-		bool italic = false;
-		for (const auto& attr : attrs) {
-			if (attr.size() >= 2 && attr[0] == 'h') {
-				bool ok{ false };
-				qreal height = attr.mid(1).toFloat(&ok);
-				if (!ok) {
-					m_nvim->api0()->vim_report_error("Invalid font height");
-					return false;
-				}
-				pointSize = height;
-			} else if (attr == "b") {
-				weight = QFont::Bold;
-			} else if (attr == "l") {
-				weight = QFont::Light;
-			} else if (attr == "sb") {
-				weight = QFont::DemiBold;
-			} else if (attr.length() > 0 && attr.at(0) == 'w') {
-				weight = (attr.right(attr.length()-1)).toInt();
-			} else if (attr == "i") {
-				italic = true;
-			}
-		}
-
-		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force, false);
+		setShellFontSuccess = setShellFont(family, pointSize, weight, italic, force, false);
 	}
 
 	// Only update the ShellWidget when font changes.
@@ -166,39 +142,14 @@ bool Shell::setGuiFontWide(const QString& fdesc, bool force, bool updateOption)
 			return false;
 		}
 
-		QStringList attrs = fdesc.split(':');
-		if (attrs.size() < 1) {
-			m_nvim->api0()->vim_report_error("Invalid wide font");
+		QString family;
+		qreal pointSize;
+		int weight;
+		bool italic;
+		if (!parseFontDesc(fdesc, family, pointSize, weight, italic))
 			return false;
-		}
 
-		// Use pointSizeF of non-wide font by default
-		qreal pointSize = font().pointSizeF();
-		int weight = -1;
-		bool italic = false;
-		for (const auto& attr : attrs) {
-			if (attr.size() >= 2 && attr[0] == 'h') {
-				bool ok{ false };
-				qreal height = attr.mid(1).toFloat(&ok);
-				if (!ok) {
-					m_nvim->api0()->vim_report_error("Invalid wide font height");
-					return false;
-				}
-				pointSize = height;
-			} else if (attr == "b") {
-				weight = QFont::Bold;
-			} else if (attr == "l") {
-				weight = QFont::Light;
-			} else if (attr == "sb") {
-				weight = QFont::DemiBold;
-			} else if (attr.length() > 0 && attr.at(0) == 'w') {
-				weight = (attr.right(attr.length()-1)).toInt();
-			} else if (attr == "i") {
-				italic = true;
-			}
-		}
-
-		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force, true);
+		setShellFontSuccess = setShellFont(family, pointSize, weight, italic, force, true);
 		if (setShellFontSuccess)
 			break;
 	}
@@ -215,9 +166,48 @@ bool Shell::setGuiFontWide(const QString& fdesc, bool force, bool updateOption)
 
 	// Updating guifontwide when the user has already called 'set guifont=...' may cause
 	// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
-	if (isGuiDialogRequest || updateOption) {
+	if (updateOption) {
 		m_nvim->api0()->vim_set_option("guifontwide", fontDesc(true));
 	}
+
+	return true;
+}
+
+bool Shell::parseFontDesc(const QString& fdesc, QString& family, qreal& pointSize, int& weight, bool& italic)
+{
+	QStringList attrs = fdesc.split(':');
+	if (attrs.size() < 1) {
+		m_nvim->api0()->vim_report_error("Invalid wide font");
+		return false;
+	}
+
+	// Use pointSizeF of non-wide font by default
+	pointSize = font().pointSizeF();
+	weight = -1;
+	italic = false;
+	for (const auto& attr : attrs) {
+		if (attr.size() >= 2 && attr[0] == 'h') {
+			bool ok{ false };
+			qreal height = attr.mid(1).toFloat(&ok);
+			if (!ok) {
+				m_nvim->api0()->vim_report_error("Invalid wide font height");
+				return false;
+			}
+			pointSize = height;
+		} else if (attr == "b") {
+			weight = QFont::Bold;
+		} else if (attr == "l") {
+			weight = QFont::Light;
+		} else if (attr == "sb") {
+			weight = QFont::DemiBold;
+		} else if (attr.length() > 0 && attr.at(0) == 'w') {
+			weight = (attr.right(attr.length()-1)).toInt();
+		} else if (attr == "i") {
+			italic = true;
+		}
+	}
+
+	family = attrs.at(0);
 
 	return true;
 }
