@@ -11,6 +11,7 @@ private slots:
 	void LessThanModifierKeys() noexcept;
 	void SpecialKeys() noexcept;
 	void KeyboardLayoutUnicodeHexInput() noexcept;
+	void CtrlCaretWellFormed() noexcept;
 };
 
 void TestInputMac::AltSpecialCharacters() noexcept
@@ -73,6 +74,19 @@ void TestInputMac::KeyboardLayoutUnicodeHexInput() noexcept
 	QKeyEvent evCtrlAltShiftA{ QEvent::KeyPress, Qt::Key_A,
 		Qt::MetaModifier | Qt::AltModifier | Qt::ShiftModifier };
 	QCOMPARE(NeovimQt::Input::convertKey(evCtrlAltShiftA), QString{ "<C-A-A>" });
+}
+
+void TestInputMac::CtrlCaretWellFormed() noexcept
+{
+	QKeyEvent evCtrl6{ QEvent::KeyPress, Qt::Key_6, Qt::MetaModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrl6), QString{ "<C-^>" });
+
+	QKeyEvent evCtrlShift6{ QEvent::KeyPress, Qt::Key_AsciiCircum, Qt::MetaModifier | Qt::ShiftModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShift6), QString{ "<C-^>" });
+
+	QKeyEvent evCtrlShiftMeta6{ QEvent::KeyPress, Qt::Key_AsciiCircum,
+		Qt::MetaModifier | Qt::ShiftModifier | Qt::ControlModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftMeta6), QString{ "<C-^>" });
 }
 
 #include "tst_input_mac.moc"

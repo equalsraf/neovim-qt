@@ -175,6 +175,14 @@ QString convertKey(const QKeyEvent& ev) noexcept
 		return ToKeyString(GetModifierPrefix(modNoShift), "lt");
 	}
 
+	// Issue#170: Normalize modifiers, CTRL+^ always sends as <C-^>
+	const bool isCaretKey{ key == Qt::Key_6 || key == Qt::Key_AsciiCircum };
+	if (isCaretKey && mod & ControlModifier()) {
+		const Qt::KeyboardModifiers modNoShiftMeta{
+			mod & ~Qt::KeyboardModifier::ShiftModifier & ~CmdModifier() };
+		return ToKeyString(GetModifierPrefix(modNoShiftMeta), "^");
+	}
+
 	if (text == "\\") {
 		return ToKeyString(GetModifierPrefix(mod), "Bslash");
 	}
