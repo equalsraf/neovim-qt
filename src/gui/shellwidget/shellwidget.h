@@ -27,7 +27,7 @@ public:
 
 	bool setShellFont(const QString& family, qreal ptSize, int weight = -1, bool italic = false, bool force = false);
 	bool setShellFont(const QFont& font);
-	bool setShellFontWide(const QVector<QFont>& font);
+	bool setShellFontWide(const QList<QFont>& font);
 	bool createShellFont(QFont& f, const QString& family, qreal ptSize, int weight = -1, bool italic = false, bool force = false);
 
 	QColor background() const;
@@ -113,7 +113,7 @@ private:
 	QColor m_spColor;
 	int m_lineSpace{ 0 };
 	QFont m_font;
-	QVector<QFont> m_fontWideList;
+    QList<QFont> m_fontWideList;
 	Background m_background{ Background::Dark };
 };
 

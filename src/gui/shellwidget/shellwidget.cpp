@@ -99,7 +99,7 @@ bool ShellWidget::setShellFont(const QFont& font)
 	return true;
 }
 
-bool ShellWidget::setShellFontWide(const QVector<QFont>& font)
+bool ShellWidget::setShellFontWide(const QList<QFont>& font)
 {
 	this->m_fontWideList = font;
 	return true;

@@ -113,7 +113,7 @@ bool Shell::setGuiFontWide(const QString& fdesc, bool force, bool updateOption)
 
 	bool setShellFontSuccess{ false };
 
-	QVector<QFont> vec;
+	QList<QFont> vec;
 	const QStringList wideFontList{ fdesc.split(',') };
 	for (const auto& wfdesc : wideFontList)
 	{
@@ -370,7 +370,7 @@ void Shell::handlePut(const QVariantList& args)
 
 	QString text = m_nvim->decode(args.at(0).toByteArray());
 	if (text.isEmpty() && m_cursor_pos.x() > 0 &&
-	    contents().constValue(m_cursor_pos.y(), m_cursor_pos.x() - 1).IsDoubleWidth()) {
+		contents().constValue(m_cursor_pos.y(), m_cursor_pos.x() - 1).IsDoubleWidth()) {
 		// nvim will seek to the second cell of a wide char and put "",
 		// expecting the cursor position and cell style to be updated properly.
 		// Handle this case.
