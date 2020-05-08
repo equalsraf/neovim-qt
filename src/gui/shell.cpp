@@ -741,12 +741,10 @@ void Shell::handleBusy(bool busy)
 	if (busy != m_neovimBusy) {
 		update(neovimCursorRect());
 	}
+
 	m_neovimBusy = busy;
-	if (busy) {
-		this->setCursor(Qt::WaitCursor);
-	} else {
-		this->unsetCursor();
-	}
+
+	setCursorFromBusyState();
 	emit neovimBusy(busy);
 }
 
@@ -1294,15 +1292,26 @@ void Shell::mouseReleaseEvent(QMouseEvent *ev)
 {
 	neovimMouseEvent(ev);
 }
+
 void Shell::mouseMoveEvent(QMouseEvent *ev)
 {
-	unsetCursor();
+	setCursorFromBusyState();
+
 	QPoint pos(ev->x()/cellSize().width(),
 			ev->y()/cellSize().height());
 	if (pos != m_mouse_pos) {
 		m_mouse_pos = pos;
 		mouseClickReset();
 		neovimMouseEvent(ev);
+	}
+}
+
+void Shell::setCursorFromBusyState() noexcept
+{
+	unsetCursor();
+
+	if (m_neovimBusy) {
+		setCursor(Qt::CursorShape::WaitCursor);
 	}
 }
 
