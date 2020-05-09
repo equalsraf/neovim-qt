@@ -30,14 +30,18 @@ ShellWidget* ShellWidget::fromFile(const QString& path)
 
 void ShellWidget::setDefaultFont()
 {
+	setShellFont(getDefaultFontFamily(), 11, -1, false, true);
+}
+
+/*static*/ QString ShellWidget::getDefaultFontFamily() noexcept
+{
 #if defined(Q_OS_MAC)
-#  define DEFAULT_FONT "Courier New"
+	return QStringLiteral("Courier New");
 #elif defined(Q_OS_WIN)
-#  define DEFAULT_FONT "Consolas"
+	return QStringLiteral("Consolas");
 #else
-#  define DEFAULT_FONT "Monospace"
+	return QStringLiteral("Monospace");
 #endif
-	setShellFont(DEFAULT_FONT, 11, -1, false, true);
 }
 
 bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, bool italic, bool force)
@@ -519,15 +523,6 @@ QRect ShellWidget::absoluteShellRect(int row0, int col0, int rowcount, int colco
 			colcount*m_cellSize.width(), rowcount*m_cellSize.height());
 }
 
-QString ShellWidget::fontFamily() const
-{
-	return QFontInfo(font()).family();
-}
-qreal ShellWidget::fontSize() const
-{
-	return font().pointSizeF();
-}
-
 int ShellWidget::rows() const
 {
 	return m_contents.rows();
@@ -577,4 +572,40 @@ void ShellWidget::handleCursorChanged()
 	update(neovimCursorRect());
 }
 
+QString ShellWidget::fontDesc() const noexcept
+{
+	return fontDesc(font());
+}
 
+/*static*/ QString ShellWidget::fontDesc(const QFont& font) noexcept
+{
+	QString fdesc{ QStringLiteral("%1:h%2").arg(font.family()).arg(font.pointSize()) };
+
+	switch (font.weight())
+	{
+		case QFont::Light:
+			fdesc += ":l";
+			break;
+
+		case QFont::Normal:
+			break;
+
+		case QFont::DemiBold:
+			fdesc += ":sb";
+			break;
+
+		case QFont::Bold:
+			fdesc += ":b";
+			break;
+
+		default:
+			fdesc += ":w" + QString::number(font.weight());
+			break;
+	}
+
+	if (font.italic()) {
+		fdesc += ":i";
+	}
+
+	return fdesc;
+}

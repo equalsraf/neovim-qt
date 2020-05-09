@@ -11,8 +11,6 @@ class ShellWidget: public QWidget
 	Q_OBJECT
 	Q_PROPERTY(QColor background READ background WRITE setBackground)
 	Q_PROPERTY(QColor foreground READ foreground WRITE setForeground)
-	Q_PROPERTY(QString fontFamily READ fontFamily)
-	Q_PROPERTY(int fontSize READ fontSize)
 	Q_PROPERTY(int rows READ rows)
 	Q_PROPERTY(int columns READ columns)
 	Q_PROPERTY(QSize cellSize READ cellSize)
@@ -32,8 +30,7 @@ public:
 	QColor background() const;
 	QColor foreground() const;
 	QColor special() const;
-	QString fontFamily() const;
-	qreal fontSize() const;
+
 	static ShellWidget* fromFile(const QString& path);
 
 	int rows() const;
@@ -46,6 +43,12 @@ public:
 
 	void setBackgroundType(Background type) { m_background = type; }
 
+	/// Get a Neovim font description of `font()`.
+	QString fontDesc() const noexcept;
+
+	/// Get a Neovim font description from QFont.
+	static QString fontDesc(const QFont& font) noexcept;
+
 signals:
 	void shellFontChanged();
 	void fontError(const QString& msg);
@@ -55,6 +58,9 @@ public slots:
 	void setBackground(const QColor& color);
 	void setForeground(const QColor& color);
 	void setDefaultFont();
+
+	/// Returns the platform-specific default font
+	static QString getDefaultFontFamily() noexcept;
 
 	int put(
 		const QString& text,

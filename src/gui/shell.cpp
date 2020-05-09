@@ -74,24 +74,6 @@ void Shell::fontError(const QString& msg)
 	}
 }
 
-QString Shell::fontDesc()
-{
-	QString fdesc = QString("%1:h%2").arg(fontFamily()).arg(fontSize());
-	if (font().weight() == QFont::Bold) {
-		fdesc += ":b";
-	} else if (font().weight() == QFont::Light) {
-		fdesc += ":l";
-	} else if (font().weight() == QFont::DemiBold) {
-		fdesc += ":sb";
-	} else if (font().weight() != QFont::Normal) {
-		fdesc += ":w" + QString::number(font().weight());
-	}
-	if (font().italic()) {
-		fdesc += ":i";
-	}
-	return fdesc;
-}
-
 /// Set the GUI font, or display the current font
 ///
 /// @param updateOption controls update of the guifont option, which should not
