@@ -45,35 +45,34 @@ void ShellWidget::setDefaultFont()
 #endif
 }
 
-// TODO Rename f -> font
-bool ShellWidget::setShellFont(const QFont& f, bool force) noexcept
+bool ShellWidget::setShellFont(const QFont& font, bool force) noexcept
 {
 	// Issue #585 Error message "Unknown font:" for Neovim 0.4.2+.
 	// This case has always been hit, but results in user visible error messages for recent
 	// releases. It is safe to ignore this case, which occurs at startup time.
-	if (f.family().isEmpty()) {
+	if (font.family().isEmpty()) {
 		return false;
 	}
 
-	QFontInfo fi(f);
-	if (fi.family().compare(f.family(), Qt::CaseInsensitive) != 0 &&
-			f.family().compare("Monospace", Qt::CaseInsensitive) != 0) {
-		emit fontError(QString("Unknown font: %1").arg(f.family()));
+	QFontInfo fi(font);
+	if (fi.family().compare(font.family(), Qt::CaseInsensitive) != 0 &&
+			font.family().compare("Monospace", Qt::CaseInsensitive) != 0) {
+		emit fontError(QString("Unknown font: %1").arg(font.family()));
 		return false;
 	}
 
 	if (!force) {
 		if (!fi.fixedPitch()) {
-			emit fontError(QString("%1 is not a fixed pitch font").arg(f.family()));
+			emit fontError(QString("%1 is not a fixed pitch font").arg(font.family()));
 			return false;
 		}
 
-		if (isBadMonospace(f)) {
-			emit fontError(QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(f.family()));
+		if (isBadMonospace(font)) {
+			emit fontError(QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(font.family()));
 		}
 	}
 
-	setFont(f);
+	setFont(font);
 	setCellSize();
 	emit shellFontChanged();
 	return true;
