@@ -54,6 +54,25 @@ public:
 	bool neovimBusy() const;
 	bool neovimAttached() const;
 
+	PopupMenu& getPopupMenu() noexcept
+	{
+		return m_pum;
+	}
+
+	/// Lookup highlight by name from hl_group_set
+	HighlightAttribute GetHighlightGroup(const QString& name) const noexcept
+	{
+		const uint64_t hl_id{ m_highlightGroupNameMap.value(name) };
+		return m_highlightMap.value(hl_id);
+	}
+
+	/// Check if highlight exists in hl_group_set
+	bool IsHighlightGroup(const QString& name) const noexcept
+	{
+		const uint64_t hl_id{ m_highlightGroupNameMap.value(name) };
+		return m_highlightMap.contains(hl_id);
+	}
+
 	/// Dispatches Neovim redraw notifications to T::handleRedraw
 	template <class T>
 	static void DispatchRedrawNotifications(
@@ -78,6 +97,13 @@ signals:
 	void neovimShowtablineSet(int);
 	void neovimShowContextMenu();
 	void fontChanged();
+	void colorsChanged();
+
+	// GuiAdaptive Color/Font Signals
+	void setGuiAdaptiveColorEnabled(bool isEnabled);
+	void setGuiAdaptiveFontEnabled(bool isEnabled);
+	void setGuiAdaptiveStyle(const QString& styleName);
+	void showGuiAdaptiveStyleList();
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
@@ -141,9 +167,16 @@ protected:
 	virtual void handleGridResize(const QVariantList& opargs);
 	virtual void handleDefaultColorsSet(const QVariantList& opargs);
 	virtual void handleHighlightAttributeDefine(const QVariantList& opargs);
+	virtual void handleHighlightGroupSet(const QVariantList& opargs) noexcept;
 	virtual void handleGridLine(const QVariantList& opargs);
 	virtual void handleGridCursorGoto(const QVariantList& opargs);
 	virtual void handleGridScroll(const QVariantList& opargs);
+
+	// GuiAdaptive Color/Font
+	virtual void handleGuiAdaptiveColor(const QVariantList& opargs) noexcept;
+	virtual void handleGuiAdaptiveFont(const QVariantList& opargs) noexcept;
+	virtual void handleGuiAdaptiveStyle(const QVariantList& opargs) noexcept;
+	virtual void handleGuiAdaptiveStyleList() noexcept;
 
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
@@ -178,6 +211,9 @@ private:
 
 	/// Modern 'ext_linegrid' highlight definition map
 	QMap<uint64_t, HighlightAttribute> m_highlightMap;
+
+	/// Storage for hl_group_set, maps to hl_id in m_highlightMap
+	QMap<QString, uint64_t> m_highlightGroupNameMap;
 
 	/// Neovim mode descriptions from "mode_change", used by guicursor
 	QVariantList m_modeInfo;
