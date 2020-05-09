@@ -97,42 +97,18 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 			return false;
 		}
 
-		setShellFontSuccess = setShellFont(font.family(), font.pointSize(), font.weight(),
-			font.italic(), force);
+		setShellFontSuccess = setShellFont(font, force);
 	}
 	else {
-		QStringList attrs = fdesc.split(':');
-		if (attrs.size() < 1) {
-			m_nvim->api0()->vim_report_error("Invalid font");
+		QVariant varFont{ TryGetQFontFromDescription(fdesc) };
+
+		if (!ShellWidget::IsValidFont(varFont)) {
+			m_nvim->api0()->vim_report_error(
+				m_nvim->encode(varFont.toString()));
 			return false;
 		}
 
-		qreal pointSize = font().pointSizeF();
-		int weight = -1;
-		bool italic = false;
-		for (const auto& attr : attrs) {
-			if (attr.size() >= 2 && attr[0] == 'h') {
-				bool ok{ false };
-				qreal height = attr.mid(1).toFloat(&ok);
-				if (!ok) {
-					m_nvim->api0()->vim_report_error("Invalid font height");
-					return false;
-				}
-				pointSize = height;
-			} else if (attr == "b") {
-				weight = QFont::Bold;
-			} else if (attr == "l") {
-				weight = QFont::Light;
-			} else if (attr == "sb") {
-				weight = QFont::DemiBold;
-			} else if (attr.length() > 0 && attr.at(0) == 'w') {
-				weight = (attr.right(attr.length()-1)).toInt();
-			} else if (attr == "i") {
-				italic = true;
-			}
-		}
-
-		setShellFontSuccess = setShellFont(attrs.at(0), pointSize, weight, italic, force);
+		setShellFontSuccess = setShellFont(qvariant_cast<QFont>(varFont), force);
 	}
 
 	// Only update the ShellWidget when font changes.

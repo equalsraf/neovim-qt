@@ -25,7 +25,7 @@ public:
 		Light
 	};
 
-	bool setShellFont(const QString& family, qreal ptSize, int weight = -1, bool italic = false, bool force = false);
+	bool setShellFont(const QFont& font, bool force = false) noexcept;
 
 	QColor background() const;
 	QColor foreground() const;
@@ -48,6 +48,18 @@ public:
 
 	/// Get a Neovim font description from QFont.
 	static QString fontDesc(const QFont& font) noexcept;
+
+	/// Converts a Neovim font description to QFont
+	///
+	/// Returns a QFont for valid descriptions.
+	/// If an invalid description is provided, returns a QString error message.
+	QVariant TryGetQFontFromDescription(const QString& fdesc) const noexcept;
+
+	/// Manually provided a `font()` for TryGetQFontFromDescription above.
+	static QVariant TryGetQFontFromDescription(const QString& fdesc, const QFont& font) noexcept;
+
+	/// Helper to check the result of TryGetQFontFromDescription
+	static bool IsValidFont(const QVariant& variant) noexcept;
 
 signals:
 	void shellFontChanged();
@@ -116,6 +128,7 @@ private:
 	QRect getNeovimCursorRect(QRect cellRect) noexcept;
 	void paintNeovimCursorBackground(QPainter& p, QRect cellRect) noexcept;
 	void paintNeovimCursorForeground(QPainter& p, QRect cellRect, QPoint pos, QChar character) noexcept;
+	QFont GetCellFont(const Cell& cell) const noexcept;
 
 	ShellContents m_contents{ 0, 0 };
 	QSize m_cellSize;

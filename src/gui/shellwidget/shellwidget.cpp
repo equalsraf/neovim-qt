@@ -30,7 +30,8 @@ ShellWidget* ShellWidget::fromFile(const QString& path)
 
 void ShellWidget::setDefaultFont()
 {
-	setShellFont(getDefaultFontFamily(), 11, -1, false, true);
+	static const QFont font{ getDefaultFontFamily(), 11 /*pointSize*/, -1 /*weight*/, false /*italic*/ };
+	setShellFont(font, true /*force*/);
 }
 
 /*static*/ QString ShellWidget::getDefaultFontFamily() noexcept
@@ -44,18 +45,9 @@ void ShellWidget::setDefaultFont()
 #endif
 }
 
-bool ShellWidget::setShellFont(const QString& family, qreal ptSize, int weight, bool italic, bool force)
+// TODO Rename f -> font
+bool ShellWidget::setShellFont(const QFont& f, bool force) noexcept
 {
-	QFont f(family, -1, weight, italic);
-	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
-	// but we want to match the family name with the bold/italic attributes.
-	f.setStyleName(QStringLiteral(""));
-
-	f.setPointSizeF(ptSize);
-	f.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
-	f.setFixedPitch(true);
-	f.setKerning(false);
-
 	// Issue #585 Error message "Unknown font:" for Neovim 0.4.2+.
 	// This case has always been hit, but results in user visible error messages for recent
 	// releases. It is safe to ignore this case, which occurs at startup time.
@@ -210,6 +202,22 @@ void ShellWidget::paintNeovimCursorForeground(
 	p.setClipping(oldClippingSetting);
 }
 
+QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
+{
+	QFont cellFont{ font() };
+
+	if (cell.IsBold() || cell.IsItalic()) {
+		cellFont.setBold(cell.IsBold());
+		cellFont.setItalic(cell.IsItalic());
+	}
+
+	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
+	// but we want to match the family name with the bold/italic attributes.
+	cellFont.setStyleName(QStringLiteral(""));
+
+	return cellFont;
+}
+
 void ShellWidget::paintEvent(QPaintEvent *ev)
 {
 	QPainter p(this);
@@ -263,15 +271,7 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 							fgColor = (cell.IsReverse()) ? background() : foreground();
 						}
 						p.setPen(fgColor);
-
-						if (cell.IsBold() || cell.IsItalic()) {
-							QFont f = p.font();
-							f.setBold(cell.IsBold());
-							f.setItalic(cell.IsItalic());
-							p.setFont(f);
-						} else {
-							p.setFont(font());
-						}
+						p.setFont(GetCellFont(cell));
 
 						// Draw chars at the baseline
 						const int cellTextOffset{ m_ascent + (m_lineSpace / 2) };
@@ -608,4 +608,58 @@ QString ShellWidget::fontDesc() const noexcept
 	}
 
 	return fdesc;
+}
+
+QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noexcept
+{
+	return TryGetQFontFromDescription(fdesc, font());
+}
+
+/*static*/ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc, const QFont& curFont) noexcept
+{
+	QStringList attrs = fdesc.split(':');
+	if (attrs.size() < 1) {
+		return QStringLiteral("Invalid font");
+	}
+
+	qreal pointSizeF = curFont.pointSizeF();
+	int weight = -1;
+	bool italic = false;
+	for (const auto& attr : attrs) {
+		if (attr.size() >= 2 && attr[0] == 'h') {
+			bool ok{ false };
+			qreal height = attr.mid(1).toFloat(&ok);
+			if (!ok || height < 0) {
+				return QStringLiteral("Invalid font height");
+			}
+			pointSizeF = height;
+		} else if (attr == "b") {
+			weight = QFont::Bold;
+		} else if (attr == "l") {
+			weight = QFont::Light;
+		} else if (attr == "sb") {
+			weight = QFont::DemiBold;
+		} else if (attr.length() > 0 && attr.at(0) == 'w') {
+			weight = (attr.right(attr.length()-1)).toInt();
+			if (weight < 0 || weight > 99) {
+				return QStringLiteral("Invalid font weight");
+			}
+		} else if (attr == "i") {
+			italic = true;
+		}
+	}
+
+	QFont font{ attrs.at(0), -1 /*pointSize*/, weight, italic };
+
+	font.setPointSizeF(pointSizeF);
+	font.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
+	font.setFixedPitch(true);
+	font.setKerning(false);
+
+	return font;
+}
+
+/*static*/ bool ShellWidget::IsValidFont(const QVariant& variant) noexcept
+{
+	return static_cast<QMetaType::Type>(variant.type()) == QMetaType::QFont;
 }
