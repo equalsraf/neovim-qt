@@ -131,6 +131,41 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 	return true;
 }
 
+bool Shell::setGuiFontWide(const QString& fdesc) noexcept
+{
+	// An empty list is valid, use guifont
+	if (fdesc.isEmpty())
+	{
+		m_guifontwidelist = {};
+		update();
+		return true;
+	}
+
+	const QStringList fdescList{ fdesc.split(",") };
+	if (fdescList.size() < 1) {
+		return false;
+	}
+
+	std::vector<QFont> fontList;
+	fontList.reserve(fdescList.size());
+
+	for (const auto& strFont : fdescList) {
+		QVariant varFont{ TryGetQFontFromDescription(strFont) };
+
+		if (!ShellWidget::IsValidFont(varFont)) {
+			m_nvim->api0()->vim_report_error(
+				m_nvim->encode(varFont.toString()));
+			return false;
+		}
+
+		fontList.push_back(qvariant_cast<QFont>(varFont));
+	}
+
+	m_guifontwidelist = std::move(fontList);
+	update();
+	return true;
+}
+
 Shell::~Shell()
 {
 	if (m_nvim && m_attached) {
@@ -821,6 +856,7 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 		setGuiFont(value.toString(), false /*force*/, false /*setOption*/);
 	} else if (name == "guifontset") {
 	} else if (name == "guifontwide") {
+		handleGuiFontWide(value);
 	} else if (name == "linespace") {
 		// The conversion to string and then to int happens because of http://doc.qt.io/qt-5/qvariant.html#toUInt
 		// toUint() fails to detect an overflow i.e. it converts to ulonglong and then returns a MAX UINT
@@ -867,6 +903,19 @@ void Shell::handleGuiFontFunction(const QVariantList& args)
 	}
 
 	setGuiFont(fdesc, force, true /*setOption*/);
+}
+
+void Shell::handleGuiFontWide(const QVariant& value) noexcept
+{
+	if (!value.canConvert<QByteArray>())
+	{
+		qWarning() << "Unexpected value for guifontwide:" << value;
+		return;
+	}
+
+	const QString fdesc{ m_nvim->decode(value.toByteArray()) };
+
+	setGuiFontWide(fdesc);
 }
 
 void Shell::handleGridResize(const QVariantList& opargs)
