@@ -3,6 +3,7 @@
 #include <QCloseEvent>
 #include <QLayout>
 #include <QSettings>
+#include <QStyleFactory>
 #include <QToolBar>
 
 namespace NeovimQt {
@@ -10,6 +11,8 @@ namespace NeovimQt {
 MainWindow::MainWindow(NeovimConnector* c, ShellOptions opts, QWidget* parent)
 	: QMainWindow(parent)
 	, m_shell_options(opts)
+	, m_defaultFont{ font() }
+	, m_defaultPalette{ palette() }
 {
 	m_errorWidget = new ErrorWidget();
 	m_stack.addWidget(m_errorWidget);
@@ -124,6 +127,19 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimSendPaste);
 	connect(m_actSelectAll, &QAction::triggered,
 			this, &MainWindow::neovimSendSelectAll);
+
+	// GuiAdaptive Color/Font/Style Signal/Slot Connections
+	connect(m_shell, &Shell::setGuiAdaptiveColorEnabled,
+			this, &MainWindow::setGuiAdaptiveColorEnabled);
+	connect(m_shell, &Shell::setGuiAdaptiveFontEnabled,
+			this, &MainWindow::setGuiAdaptiveFontEnabled);
+	connect(m_shell, &Shell::setGuiAdaptiveStyle,
+			this, &MainWindow::setGuiAdaptiveStyle);
+	connect(m_shell, &Shell::showGuiAdaptiveStyleList,
+			this, &MainWindow::showGuiAdaptiveStyleList);
+	connect(m_shell, &Shell::colorsChanged,
+			this, &MainWindow::updateAdaptiveColor);
+
 	m_shell->setFocus(Qt::OtherFocusReason);
 
 	if (m_nvim->errorCause()) {
@@ -416,4 +432,129 @@ void MainWindow::restoreWindowGeometry()
 	restoreState(settings.value("window_state").toByteArray());
 }
 
-}  // namespace NeovimQt
+void MainWindow::setGuiAdaptiveColorEnabled(bool isEnabled)
+{
+	m_isAdaptiveColorEnabled = isEnabled;
+
+	updateAdaptiveColor();
+}
+
+void MainWindow::setGuiAdaptiveFontEnabled(bool isEnabled)
+{
+	m_isAdaptiveFontEnabled = isEnabled;
+
+	updateAdaptiveFont();
+}
+
+void MainWindow::setGuiAdaptiveStyle(const QString& styleName)
+{
+	// The style may be empty if the name is invalid. This appears to be safe,
+	// calling setStyle(nullptr) will restore the default Qt Style.
+	QStyle* pStyle{ QStyleFactory::create(styleName) };
+
+	auto childrenWidgets{ findChildren<QWidget*>() + m_shell->findChildren<QWidget*>() };
+
+	for (const auto childWidget : childrenWidgets) {
+		childWidget->setStyle(pStyle);
+	}
+
+	setStyle(pStyle);
+}
+
+void MainWindow::showGuiAdaptiveStyleList()
+{
+	const QString styleKeys{ QStyleFactory::keys().join("\n") };
+	QString echoCommand{ R"(echo "%1")" };
+	m_nvim->api0()->vim_command(echoCommand.arg(styleKeys).toLatin1());
+}
+
+void MainWindow::updateAdaptiveFont() noexcept
+{
+	if (!m_shell) {
+		return;
+	}
+
+	const QFont& font{ (m_isAdaptiveFontEnabled) ?
+		m_shell->font() : m_defaultFont };
+
+	setFont(font);
+
+	auto childrenWidgets{ findChildren<QWidget*>() + m_shell->findChildren<QWidget*>() };
+
+	for (const auto childWidget : childrenWidgets) {
+		// Do not call setFont() on ShellWidget objects
+		if (qobject_cast<ShellWidget*>(childWidget)) {
+			continue;
+		}
+
+		childWidget->setFont(font);
+	}
+}
+
+static QPalette CreatePaletteFromHighlightGroups(const Shell& shell) noexcept
+{
+	const QColor& background{ shell.background() };
+	const QColor& foreground{ shell.foreground() };
+
+	QPalette palette;
+	palette.setColor(QPalette::Background, background);
+	palette.setColor(QPalette::Foreground, foreground);
+	palette.setColor(QPalette::Window, background);
+	palette.setColor(QPalette::WindowText, foreground);
+	palette.setColor(QPalette::Base, background);
+	palette.setColor(QPalette::Text, foreground);
+	palette.setColor(QPalette::Button, background);
+	palette.setColor(QPalette::ButtonText, foreground);
+
+	return palette;
+}
+
+void MainWindow::updateAdaptiveColor() noexcept
+{
+	if (!m_shell) {
+		return;
+	}
+
+	auto setPaletteAllChildren = [&](const QPalette& palette) noexcept
+	{
+		setPalette(palette);
+		auto childrenWidgets{ findChildren<QWidget*>() + m_shell->findChildren<QWidget*>() };
+
+		for (const auto childWidget : childrenWidgets) {
+			childWidget->setPalette(palette);
+		}
+	};
+
+	if (!m_isAdaptiveColorEnabled) {
+		setPaletteAllChildren(m_defaultPalette);
+		return;
+	}
+
+	setPaletteAllChildren(CreatePaletteFromHighlightGroups(*m_shell));
+
+	// Some widgets support specialized palettes
+	PopupMenu& popupMenu{ m_shell->getPopupMenu() };
+	const bool isPopupMenuSupported { m_shell->IsHighlightGroup("Pmenu")
+		&& m_shell->IsHighlightGroup("PmenuSel") };
+	if (isPopupMenuSupported) {
+		QPalette palette;
+
+		const HighlightAttribute pmenu{ m_shell->GetHighlightGroup("Pmenu") };
+		palette.setColor(QPalette::Base, pmenu.GetBackgroundColor());
+		palette.setColor(QPalette::Text, pmenu.GetForegroundColor());
+
+		const HighlightAttribute pmenusel{ m_shell->GetHighlightGroup("PmenuSel") };
+		palette.setColor(QPalette::Highlight, pmenusel.GetBackgroundColor());
+		palette.setColor(QPalette::HighlightedText, pmenusel.GetForegroundColor());
+
+		auto childrenWidgets{ popupMenu.findChildren<QWidget*>() };
+
+		for (const auto childWidget : childrenWidgets) {
+			childWidget->setPalette(palette);
+		}
+
+		popupMenu.setPalette(palette);
+	}
+}
+
+} // namespace NeovimQt

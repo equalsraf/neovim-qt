@@ -2,14 +2,16 @@
 #define NEOVIM_QT_MAINWINDOW
 
 #include <QMainWindow>
+#include <QPalette>
+#include <QSplitter>
 #include <QStackedWidget>
 #include <QTabBar>
-#include <QSplitter>
-#include "treeview.h"
-#include "neovimconnector.h"
+
 #include "errorwidget.h"
+#include "neovimconnector.h"
 #include "scrollbar.h"
 #include "shell.h"
+#include "treeview.h"
 
 namespace NeovimQt {
 
@@ -59,6 +61,12 @@ private slots:
 	void changeTab(int index);
 	void saveWindowGeometry();
 
+	// GuiAdaptive Color/Font/Style Slots
+	void setGuiAdaptiveColorEnabled(bool isEnabled);
+	void setGuiAdaptiveFontEnabled(bool isEnabled);
+	void setGuiAdaptiveStyle(const QString& style);
+	void showGuiAdaptiveStyleList();
+
 private:
 	void init(NeovimConnector *);
 
@@ -81,11 +89,14 @@ private:
 	QAction* m_actSelectAll{ nullptr };
 	ScrollBar* m_scrollbar{ nullptr };
 
-	// GuiAdaptive Color/Font
+	// GuiAdaptive Color/Font/Style
 	bool m_isAdaptiveColorEnabled{ false };
 	bool m_isAdaptiveFontEnabled{ false };
 	QFont m_defaultFont;
 	QPalette m_defaultPalette;
+
+	void updateAdaptiveColor() noexcept;
+	void updateAdaptiveFont() noexcept;
 };
 
 } // Namespace

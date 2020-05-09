@@ -232,3 +232,27 @@ function! s:GuiScrollBar(enable) abort
 endfunction
 
 command! -nargs=1 GuiScrollBar call s:GuiScrollBar(<args>)
+
+" Use Neovim theming for Qt Widgets
+function! s:GuiAdaptiveColor(enable) abort
+	call rpcnotify(0, 'Gui', 'AdaptiveColor', a:enable)
+endfunction
+command! -nargs=1 GuiAdaptiveColor call s:GuiAdaptiveColor(<args>)
+
+" Use Neovim font for Qt Widgets
+function! s:GuiAdaptiveFont(enable) abort
+	call rpcnotify(0, 'Gui', 'AdaptiveFont', a:enable)
+endfunction
+command! -nargs=1 GuiAdaptiveFont call s:GuiAdaptiveFont(<args>)
+
+" Override default Qt Style using QStyleFactory
+function! s:GuiAdaptiveStyle(styleName, ...) abort
+	call rpcnotify(0, 'Gui', 'AdaptiveStyle', a:styleName)
+endfunction
+command! -nargs=? GuiAdaptiveStyle call s:GuiAdaptiveStyle("<args>")
+
+" Print a list of available Qt Styles
+function! s:GuiAdaptiveStyleList() abort
+	call rpcnotify(0, 'Gui', 'AdaptiveStyleList')
+endfunction
+command! -nargs=0 GuiAdaptiveStyleList call s:GuiAdaptiveStyleList()

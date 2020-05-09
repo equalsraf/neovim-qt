@@ -533,6 +533,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "grid_scroll") {
 		handleGridScroll(opargs);
 	} else if (name == "hl_group_set") {
+		handleHighlightGroupSet(opargs);
 	} else if (name == "win_viewport") {
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
@@ -818,6 +819,14 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			QGuiApplication::clipboard()->setMimeData(clipData, clipboard);
 		} else if (guiEvName == "ShowContextMenu") {
 			emit neovimShowContextMenu();
+		} else if (guiEvName == "AdaptiveColor") {
+			handleGuiAdaptiveColor(args);
+		} else if (guiEvName == "AdaptiveFont") {
+			handleGuiAdaptiveFont(args);
+		} else if (guiEvName == "AdaptiveStyle") {
+			handleGuiAdaptiveStyle(args);
+		} else if (guiEvName == "AdaptiveStyleList") {
+			handleGuiAdaptiveStyleList();
 		}
 		return;
 	} else if (name != "redraw") {
@@ -964,6 +973,7 @@ void Shell::handleDefaultColorsSet(const QVariantList& opargs)
 
 	// Cells drawn with the default colors require a re-paint
 	update();
+	emit colorsChanged();
 }
 
 void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
@@ -986,6 +996,20 @@ void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
 	m_highlightMap.insert(id, hl_attr);
 }
 
+void Shell::handleHighlightGroupSet(const QVariantList& opargs) noexcept
+{
+	if (opargs.size() < 2
+		|| opargs.at(0).type() != QVariant::Type::ByteArray
+		|| !opargs.at(1).canConvert<uint64_t>()) {
+		qWarning() << "Unexpected arguments for hl_group_set:" << opargs;
+		return;
+	}
+
+	const QString name{ m_nvim->decode(opargs.at(0).toByteArray()) };
+	const uint64_t hl_id{ opargs.at(1).toULongLong() };
+
+	m_highlightGroupNameMap.insert(name, hl_id);
+}
 
 void Shell::handleGridLine(const QVariantList& opargs)
 {
@@ -1093,6 +1117,50 @@ void Shell::handleGridScroll(const QVariantList& opargs)
 
 	// Draw new cursor
 	update(neovimCursorRect());
+}
+
+void Shell::handleGuiAdaptiveColor(const QVariantList& opargs) noexcept
+{
+	if (opargs.size() < 2
+		|| !opargs.at(1).canConvert<bool>()) {
+		qWarning() << "Unexpected arguments for GuiAdaptiveColor:" << opargs;
+		return;
+	}
+
+	const bool isEnabled{ opargs.at(1).toBool() };
+
+	emit setGuiAdaptiveColorEnabled(isEnabled);
+}
+
+void Shell::handleGuiAdaptiveFont(const QVariantList& opargs) noexcept
+{
+	if (opargs.size() < 2
+		|| !opargs.at(1).canConvert<bool>()) {
+		qWarning() << "Unexpected arguments for GuiAdaptiveFont:" << opargs;
+		return;
+	}
+
+	const bool isEnabled{ opargs.at(1).toBool() };
+
+	emit setGuiAdaptiveFontEnabled(isEnabled);
+}
+
+void Shell::handleGuiAdaptiveStyle(const QVariantList& opargs) noexcept
+{
+	if (opargs.size() < 2
+		|| !opargs.at(1).canConvert<QByteArray>()) {
+		qWarning() << "Unexpected arguments for GuiAdaptiveStyle:" << opargs;
+		return;
+	}
+
+	const QString styleName { opargs.at(1).toByteArray() };
+
+	emit setGuiAdaptiveStyle(styleName);
+}
+
+void Shell::handleGuiAdaptiveStyleList() noexcept
+{
+	emit showGuiAdaptiveStyleList();
 }
 
 void Shell::paintEvent(QPaintEvent *ev)

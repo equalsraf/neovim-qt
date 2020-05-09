@@ -17,7 +17,25 @@ can be used in |ginit.vim| provided that
 ==============================================================================
 1. Commands
 
-								*Guifont* *GuiFont*
+								*GuiAdaptiveColor*
+GuiAdaptiveColor    Use the neovim `colorscheme` to style the GUI.
+>
+		    :GuiAdaptiveColor 1
+<
+								*GuiAdaptiveFont*
+GuiAdaptiveFont     Use the current `GuiFont`` to decorate the GUI.
+>
+		    :GuiAdaptiveFont 1
+<
+								*GuiAdaptiveStyle*
+GuiAdaptiveStyle    Override the default Qt Style/Theme. See
+>
+		    :GuiAdaptiveStyle Fusion
+<
+								*GuiAdaptiveStyleList*
+GuiAdaptiveStyleList    Shows the list of available Qt Styles.
+
+								*GuiFont*
 GuiFont		When called with no arguments this command display the
 		current font used by the GUI.
 
