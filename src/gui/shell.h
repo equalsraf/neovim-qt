@@ -54,7 +54,6 @@ public:
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
 	bool neovimAttached() const;
-	QString fontDesc();
 
 	/// Dispatches Neovim redraw notifications to T::handleRedraw
 	template <class T>
