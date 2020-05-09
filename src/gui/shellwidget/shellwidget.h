@@ -120,6 +120,8 @@ protected:
 	/// Get the area filled by the cursor
 	QRect neovimCursorRect() const noexcept;
 
+	std::vector<QFont> m_guifontwidelist;
+
 	/// Move the neovim cursor for text insertion and display
 	void setNeovimCursor(uint64_t col, uint64_t row) noexcept;
 
@@ -128,6 +130,11 @@ protected:
 
 	void setCellSize();
 	QRect absoluteShellRect(int row0, int col0, int rowcount, int colcount);
+
+	void setGuiFontList(const std::vector<QFont>&& fontList) noexcept
+	{
+		m_guifontwidelist = fontList;
+	}
 
 private:
 	void setFont(const QFont&);

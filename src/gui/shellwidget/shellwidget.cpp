@@ -205,6 +205,21 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 {
 	QFont cellFont{ font() };
 
+	if (cell.IsDoubleWidth()) {
+
+		auto isCharacterInWideFont = [&](const QFont& wideFont) noexcept
+		{
+			return QFontMetrics(wideFont).inFontUcs4(cell.GetCharacter());
+		};
+
+		auto wideFont = std::find_if(m_guifontwidelist.begin(), m_guifontwidelist.end(), isCharacterInWideFont);
+
+		if (wideFont != m_guifontwidelist.end())
+		{
+			cellFont = *wideFont;
+		}
+	}
+
 	if (cell.IsBold() || cell.IsItalic()) {
 		cellFont.setBold(cell.IsBold());
 		cellFont.setItalic(cell.IsItalic());
@@ -213,6 +228,10 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
 	// but we want to match the family name with the bold/italic attributes.
 	cellFont.setStyleName(QStringLiteral(""));
+
+	cellFont.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
+	cellFont.setFixedPitch(true);
+	cellFont.setKerning(false);
 
 	return cellFont;
 }
