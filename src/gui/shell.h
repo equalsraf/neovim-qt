@@ -50,7 +50,6 @@ public:
 	~Shell();
 	QSize sizeIncrement() const;
 	static QColor color(qint64 color, const QColor& fallback=QColor());
-	static bool isBadMonospace(const QFont& f);
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
 	bool neovimAttached() const;
