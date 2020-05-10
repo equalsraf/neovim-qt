@@ -61,6 +61,13 @@ public:
 	/// Helper to check the result of TryGetQFontFromDescription
 	static bool IsValidFont(const QVariant& variant) noexcept;
 
+	/// Check if a font can be safely used as a fixed pitch font
+	///
+	/// This function is not perfect and some broken fonts may still return false,
+	/// or font substitution may cause good fonts to fail. The font max/average
+	/// metrics are compared with the italic/bold double width variants.
+	static bool isBadMonospace(const QFont& f) noexcept;
+
 signals:
 	void shellFontChanged();
 	void fontError(const QString& msg);

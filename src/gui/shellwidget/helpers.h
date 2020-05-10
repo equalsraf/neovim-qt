@@ -4,6 +4,5 @@
 #include "shellcontents.h"
 
 bool saveShellContents(const ShellContents& s, const QString& filename);
-bool isBadMonospace(const QFont& f);
 
 #endif

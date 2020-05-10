@@ -663,3 +663,63 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 {
 	return static_cast<QMetaType::Type>(variant.type()) == QMetaType::QFont;
 }
+
+/*static*/ bool ShellWidget::isBadMonospace(const QFont& f) noexcept
+{
+	QFont fi(f);
+	fi.setItalic(true);
+	QFont fb(f);
+	fb.setBold(true);
+	QFont fbi(fb);
+	fbi.setItalic(true);
+
+	QFontMetrics fm_normal(f);
+	QFontMetrics fm_italic(fi);
+	QFontMetrics fm_boldit(fbi);
+	QFontMetrics fm_bold(fb);
+
+	// Regular
+	if ( fm_normal.averageCharWidth() != fm_normal.maxWidth() ) {
+		QFontInfo info(f);
+		qDebug() << f.family()
+			<< "Average and Maximum font width mismatch for Regular font; QFont::exactMatch() is" << f.exactMatch()
+			<< "Real font is " << info.family() << info.pointSize();
+		return true;
+	}
+
+	// Italic
+	if ( fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
+			fm_italic.maxWidth()*2 != fm_italic.width("MM") ) {
+		QFontInfo info(fi);
+		qDebug() << fi.family() << "Average and Maximum font width mismatch for Italic font; QFont::exactMatch() is" << fi.exactMatch()
+			<< "Real font is " << info.family() << info.pointSize();
+		return true;
+	}
+
+	// Bold
+	if ( fm_bold.averageCharWidth() != fm_bold.maxWidth() ||
+			fm_bold.maxWidth()*2 != fm_bold.width("MM") ) {
+		QFontInfo info(fb);
+		qDebug() << fb.family() << "Average and Maximum font width mismatch for Bold font; QFont::exactMatch() is" << fb.exactMatch()
+			<< "Real font is " << info.family() << info.pointSize();
+		return true;
+	}
+
+	// Bold+Italic
+	if ( fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
+			fm_boldit.maxWidth()*2 != fm_boldit.width("MM") ) {
+		QFontInfo info(fbi);
+		qDebug() << fbi.family() << "Average and Maximum font width mismatch for Bold+Italic font; QFont::exactMatch() is" << fbi.exactMatch()
+			<< "Real font is " << info.family() << info.pointSize();
+		return true;
+	}
+
+	if ( fm_normal.maxWidth() != fm_italic.maxWidth() ||
+		fm_normal.maxWidth() != fm_boldit.maxWidth() ||
+		fm_normal.maxWidth() != fm_bold.maxWidth()) {
+		qDebug() << f.family() << "Average and Maximum font width mismatch between font types";
+		return true;
+	}
+
+	return false;
+}
