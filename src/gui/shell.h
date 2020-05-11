@@ -193,7 +193,8 @@ private:
 	uint8_t m_mouseclick_count{ 0 };
 	Qt::MouseButton m_mouseclick_pending;
 	// Accumulates remainder of steppy scroll
-	QPoint m_mouse_wheel_delta_fraction;
+	QPointF m_scroll_remainder;
+	QPoint m_scroll_last_direction;
 
 	// Properties
 	bool m_neovimBusy{ false };

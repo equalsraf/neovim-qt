@@ -1,5 +1,6 @@
 #include "shell.h"
 
+#include <cmath>
 #include <QFontDialog>
 #include <QPainter>
 #include <QPaintEvent>
@@ -1243,52 +1244,75 @@ void Shell::setCursorFromBusyState() noexcept
 	}
 }
 
+static int normalize(float x)
+{
+	if (x == 0.0f) {
+		return 0;
+	}
+	if (x < 0) {
+		return -1;
+	}
+	return 1;
+}
+
 void Shell::wheelEvent(QWheelEvent *ev)
 {
 	if (!m_attached || !m_mouseEnabled) {
 		return;
 	}
-#ifdef Q_OS_MAC
-	// For some reason <ScrollWheel*> scrolls multiple lines at once
-	// we have to account for it, to make sure that pixelDelta() is used correctly.
-	const int scroll_columns = 6;
-	const int scroll_rows = 3;
-	// Minimal scroll step
-	int scroll_step_x = cellSize().width() * scroll_columns;
-	int scroll_step_y = cellSize().height() * scroll_rows;
-	// Total scroll delta considering previous events
-	QPoint total_delta = m_mouse_wheel_delta_fraction + ev->pixelDelta();
-	// Delta rounded to a minimal scroll step
-	QPoint cell_delta(total_delta.x() / scroll_step_x, total_delta.y() / scroll_step_y);
-	// Save remainder for future events
-	m_mouse_wheel_delta_fraction = total_delta - QPoint(cell_delta.x() * scroll_step_x, cell_delta.y() * scroll_step_y);
-
-	int horiz = cell_delta.x();
-	int vert = cell_delta.y();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 5, 0))
+	const int defaultDeltasPerStep = 120;
 #else
-	int horiz, vert;
-	horiz = ev->angleDelta().x();
-	vert = ev->angleDelta().y();
+	const int defaultDeltasPerStep = QWheelEvent::DefaultDeltasPerStep;
 #endif
 
-	if (horiz == 0 && vert == 0) {
+	QPointF scroll_delta_f(ev->angleDelta());
+	scroll_delta_f /= defaultDeltasPerStep;
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
+	if (ev->inverted()) {
+		scroll_delta_f = -scroll_delta_f;
+	}
+#endif
+
+	// Reset scroll remainder if we change scroll direction;
+	const int direction_x = normalize(scroll_delta_f.x());
+	if (direction_x != m_scroll_last_direction.x()) {
+		m_scroll_remainder.setX(0.0);
+		m_scroll_last_direction.setX(direction_x);
+	}
+	const int direction_y = normalize(scroll_delta_f.y());
+	if (direction_y != m_scroll_last_direction.y()) {
+		m_scroll_remainder.setY(0.0);
+		m_scroll_last_direction.setY(direction_y);
+	}
+
+	// Scroll distance considering previous events
+	const QPointF total_delta = scroll_delta_f + m_scroll_remainder;
+	const QPointF scroll_delta(std::floor(total_delta.x()),
+			std::floor(total_delta.y()));
+
+	// Store remainder so we can accumulate fine scroll events
+	m_scroll_remainder = total_delta - scroll_delta;
+
+	if (scroll_delta.isNull()) {
 		return;
 	}
 
-	QPoint pos(ev->x()/cellSize().width(),
+	const QPoint pos(ev->x()/cellSize().width(),
 			ev->y()/cellSize().height());
 
 	QString inp;
-	if (vert != 0) {
+	if (scroll_delta.y() != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
 			.arg(Input::GetModifierPrefix(ev->modifiers()))
-			.arg(vert > 0 ? "Up" : "Down")
+			.arg(scroll_delta.y() > 0 ? "Up" : "Down")
 			.arg(pos.x()).arg(pos.y());
 	}
-	if (horiz != 0) {
+	if (scroll_delta.x() != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
 			.arg(Input::GetModifierPrefix(ev->modifiers()))
-			.arg(horiz > 0 ? "Left" : "Right")
+			.arg(scroll_delta.x() > 0 ? "Left" : "Right")
 			.arg(pos.x()).arg(pos.y());
 	}
 	m_nvim->api0()->vim_input(inp.toLatin1());
