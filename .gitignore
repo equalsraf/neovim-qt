@@ -2,3 +2,7 @@
 build/
 src/gui/runtime/doc/tags
 third-party/msgpack*
+
+local.mk
+CMakeLists.txt.user
+tst_shell_start.jpg
