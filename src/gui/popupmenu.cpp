@@ -72,6 +72,13 @@ void PopupMenu::setGeometry(int64_t row, int64_t col)
 	int width = sizeHintContent.width();
 	int anchor_x = col * cell_width;
 
+	// Scrollbar visibility depends on content, increase width when necessary.
+	const QScrollBar* vScrollBar{ verticalScrollBar() };
+	if (vScrollBar && vScrollBar->isVisible())
+	{
+		width += vScrollBar->size().width();
+	}
+
 	// PUM must fit within available space to the right of anchor_x
 	if (anchor_x + width > total_width)
 	{
