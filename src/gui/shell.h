@@ -175,7 +175,6 @@ private:
 	QColor m_hg_foreground{ Qt::black };
 	QColor m_hg_background{ Qt:: white };
 	QColor m_hg_special;
-	QColor m_cursor_color{ Qt::white };
 
 	/// Modern 'ext_linegrid' highlight definition map
 	QMap<uint64_t, HighlightAttribute> m_highlightMap;
@@ -183,7 +182,6 @@ private:
 	/// Neovim mode descriptions from "mode_change", used by guicursor
 	QVariantList m_modeInfo;
 
-	bool m_insertMode{ false };
 	bool m_resizing{ false };
 	QSize m_resize_neovim_pending;
 	QLabel* m_tooltip{ nullptr };
