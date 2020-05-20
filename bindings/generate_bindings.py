@@ -50,6 +50,7 @@ class NeovimTypeVal:
     SIMPLETYPES = {
             'void': 'void',
             'Integer': 'int64_t',
+            'Float': 'double',
             'Boolean': 'bool',
             'String': 'QByteArray',
             'Object': 'QVariant',

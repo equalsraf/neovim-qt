@@ -515,6 +515,21 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, int64_t& out)
 	return false;
 }
 
+void MsgpackIODevice::send(double d)
+{
+	msgpack_pack_float(&m_pk, d);
+}
+bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, double& out)
+{
+	if ( in.type != MSGPACK_OBJECT_FLOAT) {
+		qWarning() << "Attempting to decode as double when type is" << in.type << in;
+		out = -1;
+		return true;
+	}
+	out = in.via.f64;
+	return false;
+}
+
 /**
  * Serialise a value into the msgpack stream
  */
@@ -597,6 +612,25 @@ bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QList<int64_t>& ou
 
 	for (uint64_t i=0; i<in.via.array.size; i++) {
 		int64_t val;
+		if (decodeMsgpack(in.via.array.ptr[i], val)) {
+			out.clear();
+			return true;
+		}
+		out.append(val);
+	}
+	return false;
+}
+
+bool MsgpackIODevice::decodeMsgpack(const msgpack_object& in, QList<double>& out)
+{
+	out.clear();
+	if ( in.type != MSGPACK_OBJECT_ARRAY) {
+		qWarning() << "Attempting to decode as QList<double> when type is" << in.type << in;
+		return true;
+	}
+
+	for (uint64_t i=0; i<in.via.array.size; i++) {
+		double val;
 		if (decodeMsgpack(in.via.array.ptr[i], val)) {
 			out.clear();
 			return true;
