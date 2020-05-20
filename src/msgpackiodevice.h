@@ -41,6 +41,7 @@ public:
 	MsgpackRequest* startRequestUnchecked(const QString& method, quint32 argcount);
 
 	void send(int64_t);
+	void send(double);
 	void send(const QVariant&);
 	void send(const QByteArray&);
 	void send(bool);
@@ -81,11 +82,13 @@ protected:
 	void dispatchNotification(msgpack_object& obj);
 
 	bool decodeMsgpack(const msgpack_object& in, int64_t& out);
+	bool decodeMsgpack(const msgpack_object& in, double& out);
 	bool decodeMsgpack(const msgpack_object& in, QVariant& out);
 	bool decodeMsgpack(const msgpack_object& in, QByteArray& out);
 	bool decodeMsgpack(const msgpack_object& in, bool& out);
 	bool decodeMsgpack(const msgpack_object& in, QList<QByteArray>& out);
 	bool decodeMsgpack(const msgpack_object& in, QList<int64_t>& out);
+	bool decodeMsgpack(const msgpack_object& in, QList<double>& out);
 	bool decodeMsgpack(const msgpack_object& in, QPoint& out);
 
 protected slots:
