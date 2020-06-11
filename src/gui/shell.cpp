@@ -1,18 +1,19 @@
 #include "shell.h"
 
 #include <cmath>
-#include <QFontDialog>
-#include <QPainter>
-#include <QPaintEvent>
+#include <QApplication>
+#include <QClipboard>
 #include <QDebug>
 #include <QDesktopWidget>
-#include <QApplication>
+#include <QFontDialog>
 #include <QKeyEvent>
 #include <QMimeData>
-#include <QClipboard>
-#include "msgpackrequest.h"
+#include <QPainter>
+#include <QPaintEvent>
+
 #include "input.h"
 #include "konsole_wcwidth.h"
+#include "msgpackrequest.h"
 #include "util.h"
 #include "version.h"
 
@@ -475,27 +476,6 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		handleBusy(true);
 	} else if (name == "busy_stop"){
 		handleBusy(false);
-	} else if (name == "set_icon") {
-	} else if (name == "tabline_update") {
-		if (opargs.size() < 2 || !opargs.at(0).canConvert<int64_t>()) {
-			qWarning() << "Unexpected argument for tabline_update:" << opargs;
-			return;
-		}
-		int64_t curtab = opargs.at(0).toInt();
-		QList<Tab> tabs;
-		foreach(const QVariant& tabv, opargs.at(1).toList()) {
-			QVariantMap tab = tabv.toMap();
-
-			if (!tab.contains("tab") || !tab.contains("name")) {
-				qWarning() << "Unexpected tab value in tabline_update:" << tab;
-			}
-
-			int64_t num = tab.value("tab").toInt();
-			QString name = tab.value("name").toString();
-			tabs.append(Tab(num, name));
-		}
-
-		emit neovimTablineUpdate(curtab, tabs);
 	} else if (name == "option_set") {
 		if (2 <= opargs.size()) {
 			handleSetOption(opargs.at(0).toString(), opargs.at(1));
@@ -534,10 +514,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		handleGridScroll(opargs);
 	} else if (name == "hl_group_set") {
 	} else if (name == "win_viewport") {
-	} else {
-		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
-
 }
 
 void Shell::handlePopupMenuShow(const QVariantList& opargs)
