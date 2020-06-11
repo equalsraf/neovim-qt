@@ -562,30 +562,8 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		handleBusy(true);
 	} else if (name == "busy_stop"){
 		handleBusy(false);
-	} else if (name == "tabline_update") {
-		if (opargs.size() < 2 || !opargs.at(0).canConvert<int64_t>()) {
-			qWarning() << "Unexpected argument for tabline_update:" << opargs;
-			return;
-		}
-		int64_t curtab = opargs.at(0).toInt();
-		QList<Tab> tabs;
-		foreach(const QVariant& tabv, opargs.at(1).toList()) {
-			QVariantMap tab = tabv.toMap();
-
-			if (!tab.contains("tab") || !tab.contains("name")) {
-				qWarning() << "Unexpected tab value in tabline_update:" << tab;
-			}
-
-			int64_t num = tab.value("tab").toInt();
-			QString name = tab.value("name").toString();
-			tabs.append(Tab(num, name));
-		}
-
-		emit neovimTablineUpdate(curtab, tabs);
 	} else if (name == "option_set") {
-		if (2 <= opargs.size()) {
-			handleSetOption(opargs.at(0).toString(), opargs.at(1));
-		}
+		handleSetOption(opargs);
 	} else if (name == "suspend") {
 		if (isWindow()) {
 			setWindowState(windowState() | Qt::WindowMinimized);
@@ -942,18 +920,22 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 	}
 }
 
-void Shell::handleSetOption(const QString& name, const QVariant& value)
+void Shell::handleSetOption(const QVariantList& opargs)
 {
+	if (opargs.size() < 2 || !opargs.at(0).canConvert<QString>()) {
+		qWarning() << "Unexpected arguments for option_set:" << opargs;
+		return;
+	}
+
+	const QString name{ opargs.at(0).toString() };
+	const QVariant& value{ opargs.at(1) };
+
 	if (name == "guifont") {
 		setGuiFont(value.toString(), false /*force*/);
 	} else if (name == "guifontwide") {
 		handleGuiFontWide(value);
 	} else if (name == "linespace") {
 		handleLineSpace(value);
-	} else if (name == "showtabline") {
-		emit neovimShowtablineSet(value.toString().toInt());
-	} else if (name == "ext_tabline") {
-		emit neovimExtTablineSet(value.toBool());
 	} else {
 		// Uncomment for writing new event handling code.
 		// qDebug() << "Received unknown option" << name << value;

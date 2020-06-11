@@ -1,16 +1,14 @@
-#ifndef NEOVIM_QT_SHELL
-#define NEOVIM_QT_SHELL
-
-#include <QWidget>
-#include <QVariantList>
-#include <QFont>
+#pragma once
 #include <QBackingStore>
+#include <QFont>
 #include <QLabel>
-#include <QTimer>
-#include <QUrl>
 #include <QList>
 #include <QMap>
 #include <QMenu>
+#include <QTimer>
+#include <QUrl>
+#include <QVariantList>
+#include <QWidget>
 
 #include "neovimconnector.h"
 #include "popupmenu.h"
@@ -19,19 +17,9 @@
 #include "shellwidget/cursor.h"
 #include "shellwidget/highlight.h"
 #include "shellwidget/shellwidget.h"
+#include "tab.h"
 
 namespace NeovimQt {
-
-class Tab {
-public:
-	Tab(int64_t id, QString name) {
-		this->tab = id;
-		this->name = name;
-	}
-	/// The tab handle, a unique tab identifier
-	int64_t tab;
-	QString name;
-};
 
 class Shell: public ShellWidget
 {
@@ -95,11 +83,6 @@ signals:
 	void neovimGuiCloseRequest(int status = 0);
 	/// This signal is emmited if the running neovim version is unsupported by the GUI
 	void neovimIsUnsupported();
-	void neovimExtTablineSet(bool);
-	/// The tabline needs updating. curtab is the handle of the current tab (not its index)
-	/// as seen in Tab::tab.
-	void neovimTablineUpdate(int64_t curtab, QList<NeovimQt::Tab> tabs);
-	void neovimShowtablineSet(int);
 	void neovimShowContextMenu();
 	void colorsChanged();
 
@@ -159,7 +142,7 @@ protected:
 	virtual void handleSetTitle(const QVariantList& opargs);
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 	virtual void handleBusy(bool);
-	virtual void handleSetOption(const QString& name, const QVariant& value);
+	virtual void handleSetOption(const QVariantList& opargs);
 	void handleExtGuiOption(const QString& name, const QVariant& value);
 	virtual void handlePopupMenuShow(const QVariantList& opargs);
 	virtual void handlePopupMenuSelect(const QVariantList& opargs);
@@ -288,5 +271,4 @@ template <class T>
 	}
 }
 
-} // Namespace
-#endif
+} // namespace NeovimQtj

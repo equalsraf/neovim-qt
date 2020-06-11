@@ -1,10 +1,8 @@
-#ifndef NEOVIM_QT_MAINWINDOW
-#define NEOVIM_QT_MAINWINDOW
+#pragma once
 
 #include <QMainWindow>
 #include <QPalette>
 #include <QSplitter>
-#include <QCloseEvent>
 #include <QStackedWidget>
 #include <QTabBar>
 
@@ -12,6 +10,7 @@
 #include "neovimconnector.h"
 #include "scrollbar.h"
 #include "shell.h"
+#include "tabline.h"
 #include "treeview.h"
 
 namespace NeovimQt {
@@ -27,7 +26,7 @@ public:
 		FullScreen,
 	};
 
-	MainWindow(NeovimConnector *, QWidget *parent=0);
+	MainWindow(NeovimConnector* c, QWidget* parent = nullptr) noexcept;
 
 	bool isNeovimAttached() const noexcept { return m_shell && m_shell->isNeovimAttached(); }
 
@@ -60,15 +59,11 @@ private slots:
 	void showIfDelayed();
 	void handleNeovimAttachment(bool);
 	void neovimIsUnsupported();
-	void neovimShowtablineSet(int);
-	void neovimTablineUpdate(int64_t curtab, QList<NeovimQt::Tab> tabs);
 	void neovimShowContextMenu();
 	void neovimSendCut();
 	void neovimSendCopy();
 	void neovimSendPaste();
 	void neovimSendSelectAll();
-	void extTablineSet(bool);
-	void changeTab(int index);
 	void saveWindowGeometry();
 
 	// GuiAdaptive Color/Font/Style Slots
@@ -87,8 +82,6 @@ private:
 	Shell* m_shell{ nullptr };
 	DelayedShow m_delayedShow{ DelayedShow::Disabled };
 	QStackedWidget m_stack;
-	QTabBar* m_tabline{ nullptr };
-	QToolBar* m_tabline_bar{ nullptr };
 
 	bool m_neovim_requested_close{ false };
 	QMenu* m_contextMenu{ nullptr };
@@ -97,6 +90,7 @@ private:
 	QAction* m_actPaste{ nullptr };
 	QAction* m_actSelectAll{ nullptr };
 	ScrollBar* m_scrollbar{ nullptr };
+	Tabline m_tabline;
 	int m_exitStatus{ 0 };
 
 	// GuiAdaptive Color/Font/Style
@@ -111,6 +105,4 @@ private:
 	void updateAdaptiveFont() noexcept;
 };
 
-} // Namespace
-
-#endif
+} // namespace NeovimQt
