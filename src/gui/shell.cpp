@@ -718,18 +718,10 @@ void Shell::handleModeInfoSet(const QVariantList& opargs)
 	}
 
 	const bool cursor_style_enabled{ opargs.at(0).toBool() };
-	const QVariantList mode_info{ opargs.at(1) };
-
-	// Neovim sends mode_info with an extra list container. We should extract this list so that
-	// lower levels do not need to handle the extra type checks.
-	if (mode_info.size() < 1
-		|| static_cast<QMetaType::Type>(mode_info.at(0).type()) != QMetaType::QVariantList) {
-		qWarning() << "Unexpected format for mode_info";
-		return;
-	}
+	const QVariantList mode_info = opargs.at(1).toList();
 
 	m_cursor.SetIsStyleEnabled(cursor_style_enabled);
-	m_modeInfo = mode_info.at(0).toList();
+	m_modeInfo = mode_info;
 }
 
 void Shell::handleSetTitle(const QVariantList& opargs)
