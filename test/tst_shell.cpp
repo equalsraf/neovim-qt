@@ -86,16 +86,6 @@ private slots:
 		checkStartVars(c);
 	}
 
-	void guiExtTablineSet() {
-		QStringList args;
-		args << "-u" << "NONE";
-		NeovimConnector *c = NeovimConnector::spawn(args);
-		Shell *s = new Shell(c);
-		QSignalSpy onOptionSet(s, &Shell::neovimExtTablineSet);
-		QVERIFY(onOptionSet.isValid());
-		QVERIFY(SPYWAIT(onOptionSet));
-	}
-
 	void gviminit() {
 		qputenv("GVIMINIT", "let g:test_gviminit = 1");
 		QStringList args;
@@ -184,10 +174,6 @@ private slots:
 #else
 		QCOMPARE(s->shell()->fontDesc(), QString("DejaVu Sans Mono:h14:l"));
 #endif
-
-		// GuiTabline
-		QSignalSpy onOptionSet(s->shell(), &Shell::neovimExtTablineSet);
-		QVERIFY(onOptionSet.isValid());
 	}
 
 	void CloseEvent_data() {

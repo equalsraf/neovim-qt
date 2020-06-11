@@ -13,8 +13,9 @@ static QString DefaultWindowTitle() noexcept
 	return "Neovim";
 }
 
-MainWindow::MainWindow(NeovimConnector* c, QWidget* parent)
-	: QMainWindow(parent)
+MainWindow::MainWindow(NeovimConnector* c, QWidget* parent) noexcept
+	: QMainWindow{ parent }
+	, m_tabline{ *c, this }
 	, m_defaultFont{ font() }
 	, m_defaultPalette{ palette() }
 {
@@ -42,24 +43,7 @@ void MainWindow::init(NeovimConnector *c)
 
 	m_shell = new Shell(c);
 
-	m_tabline_bar = addToolBar("tabline");
-	m_tabline_bar->setObjectName("tabline");
-	m_tabline_bar->setAllowedAreas(Qt::TopToolBarArea);
-	m_tabline_bar->setMovable(false);
-	m_tabline_bar->setFloatable(false);
-	// Avoid margins around the tabbar
-	m_tabline_bar->layout()->setContentsMargins(0, 0, 0, 0);
-
-	m_tabline = new QTabBar(m_tabline_bar);
-	m_tabline->setDrawBase(false);
-	m_tabline->setExpanding(false);
-	m_tabline->setDocumentMode(true);
-	m_tabline->setFocusPolicy(Qt::NoFocus);
-	connect(m_tabline, &QTabBar::currentChanged,
-			this, &MainWindow::changeTab);
-
-	m_tabline_bar->addWidget(m_tabline);
-	m_tabline_bar->setVisible(m_shell->GetShellOptions().IsTablineEnabled());
+	addToolBar(&m_tabline);
 
 	// Context menu and actions for right-click
 	m_contextMenu = new QMenu();
@@ -123,12 +107,6 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimError);
 	connect(m_shell, &Shell::neovimIsUnsupported,
 			this, &MainWindow::neovimIsUnsupported);
-	connect(m_shell, &Shell::neovimExtTablineSet,
-			this, &MainWindow::extTablineSet);
-	connect(m_shell, &Shell::neovimTablineUpdate,
-			this, &MainWindow::neovimTablineUpdate);
-	connect(m_shell, &Shell::neovimShowtablineSet,
-			this, &MainWindow::neovimShowtablineSet);
 	connect(m_shell, &Shell::neovimShowContextMenu,
 			this, &MainWindow::neovimShowContextMenu);
 	connect(m_actCut, &QAction::triggered,
@@ -331,95 +309,18 @@ void MainWindow::handleNeovimAttachment(bool attached)
 {
 	emit neovimAttachmentChanged(attached);
 
-	if (attached) {
-		if (isWindow() && m_shell != NULL) {
-			m_shell->updateGuiWindowState(windowState());
-		}
-	} else {
-		m_tabline->deleteLater();
-		m_tabline_bar->deleteLater();
+	if (!attached) {
+		return;
+	}
+
+	if (m_shell && isWindow()) {
+		m_shell->updateGuiWindowState(windowState());
 	}
 }
 
 Shell* MainWindow::shell()
 {
 	return m_shell;
-}
-
-void MainWindow::extTablineSet(bool val)
-{
-	ShellOptions& shellOptions{ m_shell->GetShellOptions() };
-
-	// We can ignore events where the value does not change.
-	if (val == shellOptions.IsTablineEnabled()) {
-		return;
-	}
-
-	shellOptions.SetIsTablineEnabled(val);
-	m_nvim->api0()->vim_command("silent! redraw!");
-	m_tabline_bar->setVisible(val);
-}
-
-void MainWindow::neovimShowtablineSet(int val)
-{
-	m_shell->GetShellOptions().SetOptionShowTabline(val);
-}
-
-void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
-{
-	if (!m_shell->GetShellOptions().IsTablineEnabled()) {
-		return;
-	}
-
-	// remove extra tabs
-	for (int index=tabs.size(); index<m_tabline->count(); index++) {
-		m_tabline->removeTab(index);
-	}
-
-	for (int index=0; index<tabs.size(); index++) {
-		// Escape & in tab name otherwise it will be interpreted as
-		// a keyboard shortcut (#357) - escaping is done using &&
-		QString text = tabs[index].name;
-		text.replace("&", "&&");
-
-		if (m_tabline->count() <= index) {
-			m_tabline->addTab(text);
-		} else {
-			m_tabline->setTabText(index, text);
-		}
-
-		m_tabline->setTabToolTip(index, text);
-		m_tabline->setTabData(index, QVariant::fromValue(tabs[index].tab));
-
-		if (curtab == tabs[index].tab) {
-			m_tabline->setCurrentIndex(index);
-		}
-	}
-
-	Q_ASSERT(tabs.size() == m_tabline->count());
-
-	switch(m_shell->GetShellOptions().GetOptionShowTabline())
-	{
-		// Never show tabline
-		case 0:
-			m_tabline_bar->setVisible(false);
-			break;
-
-		// Show tabline for two or more tabs.
-		case 1:
-			m_tabline_bar->setVisible(tabs.size() >= 2);
-			break;
-
-		// Always show tabline
-		case 2:
-			m_tabline_bar->setVisible(true);
-			break;
-
-		// Fallback: show tabline for two or more tabs
-		default:
-			m_tabline_bar->setVisible(tabs.size() >= 2);
-			break;
-	}
 }
 
 void MainWindow::neovimShowContextMenu()
@@ -445,20 +346,6 @@ void MainWindow::neovimSendPaste()
 void MainWindow::neovimSendSelectAll()
 {
 	m_nvim->api0()->vim_command("normal! ggVG");
-}
-
-void MainWindow::changeTab(int index)
-{
-	if (!m_shell->GetShellOptions().IsTablineEnabled()) {
-		return;
-	}
-
-	if (m_nvim->api2() == NULL) {
-		return;
-	}
-
-	int64_t tab = m_tabline->tabData(index).toInt();
-	m_nvim->api2()->nvim_set_current_tabpage(tab);
 }
 
 void MainWindow::saveWindowGeometry()
