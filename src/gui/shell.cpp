@@ -625,27 +625,6 @@ void Shell::handleModeChange(const QVariantList& opargs)
 	const QString mode{ m_nvim->decode(opargs.at(0).toByteArray()) };
 	const uint64_t modeIndex{ opargs.at(1).toULongLong() };
 
-	if (!m_cursor.IsStyleEnabled()) {
-		if (mode == "insert") {
-			m_cursor.SetColor({});
-			m_cursor.SetStyle(Cursor::Shape::Vertical, 25);
-			m_cursor.SetTimer(0, 0, 0);
-		}
-		else if (mode == "replace") {
-			m_cursor.SetColor({});
-			m_cursor.SetStyle(Cursor::Shape::Horizontal, 20);
-			m_cursor.SetTimer(0, 0, 0);
-		}
-		else {
-			m_cursor.SetColor({});
-			m_cursor.SetStyle(Cursor::Shape::Block, 100);
-			m_cursor.SetTimer(0, 0, 0);
-		}
-
-		update(neovimCursorRect());
-		return;
-	}
-
 	const uint32_t sizeModeInfo{ static_cast<uint32_t>(m_modeInfo.size()) };
 	if (modeIndex >= sizeModeInfo) {
 		return;
@@ -705,7 +684,19 @@ void Shell::handleModeChange(const QVariantList& opargs)
 	m_cursor.SetStyle(cursorShape, cellPercentage);
 	m_cursor.SetTimer(blinkWaitTime, blinkOnTime, blinkOffTime);
 
-	update(neovimCursorRect());
+	auto old = m_insertMode;
+
+	// TODO: Implement visual aids for other modes
+	if (mode == "insert") {
+		m_insertMode = true;
+	} else {
+		m_insertMode = false;
+	}
+
+	// redraw the cursor
+	if (old != m_insertMode) {
+		update(neovimCursorRect());
+	}
 }
 
 void Shell::handleModeInfoSet(const QVariantList& opargs)
@@ -728,7 +719,7 @@ void Shell::handleModeInfoSet(const QVariantList& opargs)
 		return;
 	}
 
-	m_cursor.SetIsStyleEnabled(cursor_style_enabled);
+	m_cursor.SetIsEnabled(cursor_style_enabled);
 	m_modeInfo = mode_info.at(0).toList();
 }
 
@@ -1105,7 +1096,36 @@ void Shell::paintEvent(QPaintEvent *ev)
 		return;
 	}
 
+	// Option guicursor can be disabled with `:set guicursor=`.
+	if (m_cursor.IsEnabled())
+	{
+		ShellWidget::paintEvent(ev);
+		return;
+	}
+
 	ShellWidget::paintEvent(ev);
+
+	// paint cursor - we are not actually using Neovim colors yet,
+	// just invert the shell colors by painting white with XoR
+	if (!m_neovimBusy && ev->region().contains(neovimCursorTopLeft())) {
+		bool wide = contents().constValue(m_cursor_pos.y(),
+						m_cursor_pos.x()).IsDoubleWidth();
+		QRect cursorRect(neovimCursorTopLeft(), cellSize());
+
+		if (m_insertMode) {
+			cursorRect.setWidth(2);
+		} else if (wide) {
+			cursorRect.setWidth(cursorRect.width()*2);
+		}
+		QPainter painter(this);
+		painter.setPen(m_cursor_color);
+		painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
+		if (hasFocus()) {
+			painter.fillRect(cursorRect, m_cursor_color);
+		} else {
+			painter.drawRect(cursorRect);
+		}
+	}
 }
 
 void Shell::keyPressEvent(QKeyEvent *ev)

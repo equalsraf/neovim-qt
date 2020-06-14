@@ -41,7 +41,7 @@ public:
 		m_percentage = cellPercentage;
 	}
 
-	void SetIsStyleEnabled(bool isStyleEnabled) noexcept
+	void SetIsEnabled(bool isStyleEnabled) noexcept
 	{
 		m_styleEnabled = isStyleEnabled;
 	}
@@ -51,14 +51,14 @@ public:
 		m_isBusy = isBusy;
 	}
 
-	bool IsStyleEnabled() const noexcept
+	bool IsEnabled() const noexcept
 	{
 		return m_styleEnabled && !m_isBusy;
 	}
 
 	bool IsVisible() const noexcept
 	{
-		return !m_isBusy && m_blinkState != BlinkState::Off;
+		return IsEnabled() && (m_blinkState != BlinkState::Off);
 	}
 
 	QColor GetBackgroundColor() const noexcept
