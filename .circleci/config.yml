@@ -28,5 +28,5 @@ jobs:
           name: test
           command: |
             cd build
-            ctest -VV
+            xvfb-run -a -e /dev/stdout ctest -VV
 
