@@ -79,7 +79,7 @@ App::App(int &argc, char ** argv) noexcept
 		}
 	}
 
-	processCommandlineOptions();
+	processCommandlineOptions(m_parser, arguments());
 }
 
 bool App::event(QEvent *event) noexcept
@@ -149,13 +149,13 @@ void App::showUi() noexcept
 ///
 /// When appropriate this function will call QCommandLineParser::showHelp()
 /// terminating the program.
-void App::processCommandlineOptions() noexcept
+void App::processCommandlineOptions(QCommandLineParser& parser, QStringList arguments) noexcept
 {
-	m_parser.addOption(QCommandLineOption("nvim",
+	parser.addOption(QCommandLineOption("nvim",
 				QCoreApplication::translate("main", "nvim executable path"),
 				QCoreApplication::translate("main", "nvim_path"),
 				"nvim"));
-	m_parser.addOption(QCommandLineOption("timeout",
+	parser.addOption(QCommandLineOption("timeout",
 				QCoreApplication::translate("main", "Error if nvim does not responde after count milliseconds"),
 				QCoreApplication::translate("main", "ms"),
 				"20000"));
@@ -163,83 +163,83 @@ void App::processCommandlineOptions() noexcept
 	// Some platforms use --qwindowgeometry, while other platforms use the --geometry.
 	// Make the correct help message is displayed.
 	if (hasGeometryArg()) {
-		m_parser.addOption(QCommandLineOption("geometry",
+		parser.addOption(QCommandLineOption("geometry",
 			QCoreApplication::translate("main", "Set initial window geometry"),
 			QCoreApplication::translate("main", "width>x<height")));
 	}
 	if (hasQWindowGeometryArg()) {
-		m_parser.addOption(QCommandLineOption("qwindowgeometry",
+		parser.addOption(QCommandLineOption("qwindowgeometry",
 			QCoreApplication::translate("main", "Set initial window geometry"),
 			QCoreApplication::translate("main", "width>x<height")));
 	}
 
-	m_parser.addOption(QCommandLineOption("stylesheet",
+	parser.addOption(QCommandLineOption("stylesheet",
 				QCoreApplication::translate("main", "Apply qss stylesheet from file"),
 				QCoreApplication::translate("main", "stylesheet")));
-	m_parser.addOption(QCommandLineOption("maximized",
+	parser.addOption(QCommandLineOption("maximized",
 				QCoreApplication::translate("main", "Maximize the window on startup")));
-	m_parser.addOption(QCommandLineOption("no-ext-tabline",
+	parser.addOption(QCommandLineOption("no-ext-tabline",
 				QCoreApplication::translate("main", "Disable the external GUI tabline")));
-	m_parser.addOption(QCommandLineOption("no-ext-popupmenu",
+	parser.addOption(QCommandLineOption("no-ext-popupmenu",
 				QCoreApplication::translate("main", "Disable the external GUI popup menu")));
-	m_parser.addOption(QCommandLineOption("fullscreen",
+	parser.addOption(QCommandLineOption("fullscreen",
 				QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
-	m_parser.addOption(QCommandLineOption("embed",
+	parser.addOption(QCommandLineOption("embed",
 				QCoreApplication::translate("main", "Communicate with Neovim over stdin/out")));
-	m_parser.addOption(QCommandLineOption("server",
+	parser.addOption(QCommandLineOption("server",
 				QCoreApplication::translate("main", "Connect to existing Neovim instance"),
 				QCoreApplication::translate("main", "addr")));
-	m_parser.addOption(QCommandLineOption("spawn",
+	parser.addOption(QCommandLineOption("spawn",
 				QCoreApplication::translate("main", "Treat positional arguments as the nvim argv")));
-	m_parser.addOption(QCommandLineOption({ "v", "version" },
+	parser.addOption(QCommandLineOption({ "v", "version" },
 				QCoreApplication::translate("main", "Displays version information.")));
 
-	m_parser.addHelpOption();
+	parser.addHelpOption();
 
 #ifdef Q_OS_UNIX
-	m_parser.addOption(QCommandLineOption("nofork",
+	parser.addOption(QCommandLineOption("nofork",
 				QCoreApplication::translate("main", "Run in foreground")));
 #endif
 
-	m_parser.addPositionalArgument("file",
+	parser.addPositionalArgument("file",
 			QCoreApplication::translate("main", "Edit specified file(s)"), "[file...]");
-	m_parser.addPositionalArgument("...", "Additional arguments are forwarded to Neovim", "[-- ...]");
+	parser.addPositionalArgument("...", "Additional arguments are forwarded to Neovim", "[-- ...]");
 
-	m_parser.process(arguments());
+	parser.process(arguments);
 }
 
-void App::checkArgumentsMayTerminate() noexcept
+void App::checkArgumentsMayTerminate(QCommandLineParser& parser) noexcept
 {
-	if (m_parser.isSet("help")) {
-		m_parser.showHelp();
+	if (parser.isSet("help")) {
+		parser.showHelp();
 	}
 
-	if (m_parser.isSet("version")) {
-		showVersionInfo();
+	if (parser.isSet("version")) {
+		showVersionInfo(parser);
 		::exit(0);
 	}
 
-	int exclusive = m_parser.isSet("server") + m_parser.isSet("embed") + m_parser.isSet("spawn");
+	int exclusive = parser.isSet("server") + parser.isSet("embed") + parser.isSet("spawn");
 	if (exclusive > 1) {
 		qWarning() << "Options --server, --spawn and --embed are mutually exclusive\n";
 		::exit(-1);
 	}
 
-	if (!m_parser.positionalArguments().isEmpty() &&
-			(m_parser.isSet("embed") || m_parser.isSet("server"))) {
+	if (!parser.positionalArguments().isEmpty() &&
+			(parser.isSet("embed") || parser.isSet("server"))) {
 		qWarning() << "--embed and --server do not accept positional arguments\n";
 		::exit(-1);
 	}
 
-	if (m_parser.positionalArguments().isEmpty() && m_parser.isSet("spawn")) {
+	if (parser.positionalArguments().isEmpty() && parser.isSet("spawn")) {
 		qWarning() << "--spawn requires at least one positional argument\n";
 		::exit(-1);
 	}
 
 	bool valid_timeout;
-	int timeout_opt = m_parser.value("timeout").toInt(&valid_timeout);
+	int timeout_opt = parser.value("timeout").toInt(&valid_timeout);
 	if (!valid_timeout || timeout_opt <= 0) {
-		qWarning() << "Invalid argument for --timeout" << m_parser.value("timeout");
+		qWarning() << "Invalid argument for --timeout" << parser.value("timeout");
 		::exit(-1);
 	}
 }
@@ -337,13 +337,13 @@ static QString GetNeovimVersionInfo(const QString& nvim) noexcept
 	return nvimproc.readAllStandardOutput();
 }
 
-void App::showVersionInfo() noexcept
+void App::showVersionInfo(QCommandLineParser& parser) noexcept
 {
 	QString versionInfo;
 	QTextStream out{ &versionInfo };
 
-	const QString nvimExecutable { (m_parser.isSet("nvim")) ?
-		m_parser.value("nvim") : "nvim" };
+	const QString nvimExecutable { (parser.isSet("nvim")) ?
+		parser.value("nvim") : "nvim" };
 
 	out << "NVIM-QT v" << PROJECT_VERSION << endl;
 	out << "Build type: " << CMAKE_BUILD_TYPE << endl;
