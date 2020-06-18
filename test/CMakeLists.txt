@@ -2,6 +2,7 @@ set(QTLIBS Qt5::Network Qt5::Svg Qt5::Test)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 add_definitions(-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
+add_definitions(-DNVIM_QT_BINARY=\"$<TARGET_FILE:nvim-qt>\")
 if (WIN32 AND USE_STATIC_QT)
 	add_definitions(-DUSE_STATIC_QT)
 endif ()
@@ -37,6 +38,7 @@ add_xtest(tst_callallmethods)
 add_xtest(tst_encoding)
 add_xtest(tst_msgpackiodevice)
 add_xtest_gui(tst_shell)
+add_xtest_gui(tst_main)
 
 # Platform Specific Input Tests
 add_xtest(tst_input_mac

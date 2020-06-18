@@ -21,14 +21,15 @@ public:
 	bool event(QEvent *event) noexcept;
 	void showUi() noexcept;
 	void connectToRemoteNeovim() noexcept;
-	void checkArgumentsMayTerminate() noexcept;
+	QCommandLineParser& commandLineParser() { return m_parser; }
+	static void checkArgumentsMayTerminate(QCommandLineParser&) noexcept;
+	static void processCommandlineOptions(QCommandLineParser&, QStringList) noexcept;
 
 private:
-	QString getRuntimePath() noexcept;
-	QStringList getNeovimArgs() noexcept;
-	void processCommandlineOptions() noexcept;
+	static QString getRuntimePath() noexcept;
+	static QStringList getNeovimArgs() noexcept;
 	void setupRequestTimeout() noexcept;
-	void showVersionInfo() noexcept;
+	static void showVersionInfo(QCommandLineParser&) noexcept;
 
 	QCommandLineParser m_parser;
 	std::shared_ptr<NeovimConnector> m_connector;
