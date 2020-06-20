@@ -81,7 +81,8 @@ endif()
 install(TARGETS nvim-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
 if(NOT APPLE)
 	install(DIRECTORY runtime
-		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt/)
+		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt/
+		PATTERN "README.md" EXCLUDE)
 	install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 	install(FILES ${CMAKE_SOURCE_DIR}/third-party/neovim.png
 			RENAME nvim-qt.png
