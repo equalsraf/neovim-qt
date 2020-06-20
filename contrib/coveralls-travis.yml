@@ -1,0 +1,8 @@
+gcov_options: '\-lp'
+root: '.'
+build_root: 'build'
+service_name: 'travis-ci'
+# Do not set exclude rules as they skip running gcov entirely
+# which is too broad https://github.com/eddyxu/cpp-coveralls/issues/145#issuecomment-521623753
+# instead check the travis recipe for post filters
+#exclude: ['test', 'build', 'third-party']

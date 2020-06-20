@@ -14,7 +14,9 @@ jobs:
           command: sudo apt-get update
       - run:
           name: Install dependencies
-          command: sudo apt-get install -y cmake libqt5svg5 libqt5svg5-dev neovim python3-dev python3-jinja2 python3-msgpack python3-pip qt5-default
+          command: |
+            sudo apt-get install -y cmake libqt5svg5 libqt5svg5-dev neovim python3-dev python3-jinja2 python3-msgpack python3-pip qt5-default
+            pip install --user cpp-coveralls PyYAML
       - run:
           name: build
           command: |
@@ -29,4 +31,9 @@ jobs:
           command: |
             cd build
             ctest -VV
+      - run:
+          name: Upload coverage report
+          # trick cpp-coveralls into doing the right thing
+          # https://github.com/eddyxu/cpp-coveralls/issues/143
+          command: TRAVIS_JOB_ID="#${CIRCLE_BUILD_NUM}" ~/.local/bin/cpp-coveralls -y contrib/coveralls-circle.yml -E '.*/build/.*' -E '.*/third-party/.*' -E '.*/test/.*' -E '.*/bindings/.*'
 
