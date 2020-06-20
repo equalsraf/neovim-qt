@@ -12,10 +12,16 @@ before_install:
   - brew ls | grep -wq cmake || brew install cmake
   - brew ls | grep -wq qt5 || brew install qt5
   - brew ls | grep -wq msgpack || brew install msgpack
+  # cpp-coveralls https://github.com/eddyxu/cpp-coveralls
+  - pip install cpp-coveralls PyYAML
 script:
   - mkdir build
   - cd build
-  - cmake -DUSE_SYSTEM_MSGPACK=OFF ..
+  - cmake -DUSE_SYSTEM_MSGPACK=OFF -DUSE_GCOV=ON ..
   - make
   - nvim --version
   - ctest --output-on-failure
+#after_success:
+#  # collect coverage
+#  - cd $TRAVIS_BUILD_DIR
+#  - coveralls -y contrib/coveralls-travis.yml -E '.*/build/.*' -E '.*/third-party/.*' -E '.*/test/.*' -E '.*/bindings/.*'
