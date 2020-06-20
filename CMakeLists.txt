@@ -5,7 +5,7 @@ endif (POLICY CMP0048)
 
 # Neovim-Qt Version, used by --version update before release
 # 9999 = Development Pre-Release
-project(neovim-qt VERSION 0.2.16.0)
+project(neovim-qt VERSION 0.2.17.9999)
 
 INCLUDE(CPack)
 
