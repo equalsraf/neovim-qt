@@ -25,6 +25,7 @@ private slots:
 	void callAll();
 
 private:
+	void call_metaobject_slots(QObject *obj);
 	NeovimQt::NeovimConnector *m_c;
 };
 
@@ -63,9 +64,19 @@ void TestCallAllMethods::vim_list_runtime_paths()
 
 void TestCallAllMethods::callAll()
 {
-	QVERIFY(m_c->neovimObject());
+	call_metaobject_slots(m_c->neovimObject());
+	call_metaobject_slots(m_c->api0());
+	call_metaobject_slots(m_c->api1());
+	call_metaobject_slots(m_c->api2());
+	call_metaobject_slots(m_c->api3());
+	call_metaobject_slots(m_c->api4());
+	call_metaobject_slots(m_c->api5());
+	call_metaobject_slots(m_c->api6());
+}
 
-	auto *obj = m_c->neovimObject();
+void TestCallAllMethods::call_metaobject_slots(QObject *obj)
+{
+	QVERIFY(obj);
 	const QMetaObject *meta = obj->metaObject();
 	QSignalSpy neovimErrors(m_c, SIGNAL(error(NeovimError)));
 	QVERIFY(neovimErrors.isValid());
