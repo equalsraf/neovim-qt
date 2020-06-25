@@ -24,7 +24,17 @@ private slots:
 	void vim_call_function();
 	void callAll();
 
+	void buffer_line_count();
+	void vim_var();
+	void tabpage();
 private:
+	template <typename API>
+	void buffer_line_count(API*);
+	template <typename API>
+	void vim_var(API*);
+	template <typename API>
+	void tabpage(API*);
+
 	void call_metaobject_slots(QObject *obj);
 	NeovimQt::NeovimConnector *m_c;
 };
@@ -118,6 +128,83 @@ void TestCallAllMethods::vim_call_function()
 	obj->vim_call_function("abs", args);
 	QVERIFY(SPYWAIT(result));
 	QCOMPARE(result.at(0).at(0), QVariant(2));
+}
+
+#define call_test_all_api(NAME) \
+	NAME(m_c->neovimObject());	\
+	NAME(m_c->api0());			\
+	NAME(m_c->api1());			\
+	NAME(m_c->api2());			\
+	NAME(m_c->api3());			\
+	NAME(m_c->api4());			\
+	NAME(m_c->api5());			\
+	NAME(m_c->api6());			\
+
+void TestCallAllMethods::buffer_line_count()
+{
+	call_test_all_api(buffer_line_count);
+}
+template <typename API>
+void TestCallAllMethods::buffer_line_count(API* obj)
+{
+	QVERIFY(obj);
+
+	QSignalSpy result(obj, SIGNAL(on_buffer_line_count(int64_t)));
+	QVERIFY(result.isValid());
+
+	obj->buffer_line_count(0);
+	QVERIFY(SPYWAIT(result));
+}
+
+void TestCallAllMethods::vim_var()
+{
+	call_test_all_api(vim_var);
+}
+/// Set/get/del variable
+template <typename API>
+void TestCallAllMethods::vim_var(API* obj)
+{
+	auto varname = "vim_test_var";
+	auto varvalue = "testvalue";
+
+	QVERIFY(obj);
+
+	obj->vim_set_var(varname, QString(varvalue));
+
+	QSignalSpy result(obj, SIGNAL(on_vim_get_var(QVariant)));
+	QVERIFY(result.isValid());
+	obj->vim_get_var(varname);
+
+	QVERIFY(SPYWAIT(result));
+
+	QVERIFY(result.at(0).at(0) == QByteArray(varvalue));
+
+	QSignalSpy result2(obj, SIGNAL(on_vim_del_var(QVariant)));
+	QVERIFY(result2.isValid());
+	obj->vim_del_var(varname);
+	QVERIFY(SPYWAIT(result2));
+}
+
+void TestCallAllMethods::tabpage()
+{
+	call_test_all_api(tabpage);
+}
+
+template <typename API>
+void TestCallAllMethods::tabpage(API* obj)
+{
+	auto varname = "tabpage-testvar";
+	QVERIFY(obj);
+	obj->tabpage_is_valid(0);
+	obj->tabpage_get_window(0);
+	obj->tabpage_get_windows(0);
+	obj->tabpage_set_var(0, varname, "testval");
+	obj->tabpage_get_var(0, varname);
+
+	QSignalSpy result(obj, SIGNAL(on_tabpage_del_var(QVariant)));
+	QVERIFY(result.isValid());
+	obj->tabpage_del_var(0, varname);
+	QVERIFY(SPYWAIT(result));
 }
 
 QTEST_MAIN(TestCallAllMethods)
