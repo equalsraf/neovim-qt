@@ -1,22 +1,19 @@
 version: '{build}'
 skip_tags: false
 shallow_clone: true
+image:
+- Visual Studio 2019
 environment:
   matrix:
-#  - PlatformToolset: msys2-static
-#    QTPATH: C:\msys64\mingw64\qt5-static
-#    GENERATOR: MinGW Makefiles
-#    BITS: 64
-#    ARCH: x86_64
-#    EXTRA_CMAKE_ARGS: -DUSE_STATIC_QT=1
-  - PlatformToolset: mingw-w64
-    QTPATH: C:\Qt\5.11\mingw53_32
+  - PlatformToolset: MinGW-Win64
+    QTPATH: C:\Qt\5.15.0\mingw81_64
     GENERATOR: MinGW Makefiles
     RELEASE_ARTIFACT: true
-  - PlatformToolset: v140
-    QTPATH: C:\Qt\5.11\msvc2015
-    GENERATOR: Visual Studio 14
-    ARCHI: x86
+    CMAKE_PATH_PREFIX: C:\Qt\5.15.0\mingw81_64\lib\cmake
+  - PlatformToolset: VisualStudio2019
+    QTPATH: C:\Qt\5.15.0\msvc2019_64
+    GENERATOR: Visual Studio 16
+    CMAKE_PATH_PREFIX: C:\Qt\5.15.0\msvc2019_64\lib\cmake
 configuration:
 - RelWithDebInfo
 matrix:
@@ -27,18 +24,15 @@ install:
 - set PATH=%PATH%;%CD%\Neovim\bin;
 - nvim --version
 # sh.exe must not be in the PATH
-- if "%PlatformToolset%"=="mingw-w64" set PATH=C:\mingw-w64\i686-5.3.0-posix-dwarf-rt_v4-rev0\mingw32\bin;%PATH:C:\Program Files\Git\usr\bin;=%
-- if "%PlatformToolset%"=="v140" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %archi%
-# Static qt5 builds using msys2/mingw packages
-- if "%PlatformToolset%"=="msys2-static" set PATH=C:\msys64\mingw%BITS%\bin;%PATH:C:\Program Files\Git\usr\bin;=%
-- if "%PlatformToolset%"=="msys2-static" C:\msys64\usr\bin\pacman -S --needed --noconfirm mingw-w64-%ARCH%-gcc mingw-w64-%ARCH%-cmake mingw-w64-%ARCH%-python2 mingw-w64-%ARCH%-qt5-static mingw-w64-%ARCH%-jasper
+- if "%PlatformToolset%"=="MinGW-Win64" set PATH=%PATH%;C:\Qt\5.15.0\mingw81_64\bin;C:\Qt\Tools\mingw810_64\bin;C:\Program Files\Git\usr\bin
+- if "%PlatformToolset%"=="VisualStudio2019" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 build_script:
 - cd "%APPVEYOR_BUILD_FOLDER%"
 - set PATH=%QTPATH%;%QTPATH%/bin;%PATH%
 - echo %PATH%
 - mkdir build
 - cd build
-- cmake -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../INSTALL %EXTRA_CMAKE_ARGS% ..
+- cmake -G "%GENERATOR%" -DCMAKE_PREFIX_PATH="%CMAKE_PATH_PREFIX%" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../INSTALL %EXTRA_CMAKE_ARGS% ..
 - cmake --build . --config Release --target install
 test_script:
 - set PATH=%QTPATH%;%QTPATH%/bin;%PATH%
