@@ -86,6 +86,22 @@ GuiWindowOpacity	Set window opacity. Takes a single argument,
 				a double in the range 0.0 to 1.0 (fully opaque).
 				This capability might not be supported in some platforms.
 
+								*GuiClipboard*
+GuiClipboard	Enable or disable the native GUI clipboard.
+		When enabled, neovim will use the GUI as its clipboard
+		provider.
+
+		To enable,
+>
+			GuiClipboard 1
+<
+		to disable pass 0 to the command
+>
+			GuiClipboard 0
+<
+		After disabling the GUI clipboard, neovim will select
+		a clipboard provider from the available options.
+
 ==============================================================================
 2. GUI variables
 
@@ -208,6 +224,7 @@ menu can be mapped to right click events in ginit.vim, e.g.
 	nnoremap <silent><RightMouse> :call GuiShowContextMenu()<CR>
 	inoremap <silent><RightMouse> <Esc>:call GuiShowContextMenu()<CR>
 	vnoremap <silent><RightMouse> :call GuiShowContextMenu()<CR>gv
+<
 
 ==============================================================================
 4. Internals

@@ -279,6 +279,7 @@ void Shell::setAttached(bool attached)
 
 		MsgpackRequest* req_shim{ m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim") };
 		connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
+		connect(req_shim, &MsgpackRequest::finished, this, &Shell::handleShimLoad);
 
 		MsgpackRequest* req_ginit{ m_nvim->api0()->vim_command(GetGVimInitCommand()) };
 		connect(req_ginit, &MsgpackRequest::error, this, &Shell::handleGinitError);
@@ -1880,6 +1881,18 @@ void Shell::handleGinitError(quint32 msgid, quint64 fun, const QVariant& err)
 void Shell::handleShimError(quint32 msgid, quint64 fun, const QVariant& err)
 {
 	qDebug() << "GUI shim error " << err;
+}
+
+void Shell::handleShimLoad(quint32 msgid, quint64 fun, const QVariant& resp)
+{
+	// Enable native clipboard, if api version 6 is available
+	auto api6 = m_nvim->api6();
+	if (api6) {
+		qDebug() << "Enabling native clipboard";
+		QVariantList args;
+		auto req = api6->nvim_command("GuiClipboard 1");
+		connect(req, &MsgpackRequest::error, this, &Shell::handleShimError);
+	}
 }
 
 void Shell::handleGetBackgroundOption(quint32 msgid, quint64 fun, const QVariant& val)
