@@ -1,11 +1,12 @@
 #pragma once
 
+#include <QKeyEvent>
+#include <QString>
+
 // A class to hold test data. An event type/key/modifiers
 // as used in QKeyEvent and a matching Neovim input string.
-struct InputTest
+struct InputTest final
 {
-	QEvent::Type event_type;
-	int key;
-	Qt::KeyboardModifiers modifiers;
+	QKeyEvent event;
 	QString expected_input;
 };
