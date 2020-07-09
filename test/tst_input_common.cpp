@@ -17,6 +17,7 @@ private slots:
 	void AltGrKeyEventWellFormed() noexcept;
 	void ShiftSpaceWellFormed() noexcept;
 	void ShiftBackSpaceWellFormed() noexcept;
+	void SpanishKeyboardLayout() noexcept;
 
 	// Mouse Input
 	void MouseLeftClick() noexcept;
@@ -263,6 +264,59 @@ void TestInputCommon::MouseMiddleClick() noexcept
 
 	QCOMPARE(middleClickPress, QString{ "<MiddleMouse><1,2>" });
 	QCOMPARE(middleClickRelease, QString{ "<MiddleRelease><1,2>" });
+}
+
+void TestInputCommon::SpanishKeyboardLayout() noexcept
+{
+	// Issue 720: Spanish layout ignores Left Square Bracket [
+	// NOTE: The "`" referenced below is "[" on a US layout keyboard for Windows/Linux and literal for MacOS.
+
+	// Windows ` + Space. Prints: `
+	QKeyEvent evAccentSpace{ QKeyEvent::KeyPress, Qt::Key_Space, Qt::NoModifier, QStringLiteral("`") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAccentSpace), QStringLiteral("`"));
+
+	// Windows ``: two events are sent on the second key event. Prints: ``
+	// NOTE: Linux/MacOS do not send QKeyEvents for this scenario.
+	QKeyEvent evAccentFirst{ QKeyEvent::KeyPress, Qt::Key_QuoteLeft, Qt::NoModifier, QStringLiteral("`") };
+	QKeyEvent evAccentSecond{ QKeyEvent::KeyPress, 0, Qt::NoModifier, QStringLiteral("`") };
+
+	// Windows AltGr (Right Alt) + `. Prints: [
+	QKeyEvent evAltGrSquareBracketWindows{ QKeyEvent::KeyPress, Qt::Key_AsciiCircum, Qt::AltModifier, QStringLiteral("[") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAltGrSquareBracketWindows), QStringLiteral("["));
+
+	// Linux AltGr (Right Alt) + `. Prints: [
+	QKeyEvent evAltGrSquareBracketLinux{ QKeyEvent::KeyPress, Qt::Key_BracketLeft, Qt::GroupSwitchModifier, QStringLiteral("[") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAltGrSquareBracketLinux), QStringLiteral("["));
+
+//	// MacOS Alt + `: Prints [
+//	QKeyEvent evAltLeftSquareBracketMacOS{ QKeyEvent::KeyPress, Qt::Key_Less, Qt::AltModifier, QStringLiteral("[") };
+//	QCOMPARE(NeovimQt::Input::convertKey(evAltLeftSquareBracketMacOS), QStringLiteral("["));
+//
+//	// MacOS Alt + \: Prints [
+//	QKeyEvent evAltRightSquareBracketMacOS{ QKeyEvent::KeyPress, Qt::Key_Apostrophe, Qt::AltModifier, QStringLiteral("]") };
+//	QCOMPARE(NeovimQt::Input::convertKey(evAltRightSquareBracketMacOS), QStringLiteral("["));
+
+	// Windows Shift + ` then Space. Prints ^
+	// NOTE: Linux does not send QKeyEvents for this scenario.
+	QKeyEvent evShiftAccentSpace{ QKeyEvent::KeyPress, Qt::Key_Space, Qt::NoModifier, QStringLiteral("^") };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftAccentSpace), QStringLiteral("^"));
+
+	// Windows Shift + ``. Prints ^^ (Windows) and ^ (Linux)
+	// NOTE: Linux/MacOS do not send QKeyEvents for this scenario.
+	QKeyEvent evShiftAccentAccent1{ QKeyEvent::KeyPress, Qt::Key_AsciiCircum, Qt::ShiftModifier, QStringLiteral("^") };
+	QKeyEvent evShiftAccentAccent2{ QKeyEvent::KeyPress, 0, Qt::ShiftModifier, QStringLiteral("^") };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftAccentAccent1), QStringLiteral("^"));
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftAccentAccent2), QStringLiteral("^"));
+
+	// Windows ` then e. Prints: è
+	// NOTE: Linux/MacOS do not send QKeyEvents for this scenario.
+	QKeyEvent evAccentE{ QKeyEvent::KeyPress, Qt::Key_E, Qt::NoModifier, QStringLiteral("ê") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAccentE), QStringLiteral("ê"));
+
+	// Windows Shift + ^ then e. Prints: ê
+	// NOTE: Linux/MacOS do not send QKeyEvents for this scenario.
+	QKeyEvent evShiftAccentE{ QKeyEvent::KeyPress, Qt::Key_E, Qt::NoModifier, QStringLiteral("ê") };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftAccentE), QStringLiteral("ê"));
 }
 
 #include "tst_input_common.moc"
