@@ -169,7 +169,7 @@ void ShellWidget::paintNeovimCursorForeground(
 	QPainter& p,
 	QRect cellRect,
 	QPoint pos,
-	QChar character) noexcept
+	const QString& character) noexcept
 {
 	// No focus: cursor is outline with default foreground color.
 	if (!hasFocus()) {
@@ -276,7 +276,8 @@ void ShellWidget::paintUndercurl(
 void ShellWidget::paintBackgroundClearCell(
 	QPainter& p,
 	const Cell& cell,
-	QRect cellRect) noexcept
+	QRect cellRect,
+	bool isCursorCell) noexcept
 {
 	QColor bgColor{ cell.GetBackgroundColor() };
 	if (!bgColor.isValid()) {
@@ -284,6 +285,11 @@ void ShellWidget::paintBackgroundClearCell(
 	}
 
 	p.fillRect(cellRect, bgColor);
+
+	if (isCursorCell) {
+		paintNeovimCursorBackground(p, cellRect);
+		return;
+	}
 }
 
 QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
@@ -321,6 +327,36 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 	return cellFont;
 }
 
+void ShellWidget::paintForegroundCellText(
+	QPainter& p,
+	const Cell& cell,
+	QRect cellRect,
+	bool isCursorCell) noexcept
+{
+	if (cell.GetCharacter() == ' ') {
+		return;
+	}
+
+	QColor fgColor{ cell.GetForegroundColor() };
+	if (!fgColor.isValid()) {
+		fgColor = (cell.IsReverse()) ? background() : foreground();
+	}
+	p.setPen(fgColor);
+	p.setFont(GetCellFont(cell));
+
+	// Draw chars at the baseline
+	const int cellTextOffset{ m_ascent + (m_lineSpace / 2) };
+	const QPoint pos{ cellRect.left(), cellRect.top() + cellTextOffset};
+	const uint character{ cell.GetCharacter() };
+	const QString text{ QString::fromUcs4(&character, 1) };
+
+	p.drawText(pos, text);
+
+	if (isCursorCell) {
+		paintNeovimCursorForeground(p, cellRect, pos, text);
+	}
+}
+
 void ShellWidget::paintEvent(QPaintEvent *ev)
 {
 	QPainter p(this);
@@ -352,41 +388,14 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 
 				p.setClipRegion(ovflw);
 
+				// Only paint bg/fg if this is not the second cell of a wide char
 				if (j <= 0 || !contents().constValue(i, j-1).IsDoubleWidth()) {
-					// Only paint bg/fg if this is not the second cell
-					// of a wide char
-					QColor bgColor{ cell.GetBackgroundColor() };
-					if (!bgColor.isValid()) {
-						bgColor = (cell.IsReverse()) ? foreground() : background();
-					}
-					p.fillRect(r, bgColor);
 
 					const QPoint curPos{ j, i };
 					const bool isCursorVisibleAtCell{ m_cursor.IsVisible() && m_cursor_pos == curPos };
 
-					if (isCursorVisibleAtCell) {
-						paintNeovimCursorBackground(p, r);
-					}
-
-					if (cell.GetCharacter() != ' ') {
-						QColor fgColor{ cell.GetForegroundColor() };
-						if (!fgColor.isValid()) {
-							fgColor = (cell.IsReverse()) ? background() : foreground();
-						}
-						p.setPen(fgColor);
-						p.setFont(GetCellFont(cell));
-
-						// Draw chars at the baseline
-						const int cellTextOffset{ m_ascent + (m_lineSpace / 2) };
-						const QPoint pos{ r.left(), r.top() + cellTextOffset};
-						const uint character{ cell.GetCharacter() };
-
-						p.drawText(pos, QString::fromUcs4(&character, 1));
-
-						if (isCursorVisibleAtCell) {
-							paintNeovimCursorForeground(p, r, pos, character);
-						}
-					}
+					paintBackgroundClearCell(p, cell, r, isCursorVisibleAtCell);
+					paintForegroundCellText(p, cell, r, isCursorVisibleAtCell);
 				}
 
 				paintUnderline(p, cell, r);
