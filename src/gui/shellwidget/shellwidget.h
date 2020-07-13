@@ -142,6 +142,9 @@ private:
 	QRect getNeovimCursorRect(QRect cellRect) noexcept;
 	void paintNeovimCursorBackground(QPainter& p, QRect cellRect) noexcept;
 	void paintNeovimCursorForeground(QPainter& p, QRect cellRect, QPoint pos, QChar character) noexcept;
+	void paintUnderline(QPainter& p, const Cell& cell, QRect cellRect) noexcept;
+	void paintUndercurl(QPainter& p, const Cell& cell, QRect cellRect) noexcept;
+	void paintBackgroundClearCell(QPainter& p, const Cell& cell, QRect cellRect) noexcept;
 	QFont GetCellFont(const Cell& cell) const noexcept;
 
 	ShellContents m_contents{ 0, 0 };

@@ -201,6 +201,91 @@ void ShellWidget::paintNeovimCursorForeground(
 	p.setClipping(oldClippingSetting);
 }
 
+static QLine GetUnderline(QRect cellRect) noexcept
+{
+	QPoint start{ cellRect.bottomLeft() };
+	start.ry()--;
+
+	QPoint end{ cellRect.bottomRight() };
+	end.ry()--;
+
+	return { start, end };
+}
+
+void ShellWidget::paintUnderline(
+	QPainter& p,
+	const Cell& cell,
+	QRect cellRect) noexcept
+{
+	if (!cell.IsUnderline()) {
+		return;
+	}
+
+	QPen pen;
+	if (cell.GetForegroundColor().isValid()) {
+		pen.setColor(cell.GetForegroundColor());
+	} else {
+		pen.setColor(foreground());
+	}
+
+	p.setPen(pen);
+
+	p.drawLine(GetUnderline(cellRect));
+}
+
+static QPainterPath GetUndercurlPath(QRect cellRect) noexcept
+{
+	const QLine underline{ GetUnderline(cellRect) };
+	const QPoint& start{ underline.p1() };
+	const QPoint& end{ underline.p2() };
+
+	QPainterPath path(start);
+	static constexpr int offset[8]{ 1, 0, 0, 1, 1, 2, 2, 2 };
+	for (int i = start.x() + 1; i <= end.x(); i++) {
+		path.lineTo(QPoint(i, start.y() - offset[i%8]));
+	}
+
+	return path;
+}
+
+void ShellWidget::paintUndercurl(
+	QPainter& p,
+	const Cell& cell,
+	QRect cellRect) noexcept
+{
+	if (!cell.IsUndercurl()) {
+		return;
+	}
+
+	QPen pen;
+	if (cell.GetSpecialColor().isValid()) {
+		pen.setColor(cell.GetSpecialColor());
+	} else if (special().isValid()) {
+		pen.setColor(special());
+	} else if (cell.GetForegroundColor().isValid()) {
+		pen.setColor(cell.GetForegroundColor());
+	} else {
+		pen.setColor(foreground());
+	}
+
+	p.setPen(pen);
+
+	p.drawPath(GetUndercurlPath(cellRect));
+}
+
+void ShellWidget::paintBackgroundClearCell(
+	QPainter& p,
+	const Cell& cell,
+	QRect cellRect) noexcept
+{
+	QColor bgColor{ cell.GetBackgroundColor() };
+	if (!bgColor.isValid()) {
+		bgColor = (cell.IsReverse()) ? foreground() : background();
+	}
+
+	p.fillRect(cellRect, bgColor);
+}
+
 QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 {
 	QFont cellFont{ font() };
@@ -304,43 +389,9 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 					}
 				}
 
-				// Draw "undercurl" at the bottom of the cell
-				if (cell.IsUnderline()|| cell.IsUndercurl()) {
-					QPen pen = QPen();
-					if (cell.IsUndercurl()) {
-						if (cell.GetSpecialColor().isValid()) {
-							pen.setColor(cell.GetSpecialColor());
-						} else if (special().isValid()) {
-							pen.setColor(special());
-						} else if (cell.GetForegroundColor().isValid()) {
-							pen.setColor(cell.GetForegroundColor());
-						} else {
-							pen.setColor(foreground());
-						}
-					} else if (cell.IsUnderline()) {
-						if (cell.GetForegroundColor().isValid()) {
-							pen.setColor(cell.GetForegroundColor());
-						} else {
-							pen.setColor(foreground());
-						}
-					}
+				paintUnderline(p, cell, r);
 
-					p.setPen(pen);
-					QPoint start = r.bottomLeft();
-					QPoint end = r.bottomRight();
-					start.ry()--; end.ry()--;
-					if (cell.IsUnderline()) {
-						p.drawLine(start, end);
-					} else if (cell.IsUndercurl()) {
-						static const int val[8] = {1, 0, 0, 1, 1, 2, 2, 2};
-						QPainterPath path(start);
-						for (int i = start.x() + 1; i <= end.x(); i++) {
-							int offset = val[i % 8];
-							path.lineTo(QPoint(i, start.y() - offset));
-						}
-						p.drawPath(path);
-					}
-				}
+				paintUndercurl(p, cell, r);
 			}
 		}
 	}
