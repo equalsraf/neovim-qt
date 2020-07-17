@@ -66,6 +66,9 @@ public:
 
 	bool IsUndercurl() const { return m_highlight.IsUndercurl(); }
 
+	/// Checks two cells for style equivalence, ignore differences in `m_character`
+	bool IsStyleEquivalent(const Cell& other) const;
+
 	/// Two cells are equal if both are valid, and all attributes are the same
 	bool operator==(const Cell& other) const;
 

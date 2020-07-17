@@ -17,6 +17,15 @@ void Cell::SetCharacter(uint character)
 	m_isDoubleWidth = konsole_wcwidth(character) > 1;
 }
 
+bool Cell::IsStyleEquivalent(const Cell& other) const
+{
+	if (!m_isValid || !other.m_isValid) {
+		return false;
+	}
+
+	return m_highlight == other.m_highlight;
+}
+
 bool Cell::operator==(const Cell& other) const
 {
 	if (!m_isValid || !other.m_isValid) {
