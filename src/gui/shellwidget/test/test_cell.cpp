@@ -54,7 +54,113 @@ private slots:
 		Cell c2 = Cell{ QColor{ Qt::red } };
 		QCOMPARE(c2.GetBackgroundColor(), QColor{ Qt::red });
 	}
+
+	void cellOperatorEquals() noexcept;
+
+	void cellStyleEquivalent() noexcept;
 };
+
+void Test::cellOperatorEquals() noexcept
+{
+	const HighlightAttribute hlTextBlackFillWhite{
+		Qt::black /*fgColor*/,
+		Qt::white /*bgColor*/,
+		Qt::red /*spColor*/,
+		false /*bold*/,
+		false /*italic*/,
+		false /*underline*/,
+		false /*undercurl*/,
+		false /*reverse*/ };
+
+	const HighlightAttribute hlTextWhiteFillBlack{
+		Qt::white /*fgColor*/,
+		Qt::black /*bgColor*/,
+		Qt::red /*spColor*/,
+		false /*bold*/,
+		false /*italic*/,
+		false /*underline*/,
+		false /*undercurl*/,
+		false /*reverse*/ };
+
+	const HighlightAttribute hlInvTextWhiteFillBlack{
+		Qt::white /*fgColor*/,
+		Qt::black /*bgColor*/,
+		Qt::red /*spColor*/,
+		false /*bold*/,
+		false /*italic*/,
+		false /*underline*/,
+		false /*undercurl*/,
+		true /*reverse*/ };
+
+	const HighlightAttribute hlBoldTextWhiteFillBlack{
+		Qt::white /*fgColor*/,
+		Qt::black /*bgColor*/,
+		Qt::red /*spColor*/,
+		true /*bold*/,
+		false /*italic*/,
+		false /*underline*/,
+		false /*undercurl*/,
+		false /*reverse*/ };
+
+	bool textDifferent{
+		Cell{ ' ', hlTextBlackFillWhite } == Cell{ 'A', hlTextBlackFillWhite } };
+	QVERIFY(textDifferent == false);
+
+	bool textSame{
+		Cell{ 'B', hlTextBlackFillWhite } == Cell{ 'B', hlTextBlackFillWhite } };
+	QVERIFY(textSame == true);
+
+	bool colorsDifferent{
+		Cell{ ' ', hlInvTextWhiteFillBlack } == Cell{ ' ', hlTextBlackFillWhite } };
+	QVERIFY(colorsDifferent == false);
+
+	// These two styles render identically, but are not equivalent. Their underlying
+	// data is different, so they are treated as different.
+	bool inverseOpposites{
+		Cell{ ' ', hlInvTextWhiteFillBlack } == Cell{ ' ', hlTextBlackFillWhite } };
+	QVERIFY(inverseOpposites == false);
+
+	bool stylesDifferent{
+		Cell{ ' ', hlBoldTextWhiteFillBlack } == Cell{ ' ', hlTextWhiteFillBlack } };
+	QVERIFY(stylesDifferent == false);
+}
+
+void Test::cellStyleEquivalent() noexcept
+{
+	const HighlightAttribute styleA{
+		Qt::white /*fgColor*/,
+		Qt::black /*bgColor*/,
+		Qt::red /*spColor*/,
+		true /*bold*/,
+		false /*italic*/,
+		false /*underline*/,
+		false /*undercurl*/,
+		false /*reverse*/ };
+
+	const HighlightAttribute styleB{
+		Qt::black /*fgColor*/,
+		Qt::white /*bgColor*/,
+		Qt::red /*spColor*/,
+		true /*bold*/,
+		false /*italic*/,
+		false /*underline*/,
+		false /*undercurl*/,
+		false /*reverse*/ };
+
+	Cell cellStyleATextA{ 'A', styleA };
+	Cell cellStyleATextB{ 'B', styleA };
+	Cell cellStyleBTextA{ 'B', styleB };
+	Cell cellStyleBTextB{ 'B', styleB };
+
+	QVERIFY(cellStyleATextA.IsStyleEquivalent(cellStyleATextB));
+	QVERIFY(cellStyleATextB.IsStyleEquivalent(cellStyleATextA));
+
+	QVERIFY(!cellStyleATextA.IsStyleEquivalent(cellStyleBTextA));
+	QVERIFY(!cellStyleBTextA.IsStyleEquivalent(cellStyleATextA));
+
+	QVERIFY(cellStyleBTextA.IsStyleEquivalent(cellStyleBTextB));
+	QVERIFY(cellStyleBTextB.IsStyleEquivalent(cellStyleBTextA));
+}
 
 QTEST_MAIN(Test)
 #include "test_cell.moc"
