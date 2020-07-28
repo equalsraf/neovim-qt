@@ -14,6 +14,7 @@ class ShellWidget: public QWidget
 	Q_PROPERTY(int rows READ rows)
 	Q_PROPERTY(int columns READ columns)
 	Q_PROPERTY(QSize cellSize READ cellSize)
+	Q_PROPERTY(bool ligatureMode MEMBER m_isLigatureModeEnabled READ isLigatureModeEnabled WRITE setLigatureMode)
 public:
 	ShellWidget(QWidget *parent=0);
 
@@ -67,6 +68,18 @@ public:
 	/// or font substitution may cause good fonts to fail. The font max/average
 	/// metrics are compared with the italic/bold double width variants.
 	static bool isBadMonospace(const QFont& f) noexcept;
+
+	/// Font ligatures do not render by default, since each character is an individual
+	/// entity on the Neovim grid. When ligatureMode is enabled, segments of text on
+	/// a given line with the same style are rendered together. This allows the display
+	/// of font ligatures such as those found in FiraCode.
+	void setLigatureMode(bool ligatureMode) noexcept;
+
+	/// Ligature rendering is off-by-default.
+	bool isLigatureModeEnabled() const noexcept
+	{
+		return m_isLigatureModeEnabled;
+	}
 
 signals:
 	void shellFontChanged();
@@ -155,6 +168,7 @@ private:
 	QColor m_fgColor{ Qt::black };
 	QColor m_spColor;
 	int m_lineSpace{ 0 };
+	bool m_isLigatureModeEnabled{ false };
 
 	Background m_background{ Background::Dark };
 };

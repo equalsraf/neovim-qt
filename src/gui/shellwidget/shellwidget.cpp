@@ -799,3 +799,9 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 
 	return false;
 }
+
+void ShellWidget::setLigatureMode(bool isEnabled) noexcept
+{
+	m_isLigatureModeEnabled = isEnabled;
+	update();
+}
