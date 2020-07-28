@@ -256,3 +256,9 @@ function! s:GuiAdaptiveStyleList() abort
 	call rpcnotify(0, 'Gui', 'AdaptiveStyleList')
 endfunction
 command! -nargs=0 GuiAdaptiveStyleList call s:GuiAdaptiveStyleList()
+
+" Change rendering logic to use ligature-compatible rendering scheme
+function! s:GuiRenderLigatures(enable) abort
+	call rpcnotify(0, 'Gui', 'Option', 'RenderLigatures', a:enable)
+endfunction
+command! -nargs=1 GuiRenderLigatures call s:GuiRenderLigatures(<args>)
