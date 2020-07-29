@@ -165,6 +165,11 @@ QString convertKey(const QKeyEvent& ev) noexcept
 	const QMap<int, QString>& specialKeys { GetSpecialKeysMap() };
 
 	if (specialKeys.contains(key)) {
+		// Issue#728: Shift + Space inserts ;2u in `:terminal`. Incorrectly sent as <S-Space>.
+		if (key == Qt::Key_Space) {
+			mod &= ~Qt::ShiftModifier;
+		}
+
 		return ToKeyString(GetModifierPrefix(mod), specialKeys.value(key));
 	}
 
