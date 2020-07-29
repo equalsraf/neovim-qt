@@ -14,6 +14,7 @@ private slots:
 	void CapsLockIgnored() noexcept;
 	void AltGrAloneIgnored() noexcept;
 	void AltGrKeyEventWellFormed() noexcept;
+	void ShiftSpaceWellFormed() noexcept;
 };
 
 void TestInputCommon::LessThanKey() noexcept
@@ -127,6 +128,16 @@ void TestInputCommon::CapsLockIgnored() noexcept
 
 	QKeyEvent evMetaCapsLock{ QEvent::KeyPress, Qt::Key_CapsLock, Qt::MetaModifier};
 	QCOMPARE(NeovimQt::Input::convertKey(evMetaCapsLock), QString{ "" });
+}
+
+void TestInputCommon::ShiftSpaceWellFormed() noexcept
+{
+	// Issue#728: Shift + Space inserts ;2u in `:terminal`, mode sent as <S-Space>.
+	QKeyEvent evShift{ QEvent::KeyPress, Qt::Key_Shift, Qt::ShiftModifier, "" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShift), QString{ "" });
+
+	QKeyEvent evShiftSpace{ QEvent::KeyPress, Qt::Key_Space, Qt::ShiftModifier, " " };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftSpace), QString{ "<Space>" });
 }
 
 #include "tst_input_common.moc"
