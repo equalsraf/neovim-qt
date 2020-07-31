@@ -1216,10 +1216,14 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 
 void Shell::setCursorFromBusyState() noexcept
 {
-	unsetCursor();
+	Qt::CursorShape desiredCursor{};
 
 	if (m_neovimBusy) {
-		setCursor(Qt::CursorShape::WaitCursor);
+		desiredCursor = Qt::CursorShape::WaitCursor;
+	}
+
+	if (cursor().shape() != desiredCursor) {
+		setCursor(desiredCursor);
 	}
 }
 
