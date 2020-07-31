@@ -166,7 +166,9 @@ QString convertKey(const QKeyEvent& ev) noexcept
 
 	if (specialKeys.contains(key)) {
 		// Issue#728: Shift + Space inserts ;2u in `:terminal`. Incorrectly sent as <S-Space>.
-		if (key == Qt::Key_Space) {
+		// Issue#259: Shift + BackSpace inserts 7;2u in `:terminal`. Incorrectly sent as <S-BS>.
+		if (key == Qt::Key_Space
+			|| key == Qt::Key_Backspace) {
 			mod &= ~Qt::ShiftModifier;
 		}
 
