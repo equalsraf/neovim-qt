@@ -15,6 +15,7 @@ private slots:
 	void AltGrAloneIgnored() noexcept;
 	void AltGrKeyEventWellFormed() noexcept;
 	void ShiftSpaceWellFormed() noexcept;
+	void ShiftBackSpaceWellFormed() noexcept;
 };
 
 void TestInputCommon::LessThanKey() noexcept
@@ -138,6 +139,16 @@ void TestInputCommon::ShiftSpaceWellFormed() noexcept
 
 	QKeyEvent evShiftSpace{ QEvent::KeyPress, Qt::Key_Space, Qt::ShiftModifier, " " };
 	QCOMPARE(NeovimQt::Input::convertKey(evShiftSpace), QString{ "<Space>" });
+}
+
+void TestInputCommon::ShiftBackSpaceWellFormed() noexcept
+{
+	// Issue#259: Shift + BackSpace inserts 7;2u in `:terminal`, mode sent as <S-BS>.
+	QKeyEvent evShift{ QEvent::KeyPress, Qt::Key_Shift, Qt::ShiftModifier, "" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShift), QString{ "" });
+
+	QKeyEvent evShiftBackSpace{ QEvent::KeyPress, Qt::Key_Backspace, Qt::ShiftModifier, "\b" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftBackSpace), QString{ "<BS>" });
 }
 
 #include "tst_input_common.moc"
