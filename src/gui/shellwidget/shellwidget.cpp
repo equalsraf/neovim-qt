@@ -1,8 +1,11 @@
+#include "shellwidget.h"
+
+#include <QDebug>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPaintEvent>
-#include <QDebug>
-#include "shellwidget.h"
+#include <QTextLayout>
+
 #include "helpers.h"
 
 ShellWidget::ShellWidget(QWidget* parent)
@@ -357,6 +360,157 @@ void ShellWidget::paintForegroundCellText(
 	}
 }
 
+static bool AreGlyphPositionsUniform(
+	const QVector<QPointF>& glyphPositionList,
+	int cellWidth) noexcept
+{
+	if (glyphPositionList.size() <= 1) {
+		return true;
+	}
+
+	qreal lastPos{ glyphPositionList[0].x() };
+	for (int i=1; i<glyphPositionList.size(); i++) {
+		const qreal delta{ lastPos - glyphPositionList[i].x() };
+		if (delta != cellWidth) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+static QVector<QPointF> DistributeGlyphPositions(
+	QVector<QPointF>&& glyphPositionList,
+	int cellWidth) noexcept
+{
+	if (glyphPositionList.size() > 1) {
+		qreal adjustPositionX{ glyphPositionList[0].x() };
+		for (auto& glyphPos : glyphPositionList) {
+			glyphPos.setX(adjustPositionX);
+			adjustPositionX += cellWidth;
+		}
+	}
+
+	return std::move(glyphPositionList);
+}
+
+static QVector<uint32_t> RemoveLigaturesUnderCursor(
+	const QGlyphRun& glyphRun,
+	const QString& textGlyphRun,
+	int cursorGlyphRunPos) noexcept
+{
+	auto glyphIndexList{ glyphRun.glyphIndexes() };
+	auto glyphIndexListNoLigatures{ glyphRun.rawFont().glyphIndexesForString(textGlyphRun) };
+
+	if (cursorGlyphRunPos < 0
+		|| cursorGlyphRunPos >= glyphIndexList.size()
+		|| cursorGlyphRunPos >= glyphIndexListNoLigatures.size()) {
+		qDebug() << "ERROR: Invalid cursorGlyphRunPos!";
+		return {};
+	}
+
+	if (glyphIndexList.at(cursorGlyphRunPos) != glyphIndexListNoLigatures.at(cursorGlyphRunPos)) {
+		for(int i=cursorGlyphRunPos; i>=0; i--) {
+			if (glyphIndexList.at(i) == glyphIndexListNoLigatures.at(i)) {
+				break;
+			}
+
+			glyphIndexList.data()[i] = glyphIndexListNoLigatures[i];
+		}
+
+		for(int i=cursorGlyphRunPos+1; i<glyphIndexList.size(); i++) {
+			if (glyphIndexList.at(i) == glyphIndexListNoLigatures.at(i)) {
+				break;
+			}
+
+			glyphIndexList.data()[i] = glyphIndexListNoLigatures[i];
+		}
+
+		return glyphIndexList;
+	}
+
+	// No glyph changes required
+	return {};
+}
+
+void ShellWidget::paintForegroundTextBlock(
+	QPainter& p,
+	const Cell& cell,
+	QRect blockRect,
+	const QString& text,
+	int cursorPos) noexcept
+{
+	QColor fgColor{ cell.GetForegroundColor() };
+	if (!fgColor.isValid()) {
+		fgColor = (cell.IsReverse()) ? background() : foreground();
+	}
+
+	const QFont blockFont{ GetCellFont(cell) };
+
+	p.setPen(fgColor);
+	p.setFont(blockFont);
+
+	const int cellTextOffset{ m_lineSpace / 2 };
+	const QPoint pos{ blockRect.left(), blockRect.top() + cellTextOffset };
+
+	QTextLayout textLayout{ text, blockFont, p.device() };
+	textLayout.setCacheEnabled(true);
+	textLayout.beginLayout();
+	QTextLine line = textLayout.createLine();
+	if (!line.isValid()) {
+		return;
+	}
+	line.setNumColumns(text.length());
+	textLayout.endLayout();
+
+	int glyphsRendered{ 0 };
+	for (auto& glyphRun : textLayout.glyphRuns()) {
+		auto glyphPositionList{ glyphRun.positions() };
+		int sizeGlyphRun{ glyphPositionList.size() };
+
+		const int cellWidth{ (cell.IsDoubleWidth()) ?
+			m_cellSize.width() * 2 : m_cellSize.width() };
+
+		// When characters are rendered as a string, they may not be uniformly
+		// distributed. Check for even spacing and redistribute as necessary.
+		if (!AreGlyphPositionsUniform(glyphPositionList, cellWidth)) {
+			glyphRun.setPositions(
+				DistributeGlyphPositions(std::move(glyphPositionList), cellWidth));
+		}
+
+		const bool isCursorVisibleInGlyphRun{ cursorPos >= 0
+			&& cursorPos < sizeGlyphRun + glyphsRendered
+			&& cursorPos >= glyphsRendered };
+
+		// When the cursor is NOT within the glyph run, render as-is.
+		if (!isCursorVisibleInGlyphRun) {
+			p.drawGlyphRun(pos, glyphRun);
+			glyphsRendered += sizeGlyphRun;
+			continue;
+		}
+
+		// When the cursor IS within the glyph run, decompose individual characters under the cursor.
+		const int cursorGlyphRunPos { cursorPos - glyphsRendered };
+		const QString textGlyphRun{ QStringRef{ &text, glyphsRendered, sizeGlyphRun }.toString() };
+
+		// Compares a glyph run with and without ligatures. Ligature glyphs are detected as differences
+		// in these two lists. A non-empty newCursorGlyphList indicates glyph substitution is required.
+		const auto newCursorGlyphList { RemoveLigaturesUnderCursor(glyphRun, textGlyphRun, cursorGlyphRunPos) };
+		if (!newCursorGlyphList.empty()) {
+			glyphRun.setGlyphIndexes(newCursorGlyphList);
+		}
+
+		p.drawGlyphRun(pos, glyphRun);
+		glyphsRendered += sizeGlyphRun;
+
+		const QRect cursorCellRect{ neovimCursorRect() };
+		paintNeovimCursorBackground(p, cursorCellRect);
+		paintNeovimCursorForeground(
+			p, cursorCellRect, glyphRun.positions().at(cursorGlyphRunPos).toPoint() + pos,
+			textGlyphRun.at(cursorGlyphRunPos));
+	}
+}
+
 void ShellWidget::paintEvent(QPaintEvent *ev)
 {
 	QPainter p(this);
@@ -364,44 +518,11 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 	p.setClipping(true);
 
 	for (auto rect{ ev->region().cbegin() }; rect != ev->region().cend(); rect++) {
-		int start_row = rect->top() / m_cellSize.height();
-		int end_row = rect->bottom() / m_cellSize.height();
-		int start_col = rect->left() / m_cellSize.width();
-		int end_col = rect->right() / m_cellSize.width();
-
-		// Paint margins
-		if (end_col >= m_contents.columns()) {
-			end_col = m_contents.columns() - 1;
+		if (isLigatureModeEnabled()) {
+			paintRectLigatures(p, *rect);
 		}
-		if (end_row >= m_contents.rows()) {
-			end_row = m_contents.rows() - 1;
-		}
-
-		// end_col/row is inclusive
-		for (int i=start_row; i<=end_row; i++) {
-			for (int j=end_col; j>=start_col; j--) {
-
-				const Cell& cell = m_contents.constValue(i,j);
-				int chars = cell.IsDoubleWidth() ? 2 : 1;
-				QRect r = absoluteShellRect(i, j, 1, chars);
-				QRect ovflw = absoluteShellRect(i, j, 1, chars + 1);
-
-				p.setClipRegion(ovflw);
-
-				// Only paint bg/fg if this is not the second cell of a wide char
-				if (j <= 0 || !contents().constValue(i, j-1).IsDoubleWidth()) {
-
-					const QPoint curPos{ j, i };
-					const bool isCursorVisibleAtCell{ m_cursor.IsVisible() && m_cursor_pos == curPos };
-
-					paintBackgroundClearCell(p, cell, r, isCursorVisibleAtCell);
-					paintForegroundCellText(p, cell, r, isCursorVisibleAtCell);
-				}
-
-				paintUnderline(p, cell, r);
-
-				paintUndercurl(p, cell, r);
-			}
+		else {
+			paintRectNoLigatures(p, *rect);
 		}
 	}
 
@@ -423,6 +544,113 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 	//	p.setPen(QPen(Qt::red, 1,  Qt::DashLine));
 	//	p.drawLine(0, i, width(), i);
 	//}
+}
+
+void ShellWidget::paintRectNoLigatures(QPainter& p, const QRect rect) noexcept
+{
+	int start_row = rect.top() / m_cellSize.height();
+	int end_row = rect.bottom() / m_cellSize.height();
+	int start_col = rect.left() / m_cellSize.width();
+	int end_col = rect.right() / m_cellSize.width();
+
+	// Paint margins
+	if (end_col >= m_contents.columns()) {
+		end_col = m_contents.columns() - 1;
+	}
+	if (end_row >= m_contents.rows()) {
+		end_row = m_contents.rows() - 1;
+	}
+
+	// end_col/row is inclusive
+	for (int i=start_row; i<=end_row; i++) {
+		for (int j=end_col; j>=start_col; j--) {
+
+			const Cell& cell = m_contents.constValue(i,j);
+			int chars = cell.IsDoubleWidth() ? 2 : 1;
+			QRect r = absoluteShellRect(i, j, 1, chars);
+			QRect ovflw = absoluteShellRect(i, j, 1, chars + 1);
+
+			p.setClipRegion(ovflw);
+
+			// Only paint bg/fg if this is not the second cell of a wide char
+			if (j <= 0 || !contents().constValue(i, j-1).IsDoubleWidth()) {
+
+				const QPoint curPos{ j, i };
+				const bool isCursorVisibleAtCell{ m_cursor.IsVisible() && m_cursor_pos == curPos };
+
+				paintBackgroundClearCell(p, cell, r, isCursorVisibleAtCell);
+				paintForegroundCellText(p, cell, r, isCursorVisibleAtCell);
+			}
+
+			paintUnderline(p, cell, r);
+
+			paintUndercurl(p, cell, r);
+		}
+	}
+}
+
+void ShellWidget::paintRectLigatures(QPainter& p, const QRect rect) noexcept
+{
+	int start_row = rect.top() / m_cellSize.height();
+	int end_row = rect.bottom() / m_cellSize.height();
+	int start_col = 0;
+	int end_col = m_contents.columns() - 1;
+
+	// Paint margins
+	if (end_col >= m_contents.columns()) {
+		end_col = m_contents.columns() - 1;
+	}
+	if (end_row >= m_contents.rows()) {
+		end_row = m_contents.rows() - 1;
+	}
+
+	// end_col/row is inclusive
+	for (int i=start_row; i<=end_row; i++) {
+		for (int j=start_col; j<=end_col; j++) {
+
+			const Cell& firstCell{ m_contents.constValue(i,j) };
+			const int chars{ firstCell.IsDoubleWidth() ? 2 : 1 };
+			const QRect firstCellRect{ absoluteShellRect(i, j, 1, chars) };
+
+			QString blockText;
+			int blockCursorPos{ -1 };
+
+			while (j <= end_col)
+			{
+				const Cell& checkCell{ m_contents.constValue(i, j) };
+
+				if (!firstCell.IsStyleEquivalent(checkCell)) {
+					j--;
+					break;
+				}
+
+				const QPoint checkPos{ j, i };
+				if (m_cursor_pos == checkPos) {
+					blockCursorPos = blockText.size();
+				}
+
+				const uint cellCharacter{ checkCell.GetCharacter() };
+				blockText += QString::fromUcs4(&cellCharacter, 1);
+
+				if (checkCell.IsDoubleWidth()) {
+					j++;
+				}
+
+				j++;
+			}
+
+			const Cell& lastCell{ m_contents.constValue(i,j) };
+			int lastCellChars = lastCell.IsDoubleWidth() ? 2 : 1;
+			QRect lastCellRect = absoluteShellRect(i, j, 1, lastCellChars);
+
+			QRect blockRect{ firstCellRect.topLeft(), lastCellRect.bottomRight() };
+
+			paintBackgroundClearCell(p, firstCell, blockRect, false);
+			paintForegroundTextBlock(p, firstCell, blockRect, blockText, blockCursorPos);
+			paintUnderline(p, firstCell, blockRect);
+			paintUndercurl(p, firstCell, blockRect);
+		}
+	}
 }
 
 void ShellWidget::resizeEvent(QResizeEvent *ev)
@@ -543,8 +771,13 @@ int ShellWidget::put(
 {
 	int cols_changed = m_contents.put(text, row, column, hl_attr);
 	if (cols_changed > 0) {
-		QRect rect = absoluteShellRect(row, column, 1, cols_changed);
-		update(rect);
+		if (isLigatureModeEnabled()) {
+			update(absoluteShellRectRow(row));
+		}
+		else {
+			QRect rect = absoluteShellRect(row, column, 1, cols_changed);
+			update(rect);
+		}
 	}
 	return cols_changed;
 }
@@ -552,7 +785,7 @@ int ShellWidget::put(
 void ShellWidget::clearRow(int row)
 {
 	m_contents.clearRow(row);
-	QRect rect = absoluteShellRect(row, 0, 1, m_contents.columns());
+	QRect rect = absoluteShellRectRow(row);
 	update(rect);
 }
 void ShellWidget::clearShell(QColor bg)
@@ -578,6 +811,7 @@ void ShellWidget::scrollShell(int rows)
 		scroll(0, -rows*m_cellSize.height());
 	}
 }
+
 /// Scroll an area, count rows (positive numbers move content up)
 void ShellWidget::scrollShellRegion(int row0, int row1, int col0,
 			int col1, int rows)
@@ -590,13 +824,15 @@ void ShellWidget::scrollShellRegion(int row0, int row1, int col0,
 	}
 }
 
-/// Convert Area in row/col coordinates into pixel coordinates
-///
-/// (row0, col0) is the start position and rowcount/colcount the size
-QRect ShellWidget::absoluteShellRect(int row0, int col0, int rowcount, int colcount)
+QRect ShellWidget::absoluteShellRect(int row0, int col0, int rowcount, int colcount) const noexcept
 {
 	return QRect(col0*m_cellSize.width(), row0*m_cellSize.height(),
 			colcount*m_cellSize.width(), rowcount*m_cellSize.height());
+}
+
+QRect ShellWidget::absoluteShellRectRow(int row) const noexcept
+{
+	return absoluteShellRect(row, 0, 1, m_contents.columns());
 }
 
 int ShellWidget::rows() const
@@ -612,12 +848,25 @@ int ShellWidget::columns() const
 void ShellWidget::setNeovimCursor(uint64_t row, uint64_t col) noexcept
 {
 	// Clear the stale cursor
-	update(neovimCursorRect());
+	if (isLigatureModeEnabled()) {
+		uint64_t oldCursorRow{ static_cast<uint64_t>(m_cursor_pos.y()) };
 
-	// Update cursor position, draw at new location
+		// Ligature mode only requires clear during cursor row changes.
+		if (row != oldCursorRow) {
+			update(absoluteShellRectRow(oldCursorRow));
+		}
+	}
+	else {
+		update(neovimCursorRect());
+	}
+
+	// Update cursor position
 	m_cursor_pos = QPoint(col, row);
 	m_cursor.ResetTimer();
-	update(neovimCursorRect());
+
+	// Draw cursor at new location
+	update((isLigatureModeEnabled()) ?
+		absoluteShellRectRow(row) : neovimCursorRect());
 }
 
 /// The top left corner position (pixel) for the cursor
