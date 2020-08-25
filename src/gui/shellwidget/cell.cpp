@@ -23,6 +23,10 @@ bool Cell::IsStyleEquivalent(const Cell& other) const
 		return false;
 	}
 
+	if (IsDoubleWidth() != other.IsDoubleWidth()) {
+		return false;
+	}
+
 	return m_highlight == other.m_highlight;
 }
 

@@ -139,10 +139,18 @@ protected:
 	void setNeovimCursor(uint64_t col, uint64_t row) noexcept;
 
 	virtual void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
+
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
 
 	void setCellSize();
-	QRect absoluteShellRect(int row0, int col0, int rowcount, int colcount);
+
+	/// Converts an area in row/col coordinates into pixel coordinates.
+	///
+	/// (row0, col0) is the start position and rowcount/colcount the size
+	QRect absoluteShellRect(int row0, int col0, int rowcount, int colcount) const noexcept;
+
+	/// Computes the entire row position and size in pixel coordinates.
+	QRect absoluteShellRectRow(int row) const noexcept;
 
 	void setGuiFontList(const std::vector<QFont>&& fontList) noexcept
 	{
@@ -153,12 +161,22 @@ private:
 	void setFont(const QFont&);
 	void handleCursorChanged();
 	QRect getNeovimCursorRect(QRect cellRect) noexcept;
+	void paintRectLigatures(QPainter& p, QRect rect) noexcept;
+	void paintRectNoLigatures(QPainter& p, QRect rect) noexcept;
 	void paintNeovimCursorBackground(QPainter& p, QRect cellRect) noexcept;
 	void paintNeovimCursorForeground(QPainter& p, QRect cellRect, QPoint pos, const QString& character) noexcept;
 	void paintUnderline(QPainter& p, const Cell& cell, QRect cellRect) noexcept;
 	void paintUndercurl(QPainter& p, const Cell& cell, QRect cellRect) noexcept;
 	void paintBackgroundClearCell(QPainter& p, const Cell& cell, QRect cellRect, bool isCursorCell) noexcept;
 	void paintForegroundCellText(QPainter& p, const Cell& cell, QRect cellRect, bool isCursorCell) noexcept;
+
+	void paintForegroundTextBlock(
+		QPainter& p,
+		const Cell& cell,
+		QRect blockRect,
+		const QString& text,
+		int cursorPos) noexcept;
+
 	QFont GetCellFont(const Cell& cell) const noexcept;
 
 	ShellContents m_contents{ 0, 0 };
