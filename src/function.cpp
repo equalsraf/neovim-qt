@@ -156,8 +156,7 @@ QList<QPair<QString,QString> > Function::parseParameters(const QVariantList& obj
 		}
 
 		for (int j=0; j<params.size(); j+=2) {
-			QByteArray type, name;
-			if (!params.at(j).canConvert<QByteArray>() || 
+			if (!params.at(j).canConvert<QByteArray>() ||
 					!params.at(j+1).canConvert<QByteArray>()) {
 				return fail;
 			}
