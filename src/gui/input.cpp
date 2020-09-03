@@ -116,17 +116,13 @@ QString convertMouse(
 		return {};
 	}
 
-	return QString{ "<%1%2%3><%4,%5>" }
-		.arg(GetModifierPrefix(mod))
-		.arg(varButtonName.toString())
-		.arg(GetEventString(type))
-		.arg(pos.x())
-		.arg(pos.y());
+	return QString{ "<%1%2%3><%4,%5>" }.arg(GetModifierPrefix(mod), varButtonName.toString(), GetEventString(type))
+		.arg(pos.x(), pos.y());
 }
 
 QString ToKeyString(const QString& modPrefix, const QString& key) noexcept
 {
-	return QString{ "<%1%2>" }.arg(modPrefix).arg(key);
+	return QString{ "<%1%2>" }.arg(modPrefix, key);
 }
 
 QString convertKey(const QKeyEvent& ev) noexcept

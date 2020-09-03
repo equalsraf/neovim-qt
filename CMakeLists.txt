@@ -36,7 +36,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"qfileinfo-exists,"
 #			"qgetenv,"
 			"qmap-with-pointer-key,"
-#			"qstring-arg,"
+			"qstring-arg,"
 			"qstring-comparison-to-implicit-char,"
 			"qstring-insensitive-allocation,"
 #			"qstring-ref,"
