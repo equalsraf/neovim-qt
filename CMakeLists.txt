@@ -34,7 +34,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"qdatetime-utc,"
 #			"qenums,"
 			"qfileinfo-exists,"
-#			"qgetenv,"
+			"qgetenv,"
 			"qmap-with-pointer-key,"
 			"qstring-arg,"
 			"qstring-comparison-to-implicit-char,"
