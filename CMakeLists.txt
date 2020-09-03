@@ -30,7 +30,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"no-qgetenv,"
 			"no-qstring-arg,"
 			"no-qstring-ref,"
-			"no-unused-non-trivial-variable,"
 			"level1",
 			"no-connect-3arg-lambda,"
 			"no-inefficient-qlist-soft,"

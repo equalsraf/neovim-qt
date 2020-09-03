@@ -569,7 +569,6 @@ void Shell::handlePopupMenuShow(const QVariantList& opargs)
 	for (const auto& v : items) {
 		QVariantList item = v.toList();
 		// Item is (text, kind, extra, info)
-		QString text = item.value(0).toString();
 		if (item.size() < 4
 			|| item.isEmpty()
 			|| item.value(0).toString().isEmpty()) {
