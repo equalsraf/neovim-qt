@@ -43,7 +43,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"qt-macros,"
 			"strict-iterators,"
 			"temporary-iterator,"
-#			"unused-non-trivial-variable,"
+			"unused-non-trivial-variable,"
 			"writing-to-temporary,"
 			"wrong-qevent-cast,"
 			"wrong-qglobalstatic,"
