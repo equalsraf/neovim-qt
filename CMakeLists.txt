@@ -39,7 +39,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"qstring-arg,"
 			"qstring-comparison-to-implicit-char,"
 			"qstring-insensitive-allocation,"
-#			"qstring-ref,"
+			"qstring-ref,"
 			"qt-macros,"
 			"strict-iterators,"
 			"temporary-iterator,"
