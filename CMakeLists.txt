@@ -29,7 +29,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"lambda-unique-connection,"
 			"lowercase-qml-type-name,"
 			"mutable-container-key,"
-#			"overloaded-signal,"
+			"overloaded-signal,"
 			"qcolor-from-literal,"
 			"qdatetime-utc,"
 #			"qenums,"

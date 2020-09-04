@@ -52,7 +52,7 @@ private slots:
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		s->repaint();
 
@@ -68,7 +68,7 @@ private slots:
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 		checkStartVars(c);
 	}
 
@@ -80,7 +80,7 @@ private slots:
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 		checkStartVars(c);
 	}
 
@@ -104,7 +104,7 @@ private slots:
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		auto req = c->api0()->vim_command_output(c->encode("echo g:test_gviminit"));
 		QSignalSpy cmd(req, SIGNAL(finished(quint32, quint64, QVariant)));
@@ -129,7 +129,7 @@ private slots:
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, [](QString msg, const QVariant& err) {
 				qDebug() << msg << err;
@@ -223,7 +223,7 @@ private slots:
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, [](QString msg, const QVariant& err) {
 				qDebug() << msg << err;
@@ -284,7 +284,7 @@ private slots:
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, [](QString msg, const QVariant& err) {
 				qDebug() << msg << err;

@@ -147,11 +147,6 @@ void MainWindow::init(NeovimConnector *c)
 	}
 }
 
-bool MainWindow::neovimAttached() const
-{
-	return (m_shell != NULL && m_shell->neovimAttached());
-}
-
 /** The Neovim process has exited */
 void MainWindow::neovimExited(int status)
 {
@@ -304,7 +299,6 @@ void MainWindow::showIfDelayed()
 
 void MainWindow::neovimAttachmentChanged(bool attached)
 {
-	emit neovimAttached(attached);
 	if (attached) {
 		if (isWindow() && m_shell != NULL) {
 			m_shell->updateGuiWindowState(windowState());
@@ -313,6 +307,8 @@ void MainWindow::neovimAttachmentChanged(bool attached)
 		m_tabline->deleteLater();
 		m_tabline_bar->deleteLater();
 	}
+
+	emit neovimAttached(attached);
 }
 
 Shell* MainWindow::shell()
