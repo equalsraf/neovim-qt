@@ -77,7 +77,7 @@ static QVariant GetButtonName(
 			return QStringLiteral("Middle");
 
 		case Qt::NoButton:
-			return QStringLiteral("");
+			return QLatin1String{""};
 
 		default:
 			return {}; // Invalid

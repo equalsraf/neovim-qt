@@ -227,7 +227,7 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 
 	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
 	// but we want to match the family name with the bold/italic attributes.
-	cellFont.setStyleName(QStringLiteral(""));
+	cellFont.setStyleName({});
 
 	cellFont.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
 	cellFont.setFixedPitch(true);
