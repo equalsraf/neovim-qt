@@ -21,7 +21,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 		string(CONCAT CLAZY_CHECKS
 			"connect-by-name,"
 			"connect-non-signal,"
-#			"connect-not-normalized,"
+			"connect-not-normalized,"
 			"container-anti-pattern,"
 			"empty-qstringliteral,"
 #			"fully-qualified-moc-types,"
