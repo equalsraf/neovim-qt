@@ -84,6 +84,7 @@ signals:
 	void neovimAttached(bool);
 	void neovimMaximized(bool);
 	void neovimForeground();
+	void neovimOpacity(double);
 	void neovimSuspend();
 	void neovimFullScreen(bool);
 	void neovimGuiCloseRequest();
