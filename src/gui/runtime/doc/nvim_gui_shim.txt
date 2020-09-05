@@ -81,6 +81,11 @@ GuiPopupmenu	Enable or disable the external GUI popup menu
 								*GuiRenderLigatures*
 GuiRenderLigatures	Enable or disable rendering ligatures
 
+								*GuiWindowOpacity*
+GuiWindowOpacity	Set window opacity. Takes a single argument,
+				a double in the range 0.0 to 1.0 (fully opaque).
+				This capability might not be supported in some platforms.
+
 ==============================================================================
 2. GUI variables
 

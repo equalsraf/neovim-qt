@@ -262,3 +262,9 @@ function! s:GuiRenderLigatures(enable) abort
 	call rpcnotify(0, 'Gui', 'Option', 'RenderLigatures', a:enable)
 endfunction
 command! -nargs=1 GuiRenderLigatures call s:GuiRenderLigatures(<args>)
+
+" Set window transparency, forwards to Qt setWindowOpacity
+function! s:GuiWindowOpacityCommand(value) abort
+  call rpcnotify(0, 'Gui', 'WindowOpacity', a:value)
+endfunction
+command! -nargs=1 GuiWindowOpacity call s:GuiWindowOpacityCommand("<args>")

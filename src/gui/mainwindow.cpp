@@ -107,6 +107,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimFullScreen);
 	connect(m_shell, &Shell::neovimGuiCloseRequest,
 			this, &MainWindow::neovimGuiCloseRequest);
+	connect(m_shell, &Shell::neovimOpacity,
+			this, &MainWindow::setWindowOpacity);
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &MainWindow::neovimExited);
 	connect(m_nvim, &NeovimConnector::error,

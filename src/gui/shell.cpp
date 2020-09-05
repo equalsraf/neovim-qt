@@ -817,6 +817,12 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 
 			qDebug() << "Neovim changed clipboard" << data << type << reg_name << clipboard;
 			QGuiApplication::clipboard()->setMimeData(clipData, clipboard);
+		} else if (guiEvName == "WindowOpacity" && args.size() == 2) {
+			bool ok = false;
+			auto val = args.at(1).toDouble(&ok);
+			if (ok) {
+				emit neovimOpacity(val);
+			}
 		} else if (guiEvName == "ShowContextMenu") {
 			emit neovimShowContextMenu();
 		} else if (guiEvName == "AdaptiveColor") {
