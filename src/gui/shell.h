@@ -1,36 +1,26 @@
 #ifndef NEOVIM_QT_SHELL
 #define NEOVIM_QT_SHELL
 
-#include <QWidget>
-#include <QVariantList>
-#include <QFont>
 #include <QBackingStore>
+#include <QFont>
 #include <QLabel>
-#include <QTimer>
-#include <QUrl>
 #include <QList>
 #include <QMap>
 #include <QMenu>
+#include <QTimer>
+#include <QUrl>
+#include <QVariantList>
+#include <QWidget>
 
 #include "neovimconnector.h"
-#include "shellwidget/highlight.h"
-#include "shellwidget/shellwidget.h"
-#include "shellwidget/cursor.h"
 #include "popupmenu.h"
 #include "popupmenumodel.h"
+#include "shellwidget/cursor.h"
+#include "shellwidget/highlight.h"
+#include "shellwidget/shellwidget.h"
+#include "tab.h"
 
 namespace NeovimQt {
-
-class Tab {
-public:
-	Tab(int64_t id, QString name) {
-		this->tab = id;
-		this->name = name;
-	}
-	/// The tab handle, a unique tab identifier
-	int64_t tab;
-	QString name;
-};
 
 class ShellOptions {
 public:

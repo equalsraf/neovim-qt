@@ -10,6 +10,7 @@
 #include "errorwidget.h"
 #include "scrollbar.h"
 #include "shell.h"
+#include "tabline.h"
 
 namespace NeovimQt {
 
@@ -48,36 +49,31 @@ private slots:
 	void showIfDelayed();
 	void neovimAttachmentChanged(bool);
 	void neovimIsUnsupported();
-	void neovimShowtablineSet(int);
-	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
 	void neovimShowContextMenu();
 	void neovimSendCut();
 	void neovimSendCopy();
 	void neovimSendPaste();
 	void neovimSendSelectAll();
-	void extTablineSet(bool);
-	void changeTab(int index);
 	void saveWindowGeometry();
 
 private:
 	void init(NeovimConnector *);
-	NeovimConnector *m_nvim;
-	ErrorWidget *m_errorWidget;
-	QSplitter *m_window;
-	TreeView *m_tree;
-	Shell *m_shell;
+	NeovimConnector *m_nvim{};
+	ErrorWidget *m_errorWidget{};
+	QSplitter *m_window{};
+	TreeView *m_tree{};
+	Shell *m_shell{};
 	DelayedShow m_delayedShow;
 	QStackedWidget m_stack;
-	QTabBar *m_tabline;
-	QToolBar *m_tabline_bar;
 	ShellOptions m_shell_options;
-	bool m_neovim_requested_close;
-	QMenu *m_contextMenu;
-	QAction *m_actCut;
-	QAction *m_actCopy;
-	QAction *m_actPaste;
-	QAction *m_actSelectAll;
-	ScrollBar *m_scrollbar;
+	bool m_neovim_requested_close{ false };
+	QMenu *m_contextMenu{};
+	QAction *m_actCut{};
+	QAction *m_actCopy{};
+	QAction *m_actPaste{};
+	QAction *m_actSelectAll{};
+	ScrollBar *m_scrollbar{};
+	Tabline m_tabline;
 };
 
 } // Namespace
