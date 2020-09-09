@@ -15,6 +15,7 @@
 #include "konsole_wcwidth.h"
 #include "util.h"
 #include "version.h"
+#include "helpers.h"
 
 namespace NeovimQt {
 
@@ -1539,8 +1540,8 @@ void Shell::tooltip(const QString& text)
 		m_tooltip->show();
 	}
 
-	m_tooltip->setMinimumWidth( QFontMetrics(m_tooltip->font()).width(text) );
-	m_tooltip->setMaximumWidth( QFontMetrics(m_tooltip->font()).width(text) );
+	m_tooltip->setMinimumWidth(GetHorizontalAdvance(QFontMetrics{ m_tooltip->font() }, text));
+	m_tooltip->setMaximumWidth(GetHorizontalAdvance(QFontMetrics{ m_tooltip->font() }, text));
 	m_tooltip->update();
 }
 

@@ -1,8 +1,13 @@
-#ifndef QSHELLWIDGET2_UTIL
-#define QSHELLWIDGET2_UTIL
+#pragma once
+
+#include <QFontMetrics>
 
 #include "shellcontents.h"
 
-bool saveShellContents(const ShellContents& s, const QString& filename);
+/// Helper for deprecated QFontMetrics::width(...). Eventually remove this code.
+int GetHorizontalAdvance(const QFontMetrics& fm, QChar character) noexcept;
 
-#endif
+/// Helper for deprecated QFontMetrics::width(...). Eventually remove this code.
+int GetHorizontalAdvance(const QFontMetrics& fm, const QString& text) noexcept;
+
+bool saveShellContents(const ShellContents& s, const QString& filename);
