@@ -78,6 +78,19 @@ if(APPLE)
 #		COMMENT "Bundling Qt libraries")
 endif()
 
+# Link Time Optimization, especially useful for unused auto-generated code.
+# On Windows, MinGW may not support LTO.
+# See https://github.com/neovim/neovim/pull/8654
+if(POLICY CMP0069 AND NOT MINGW)
+	cmake_policy(SET CMP0069 NEW)
+
+	include(CheckIPOSupported)
+	check_ipo_supported(RESULT IPO_SUPPORTED)
+	if(IPO_SUPPORTED AND (NOT CMAKE_BUILD_TYPE MATCHES Debug))
+		set_property(TARGET nvim-qt PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+	endif()
+endif()
+
 install(TARGETS nvim-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
 if(NOT APPLE)
 	install(DIRECTORY runtime
