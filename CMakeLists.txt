@@ -24,7 +24,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"connect-not-normalized,"
 			"container-anti-pattern,"
 			"empty-qstringliteral,"
-#			"fully-qualified-moc-types,"
+			"fully-qualified-moc-types,"
 #			"lambda-in-connect,"
 			"lambda-unique-connection,"
 			"lowercase-qml-type-name,"
