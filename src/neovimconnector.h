@@ -49,11 +49,7 @@ public:
 		MsgpackError,
 		RuntimeMsgpackError,
 	};
-#ifdef Q_ENUM
 	Q_ENUM(NeovimError)
-#else
-	Q_ENUMS(NeovimError)
-#endif
 
 	/** Underlying connection used to read Neovim */
         enum NeovimConnectionType {
@@ -103,7 +99,7 @@ public:
 signals:
 	/** Emitted when Neovim is ready @see ready */
 	void ready();
-	void error(NeovimError);
+	void error(NeovimQt::NeovimConnector::NeovimError);
 	void processExited(int exitCode);
 
 public slots:

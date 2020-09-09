@@ -32,7 +32,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"overloaded-signal,"
 			"qcolor-from-literal,"
 			"qdatetime-utc,"
-#			"qenums,"
+			"qenums,"
 			"qfileinfo-exists,"
 			"qgetenv,"
 			"qmap-with-pointer-key,"
