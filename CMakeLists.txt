@@ -19,34 +19,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 
 	if(ENABLE_CLAZY)
 		string(CONCAT CLAZY_CHECKS
-			"connect-by-name,"
-			"connect-non-signal,"
-			"connect-not-normalized,"
-			"container-anti-pattern,"
-			"empty-qstringliteral,"
-			"fully-qualified-moc-types,"
-#			"lambda-in-connect,"
-			"lambda-unique-connection,"
-			"lowercase-qml-type-name,"
-			"mutable-container-key,"
-			"overloaded-signal,"
-			"qcolor-from-literal,"
-			"qdatetime-utc,"
-			"qenums,"
-			"qfileinfo-exists,"
-			"qgetenv,"
-			"qmap-with-pointer-key,"
-			"qstring-arg,"
-			"qstring-comparison-to-implicit-char,"
-			"qstring-insensitive-allocation,"
-			"qstring-ref,"
-			"qt-macros,"
-			"strict-iterators,"
-			"temporary-iterator,"
-			"unused-non-trivial-variable,"
-			"writing-to-temporary,"
-			"wrong-qevent-cast,"
-			"wrong-qglobalstatic,"
+			"level0,"
 			)
 
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -plugin-arg-clazy -Xclang ${CLAZY_CHECKS} -Wno-deprecated-declarations -Werror")
