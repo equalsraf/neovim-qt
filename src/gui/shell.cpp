@@ -1242,20 +1242,12 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	if (!m_attached || !m_mouseEnabled) {
 		return;
 	}
-#if (QT_VERSION < QT_VERSION_CHECK(5, 5, 0))
-	const int defaultDeltasPerStep = 120;
-#else
-	const int defaultDeltasPerStep = QWheelEvent::DefaultDeltasPerStep;
-#endif
 
-	QPointF scroll_delta_f(ev->angleDelta());
-	scroll_delta_f /= defaultDeltasPerStep;
+	QPointF scroll_delta_f{ ev->angleDelta() / QWheelEvent::DefaultDeltasPerStep };
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
 	if (ev->inverted()) {
 		scroll_delta_f = -scroll_delta_f;
 	}
-#endif
 
 	// Reset scroll remainder if we change scroll direction;
 	const int direction_x = normalize(scroll_delta_f.x());
