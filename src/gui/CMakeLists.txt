@@ -105,15 +105,11 @@ if(NOT APPLE)
 			DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps/)
 endif()
 
-if(WIN32 AND NOT CMAKE_CROSSCOMPILING)
-	if(Qt5Core_VERSION VERSION_LESS 5.3)
-		message(WARNING "Cannot use windeployqt in Qt 5.2 and earlier")
-	elseif(NOT DEFINED USE_STATIC_QT)
-		include(WinDeployQt)
-		WinDeployQt(TARGET nvim-qt COMPILER_RUNTIME INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
-		install(DIRECTORY ${PROJECT_BINARY_DIR}/windeployqt/
-			DESTINATION ${CMAKE_INSTALL_BINDIR})
-	endif()
+if(WIN32 AND NOT CMAKE_CROSSCOMPILING AND NOT DEFINED USE_STATIC_QT)
+	include(WinDeployQt)
+	WinDeployQt(TARGET nvim-qt COMPILER_RUNTIME INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
+	install(DIRECTORY ${PROJECT_BINARY_DIR}/windeployqt/
+		DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 # Generate help tags

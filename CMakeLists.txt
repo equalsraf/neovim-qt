@@ -45,6 +45,10 @@ find_package(Qt5Svg REQUIRED)
 find_package(Qt5Test REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
+if(Qt5Core_VERSION VERSION_LESS 5.8)
+	message(FATAL_ERROR "Minimum supported Qt5 version is 5.8!")
+endif()
+
 # msgpack
 option(USE_SYSTEM_MSGPACK "Use system msgpack libraries " OFF)
 if(USE_SYSTEM_MSGPACK)
