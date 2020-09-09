@@ -10,7 +10,7 @@ Qt::KeyboardModifiers ControlModifier() noexcept
 
 Qt::KeyboardModifiers CmdModifier() noexcept
 {
-	return static_cast<Qt::KeyboardModifiers>(0);
+	return Qt::KeyboardModifier::NoModifier;
 }
 
 Qt::Key Key_Control() noexcept
