@@ -242,11 +242,11 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 
 	p.setClipping(true);
 
-	foreach(QRect rect, ev->region().rects()) {
-		int start_row = rect.top() / m_cellSize.height();
-		int end_row = rect.bottom() / m_cellSize.height();
-		int start_col = rect.left() / m_cellSize.width();
-		int end_col = rect.right() / m_cellSize.width();
+	for (auto rect{ ev->region().cbegin() }; rect != ev->region().cend(); rect++) {
+		int start_row = rect->top() / m_cellSize.height();
+		int end_row = rect->bottom() / m_cellSize.height();
+		int start_col = rect->left() / m_cellSize.width();
+		int end_col = rect->right() / m_cellSize.width();
 
 		// Paint margins
 		if (end_col >= m_contents.columns()) {
@@ -347,24 +347,22 @@ void ShellWidget::paintEvent(QPaintEvent *ev)
 
 	p.setClipping(false);
 
-	QRect shellArea = absoluteShellRect(0, 0,
-				m_contents.rows(), m_contents.columns());
-	QRegion margins = QRegion(rect()).subtracted(shellArea);
-	foreach(QRect margin, margins.intersected(ev->region()).rects()) {
-		p.fillRect(margin, background());
+	const QRect shellArea{ absoluteShellRect(0, 0, m_contents.rows(), m_contents.columns()) };
+	const QRegion margins{ QRegion(rect()).subtracted(shellArea) };
+	const QRegion marginsIntersected{ margins.intersected(ev->region()) };
+	for (auto margin{ marginsIntersected.cbegin() }; margin != marginsIntersected.cend(); margin++) {
+		p.fillRect(*margin, background());
 	}
 
-#if 0
-	// Draw DEBUG rulers
-	for (int i=m_cellSize.width(); i<width(); i+=m_cellSize.width()) {
-		p.setPen(QPen(Qt::red, 1,  Qt::DashLine));
-		p.drawLine(i, 0, i, height());
-	}
-	for (int i=m_cellSize.height(); i<width(); i+=m_cellSize.height()) {
-		p.setPen(QPen(Qt::red, 1,  Qt::DashLine));
-		p.drawLine(0, i, width(), i);
-	}
-#endif
+	// Uncomment to draw Debug rulers
+	//for (int i=m_cellSize.width(); i<width(); i+=m_cellSize.width()) {
+	//	p.setPen(QPen(Qt::red, 1,  Qt::DashLine));
+	//	p.drawLine(i, 0, i, height());
+	//}
+	//for (int i=m_cellSize.height(); i<width(); i+=m_cellSize.height()) {
+	//	p.setPen(QPen(Qt::red, 1,  Qt::DashLine));
+	//	p.drawLine(0, i, width(), i);
+	//}
 }
 
 void ShellWidget::resizeEvent(QResizeEvent *ev)
