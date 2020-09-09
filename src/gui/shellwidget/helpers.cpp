@@ -1,14 +1,39 @@
+#include "helpers.h"
+
+#include <QDebug>
 #include <QImage>
 #include <QPainter>
-#include <QDebug>
-#include "helpers.h"
+
+#include "version.h"
+
+template <class T>
+static int GetHorizontalAdvanceHelper(const QFontMetrics& fm, const T& text) noexcept
+{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 11, 0))
+	return fm.width(text);
+#else
+	return fm.horizontalAdvance(text);
+#endif
+}
+
+// TODO Issue#750: Remove this function, requires Qt 5.11
+int GetHorizontalAdvance(const QFontMetrics& fm, QChar character) noexcept
+{
+	return GetHorizontalAdvanceHelper(fm, character);
+}
+
+// TODO Issue#750: Remove this function, requires Qt 5.11
+int GetHorizontalAdvance(const QFontMetrics& fm, const QString& text) noexcept
+{
+	return GetHorizontalAdvanceHelper(fm, text);
+}
 
 /// Save shell contents into a file, returns file on error (see QImage::save)
 bool saveShellContents(const ShellContents& s, const QString& filename)
 {
 	QFont f;
 	QFontMetrics fm(f);
-	int w = fm.width('W');
+	int w = GetHorizontalAdvance(fm, 'W');
 	int h = fm.height();
 
 	QImage img( s.columns()*w,

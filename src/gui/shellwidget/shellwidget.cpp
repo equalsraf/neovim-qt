@@ -102,7 +102,7 @@ void ShellWidget::setCellSize()
 {
 	QFontMetrics fm(font());
 	m_ascent = fm.ascent();
-	m_cellSize = QSize(fm.width('W'),
+	m_cellSize = QSize(GetHorizontalAdvance(fm, 'W'),
 			qMax(fm.lineSpacing(), fm.height()) + m_lineSpace);
 	setSizeIncrement(m_cellSize);
 }
@@ -707,7 +707,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 
 	// Italic
 	if ( fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
-			fm_italic.maxWidth()*2 != fm_italic.width("MM") ) {
+			fm_italic.maxWidth()*2 != GetHorizontalAdvance(fm_italic, "MM") ) {
 		QFontInfo info(fi);
 		qDebug() << fi.family() << "Average and Maximum font width mismatch for Italic font; QFont::exactMatch() is" << fi.exactMatch()
 			<< "Real font is " << info.family() << info.pointSize();
@@ -716,7 +716,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 
 	// Bold
 	if ( fm_bold.averageCharWidth() != fm_bold.maxWidth() ||
-			fm_bold.maxWidth()*2 != fm_bold.width("MM") ) {
+			fm_bold.maxWidth()*2 != GetHorizontalAdvance(fm_bold, "MM") ) {
 		QFontInfo info(fb);
 		qDebug() << fb.family() << "Average and Maximum font width mismatch for Bold font; QFont::exactMatch() is" << fb.exactMatch()
 			<< "Real font is " << info.family() << info.pointSize();
@@ -725,7 +725,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 
 	// Bold+Italic
 	if ( fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
-			fm_boldit.maxWidth()*2 != fm_boldit.width("MM") ) {
+			fm_boldit.maxWidth()*2 != GetHorizontalAdvance(fm_boldit, "MM") ) {
 		QFontInfo info(fbi);
 		qDebug() << fbi.family() << "Average and Maximum font width mismatch for Bold+Italic font; QFont::exactMatch() is" << fbi.exactMatch()
 			<< "Real font is " << info.family() << info.pointSize();
