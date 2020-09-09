@@ -1274,8 +1274,16 @@ void Shell::wheelEvent(QWheelEvent *ev)
 		return;
 	}
 
+// TODO Issue#751:  Remove Deprecated code, keep #else below
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
 	const QPoint pos(ev->x()/cellSize().width(),
 			ev->y()/cellSize().height());
+#else
+	const QPointF mousePos{ ev->position() };
+	const QSize size{ cellSize() };
+	const QPointF pos{ mousePos.x() / size.width(),
+		mousePos.y() / size.height() };
+#endif
 
 	QString inp;
 	if (scroll_delta.y() != 0) {
