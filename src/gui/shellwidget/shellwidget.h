@@ -9,11 +9,7 @@
 class ShellWidget: public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY(QColor background READ background WRITE setBackground)
-	Q_PROPERTY(QColor foreground READ foreground WRITE setForeground)
-	Q_PROPERTY(int rows READ rows)
-	Q_PROPERTY(int columns READ columns)
-	Q_PROPERTY(QSize cellSize READ cellSize)
+
 public:
 	ShellWidget(QWidget *parent=0);
 
