@@ -149,7 +149,7 @@ void NeovimApi{{api_level}}::handleResponse(uint32_t msgid, uint64_t fun, const 
 	{% endfor %}
 	};
 
-	QList<Function> supported;
+	QVector<Function> supported;
 	supported.reserve(ftable.size());
 	for(const auto& val : ftable) {
 		auto f = Function::fromVariant(val);

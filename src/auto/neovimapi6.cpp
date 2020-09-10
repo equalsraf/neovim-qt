@@ -1,4 +1,4 @@
-// Auto generated 2020-09-09 13:30:54.415020 from nvim API level:6
+// Auto generated 2020-09-09 15:16:43.068844 from nvim API level:6
 #include "auto/neovimapi6.h"
 #include "msgpackiodevice.h"
 #include "msgpackrequest.h"
@@ -6419,7 +6419,7 @@ void NeovimApi6::handleResponse(uint32_t msgid, uint64_t fun, const QVariant& re
 				, false },
 		};
 
-	QList<Function> supported;
+	QVector<Function> supported;
 	supported.reserve(ftable.size());
 	for(const auto& val : ftable) {
 		auto f = Function::fromVariant(val);

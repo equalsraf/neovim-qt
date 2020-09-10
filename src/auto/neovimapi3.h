@@ -1,4 +1,4 @@
-// Auto generated 2020-09-09 13:30:54.167971 from nvim API level:3
+// Auto generated 2020-09-09 15:16:42.820006 from nvim API level:3
 #pragma once
 
 #include <QObject>

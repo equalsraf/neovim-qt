@@ -27,7 +27,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"detaching-temporary,"
 			"foreach,"
 			"incorrect-emit,"
-			#"inefficient-qlist-soft,"
+			"inefficient-qlist-soft,"
 			"install-event-filter,"
 			"non-pod-global-static,"
 			#"overridden-signal,"
