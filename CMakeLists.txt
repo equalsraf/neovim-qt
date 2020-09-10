@@ -22,7 +22,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"level0,"
 			"auto-unexpected-qstringbuilder,"
 			"child-event-qobject-cast,"
-			#"connect-3arg-lambda,"
+			"connect-3arg-lambda,"
 			"const-signal-or-slot,"
 			"detaching-temporary,"
 			"foreach,"

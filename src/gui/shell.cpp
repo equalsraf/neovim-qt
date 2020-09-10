@@ -1626,17 +1626,18 @@ void Shell::openFiles(QList<QUrl> urls)
 // whatever neovim is doing by pressing Ctrl-C.
 void Shell::bailoutIfinputBlocking()
 {
-	auto api = m_nvim->api2();
-	if (api) {
-		auto req = api->nvim_get_mode();
-
-		connect(req, &MsgpackRequest::finished, [api](quint32 msgid, quint64 f, const QVariant& r) {
-				auto map = r.toMap();
-				if (map.value("blocking", false) == true) {
-					api->nvim_input("<C-c>");
-				}
-		});
+	NeovimApi2* api{ m_nvim->api2() };
+	if (!api) {
+		return;
 	}
+	MsgpackRequest* req{ api->nvim_get_mode() };
+
+	connect(req, &MsgpackRequest::finished, api, [api](uint32_t msgid, uint64_t f, const QVariant& r) {
+		const QMap<QString, QVariant> map{ r.toMap() };
+		if (map.value("blocking", false) == true) {
+			api->nvim_input("<C-c>");
+		}
+	});
 }
 
 ShellRequestHandler::ShellRequestHandler(Shell *parent)
