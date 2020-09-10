@@ -643,7 +643,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	qreal pointSizeF = curFont.pointSizeF();
 	int weight = -1;
 	bool italic = false;
-	for (const auto& attr : attrs) {
+	for (const auto& attr : qAsConst(attrs)) {
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok{ false };
 			qreal height = attr.midRef(1).toFloat(&ok);

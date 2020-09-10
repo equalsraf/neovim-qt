@@ -37,7 +37,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"qlatin1string-non-ascii,"
 			#"qproperty-without-notify,"
 			"qstring-left,"
-			#"range-loop,"
+			"range-loop,"
 			"returning-data-from-temporary,"
 			"rule-of-two-soft,"
 			"skipped-base-method,"
