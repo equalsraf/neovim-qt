@@ -133,7 +133,7 @@ protected slots:
 	void mouseClickReset();
 	void mouseClickIncrement(Qt::MouseButton bt);
 	void init();
-	void fontError(const QString& msg);
+	void handleFontError(const QString& msg);
 	void updateWindowId();
 	void updateClientInfo();
 	void handleGinitError(quint32 msgid, quint64 fun, const QVariant& err);

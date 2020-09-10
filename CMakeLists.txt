@@ -30,7 +30,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"inefficient-qlist-soft,"
 			"install-event-filter,"
 			"non-pod-global-static,"
-			#"overridden-signal,"
+			"overridden-signal,"
 			"post-event,"
 			"qdeleteall,"
 			"qhash-namespace,"

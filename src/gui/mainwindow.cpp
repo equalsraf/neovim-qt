@@ -91,10 +91,10 @@ void MainWindow::init(NeovimConnector *c)
 	m_stack.insertWidget(1, m_window);
 	m_stack.setCurrentIndex(1);
 
-	connect(m_shell, SIGNAL(neovimAttached(bool)),
-			this, SLOT(neovimAttachmentChanged(bool)));
-	connect(m_shell, SIGNAL(neovimTitleChanged(QString)),
-			this, SLOT(neovimSetTitle(QString)));
+	connect(m_shell, &Shell::neovimAttachedChanged,
+			this, &MainWindow::neovimAttachmentChanged);
+	connect(m_shell, &Shell::neovimTitleChanged,
+			this, &MainWindow::neovimSetTitle);
 	connect(m_shell, &Shell::neovimResized,
 			this, &MainWindow::neovimWidgetResized);
 	connect(m_shell, &Shell::neovimMaximized,

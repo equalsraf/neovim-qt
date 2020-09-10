@@ -58,7 +58,7 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	connect(this, &ShellWidget::shellFontChanged,
 			this, &Shell::fontChanged);
 	connect(this, &ShellWidget::fontError,
-			this, &Shell::fontError);
+			this, &Shell::handleFontError);
 
 	m_nvim->setRequestHandler(new ShellRequestHandler(this));
 
@@ -67,7 +67,7 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	}
 }
 
-void Shell::fontError(const QString& msg)
+void Shell::handleFontError(const QString& msg)
 {
 	if (isNeovimAttached()) {
 		m_nvim->api0()->vim_report_error(m_nvim->encode(msg));
