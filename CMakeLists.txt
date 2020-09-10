@@ -20,6 +20,28 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 	if(ENABLE_CLAZY)
 		string(CONCAT CLAZY_CHECKS
 			"level0,"
+			"auto-unexpected-qstringbuilder,"
+			"child-event-qobject-cast,"
+			#"connect-3arg-lambda,"
+			"const-signal-or-slot,"
+			"detaching-temporary,"
+			"foreach,"
+			"incorrect-emit,"
+			#"inefficient-qlist-soft,"
+			"install-event-filter,"
+			"non-pod-global-static,"
+			#"overridden-signal,"
+			"post-event,"
+			"qdeleteall,"
+			"qhash-namespace,"
+			"qlatin1string-non-ascii,"
+			#"qproperty-without-notify,"
+			"qstring-left,"
+			#"range-loop,"
+			"returning-data-from-temporary,"
+			"rule-of-two-soft,"
+			"skipped-base-method,"
+			"virtual-signal,"
 			)
 
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -plugin-arg-clazy -Xclang ${CLAZY_CHECKS} -Wno-deprecated-declarations -Werror")
