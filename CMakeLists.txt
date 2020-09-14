@@ -15,7 +15,16 @@ endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 		"${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -std=c++11 -Wfatal-errors")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wunused-variable -std=c++11")
+
+	if(ENABLE_CLAZY)
+		string(CONCAT CLAZY_CHECKS
+			"level0,"
+			"level1,"
+			)
+
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -plugin-arg-clazy -Xclang ${CLAZY_CHECKS} -Wno-deprecated-declarations -Werror")
+	endif()
 endif()
 
 option(USE_GCOV "Enable gcov support" OFF)

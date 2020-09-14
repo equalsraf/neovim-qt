@@ -91,10 +91,10 @@ void MainWindow::init(NeovimConnector *c)
 	m_stack.insertWidget(1, m_window);
 	m_stack.setCurrentIndex(1);
 
-	connect(m_shell, SIGNAL(neovimAttached(bool)),
-			this, SLOT(neovimAttachmentChanged(bool)));
-	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)),
-			this, SLOT(neovimSetTitle(const QString &)));
+	connect(m_shell, &Shell::neovimAttachedChanged,
+			this, &MainWindow::neovimAttachmentChanged);
+	connect(m_shell, &Shell::neovimTitleChanged,
+			this, &MainWindow::neovimSetTitle);
 	connect(m_shell, &Shell::neovimResized,
 			this, &MainWindow::neovimWidgetResized);
 	connect(m_shell, &Shell::neovimMaximized,
@@ -145,11 +145,6 @@ void MainWindow::init(NeovimConnector *c)
 	if (m_nvim->errorCause()) {
 		neovimError(m_nvim->errorCause());
 	}
-}
-
-bool MainWindow::neovimAttached() const
-{
-	return (m_shell != NULL && m_shell->neovimAttached());
 }
 
 /** The Neovim process has exited */
@@ -304,7 +299,6 @@ void MainWindow::showIfDelayed()
 
 void MainWindow::neovimAttachmentChanged(bool attached)
 {
-	emit neovimAttached(attached);
 	if (attached) {
 		if (isWindow() && m_shell != NULL) {
 			m_shell->updateGuiWindowState(windowState());
@@ -313,6 +307,8 @@ void MainWindow::neovimAttachmentChanged(bool attached)
 		m_tabline->deleteLater();
 		m_tabline_bar->deleteLater();
 	}
+
+	emit neovimAttached(attached);
 }
 
 Shell* MainWindow::shell()

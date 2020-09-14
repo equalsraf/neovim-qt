@@ -58,7 +58,7 @@ bool Function::isValid() const
  * Two functions are considered identical if their names
  * argument and return types, and error status are identical
  */
-bool Function::operator==(const Function& other)
+bool Function::operator==(const Function& other) const noexcept
 {
 	if ( this->name != other.name ) {
 		return false;
@@ -156,8 +156,7 @@ QList<QPair<QString,QString> > Function::parseParameters(const QVariantList& obj
 		}
 
 		for (int j=0; j<params.size(); j+=2) {
-			QByteArray type, name;
-			if (!params.at(j).canConvert<QByteArray>() || 
+			if (!params.at(j).canConvert<QByteArray>() ||
 					!params.at(j+1).canConvert<QByteArray>()) {
 				return fail;
 			}
@@ -174,14 +173,14 @@ QString Function::signature() const
 {
 	QStringList sigparams;
 	foreach(const StringPair p, parameters) {
-		sigparams.append(QString("%1 %2").arg(p.first).arg(p.second));
+		sigparams.append(QString("%1 %2").arg(p.first, p.second));
 	}
 
 	QString notes;
 	if (can_fail) {
 		notes += " !fail";
 	}
-	return  QString("%1 %2(%3)%4").arg(return_type).arg(name).arg(sigparams.join(", ")).arg(notes);
+	return  QString("%1 %2(%3)%4").arg(return_type, name, sigparams.join(", "), notes);
 }
 
 } // Namespace

@@ -58,7 +58,7 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	connect(this, &ShellWidget::shellFontChanged,
 			this, &Shell::fontChanged);
 	connect(this, &ShellWidget::fontError,
-			this, &Shell::fontError);
+			this, &Shell::handleFontError);
 
 	m_nvim->setRequestHandler(new ShellRequestHandler(this));
 
@@ -67,9 +67,9 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	}
 }
 
-void Shell::fontError(const QString& msg)
+void Shell::handleFontError(const QString& msg)
 {
-	if (m_attached) {
+	if (isNeovimAttached()) {
 		m_nvim->api0()->vim_report_error(m_nvim->encode(msg));
 	}
 }
@@ -113,7 +113,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 	}
 
 	// Only update the ShellWidget when font changes.
-	if (!setShellFontSuccess || !m_attached) {
+	if (!setShellFontSuccess || !isNeovimAttached()) {
 		return false;
 	}
 
@@ -168,7 +168,7 @@ bool Shell::setGuiFontWide(const QString& fdesc) noexcept
 
 Shell::~Shell()
 {
-	if (m_nvim && m_attached) {
+	if (m_nvim && isNeovimAttached()) {
 		m_nvim->api0()->ui_detach();
 	}
 }
@@ -204,7 +204,8 @@ void Shell::setAttached(bool attached)
 		}
 
 	}
-	emit neovimAttached(attached);
+
+	emit neovimAttachedChanged(attached);
 	update();
 }
 
@@ -568,7 +569,6 @@ void Shell::handlePopupMenuShow(const QVariantList& opargs)
 	for (const auto& v : items) {
 		QVariantList item = v.toList();
 		// Item is (text, kind, extra, info)
-		QString text = item.value(0).toString();
 		if (item.size() < 4
 			|| item.isEmpty()
 			|| item.value(0).toString().isEmpty()) {
@@ -731,14 +731,14 @@ void Shell::handleBusy(bool busy)
 {
 	m_cursor.SetIsBusy(busy);
 
-	if (busy != m_neovimBusy) {
+	if (isNeovimBusy() != busy) {
 		update(neovimCursorRect());
 	}
 
 	m_neovimBusy = busy;
 
 	setCursorFromBusyState();
-	emit neovimBusy(busy);
+	emit neovimBusyChanged(busy);
 }
 
 // FIXME: fix QVariant type conversions
@@ -1165,7 +1165,7 @@ void Shell::handleGuiAdaptiveStyleList() noexcept
 
 void Shell::paintEvent(QPaintEvent *ev)
 {
-	if (!m_attached) {
+	if (!isNeovimAttached()) {
 		QPainter painter(this);
 		painter.fillRect(rect(), palette().window());
 		return;
@@ -1176,7 +1176,7 @@ void Shell::paintEvent(QPaintEvent *ev)
 
 void Shell::keyPressEvent(QKeyEvent *ev)
 {
-	if (!m_nvim || !m_attached) {
+	if (!m_nvim || !isNeovimAttached()) {
 		QWidget::keyPressEvent(ev);
 		return;
 	}
@@ -1203,7 +1203,7 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 
 void Shell::neovimMouseEvent(QMouseEvent *ev)
 {
-	if (!m_attached || !m_mouseEnabled) {
+	if (!isNeovimAttached() || !m_mouseEnabled) {
 		return;
 	}
 
@@ -1285,7 +1285,7 @@ void Shell::setCursorFromBusyState() noexcept
 {
 	Qt::CursorShape desiredCursor{};
 
-	if (m_neovimBusy) {
+	if (isNeovimBusy()) {
 		desiredCursor = Qt::CursorShape::WaitCursor;
 	}
 
@@ -1307,7 +1307,7 @@ static int normalize(float x)
 
 void Shell::wheelEvent(QWheelEvent *ev)
 {
-	if (!m_attached || !m_mouseEnabled) {
+	if (!isNeovimAttached() || !m_mouseEnabled) {
 		return;
 	}
 #if (QT_VERSION < QT_VERSION_CHECK(5, 5, 0))
@@ -1355,14 +1355,12 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	QString inp;
 	if (scroll_delta.y() != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
-			.arg(Input::GetModifierPrefix(ev->modifiers()))
-			.arg(scroll_delta.y() > 0 ? "Up" : "Down")
-			.arg(pos.x()).arg(pos.y());
+			.arg(Input::GetModifierPrefix(ev->modifiers()), scroll_delta.y() > 0 ? "Up" : "Down")
+			.arg(pos.x(), pos.y());
 	}
 	if (scroll_delta.x() != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
-			.arg(Input::GetModifierPrefix(ev->modifiers()))
-			.arg(scroll_delta.x() > 0 ? "Left" : "Right")
+			.arg(Input::GetModifierPrefix(ev->modifiers()), (scroll_delta.x() > 0) ? "Left" : "Right")
 			.arg(pos.x()).arg(pos.y());
 	}
 	m_nvim->api0()->vim_input(inp.toLatin1());
@@ -1370,7 +1368,7 @@ void Shell::wheelEvent(QWheelEvent *ev)
 
 void Shell::updateWindowId()
 {
-	if (m_attached &&
+	if (isNeovimAttached() &&
 		m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
 		WId window_id = effectiveWinId();
 		m_nvim->api0()->vim_set_var("GuiWindowId", QVariant(window_id));
@@ -1381,7 +1379,7 @@ void Shell::updateWindowId()
 
 void Shell::updateClientInfo()
 {
-	if (m_attached) {
+	if (isNeovimAttached()) {
 		auto api4 = m_nvim->api4();
 		if (api4) {
 			WId window_id = effectiveWinId();
@@ -1444,7 +1442,7 @@ void Shell::resizeNeovim(int n_cols, int n_rows)
 
 void Shell::resizeEvent(QResizeEvent *ev)
 {
-	if (!m_attached) {
+	if (!isNeovimAttached()) {
 		QWidget::resizeEvent(ev);
 		return;
 	}
@@ -1478,7 +1476,7 @@ void Shell::changeEvent( QEvent *ev)
 /// g:Gui* variables will be set in Neovim
 void Shell::updateGuiWindowState(Qt::WindowStates state)
 {
-	if (!m_attached) {
+	if (!isNeovimAttached()) {
 		return;
 	}
 	if (state & Qt::WindowMaximized) {
@@ -1495,7 +1493,7 @@ void Shell::updateGuiWindowState(Qt::WindowStates state)
 
 void Shell::closeEvent(QCloseEvent *ev)
 {
-	if (m_attached &&
+	if (isNeovimAttached() &&
 		m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
 		// If attached to a spawned Neovim process, ignore the event
 		// and try to close Neovim as :qa
@@ -1509,7 +1507,7 @@ void Shell::closeEvent(QCloseEvent *ev)
 
 void Shell::focusInEvent(QFocusEvent *ev)
 {
-	if (m_attached) {
+	if (isNeovimAttached()) {
 		// Issue #329: The <FocusGained> key no longer exists, use autocmd instead.
 		m_nvim->api0()->vim_command("if exists('#FocusGained') | doautocmd <nomodeline> FocusGained | endif");
 	}
@@ -1518,7 +1516,7 @@ void Shell::focusInEvent(QFocusEvent *ev)
 
 void Shell::focusOutEvent(QFocusEvent *ev)
 {
-	if (m_attached) {
+	if (isNeovimAttached()) {
 		// Issue #591: Option <nomodeline> prevents unwanted interaction, consistent with nvim.
 		m_nvim->api0()->vim_command("if exists('#FocusLost') | doautocmd <nomodeline> FocusLost | endif");
 	}
@@ -1554,7 +1552,7 @@ void Shell::tooltip(const QString& text)
 
 void Shell::inputMethodEvent(QInputMethodEvent *ev)
 {
-	if (!m_attached) {
+	if (!isNeovimAttached()) {
 		return;
 	}
 	if ( !ev->commitString().isEmpty() ) {
@@ -1577,19 +1575,9 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 	return QVariant();
 }
 
-bool Shell::neovimBusy() const
-{
-	return m_neovimBusy;
-}
-
-bool Shell::neovimAttached() const
-{
-	return m_attached;
-}
-
 void Shell::dragEnterEvent(QDragEnterEvent *ev)
 {
-	if (!m_attached) {
+	if (!isNeovimAttached()) {
 		return;
 	}
 
@@ -1600,7 +1588,7 @@ void Shell::dragEnterEvent(QDragEnterEvent *ev)
 
 void Shell::dropEvent(QDropEvent *ev)
 {
-	if (!m_attached) {
+	if (!isNeovimAttached()) {
 		return;
 	}
 
@@ -1618,7 +1606,7 @@ void Shell::dropEvent(QDropEvent *ev)
 /// Open multiple URLs in Neovim
 void Shell::openFiles(QList<QUrl> urls)
 {
-	if (m_nvim && m_attached) {
+	if (m_nvim && isNeovimAttached()) {
 		QVariantList args;
 		foreach(QUrl u, urls) {
 			if ( u.scheme() == "file" ) {
@@ -1638,17 +1626,18 @@ void Shell::openFiles(QList<QUrl> urls)
 // whatever neovim is doing by pressing Ctrl-C.
 void Shell::bailoutIfinputBlocking()
 {
-	auto api = m_nvim->api2();
-	if (api) {
-		auto req = api->nvim_get_mode();
-
-		connect(req, &MsgpackRequest::finished, [api](quint32 msgid, quint64 f, const QVariant& r) {
-				auto map = r.toMap();
-				if (map.value("blocking", false) == true) {
-					api->nvim_input("<C-c>");
-				}
-		});
+	NeovimApi2* api{ m_nvim->api2() };
+	if (!api) {
+		return;
 	}
+	MsgpackRequest* req{ api->nvim_get_mode() };
+
+	connect(req, &MsgpackRequest::finished, api, [api](uint32_t msgid, uint64_t f, const QVariant& r) {
+		const QMap<QString, QVariant> map{ r.toMap() };
+		if (map.value("blocking", false) == true) {
+			api->nvim_input("<C-c>");
+		}
+	});
 }
 
 ShellRequestHandler::ShellRequestHandler(Shell *parent)

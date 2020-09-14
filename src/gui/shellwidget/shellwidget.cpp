@@ -227,7 +227,7 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 
 	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
 	// but we want to match the family name with the bold/italic attributes.
-	cellFont.setStyleName(QStringLiteral(""));
+	cellFont.setStyleName({});
 
 	cellFont.setStyleHint(QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::ForceIntegerMetrics));
 	cellFont.setFixedPitch(true);
@@ -643,10 +643,10 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	qreal pointSizeF = curFont.pointSizeF();
 	int weight = -1;
 	bool italic = false;
-	for (const auto& attr : attrs) {
+	for (const auto& attr : qAsConst(attrs)) {
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok{ false };
-			qreal height = attr.mid(1).toFloat(&ok);
+			qreal height = attr.midRef(1).toFloat(&ok);
 			if (!ok || height < 0) {
 				return QStringLiteral("Invalid font height");
 			}
@@ -658,7 +658,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 		} else if (attr == "sb") {
 			weight = QFont::DemiBold;
 		} else if (attr.length() > 0 && attr.at(0) == 'w') {
-			weight = (attr.right(attr.length()-1)).toInt();
+			weight = (attr.rightRef(attr.length()-1)).toInt();
 			if (weight < 0 || weight > 99) {
 				return QStringLiteral("Invalid font weight");
 			}

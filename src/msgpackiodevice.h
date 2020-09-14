@@ -9,11 +9,12 @@ namespace NeovimQt {
 
 class MsgpackRequest;
 class MsgpackRequestHandler;
-class MsgpackIODevice: public QObject
+
+class MsgpackIODevice : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(MsgpackError error READ errorCause NOTIFY error)
-	Q_PROPERTY(QByteArray encoding READ encoding WRITE setEncoding)
+
 public:
 	enum MsgpackError {
 		NoError=0,
@@ -21,11 +22,7 @@ public:
 		InvalidMsgpack,
 		UnsupportedEncoding,
 	};
-#ifdef Q_ENUM
 	Q_ENUM(MsgpackError)
-#else
-	Q_ENUMS(MsgpackError)
-#endif
 	MsgpackIODevice(QIODevice *, QObject *parent=0);
 	~MsgpackIODevice();
         static MsgpackIODevice* fromStdinOut(QObject *parent=0);
@@ -69,9 +66,10 @@ public:
 
 	QList<quint32> pendingRequests() const;
 signals:
-	void error(MsgpackError);
+	void error(NeovimQt::MsgpackIODevice::MsgpackError);
 	/** A notification with the given name and arguments was received */
 	void notification(const QByteArray &name, const QVariantList& args);
+	void encodingChanged();
 
 protected:
 	void sendError(const msgpack_object& req, const QString& msg);
@@ -92,7 +90,7 @@ protected:
 	bool decodeMsgpack(const msgpack_object& in, QPoint& out);
 
 protected slots:
-	void setError(MsgpackError err, const QString& msg);
+	void setError(NeovimQt::MsgpackIODevice::MsgpackError err, const QString& msg);
 
 	void dataAvailable();
 	void dataAvailableStdin(const QByteArray&);
