@@ -36,18 +36,18 @@ jobs:
       displayName: CMake Build
   - job: Windows
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-2019'
     steps:
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: '3.7'
+        versionSpec: '3.8'
         architecture: 'x64'
       displayName: Setup Python
     - script: |
         cinst --no-progress -y 7zip neovim
         pip install aqtinstall
         cd $(Build.BinariesDirectory)
-        python -m aqt install 5.12.1 windows desktop win64_msvc2017_64
+        python -m aqt install 5.15.0 windows desktop win64_msvc2019_64
       displayName: Install Dependencies
     - powershell: |
         Write-Host "##vso[task.setvariable variable=PATH;]${env:PATH};C:\tools\neovim\Neovim\bin";
@@ -55,7 +55,7 @@ jobs:
     - task: CMake@1
       inputs:
         workingDirectory: $(Build.BinariesDirectory)
-        cmakeArgs: -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=$(Build.BinariesDirectory)\Qt5.12.1\5.12.1\msvc2017_64 $(Build.SourcesDirectory)
+        cmakeArgs: -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=$(Build.BinariesDirectory)\5.15.0\msvc2019_64\lib\cmake;$(Build.BinariesDirectory)\5.15.0\msvc2019_64\bin $(Build.SourcesDirectory)
       displayName: CMake Configure
     - task: CMake@1
       inputs:
