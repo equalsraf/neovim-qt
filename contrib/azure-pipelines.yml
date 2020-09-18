@@ -6,7 +6,7 @@ jobs:
     - script: |
         sudo add-apt-repository -y ppa:neovim-ppa/stable
         sudo apt update -y
-        sudo apt install -y neovim qt5-default ninja-build
+        sudo apt install -y libqt5svg5-dev neovim ninja-build qt5-default
       displayName: Install Dependencies
     - task: CMake@1
       inputs:
