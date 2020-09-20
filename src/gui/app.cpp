@@ -337,6 +337,13 @@ static QString GetNeovimVersionInfo(const QString& nvim) noexcept
 	return nvimproc.readAllStandardOutput();
 }
 
+// TODO Issue#752: Remove `endl` and `QT_ENDL` wrapper
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+	#define QT_ENDL endl
+#else
+	#define QT_ENDL Qt::endl
+#endif
+
 void App::showVersionInfo(QCommandLineParser& parser) noexcept
 {
 	QString versionInfo;
@@ -345,18 +352,18 @@ void App::showVersionInfo(QCommandLineParser& parser) noexcept
 	const QString nvimExecutable { (parser.isSet("nvim")) ?
 		parser.value("nvim") : "nvim" };
 
-	out << "NVIM-QT v" << PROJECT_VERSION << endl;
-	out << "Build type: " << CMAKE_BUILD_TYPE << endl;
-	out << "Compilation:" << CMAKE_CXX_FLAGS << endl;
-	out << "Qt Version: " << QT_VERSION_STR << endl;
-	out << "Environment: " << endl;
-	out << "  nvim: " << nvimExecutable << endl;
-	out << "  args: " << getNeovimArgs().join(" ") << endl;
-	out << "  runtime: " << getRuntimePath() << endl;
+	out << "NVIM-QT v" << PROJECT_VERSION << QT_ENDL;
+	out << "Build type: " << CMAKE_BUILD_TYPE << QT_ENDL;
+	out << "Compilation:" << CMAKE_CXX_FLAGS << QT_ENDL;
+	out << "Qt Version: " << QT_VERSION_STR << QT_ENDL;
+	out << "Environment: " << QT_ENDL;
+	out << "  nvim: " << nvimExecutable << QT_ENDL;
+	out << "  args: " << getNeovimArgs().join(" ") << QT_ENDL;
+	out << "  runtime: " << getRuntimePath() << QT_ENDL;
 
-	out << endl;
+	out << QT_ENDL;
 
-	out << GetNeovimVersionInfo(nvimExecutable) << endl;
+	out << GetNeovimVersionInfo(nvimExecutable) << QT_ENDL;
 
 	PrintInfo(versionInfo);
 }
