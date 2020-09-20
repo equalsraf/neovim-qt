@@ -18,12 +18,11 @@ protected:
 
 void TestEncoding::encodeString()
 {
-	bool failed_to_set = false;
 	QMetaObject::Connection conn;
 	m_c->neovimObject()->vim_set_var("testing-neovim-qt", QString("value"));
 	m_c->neovimObject()->vim_get_var("testing-neovim-qt");
 	conn = connect(m_c->neovimObject(), &NeovimQt::NeovimApi1::on_vim_get_var,
-			[&failed_to_set](const QVariant& v) {
+			[](const QVariant& v) {
 				QVERIFY(v == QByteArray("value"));
 			});
 	QTest::qWait(500);
