@@ -5,6 +5,7 @@ Neovim client library and GUI, in Qt5.
 [![Build status](https://ci.appveyor.com/api/projects/status/c252f54mfjcuud8x/branch/master?svg=true)](https://ci.appveyor.com/project/equalsraf/neovim-qt/branch/master)
 [![Build Status](https://travis-ci.org/equalsraf/neovim-qt.svg?branch=master)](https://travis-ci.org/equalsraf/neovim-qt)
 [![Coverage Status](https://coveralls.io/repos/github/equalsraf/neovim-qt/badge.svg?branch=master)](https://coveralls.io/github/equalsraf/neovim-qt?branch=master)
+[![codecov Status](https://codecov.io/gh/equalsraf/neovim-qt/branch/master/graph/badge.svg)](https://codecov.io/gh/equalsraf/neovim-qt)
 [![Build Status](https://dev.azure.com/equalsraf/neovim-qt/_apis/build/status/equalsraf.neovim-qt?branchName=master)](https://dev.azure.com/equalsraf/neovim-qt/_build/latest?definitionId=1&branchName=master)
 [![Downloads](https://img.shields.io/github/downloads/equalsraf/neovim-qt/total.svg?maxAge=2592000)](https://github.com/equalsraf/neovim-qt/releases)
 
