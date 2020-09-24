@@ -33,14 +33,14 @@ jobs:
             cd build
             ctest -VV
       - run:
-          name: Upload coverage report
-          # trick cpp-coveralls into doing the right thing
-          # https://github.com/eddyxu/cpp-coveralls/issues/143
-          command: TRAVIS_JOB_ID="#${CIRCLE_BUILD_NUM}" ~/.local/bin/cpp-coveralls -y contrib/coveralls-circle.yml -E '.*/build/.*' -E '.*/third-party/.*' -E '.*/test/.*' -E '.*/bindings/.*'
-      - run:
           name: Generate coverage report with lcov
           command: lcov --directory . --capture --output-file coverage.info
       - run:
           name: Upload coverage report to codecov
           command: bash <(curl -s https://codecov.io/bash) -f coverage.info 
+      - run:
+          name: Upload coverage report
+          # trick cpp-coveralls into doing the right thing
+          # https://github.com/eddyxu/cpp-coveralls/issues/143
+          command: TRAVIS_JOB_ID="#${CIRCLE_BUILD_NUM}" ~/.local/bin/cpp-coveralls -y contrib/coveralls-circle.yml -E '.*/build/.*' -E '.*/third-party/.*' -E '.*/test/.*' -E '.*/bindings/.*'
 
