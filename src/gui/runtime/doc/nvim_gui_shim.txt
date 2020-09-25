@@ -78,6 +78,21 @@ GuiTabline	Enable or disable the external GUI tabline
 								*GuiPopupmenu*
 GuiPopupmenu	Enable or disable the external GUI popup menu
 
+								*GuiClipboard*
+GuiClipboard	Enable or disable the native GUI clipboard.
+		When enabled, neovim will use the GUI as its clipboard
+		provider.
+
+		To enable,
+>
+			GuiClipboard 1
+<
+		to disable pass 0 to the command
+>
+			GuiClipboard 0
+<
+		After disabling the GUI clipboard, neovim will select
+		a clipboard provider from the available options.
 
 ==============================================================================
 2. GUI variables
@@ -182,6 +197,7 @@ menu can be mapped to right click events in ginit.vim, e.g.
 	nnoremap <silent><RightMouse> :call GuiShowContextMenu()<CR>
 	inoremap <silent><RightMouse> <Esc>:call GuiShowContextMenu()<CR>
 	vnoremap <silent><RightMouse> :call GuiShowContextMenu()<CR>gv
+<
 
 ==============================================================================
 4. Internals

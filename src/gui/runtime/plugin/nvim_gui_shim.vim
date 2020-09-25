@@ -127,6 +127,8 @@ function GuiName()
 	return get(info.client, 'name', '')
 endfunction
 
+let s:ui_clipboard_enabled = 0
+
 function s:ui_has_clipboard(idx, ui_info)
 	if has_key(a:ui_info, 'chan') == 0
 		return 0
@@ -143,33 +145,7 @@ function s:ui_has_clipboard(idx, ui_info)
 	endif
 endfunction
 
-"Enable a GUI provided clipboard
-function GuiClipboard()
-	if !has("nvim-0.3.2")
-		echoerr "UI clipboard requires nvim >=0.3.2"
-		return
-	endif
-
-	let uis = nvim_list_uis()
-	call filter(uis, funcref('s:ui_has_clipboard'))
-	if len(uis) == 0
-		echoerr "No UIs with clipboard support are attached"
-		return
-	endif
-	let ui_chan = uis[-1].chan
-
-    let g:clipboard = {
-          \   'name': 'custom',
-          \   'copy': {
-          \      '+': {lines, regtype -> rpcnotify(ui_chan, 'Gui', 'SetClipboard', lines, regtype, '+')},
-          \      '*': {lines, regtype -> rpcnotify(ui_chan, 'Gui', 'SetClipboard', lines, regtype, '*')},
-          \    },
-          \   'paste': {
-          \      '+': {-> rpcrequest(ui_chan, 'Gui', 'GetClipboard', '+')},
-          \      '*': {-> rpcrequest(ui_chan, 'Gui', 'GetClipboard', '*')},
-          \   },
-          \ }
-
+function s:reload_clipboard_provider()
 	" We need to reload the neovim clipboard provider here so it picks up on
 	" g:clipboard. In older versions of neovim (<=0.3.8) the provider would
 	" short circuit if a working clipboard was not available. After 0.3.8
@@ -178,9 +154,83 @@ function GuiClipboard()
 	"
 	" TLDR; source this to reinitialize the clipboard provider, this may not
 	" work
-    unlet! g:loaded_clipboard_provider
-    runtime autoload/provider/clipboard.vim
+	unlet! g:loaded_clipboard_provider
+	runtime autoload/provider/clipboard.vim
 endfunction
+
+function s:disable_custom_clipboard()
+	if exists("g:clipboard")
+		unlet g:clipboard
+	endif
+	call s:reload_clipboard_provider()
+endfunction
+
+"Enable a GUI clipboard
+function s:SetupGuiClipboard(silent)
+	if !has("nvim-0.3.2")
+		if a:silent == 0
+			echoerr "UI clipboard requires nvim >=0.3.2"
+		endif
+		return
+	endif
+
+	let uis = nvim_list_uis()
+	call filter(uis, funcref('s:ui_has_clipboard'))
+	if len(uis) == 0
+		if a:silent == 0
+			echoerr "No UIs with clipboard support are attached"
+		end
+		call s:disable_custom_clipboard()
+		return
+	endif
+	let ui_chan = uis[-1].chan
+
+	let g:clipboard = {
+		  \   'name': 'custom',
+		  \   'copy': {
+		  \      '+': {lines, regtype -> rpcnotify(ui_chan, 'Gui', 'SetClipboard', lines, regtype, '+')},
+		  \      '*': {lines, regtype -> rpcnotify(ui_chan, 'Gui', 'SetClipboard', lines, regtype, '*')},
+		  \    },
+		  \   'paste': {
+		  \      '+': {-> rpcrequest(ui_chan, 'Gui', 'GetClipboard', '+')},
+		  \      '*': {-> rpcrequest(ui_chan, 'Gui', 'GetClipboard', '*')},
+		  \   },
+		  \ }
+
+	call s:reload_clipboard_provider()
+endfunction
+
+" For compatibility with an earlier version
+function GuiClipboard()
+	call s:SetupGuiClipboard(0)
+endfunction
+
+" Enable/Disable the GUI clipboard
+function s:GuiClipboardSet(enable)
+	if a:enable == 0
+		let s:ui_clipboard_enabled = 0
+		call s:disable_custom_clipboard()
+	else
+		let s:ui_clipboard_enabled = 1
+		call s:SetupGuiClipboard(0)
+	endif
+endfunction
+command! -nargs=1 GuiClipboard call s:GuiClipboardSet(<args>)
+
+" If enabled reconfigure the GUI clipboard
+function s:UpdateGuiClipboard()
+	if s:ui_clipboard_enabled == 1
+		call s:SetupGuiClipboard(1)
+	endif
+endfunction
+
+" When a UI attaches/detaches try to reconfigure the GUI
+" clipboard
+augroup GuiClipboard
+	autocmd!
+	autocmd UIEnter * :call s:UpdateGuiClipboard()
+	autocmd UILeave * :call s:UpdateGuiClipboard()
+augroup END
 
 " Directory autocommands for Treeview
 augroup guiDirEvents

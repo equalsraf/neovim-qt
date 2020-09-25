@@ -125,6 +125,7 @@ protected slots:
 	void updateClientInfo();
 	void handleGinitError(quint32 msgid, quint64 fun, const QVariant& err);
 	void handleShimError(quint32 msgid, quint64 fun, const QVariant& err);
+	void handleShimLoad(quint32 msgid, quint64 fun, const QVariant& resp);
 	void handleGetBackgroundOption(quint32 msgid, quint64 fun, const QVariant& val);
 
 protected:
