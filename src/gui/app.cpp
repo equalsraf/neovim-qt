@@ -97,8 +97,8 @@ void App::showUi() noexcept
 {
 	ShellOptions opts{ GetShellOptionsFromQSettings() };
 
-	if (m_parser.isSet("class")) {
-		setApplicationName(m_parser.value("class"));
+	if (m_parser.isSet("name")) {
+		setApplicationName(m_parser.value("name"));
 	}
 
 	if (m_parser.isSet("no-ext-tabline")) {
