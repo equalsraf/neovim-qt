@@ -1355,14 +1355,12 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	QString inp;
 	if (scroll_delta.y() != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
-			.arg(Input::GetModifierPrefix(ev->modifiers()))
-			.arg(scroll_delta.y() > 0 ? "Up" : "Down")
-			.arg(pos.x()).arg(pos.y());
+			.arg(Input::GetModifierPrefix(ev->modifiers()), scroll_delta.y() > 0 ? "Up" : "Down")
+			.arg(pos.x(), pos.y());
 	}
 	if (scroll_delta.x() != 0) {
 		inp += QString("<%1ScrollWheel%2><%3,%4>")
-			.arg(Input::GetModifierPrefix(ev->modifiers()))
-			.arg(scroll_delta.x() > 0 ? "Left" : "Right")
+			.arg(Input::GetModifierPrefix(ev->modifiers()), (scroll_delta.x() > 0) ? "Left" : "Right")
 			.arg(pos.x()).arg(pos.y());
 	}
 	m_nvim->api0()->vim_input(inp.toLatin1());
