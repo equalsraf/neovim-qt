@@ -749,8 +749,13 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		if (guiEvName == "Font") {
 			handleGuiFontFunction(args);
 		} else if (guiEvName == "Foreground" && args.size() == 1) {
-			activateWindow();
-			raise();
+			if (isWindow()) {
+				setWindowState(windowState() & ~Qt::WindowMinimized);
+				show();
+				activateWindow();
+			} else {
+				emit neovimForeground();
+			}
 		} else if (guiEvName == "WindowMaximized" && args.size() == 2) {
 			if (isWindow()) {
 				setWindowState(variant_not_zero(args.at(1)) ?

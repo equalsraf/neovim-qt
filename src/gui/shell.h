@@ -83,6 +83,7 @@ signals:
 	void neovimResized(int rows, int cols);
 	void neovimAttached(bool);
 	void neovimMaximized(bool);
+	void neovimForeground();
 	void neovimSuspend();
 	void neovimFullScreen(bool);
 	void neovimGuiCloseRequest();
