@@ -65,7 +65,7 @@ App::App(int &argc, char ** argv) noexcept
 	}
 #endif
 
-	if (!qgetenv("NVIM_QT_LOG").isEmpty()) {
+	if (!qEnvironmentVariableIsEmpty("NVIM_QT_LOG")) {
 		qInstallMessageHandler(logger);
 	}
 
