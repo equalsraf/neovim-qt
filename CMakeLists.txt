@@ -27,7 +27,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"no-lambda-in-connect,"
 			"no-overloaded-signal,"
 			"no-qenums,"
-			"no-qstring-ref,"
 			"level1",
 			"no-connect-3arg-lambda,"
 			"no-inefficient-qlist-soft,"
