@@ -768,12 +768,7 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 				emit neovimFullScreen(variant_not_zero(args.at(1)));
 			}
 		} else if (guiEvName == "Linespace" && args.size() == 2) {
-			// The conversion to string and then to int happens because of http://doc.qt.io/qt-5/qvariant.html#toUInt
-			// toUint() fails to detect an overflow i.e. it converts to ulonglong and then returns a MAX UINT
-			auto val = args.at(1).toString().toInt();
-			setLineSpace(val);
-			m_nvim->api0()->vim_set_var("GuiLinespace", val);
-			resizeNeovim(size());
+			handleLineSpace(args.at(1));
 		} else if (guiEvName == "Mousehide" && args.size() == 2) {
 			m_mouseHide = variant_not_zero(args.at(1));
 			int val = m_mouseHide ? 1 : 0;
@@ -860,9 +855,7 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 	} else if (name == "guifontwide") {
 		handleGuiFontWide(value);
 	} else if (name == "linespace") {
-		// The conversion to string and then to int happens because of http://doc.qt.io/qt-5/qvariant.html#toUInt
-		// toUint() fails to detect an overflow i.e. it converts to ulonglong and then returns a MAX UINT
-		setLineSpace(value.toString().toInt());
+		handleLineSpace(value);
 	} else if (name == "showtabline") {
 		emit neovimShowtablineSet(value.toString().toInt());
 	} else if (name == "ext_tabline") {
@@ -918,6 +911,21 @@ void Shell::handleGuiFontWide(const QVariant& value) noexcept
 	const QString fdesc{ m_nvim->decode(value.toByteArray()) };
 
 	setGuiFontWide(fdesc);
+}
+
+void Shell::handleLineSpace(const QVariant& value) noexcept
+{
+	bool isValid{ false };
+	int linespace{ value.toInt(&isValid) };
+
+	if (!isValid || linespace < 0) {
+		qDebug() << "Invalid GuiLinespace value:" << value;
+		return;
+	}
+
+	setLineSpace(linespace);
+	m_nvim->api0()->vim_set_var("GuiLinespace", linespace);
+	resizeNeovim(size());
 }
 
 void Shell::handleGridResize(const QVariantList& opargs)
