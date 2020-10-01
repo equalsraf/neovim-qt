@@ -7,6 +7,7 @@ class TestInputCommon : public QObject
 	Q_OBJECT
 
 private slots:
+	// Keyboard Input
 	void LessThanKey() noexcept;
 	void ModifierOnlyKeyEventsIgnored() noexcept;
 	void VolumeKeysIgnored() noexcept;
@@ -16,6 +17,11 @@ private slots:
 	void AltGrKeyEventWellFormed() noexcept;
 	void ShiftSpaceWellFormed() noexcept;
 	void ShiftBackSpaceWellFormed() noexcept;
+
+	// Mouse Input
+	void MouseLeftClick() noexcept;
+	void MouseRightClick() noexcept;
+	void MouseMiddleClick() noexcept;
 };
 
 void TestInputCommon::LessThanKey() noexcept
@@ -149,6 +155,114 @@ void TestInputCommon::ShiftBackSpaceWellFormed() noexcept
 
 	QKeyEvent evShiftBackSpace{ QEvent::KeyPress, Qt::Key_Backspace, Qt::ShiftModifier, "\b" };
 	QCOMPARE(NeovimQt::Input::convertKey(evShiftBackSpace), QString{ "<BS>" });
+}
+
+void TestInputCommon::MouseLeftClick() noexcept
+{
+	QString leftClickPress{ NeovimQt::Input::convertMouse(
+		Qt::LeftButton,
+		QEvent::MouseButtonPress,
+		Qt::NoModifier,
+		{ 1, 2 },
+		1 /*clickCount*/) };
+	QString leftClickRelease{ NeovimQt::Input::convertMouse(
+		Qt::LeftButton,
+		QEvent::MouseButtonRelease,
+		Qt::NoModifier,
+		{ 1, 2 },
+		1 /*clickCount*/) };
+
+	QCOMPARE(leftClickPress, QString{ "<LeftMouse><1,2>" });
+	QCOMPARE(leftClickRelease, QString{ "<LeftRelease><1,2>" });
+
+	QString leftClickShiftPress{ NeovimQt::Input::convertMouse(
+		Qt::LeftButton,
+		QEvent::MouseButtonPress,
+		Qt::ShiftModifier,
+		{ 3, 4 },
+		1 /*clickCount*/) };
+	QString leftClickShiftRelease{ NeovimQt::Input::convertMouse(
+		Qt::LeftButton,
+		QEvent::MouseButtonRelease,
+		Qt::ShiftModifier,
+		{ 3, 4 },
+		1 /*clickCount*/) };
+
+	QCOMPARE(leftClickShiftPress, QString{ "<S-LeftMouse><3,4>" });
+	QCOMPARE(leftClickShiftRelease, QString{ "<S-LeftRelease><3,4>" });
+
+	QString leftDoubleClickPress{ NeovimQt::Input::convertMouse(
+		Qt::LeftButton,
+		QEvent::MouseButtonPress,
+		Qt::NoModifier,
+		{ 5, 6 },
+		2 /*clickCount*/) };
+
+	QString leftDoubleClickRelease{ NeovimQt::Input::convertMouse(
+		Qt::LeftButton,
+		QEvent::MouseButtonRelease,
+		Qt::NoModifier,
+		{ 5, 6 },
+		2 /*clickCount*/) };
+
+	QCOMPARE(leftDoubleClickPress, QString{ "<2-LeftMouse><5,6>" });
+	QCOMPARE(leftDoubleClickRelease, QString{ "<2-LeftRelease><5,6>" });
+
+	QString leftDoubleClickShiftPress{ NeovimQt::Input::convertMouse(
+		Qt::LeftButton,
+		QEvent::MouseButtonPress,
+		Qt::ShiftModifier,
+		{ 7, 8 },
+		2 /*clickCount*/) };
+
+	QString leftDoubleClickShiftRelease{ NeovimQt::Input::convertMouse(
+		Qt::LeftButton,
+		QEvent::MouseButtonRelease,
+		Qt::ShiftModifier,
+		{ 7, 8 },
+		2 /*clickCount*/) };
+
+	QCOMPARE(leftDoubleClickShiftPress, QString{ "<S-2-LeftMouse><7,8>" });
+	QCOMPARE(leftDoubleClickShiftRelease, QString{ "<S-2-LeftRelease><7,8>" });
+}
+
+void TestInputCommon::MouseRightClick() noexcept
+{
+	QString rightClickPress{ NeovimQt::Input::convertMouse(
+		Qt::RightButton,
+		QEvent::MouseButtonPress,
+		Qt::NoModifier,
+		{ 1, 2 },
+		1 /*clickCount*/) };
+	QString rightClickRelease{ NeovimQt::Input::convertMouse(
+		Qt::RightButton,
+		QEvent::MouseButtonRelease,
+		Qt::NoModifier,
+		{ 1, 2 },
+		1 /*clickCount*/) };
+
+	QCOMPARE(rightClickPress, QString{ "<RightMouse><1,2>" });
+	QCOMPARE(rightClickRelease, QString{ "<RightRelease><1,2>" });
+}
+
+void TestInputCommon::MouseMiddleClick() noexcept
+{
+	//Qt::MidButton
+	QString middleClickPress{ NeovimQt::Input::convertMouse(
+		Qt::MidButton,
+		QEvent::MouseButtonPress,
+		Qt::NoModifier,
+		{ 1, 2 },
+		1 /*clickCount*/) };
+	QString middleClickRelease{ NeovimQt::Input::convertMouse(
+		Qt::MidButton,
+		QEvent::MouseButtonRelease,
+		Qt::NoModifier,
+		{ 1, 2 },
+		1 /*clickCount*/) };
+
+	QCOMPARE(middleClickPress, QString{ "<MiddleMouse><1,2>" });
+	QCOMPARE(middleClickRelease, QString{ "<MiddleRelease><1,2>" });
 }
 
 #include "tst_input_common.moc"
