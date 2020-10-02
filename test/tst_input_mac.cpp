@@ -41,9 +41,9 @@ void TestInputMac::LessThanModifierKeys() noexcept
 
 void TestInputMac::SpecialKeys() noexcept
 {
-	const QMap<int, QString>& specialKeys { NeovimQt::Input::GetSpecialKeysMap() };
+	const QList<int> specialKeys{ NeovimQt::Input::GetSpecialKeysMap().keys() };
 
-	for (const auto k : specialKeys.keys()) {
+	for (const auto k : specialKeys) {
 		// On Mac Meta is the Control key, treated as C-.
 		QList<QPair<QKeyEvent, QString>> keyEventList{
 			{ { QEvent::KeyPress, k, Qt::NoModifier, {} },      "<%1>" },
@@ -54,7 +54,7 @@ void TestInputMac::SpecialKeys() noexcept
 
 		for (const auto& keyEvent : keyEventList) {
 			QCOMPARE(NeovimQt::Input::convertKey(keyEvent.first),
-				keyEvent.second.arg(specialKeys.value(k)));
+				keyEvent.second.arg(NeovimQt::Input::GetSpecialKeysMap().value(k)));
 		}
 	}
 }
