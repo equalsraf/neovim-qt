@@ -203,7 +203,7 @@ void App::processCommandlineOptions(QCommandLineParser& parser, QStringList argu
 
 	parser.addPositionalArgument("file",
 			QCoreApplication::translate("main", "Edit specified file(s)"), "[file...]");
-	parser.addPositionalArgument("...", "Additional arguments are forwarded to Neovim", "[-- ...]");
+	parser.addPositionalArgument("-- [nvim_args]", "Additional arguments are forwarded to Neovim: \"nvim-qt -- -u NONE\"", "[-- nvim_args]");
 
 	parser.process(arguments);
 }
