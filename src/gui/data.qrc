@@ -2,8 +2,5 @@
 <qresource>
   <file alias="neovim.png">../../third-party/neovim.png</file>
   <file alias="neovim.svg">../../third-party/neovim.svg</file>
-  <file alias="icons/unknown.png">../../third-party/oxygen/unknown.png</file>
-  <file alias="icons/inode-directory.png">../../third-party/oxygen/inode-directory.png</file>
-  <file alias="icons/document-open-recent.png">../../third-party/oxygen/document-open-recent.png</file>
 </qresource>
 </RCC>
