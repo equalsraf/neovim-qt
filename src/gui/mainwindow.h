@@ -27,7 +27,12 @@ public:
 	};
 
 	MainWindow(NeovimConnector *, ShellOptions opts, QWidget *parent=0);
-	bool neovimAttached() const;
+
+	bool isNeovimAttached() const
+	{
+		return m_shell && m_shell->isNeovimAttached();
+	}
+
 	Shell* shell();
 	void restoreWindowGeometry();
 public slots:
