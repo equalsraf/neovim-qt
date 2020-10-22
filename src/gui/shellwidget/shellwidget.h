@@ -2,6 +2,7 @@
 #define QSHELLWIDGET2_SHELLWIDGET
 
 #include <QWidget>
+#include <QGlyphRun>
 
 #include "shellcontents.h"
 #include "cursor.h"
@@ -80,6 +81,32 @@ public:
 	{
 		return m_isLigatureModeEnabled;
 	}
+
+	/// FIXME Comment
+	static bool AreGlyphPositionsUniform(
+		const QVector<QPointF>& glyphPositionList,
+		int cellWidth) noexcept;
+
+	/// FIXME Comment
+	static void DistributeGlyphPositions(
+		QGlyphRun& glyphRunOut,
+		const QString& text,
+		int cellWidth) noexcept;
+
+	// FIXME Comment
+	static void RemoveLigaturesUnderCursor(
+		QGlyphRun& glyphRunOut,
+		const QString& textGlyphRun,
+		int cursorTextPos,
+		int cellWidth,
+		const QVector<uint32_t>* glyphIndexListNoLigaturesOverride = nullptr) noexcept;
+
+	/// FIXME Comment
+	QList<QGlyphRun> GetGlyphRunListForTextBlock(
+		QPainter& p,
+		QRect blockRect,
+		const QString& text,
+		const QFont& blockFont) noexcept;
 
 signals:
 	void shellFontChanged();
