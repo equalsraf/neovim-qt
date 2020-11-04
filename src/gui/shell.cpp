@@ -1315,45 +1315,25 @@ void Shell::setCursorFromBusyState() noexcept
 	}
 }
 
-static int normalize(float x)
-{
-	if (x == 0.0f) {
-		return 0;
-	}
-	if (x < 0) {
-		return -1;
-	}
-	return 1;
-}
-
 void Shell::wheelEvent(QWheelEvent *ev)
 {
 	if (!m_attached || !m_mouseEnabled) {
 		return;
 	}
 
-	QPointF scroll_delta_f{ ev->angleDelta() / QWheelEvent::DefaultDeltasPerStep };
+	// Issue 785: {Touchpad scrolling only works if the user scrolls really fast, scroll_delta_f can be < 1 for slow scroll events}
+	QPointF scroll_delta_f{ QPointF{ ev->angleDelta() } / QWheelEvent::DefaultDeltasPerStep };
 
 	if (ev->inverted()) {
 		scroll_delta_f = -scroll_delta_f;
 	}
 
-	// Reset scroll remainder if we change scroll direction;
-	const int direction_x = normalize(scroll_delta_f.x());
-	if (direction_x != m_scroll_last_direction.x()) {
-		m_scroll_remainder.setX(0.0);
-		m_scroll_last_direction.setX(direction_x);
-	}
-	const int direction_y = normalize(scroll_delta_f.y());
-	if (direction_y != m_scroll_last_direction.y()) {
-		m_scroll_remainder.setY(0.0);
-		m_scroll_last_direction.setY(direction_y);
-	}
+	// Don't reset scroll remainder when we change scroll direction
 
 	// Scroll distance considering previous events
 	const QPointF total_delta = scroll_delta_f + m_scroll_remainder;
-	const QPointF scroll_delta(std::floor(total_delta.x()),
-			std::floor(total_delta.y()));
+	const QPointF scroll_delta(std::trunc(total_delta.x()),
+			std::trunc(total_delta.y()));
 
 	// Store remainder so we can accumulate fine scroll events
 	m_scroll_remainder = total_delta - scroll_delta;
