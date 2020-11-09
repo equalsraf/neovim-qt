@@ -97,7 +97,7 @@ signals:
 	void neovimExtPopupmenuSet(bool);
 	/// The tabline needs updating. curtab is the handle of the current tab (not its index)
 	/// as seen in Tab::tab.
-	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
+	void neovimTablineUpdate(int64_t curtab, QList<NeovimQt::Tab> tabs);
 	void neovimShowtablineSet(int);
 	void neovimShowContextMenu();
 	void fontChanged();
