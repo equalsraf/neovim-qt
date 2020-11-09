@@ -93,8 +93,8 @@ void MainWindow::init(NeovimConnector *c)
 
 	connect(m_shell, SIGNAL(neovimAttached(bool)),
 			this, SLOT(neovimAttachmentChanged(bool)));
-	connect(m_shell, SIGNAL(neovimTitleChanged(const QString &)),
-			this, SLOT(neovimSetTitle(const QString &)));
+	connect(m_shell, SIGNAL(neovimTitleChanged(QString)),
+			this, SLOT(neovimSetTitle(QString)));
 	connect(m_shell, &Shell::neovimResized,
 			this, &MainWindow::neovimWidgetResized);
 	connect(m_shell, &Shell::neovimMaximized,

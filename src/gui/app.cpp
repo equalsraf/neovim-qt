@@ -118,8 +118,8 @@ void App::showUi() noexcept
 #else
 	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(m_connector.get(), opts);
 
-	QObject::connect(instance(), SIGNAL(openFilesTriggered(const QList<QUrl>)),
-		win->shell(), SLOT(openFiles(const QList<QUrl>)));
+	QObject::connect(instance(), SIGNAL(openFilesTriggered(QList<QUrl>)),
+		win->shell(), SLOT(openFiles(QList<QUrl>)));
 
 	// Window geometry should be restored only when the user does not specify
 	// one of the following command line arguments. Argument "maximized" can

@@ -278,7 +278,7 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params, const QString
 
 	connect(p, SIGNAL(error(QProcess::ProcessError)),
 			c, SLOT(processError(QProcess::ProcessError)));
-	connect(p, SIGNAL(finished(int, QProcess::ExitStatus)),
+	connect(p, SIGNAL(finished(int,QProcess::ExitStatus)),
 			c, SIGNAL(processExited(int)));
 	connect(p, &QProcess::started,
 			c, &NeovimConnector::discoverMetadata);
