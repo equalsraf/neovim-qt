@@ -1321,50 +1321,64 @@ void Shell::wheelEvent(QWheelEvent *ev)
 		return;
 	}
 
-	// Issue 785: {Touchpad scrolling only works if the user scrolls really fast, scroll_delta_f can be < 1 for slow scroll events}
-	QPointF scroll_delta_f{ QPointF{ ev->angleDelta() } / QWheelEvent::DefaultDeltasPerStep };
+	const QString evString{ GetWheelEventStringAndSetScrollRemainder(
+		*ev, m_scrollDeltaRemainder, cellSize()) };
 
-	if (ev->inverted()) {
-		scroll_delta_f = -scroll_delta_f;
+	if (evString.isEmpty()) {
+		return;
 	}
 
-	// Don't reset scroll remainder when we change scroll direction
+	m_nvim->api0()->vim_input(evString.toLatin1());
+}
 
-	// Scroll distance considering previous events
-	const QPointF total_delta = scroll_delta_f + m_scroll_remainder;
-	const QPointF scroll_delta(std::trunc(total_delta.x()),
-			std::trunc(total_delta.y()));
+/*static*/ QString Shell::GetWheelEventStringAndSetScrollRemainder(
+	const QWheelEvent& ev,
+	QPoint& scrollRemainderOut,
+	QSize cellSize,
+	int deltasPerStep) noexcept
+{
+	int invertConstant{ (ev.inverted()) ? -1 : 1 };
 
-	// Store remainder so we can accumulate fine scroll events
-	m_scroll_remainder = total_delta - scroll_delta;
+	QPoint scrollRemainderAndEvent { (ev.angleDelta() * invertConstant) + scrollRemainderOut };
 
-	if (scroll_delta.isNull()) {
-		return;
+	scrollRemainderOut.rx() = scrollRemainderAndEvent.x() % deltasPerStep;
+	scrollRemainderOut.ry() = scrollRemainderAndEvent.y() % deltasPerStep;
+
+	const bool isScrollDeltaOverflow{ scrollRemainderAndEvent.x() >= deltasPerStep
+		|| scrollRemainderAndEvent.x() <= -deltasPerStep
+		|| scrollRemainderAndEvent.y() >= deltasPerStep
+		|| scrollRemainderAndEvent.y() <= -deltasPerStep };
+
+	if (!isScrollDeltaOverflow)
+	{
+		return {};
 	}
 
 // TODO Issue#751:  Remove Deprecated code, keep #else below
 #if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
-	const QPoint pos(ev->x()/cellSize().width(),
-			ev->y()/cellSize().height());
+	const QPoint evPos{ ev.x(), ev.y() };
 #else
-	const QPointF mousePos{ ev->position() };
-	const QSize size{ cellSize() };
-	const QPointF pos{ mousePos.x() / size.width(),
-		mousePos.y() / size.height() };
+	const QPoint evPos{ ev.position().toPoint() };
 #endif
 
-	QString inp;
-	if (scroll_delta.y() != 0) {
-		inp += QString("<%1ScrollWheel%2><%3,%4>")
-			.arg(Input::GetModifierPrefix(ev->modifiers()), scroll_delta.y() > 0 ? "Up" : "Down")
-			.arg(pos.x(), pos.y());
+	QPoint evCellPos{ evPos.x() / cellSize.width(), evPos.y() / cellSize.height() };
+
+	QString wheelEventString;
+	if (scrollRemainderAndEvent.y() > 0) {
+		wheelEventString += QStringLiteral("<%1ScrollWheelUp><%2,%3>");
 	}
-	if (scroll_delta.x() != 0) {
-		inp += QString("<%1ScrollWheel%2><%3,%4>")
-			.arg(Input::GetModifierPrefix(ev->modifiers()), (scroll_delta.x() > 0) ? "Left" : "Right")
-			.arg(pos.x()).arg(pos.y());
+	else if (scrollRemainderAndEvent.y() < 0) {
+		wheelEventString += QStringLiteral("<%1ScrollWheelDown><%2,%3>");
 	}
-	m_nvim->api0()->vim_input(inp.toLatin1());
+
+	if (scrollRemainderAndEvent.x() < 0) {
+		wheelEventString += QStringLiteral("<%1ScrollWheelRight><%2,%3>");
+	}
+	else if (scrollRemainderAndEvent.x() > 0) {
+		wheelEventString += QStringLiteral("<%1ScrollWheelLeft><%2,%3>");
+	}
+
+	return wheelEventString.arg(Input::GetModifierPrefix(ev.modifiers())).arg(evCellPos.x()).arg(evCellPos.y());
 }
 
 void Shell::updateWindowId()
