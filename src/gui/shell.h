@@ -58,6 +58,14 @@ public:
 		return m_pum;
 	}
 
+	/// Convert QWheelEvent to Neovim wheel event string. Testable.
+	/// NOTE: Sums and stores partial wheel events in outparam `scrollRemainderOut`
+	static QString GetWheelEventStringAndSetScrollRemainder(
+		const QWheelEvent& ev,
+		QPoint& scrollRemainderOut,
+		QSize cellSize,
+		int deltasPerStep = QWheelEvent::DefaultDeltasPerStep) noexcept;
+
 	/// Lookup highlight by name from hl_group_set
 	HighlightAttribute GetHighlightGroup(const QString& name) const noexcept
 	{
@@ -229,8 +237,7 @@ private:
 	uint8_t m_mouseclick_count{ 0 };
 	Qt::MouseButton m_mouseclick_pending;
 	// Accumulates remainder of steppy scroll
-	QPointF m_scroll_remainder;
-	QPoint m_scroll_last_direction;
+	QPoint m_scrollDeltaRemainder;
 
 	// Properties
 	bool m_neovimBusy{ false };
