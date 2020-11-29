@@ -2,6 +2,7 @@ sudo: false
 language: cpp
 os:
   - osx
+osx_image: xcode12.2
 compiler:
   - gcc
   - clang
