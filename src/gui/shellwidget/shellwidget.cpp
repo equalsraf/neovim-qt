@@ -778,8 +778,15 @@ void ShellWidget::paintForegroundTextBlock(
 			blockRect.left() + (m_cellSize.width() * cursorPos),
 			blockRect.top() + m_ascent + (m_lineSpace / 2) };
 
+		// Issue 735: Some characters (emoji) contain multiple bytes.
+		// FIXME Is QTextBoundary a better approach? Will this work for 3+ byte chars?
+		QString cursorText{ text.at(cursorPos) };
+		if (cell.IsDoubleWidth() && IsValidIndex(text, cursorPos + 1)) {
+			cursorText += text.at(cursorPos + 1);
+		}
+
 		paintNeovimCursorBackground(p, neovimCursorRect());
-		paintNeovimCursorForeground(p, neovimCursorRect(), cursorDrawPos, text.at(cursorPos));
+		paintNeovimCursorForeground(p, neovimCursorRect(), cursorDrawPos, cursorText);
 	}
 }
 
