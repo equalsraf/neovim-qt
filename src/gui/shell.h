@@ -126,6 +126,7 @@ protected:
 	virtual void keyPressEvent(QKeyEvent *ev) Q_DECL_OVERRIDE;
         void paintLogo(QPainter&);
 	virtual void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
+	virtual void showEvent(QShowEvent* ev) Q_DECL_OVERRIDE;
 	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void focusInEvent(QFocusEvent *ev) Q_DECL_OVERRIDE;
@@ -190,6 +191,7 @@ private slots:
 	void setAttached(bool attached);
 
 private:
+	bool m_init_called{ false };
 	bool m_attached{ false };
 	NeovimConnector* m_nvim{ nullptr };
 

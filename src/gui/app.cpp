@@ -283,11 +283,11 @@ void App::showUi() noexcept
 	}
 
 	if (m_parser.isSet("fullscreen")) {
-		win->delayedShow(NeovimQt::MainWindow::DelayedShow::FullScreen);
+		win->showFullScreen();
 	} else if (m_parser.isSet("maximized")) {
-		win->delayedShow(NeovimQt::MainWindow::DelayedShow::Maximized);
+		win->showMaximized();
 	} else {
-		win->delayedShow();
+		win->show();
 	}
 #endif
 }
@@ -481,7 +481,7 @@ void App::openNewWindow(const QVariantList& args) noexcept
 	ConnectorInitArgs params{ type, 2000, std::move(server), std::move(nvim), getNeovimArgs() };
 	MainWindow* win{ &createWindow(params) };
 	win->resize(s_lastActiveWindow->size());
-	win->delayedShow();
+	win->show();
 }
 
 } // namespace NeovimQt
