@@ -129,11 +129,11 @@ void App::showUi() noexcept
 	}
 
 	if (m_parser.isSet("fullscreen")) {
-		win->delayedShow(NeovimQt::MainWindow::DelayedShow::FullScreen);
+		win->showFullScreen();
 	} else if (m_parser.isSet("maximized")) {
-		win->delayedShow(NeovimQt::MainWindow::DelayedShow::Maximized);
+		win->showMaximized();
 	} else {
-		win->delayedShow();
+		win->show();
 	}
 #endif
 }

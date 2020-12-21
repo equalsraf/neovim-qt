@@ -31,8 +31,6 @@ public:
 	bool neovimAttached() const;
 	Shell* shell();
 	void restoreWindowGeometry();
-public slots:
-	void delayedShow(DelayedShow type=DelayedShow::Normal);
 signals:
 	void neovimAttached(bool);
 	void closing(int);
@@ -50,7 +48,6 @@ private slots:
 	void neovimExited(int status);
 	void neovimError(NeovimConnector::NeovimError);
 	void reconnectNeovim();
-	void showIfDelayed();
 	void neovimAttachmentChanged(bool);
 	void neovimIsUnsupported();
 	void neovimShowtablineSet(int);
@@ -78,7 +75,6 @@ private:
 	QSplitter* m_window{ nullptr };
 	TreeView* m_tree{ nullptr };
 	Shell* m_shell{ nullptr };
-	DelayedShow m_delayedShow{ DelayedShow::Disabled };
 	QStackedWidget m_stack;
 	QTabBar* m_tabline{ nullptr };
 	QToolBar* m_tabline_bar{ nullptr };
