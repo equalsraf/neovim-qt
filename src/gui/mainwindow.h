@@ -20,24 +20,16 @@ class MainWindow: public QMainWindow
 {
 	Q_OBJECT
 public:
-	enum DelayedShow {
-		Disabled,
-		Normal,
-		Maximized,
-		FullScreen,
-	};
-
 	MainWindow(NeovimConnector* c, QWidget* parent = nullptr) noexcept;
 
 	bool isNeovimAttached() const noexcept { return m_shell && m_shell->isNeovimAttached(); }
 
 	Shell* shell();
+
 	void restoreWindowGeometry();
 
 	bool active() const noexcept { return m_isActive; }
 
-public slots:
-	void delayedShow(NeovimQt::MainWindow::DelayedShow type=DelayedShow::Normal);
 signals:
 	void neovimAttachmentChanged(bool);
 	void closing(int);
@@ -58,7 +50,6 @@ private slots:
 	void neovimExited(int status);
 	void neovimError(NeovimConnector::NeovimError);
 	void reconnectNeovim();
-	void showIfDelayed();
 	void handleNeovimAttachment(bool);
 	void neovimIsUnsupported();
 	void saveWindowGeometry();
@@ -77,7 +68,6 @@ private:
 	QSplitter* m_window{ nullptr };
 	TreeView* m_tree{ nullptr };
 	Shell* m_shell{ nullptr };
-	DelayedShow m_delayedShow{ DelayedShow::Disabled };
 	QStackedWidget m_stack;
 
 	bool m_neovim_requested_close{ false };

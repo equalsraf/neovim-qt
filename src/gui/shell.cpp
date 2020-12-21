@@ -11,6 +11,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QSettings>
+#include <QShowEvent>
 
 #include "app.h"
 #include "helpers.h"
@@ -90,8 +91,6 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 		return;
 	}
 
-	connect(m_nvim, &NeovimConnector::ready,
-			this, &Shell::init);
 	connect(m_nvim, &NeovimConnector::error,
 			this, &Shell::neovimError);
 	connect(m_nvim, &NeovimConnector::processExited,
@@ -99,10 +98,6 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	connect(this, &ShellWidget::fontError, this, &Shell::handleFontError);
 
 	m_nvim->setRequestHandler(new ShellRequestHandler(this));
-
-	if (m_nvim->isReady()) {
-		init();
-	}
 }
 
 void Shell::handleFontError(const QString& msg)
@@ -300,6 +295,12 @@ void Shell::setAttached(bool attached)
 
 void Shell::init()
 {
+	// Prevent init() from being called multiple times
+	if (m_init_called) {
+		return;
+	}
+	m_init_called = true;
+
 	// Make sure the connector provides us with an api object
 	if (!m_nvim || !m_nvim->api0()) {
 		emit neovimIsUnsupported();
@@ -311,9 +312,9 @@ void Shell::init()
 	connect(m_nvim->api0(), &NeovimApi0::on_ui_try_resize,
 			this, &Shell::neovimResizeFinished);
 
-	QRect screenRect = QApplication::desktop()->availableGeometry(this);
-	int64_t width = screenRect.width()*0.66/cellSize().width();
-	int64_t height = screenRect.height()*0.66/cellSize().height();
+	const int64_t shellWidth{ width() / cellSize().width() };
+	const int64_t shellHeight{ height() / cellSize().height() };
+
 	QVariantMap options;
 	if (m_options.IsTablineEnabled()) {
 		options.insert("ext_tabline", true);
@@ -328,10 +329,10 @@ void Shell::init()
 
 	MsgpackRequest* req{ nullptr };
 	if (m_nvim->api2()) {
-		req = m_nvim->api2()->nvim_ui_attach(width, height, options);
+		req = m_nvim->api2()->nvim_ui_attach(shellWidth, shellHeight, options);
 	}
 	else {
-		req = m_nvim->api0()->ui_attach(width, height, true);
+		req = m_nvim->api0()->ui_attach(shellWidth, shellHeight, true);
 	}
 
 	connect(req, &MsgpackRequest::timeout, m_nvim, &NeovimConnector::fatalTimeout);
@@ -1316,6 +1317,19 @@ void Shell::handleGuiAdaptiveStyle(const QVariantList& opargs) noexcept
 void Shell::handleGuiAdaptiveStyleList() noexcept
 {
 	emit showGuiAdaptiveStyleList();
+}
+
+void Shell::showEvent(QShowEvent* ev)
+{
+	// Prevent init() from being called multiple times
+	if (m_init_called) {
+		return;
+	}
+
+	connect(m_nvim, &NeovimConnector::ready, this, &Shell::init);
+	if (m_nvim->isReady()) {
+		init();
+	}
 }
 
 void Shell::paintEvent(QPaintEvent *ev)

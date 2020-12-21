@@ -126,8 +126,6 @@ void MainWindow::init(NeovimConnector *c)
 /** The Neovim process has exited */
 void MainWindow::neovimExited(int status)
 {
-	showIfDelayed();
-
 	if (m_nvim->errorCause() != NeovimConnector::NoError) {
 		m_errorWidget->setText(m_nvim->errorString());
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
@@ -142,8 +140,6 @@ void MainWindow::neovimExited(int status)
 }
 void MainWindow::neovimError(NeovimConnector::NeovimError err)
 {
-	showIfDelayed();
-
 	switch(err) {
 	case NeovimConnector::FailedToStart:
 		m_errorWidget->setText("Unable to start nvim: " + m_nvim->errorString());
@@ -156,7 +152,6 @@ void MainWindow::neovimError(NeovimConnector::NeovimError err)
 }
 void MainWindow::neovimIsUnsupported()
 {
-	showIfDelayed();
 	m_errorWidget->setText(QString("Cannot connect to this Neovim, required API version 1, found [%1-%2]")
 			.arg(m_nvim->apiCompatibility())
 			.arg(m_nvim->apiLevel()));
@@ -272,47 +267,13 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 }
 void MainWindow::changeEvent(QEvent* ev)
 {
-	if (ev->type() == QEvent::WindowStateChange && isWindow()) {
+	if (m_shell && ev->type() == QEvent::WindowStateChange && isWindow()) {
 		m_shell->updateGuiWindowState(windowState());
 
 		m_isActive = (windowState() == Qt::WindowState::WindowActive);
 		emit activeChanged(*this);
 	}
 	QWidget::changeEvent(ev);
-}
-
-/// Call show() after a 1s delay or when Neovim attachment
-/// is complete, whichever comes first
-void MainWindow::delayedShow(DelayedShow type)
-{
-	m_delayedShow = type;
-	if (m_nvim->errorCause() != NeovimConnector::NoError) {
-		showIfDelayed();
-		return;
-	}
-
-	if (type != DelayedShow::Disabled) {
-		QTimer *t = new QTimer(this);
-		t->setSingleShot(true);
-		t->setInterval(1000);
-		connect(m_shell, &Shell::neovimResized, this, &MainWindow::showIfDelayed);
-		connect(t, &QTimer::timeout, this, &MainWindow::showIfDelayed);
-		t->start();
-	}
-}
-
-void MainWindow::showIfDelayed()
-{
-	if (!isVisible()) {
-		if (m_delayedShow == DelayedShow::Normal) {
-			show();
-		} else if (m_delayedShow == DelayedShow::Maximized) {
-			showMaximized();
-		} else if (m_delayedShow == DelayedShow::FullScreen) {
-			showFullScreen();
-		}
-	}
-	m_delayedShow = DelayedShow::Disabled;
 }
 
 void MainWindow::handleNeovimAttachment(bool attached)
