@@ -133,7 +133,12 @@ QRect ShellWidget::getNeovimCursorRect(QRect cellRect) noexcept
 
 		case Cursor::Shape::Vertical:
 		{
-			cursorRect.setWidth(cursorRect.width() * m_cursor.GetPercentage() / 100);
+			// Issue #800: for vertical bar cursor, use single cell width
+			// instead of the provided cell rect. Cell rect may have doubled
+			// width, for example, when the cell contains a double width char.
+			// Always using single cell width prevents vertical bar to be a bit
+			// thicker on a double width char.
+			cursorRect.setWidth(m_cellSize.width() * m_cursor.GetPercentage() / 100);
 		}
 		break;
 	}
