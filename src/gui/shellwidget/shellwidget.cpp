@@ -247,8 +247,24 @@ static QPainterPath GetUndercurlPath(QRect cellRect) noexcept
 	const QPoint& start{ underline.p1() };
 	const QPoint& end{ underline.p2() };
 
-	QPainterPath path(start);
 	static constexpr int offset[8]{ 1, 0, 0, 1, 1, 2, 2, 2 };
+
+	// Be careful to set correct offset for the starting point of the undercurl
+	// so that it doesn't make discontinuity at the cell boundary.
+	//
+	// Simply using `start` always set the y offset of starting point to zero,
+	// but it is incorrect in most cases; the ending point of the undercurl on
+	// the previous cell has non-zero offset except
+	// offset[previous_undercurl_ending_x % 8] == 0.
+	//
+	// To make undercurl smoothly connected, we need to set correct offset to
+	// the starting point according to the x coordinate of it.
+	//
+	// See also Pull Request #803 (comment):
+	// https://github.com/equalsraf/neovim-qt/pull/803#issuecomment-751166085
+	QPoint undercurlStart{ start.x(), start.y() - offset[start.x() % 8] };
+
+	QPainterPath path{ undercurlStart };
 	for (int i = start.x() + 1; i <= end.x(); i++) {
 		path.lineTo(QPoint(i, start.y() - offset[i%8]));
 	}
