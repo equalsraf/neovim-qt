@@ -4,7 +4,6 @@ include_directories(.. shellwidget)
 qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
 if(WIN32)
 	set(SRCS_PLATFORM
-		app_runtime.cpp
 		arguments_qwindowgeometry.cpp
 		input_win32.cpp
 		printinfo_msgbox.cpp
@@ -18,7 +17,6 @@ if(WIN32)
 	enable_language(RC)
 elseif(APPLE)
 	set(SRCS_PLATFORM
-		app_runtime_mac.cpp
 		arguments_qwindowgeometry.cpp
 		input_mac.cpp
 		printinfo_stdout.cpp
@@ -29,7 +27,6 @@ elseif(APPLE)
 	set(MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in)
 else()
 	set(SRCS_PLATFORM
-		app_runtime.cpp
 		arguments_geometry.cpp
 		input_unix.cpp
 		printinfo_stdout.cpp
@@ -55,9 +52,12 @@ add_library(neovim-qt-gui
 	${NEOVIM_RCC_SOURCES})
 target_link_libraries(neovim-qt-gui ${QTLIBS} qshellwidget neovim-qt)
 
-if(NOT APPLE)
-	set_property(SOURCE app_runtime.cpp PROPERTY COMPILE_DEFINITIONS
-		NVIM_QT_RUNTIME_PATH="${CMAKE_INSTALL_FULL_DATADIR}/nvim-qt/runtime")
+if(APPLE)
+	set_property(SOURCE app.cpp PROPERTY COMPILE_DEFINITIONS
+		NVIM_QT_RELATIVE_RUNTIME_PATH="../Resources/runtime")
+else()
+	set_property(SOURCE app.cpp PROPERTY COMPILE_DEFINITIONS
+		NVIM_QT_RELATIVE_RUNTIME_PATH="../share/nvim-qt/runtime")
 endif()
 
 add_executable(nvim-qt WIN32 MACOSX_BUNDLE main.cpp
