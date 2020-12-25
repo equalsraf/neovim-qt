@@ -13,10 +13,6 @@ QString App::getRuntimePath() noexcept
 		return path;
 	}
 
-	if (QFileInfo(NVIM_QT_RUNTIME_PATH).isDir()) {
-		return QStringLiteral(NVIM_QT_RUNTIME_PATH);
-	}
-
 	// Look for the runtime relative to the nvim-qt binary
 	const QDir d = QDir{ applicationDirPath() }.filePath("../share/nvim-qt/runtime");
 

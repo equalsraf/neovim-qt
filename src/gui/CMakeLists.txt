@@ -55,11 +55,6 @@ add_library(neovim-qt-gui
 	${NEOVIM_RCC_SOURCES})
 target_link_libraries(neovim-qt-gui ${QTLIBS} qshellwidget neovim-qt)
 
-if(NOT APPLE)
-	set_property(SOURCE app_runtime.cpp PROPERTY COMPILE_DEFINITIONS
-		NVIM_QT_RUNTIME_PATH="${CMAKE_INSTALL_FULL_DATADIR}/nvim-qt/runtime")
-endif()
-
 add_executable(nvim-qt WIN32 MACOSX_BUNDLE main.cpp
 	${NEOVIM_RCC_SOURCES}
 	${RES_FILE}
