@@ -19,12 +19,7 @@ configuration:
 matrix:
   fast_finish: false
 install:
-# Currently Windows Nightly Builds of Neovim are not working.
-# For now, we can test with a 0.4.4 Release Build. Good enough.
-# See: https://github.com/neovim/neovim/issues/13312
-#
-#- ps: appveyor DownloadFile -FileName Neovim.zip "https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip"
-- ps: appveyor DownloadFile -FileName Neovim.zip "https://github.com/neovim/neovim/releases/download/v0.4.4/nvim-win64.zip"
+- ps: appveyor DownloadFile -FileName Neovim.zip "https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip"
 - 7z x Neovim.zip
 - set PATH=%PATH%;%CD%\Neovim\bin;
 - nvim --version
