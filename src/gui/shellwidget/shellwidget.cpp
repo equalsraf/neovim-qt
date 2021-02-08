@@ -499,7 +499,8 @@ void ShellWidget::paintForegroundTextBlock(
 				DistributeGlyphPositions(std::move(glyphPositionList), cellWidth));
 		}
 
-		const bool isCursorVisibleInGlyphRun{ cursorPos >= 0
+		const bool isCursorVisibleInGlyphRun{ m_cursor.IsVisible()
+			&& cursorPos >= 0
 			&& cursorPos < sizeGlyphRun + glyphsRendered
 			&& cursorPos >= glyphsRendered };
 
