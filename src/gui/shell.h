@@ -11,7 +11,7 @@
 #include <QList>
 #include <QMap>
 #include <QMenu>
-
+#include "cmdline/extcmdlinewidget.h"
 #include "neovimconnector.h"
 #include "shellwidget/highlight.h"
 #include "shellwidget/shellwidget.h"
@@ -37,6 +37,7 @@ public:
 	bool enable_ext_tabline{ true };
 	bool enable_ext_popupmenu{ true };
 	bool enable_ext_linegrid{ true };
+	bool enable_ext_cmdline{ false };
 	int nvim_show_tabline{ 1 };
 };
 
@@ -188,12 +189,15 @@ protected:
 	virtual void handleGuiAdaptiveStyle(const QVariantList& opargs) noexcept;
 	virtual void handleGuiAdaptiveStyleList() noexcept;
 
+	// FIXME? handleCmdlinePos? Rename to CommandlineAnchor?
+	//void handleGuiCommandlinePosition(const QVariantList& opargs) noexcept;
+
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseMoveEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	void bailoutIfinputBlocking();
-	void setCursorFromBusyState() noexcept;
+	void setMouseCursorFromBusyState() noexcept;
 
 	QString neovimErrorToString(const QVariant& err);
 
@@ -244,6 +248,8 @@ private:
 	ShellOptions m_options;
 	PopupMenu m_pum{ this };
 	bool m_mouseEnabled{ true };
+
+	Cmdline::ExtCmdlineWidget* m_cmdlineWidget{ nullptr };
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler

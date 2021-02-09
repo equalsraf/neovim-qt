@@ -268,3 +268,15 @@ function! s:GuiWindowOpacityCommand(value) abort
   call rpcnotify(0, 'Gui', 'WindowOpacity', a:value)
 endfunction
 command! -nargs=1 GuiWindowOpacity call s:GuiWindowOpacityCommand("<args>")
+
+" Enable/Disable external GUI commandline 'ext_cmdline'
+function! s:GuiCmdline(enable) abort
+	call rpcnotify(0, 'Gui', 'Option', 'Cmdline', a:enable)
+endfunction
+command! -nargs=1 GuiCmdline call s:GuiCmdline(<args>)
+
+" Set external commandline position: "Top", "Bottom", "Center"
+function! s:GuiCommandlinePosition(position) abort
+	call rpcnotify(0, 'Gui', 'CommandlinePosition', a:position)
+endfunction
+command! -nargs=1 GuiCommandlinePosition call s:GuiCommandlinePosition(<args>)

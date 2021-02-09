@@ -2,11 +2,12 @@
 #define QSHELLWIDGET2_SHELLWIDGET
 
 #include <QWidget>
+#include <QFrame>
 
 #include "shellcontents.h"
 #include "cursor.h"
 
-class ShellWidget: public QWidget
+class ShellWidget: public QFrame
 {
 	Q_OBJECT
 	Q_PROPERTY(QColor background READ background WRITE setBackground)
@@ -81,10 +82,37 @@ public:
 		return m_isLigatureModeEnabled;
 	}
 
+	/// Move the neovim cursor for text insertion and display
+	void setNeovimCursor(uint64_t col, uint64_t row) noexcept;
+
+	const Cursor& getCursor() const noexcept
+	{
+		return m_cursor;
+	}
+
+	void CopyCursorStyle(const Cursor& cursor) noexcept
+	{
+		m_cursor.CopyCursorStyle(cursor);
+	}
+
+	void setIgnoreFocus(bool ignore) noexcept
+	{
+		m_ignoreFocus = ignore;
+	}
+
+	// FIXME Comment, returns the size in Cell of ShellWidget
+	QSize shellGridSize() noexcept
+	{
+		return { m_contents.columns(), m_contents.rows() };
+	}
+
+
 signals:
 	void shellFontChanged();
 	void fontError(const QString& msg);
+
 public slots:
+	void resizeShell(QSize size) noexcept;
 	void resizeShell(int rows, int columns);
 	void setSpecial(const QColor& color);
 	void setBackground(const QColor& color);
@@ -135,9 +163,6 @@ protected:
 
 	std::vector<QFont> m_guifontwidelist;
 
-	/// Move the neovim cursor for text insertion and display
-	void setNeovimCursor(uint64_t col, uint64_t row) noexcept;
-
 	virtual void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
 
 	virtual void resizeEvent(QResizeEvent *ev) Q_DECL_OVERRIDE;
@@ -187,6 +212,8 @@ private:
 	QColor m_spColor;
 	int m_lineSpace{ 0 };
 	bool m_isLigatureModeEnabled{ false };
+
+	bool m_ignoreFocus{ false };
 
 	Background m_background{ Background::Dark };
 };
