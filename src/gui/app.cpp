@@ -97,6 +97,10 @@ void App::showUi() noexcept
 {
 	ShellOptions opts{ GetShellOptionsFromQSettings() };
 
+	if (m_parser.isSet("name")) {
+		setApplicationName(m_parser.value("name"));
+	}
+
 	if (m_parser.isSet("no-ext-tabline")) {
 		opts.enable_ext_tabline = false;
 	}
@@ -159,6 +163,10 @@ void App::processCommandlineOptions(QCommandLineParser& parser, QStringList argu
 				QCoreApplication::translate("main", "Error if nvim does not responde after count milliseconds"),
 				QCoreApplication::translate("main", "ms"),
 				"20000"));
+	parser.addOption(QCommandLineOption("name",
+				QCoreApplication::translate("main", "set custom application name"),
+				QCoreApplication::translate("main", "app_name"),
+				"nvim-qt"));
 
 	// Some platforms use --qwindowgeometry, while other platforms use the --geometry.
 	// Make the correct help message is displayed.
