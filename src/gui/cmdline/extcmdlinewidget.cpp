@@ -33,7 +33,6 @@ ExtCmdlineWidget::ExtCmdlineWidget(NeovimConnector* nvim, ShellWidget* parent) n
 	frameLayout->addWidget(m_cmdTextBox);
 
 	m_cmdBlockText = new BlockDisplay();
-	//m_cmdTextBox->setIgnoreFocus(true);
 
 	m_vLayout = new QVBoxLayout();
 	m_vLayout->addWidget(m_cmdBlockText);
@@ -238,6 +237,9 @@ void ExtCmdlineWidget::handleCmdlineSpecialChar(const QVariantList& args) noexce
 	//	line.m_content.replace(line.m_position, 1, c);
 	//	qDebug() << "TWO:" << c;
 	//}
+	qDebug() << "c:" << c;
+	qDebug() << "shift:" << shift;
+	qDebug() << "level:" << level;
 
 	m_cmdTextBox->put(line.getPromptText(),0,0); // FIXME ???
 }
@@ -300,9 +302,38 @@ void ExtCmdlineWidget::handleCmdlineBlockHide() noexcept
 	m_cmdBlockText->hide();
 }
 
+static void WriteCommandlinePositionSetting(const QString& position) noexcept
+{
+	QSettings settings("nvim-qt", "nvim-qt");
+
+	if (!settings.isWritable()) {
+		return;
+	}
+
+	settings.setValue("Commandline/position", position);
+}
+
 void ExtCmdlineWidget::handleGuiCommandlinePosition(const QVariantList& args) noexcept
 {
-	qDebug() << args;
+	if (args.size() < 2
+		|| !args.at(1).canConvert<QByteArray>()) {
+		qWarning() << "Unexpected arguments for GuiCommandlinePosition:" << args;
+	}
+
+	const QString position{ m_nvim->decode(args.at(1).toByteArray()).toLower() };
+
+	if (position == "top") {
+		m_position = Position::Top;
+		WriteCommandlinePositionSetting(position);
+	}
+	else if (position == "center") {
+		m_position = Position::Center;
+		WriteCommandlinePositionSetting(position);
+	}
+	else if (position == "bottom") {
+		m_position = Position::Bottom;
+		WriteCommandlinePositionSetting(position);
+	}
 }
 
 void ExtCmdlineWidget::updateGeometry() noexcept

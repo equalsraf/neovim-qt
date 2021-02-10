@@ -279,4 +279,4 @@ command! -nargs=1 GuiCmdline call s:GuiCmdline(<args>)
 function! s:GuiCommandlinePosition(position) abort
 	call rpcnotify(0, 'Gui', 'CommandlinePosition', a:position)
 endfunction
-command! -nargs=1 GuiCommandlinePosition call s:GuiCommandlinePosition(<args>)
+command! -nargs=1 GuiCommandlinePosition call s:GuiCommandlinePosition("<args>")

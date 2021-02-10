@@ -95,11 +95,6 @@ public:
 		m_cursor.CopyCursorStyle(cursor);
 	}
 
-	void setIgnoreFocus(bool ignore) noexcept
-	{
-		m_ignoreFocus = ignore;
-	}
-
 	// FIXME Comment, returns the size in Cell of ShellWidget
 	QSize shellGridSize() noexcept
 	{
@@ -212,8 +207,6 @@ private:
 	QColor m_spColor;
 	int m_lineSpace{ 0 };
 	bool m_isLigatureModeEnabled{ false };
-
-	bool m_ignoreFocus{ false };
 
 	Background m_background{ Background::Dark };
 };

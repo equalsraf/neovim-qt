@@ -1,10 +1,12 @@
 #include "shellwidget.h"
 
 #include <QDebug>
+#include <QGuiApplication>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPaintEvent>
 #include <QTextLayout>
+#include <QWindow>
 
 #include "helpers.h"
 
@@ -146,6 +148,17 @@ QRect ShellWidget::getNeovimCursorRect(QRect cellRect) noexcept
 	return cursorRect;
 }
 
+static bool GetParentWindowFocus() noexcept
+{
+	QWindow* parentWindow{ QGuiApplication::focusWindow() };
+
+	if (!parentWindow) {
+		return false;
+	}
+
+	return parentWindow->isActive();
+}
+
 void ShellWidget::paintNeovimCursorBackground(QPainter& p, QRect cellRect) noexcept
 {
 	const QRect cursorRect{ getNeovimCursorRect(cellRect) };
@@ -157,9 +170,7 @@ void ShellWidget::paintNeovimCursorBackground(QPainter& p, QRect cellRect) noexc
 		cursorBackgroundColor = foreground();
 	}
 
-	// If the window does not have focus, draw an outline around the cursor cell.
-	//if (this->parentWidget()->hasFocus()) {
-	if (!m_ignoreFocus && !hasFocus()) {
+	if (!GetParentWindowFocus()) {
 		QRect noFocusCursorRect{ cellRect };
 		noFocusCursorRect.adjust(-1, -1, -1, -1);
 
@@ -181,8 +192,7 @@ void ShellWidget::paintNeovimCursorForeground(
 	const QString& character) noexcept
 {
 	// No focus: cursor is outline with default foreground color.
-	//if (this->parentWidget()->hasFocus()) {
-	if (!m_ignoreFocus && !hasFocus()) {
+	if (!GetParentWindowFocus()) {
 		return;
 	}
 

@@ -728,7 +728,6 @@ void Shell::handleModeChange(const QVariantList& opargs)
 
 	// FIXME This should be an emit signal, handle slot in cmdlinewidget.
 	m_cmdlineWidget->setCursorStyle(getCursor()); // FIXME! nultpr deref!
-	qDebug() << "MODELINE GUICMDLINE WIDGET!";
 }
 
 void Shell::handleModeInfoSet(const QVariantList& opargs)
