@@ -6,7 +6,7 @@
 	invalidCell.m_character = 'X';
 	invalidCell.m_isValid = false;
 	invalidCell.m_highlight = { Qt::white, Qt::red, QColor::Invalid,
-		false, false, false, false, false };
+		false, false, false, false, false, false };
 
 	return invalidCell;
 }

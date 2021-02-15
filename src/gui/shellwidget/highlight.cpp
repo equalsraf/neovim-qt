@@ -24,6 +24,7 @@ HighlightAttribute::HighlightAttribute(const QVariantMap& rgb_attr) noexcept
 	m_bold = rgb_attr.contains("bold");
 	m_underline = rgb_attr.contains("underline");
 	m_undercurl = rgb_attr.contains("undercurl");
+	m_strikethrough = rgb_attr.contains("strikethrough");
 }
 
 QColor HighlightAttribute::GetForegroundColor() const noexcept {
@@ -51,5 +52,6 @@ bool HighlightAttribute::operator==(const HighlightAttribute& other) const noexc
 		m_italic == other.m_italic &&
 		m_bold == other.m_bold &&
 		m_underline == other.m_underline &&
-		m_undercurl == other.m_undercurl;
+		m_undercurl == other.m_undercurl &&
+		m_strikethrough == other.m_strikethrough;
 }

@@ -318,6 +318,7 @@ void Shell::handleHighlightSet(const QVariantMap& attrs)
 	m_font_italic = attrs.value("italic").toBool();
 	m_font_undercurl = attrs.value("undercurl").toBool();
 	m_font_underline = attrs.value("underline").toBool();
+	m_font_strikethrough = attrs.value("strikethrough").toBool();
 }
 
 /// Paint a character and advance the cursor
@@ -341,7 +342,7 @@ void Shell::handlePut(const QVariantList& args)
 		int cols = put(text, m_cursor_pos.y(), m_cursor_pos.x(),
 				m_hg_foreground, m_hg_background, m_hg_special,
 				m_font_bold, m_font_italic,
-				m_font_underline, m_font_undercurl);
+				m_font_underline, m_font_undercurl, m_font_strikethrough);
 		// Move cursor ahead
 		setNeovimCursor(m_cursor_pos.y(), m_cursor_pos.x()+cols);
 	}

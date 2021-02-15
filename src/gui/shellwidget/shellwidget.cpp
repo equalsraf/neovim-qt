@@ -297,6 +297,39 @@ void ShellWidget::paintUndercurl(
 	p.drawPath(GetUndercurlPath(cellRect));
 }
 
+// FIXME Copy-Pasted Code! Refactor with Underline? This and below
+static QLine GetStrikeThrough(QRect cellRect) noexcept
+{
+	QPoint start{ cellRect.bottomLeft() };
+	start.ry() -= (cellRect.bottom() - cellRect.top()) / 2 + 1;
+
+	QPoint end{ cellRect.bottomRight() };
+	end.ry() -= (cellRect.bottom() - cellRect.top()) / 2 + 1;
+
+	return { start, end };
+}
+
+void ShellWidget::paintStrikeThrough(
+	QPainter& p,
+	const Cell& cell,
+	QRect cellRect) noexcept
+{
+	if (!cell.IsStrikeThrough()) {
+		return;
+	}
+
+	QPen pen;
+	if (cell.GetForegroundColor().isValid()) {
+		pen.setColor(cell.GetForegroundColor());
+	} else {
+		pen.setColor(foreground());
+	}
+
+	p.setPen(pen);
+
+	p.drawLine(GetStrikeThrough(cellRect));
+}
+
 void ShellWidget::paintBackgroundClearCell(
 	QPainter& p,
 	const Cell& cell,
@@ -335,10 +368,10 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 		}
 	}
 
-	if (cell.IsBold() || cell.IsItalic()) {
-		cellFont.setBold(cell.IsBold());
-		cellFont.setItalic(cell.IsItalic());
-	}
+	cellFont.setBold(cell.IsBold());
+	cellFont.setItalic(cell.IsItalic());
+	// FIXME!
+	//cellFont.setStrikeOut(cell.IsStrikeThrough()); // FIXME :s striktrought in guifont!
 
 	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
 	// but we want to match the family name with the bold/italic attributes.
@@ -604,8 +637,8 @@ void ShellWidget::paintRectNoLigatures(QPainter& p, const QRect rect) noexcept
 			}
 
 			paintUnderline(p, cell, r);
-
 			paintUndercurl(p, cell, r);
+			paintStrikeThrough(p, cell, r);
 		}
 	}
 }
@@ -670,6 +703,7 @@ void ShellWidget::paintRectLigatures(QPainter& p, const QRect rect) noexcept
 			paintForegroundTextBlock(p, firstCell, blockRect, blockText, blockCursorPos);
 			paintUnderline(p, firstCell, blockRect);
 			paintUndercurl(p, firstCell, blockRect);
+			paintStrikeThrough(p, firstCell, blockRect);
 		}
 	}
 }
@@ -777,10 +811,11 @@ int ShellWidget::put(
 	bool italic,
 	bool underline,
 	bool undercurl,
+	bool strikethrough,
 	bool reverse)
 {
 	HighlightAttribute hl_attr = { fg, bg, sp,
-		reverse, italic, bold, underline, undercurl };
+		reverse, italic, bold, underline, undercurl, strikethrough };
 	return put(text, row, column, hl_attr);
 }
 

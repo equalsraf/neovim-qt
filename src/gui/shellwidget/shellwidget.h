@@ -105,6 +105,7 @@ public slots:
 		bool italic = false,
 		bool underline = false,
 		bool undercurl = false,
+		bool strikethrough = false,
 		bool reverse = false);
 
 	int put(
@@ -167,6 +168,7 @@ private:
 	void paintNeovimCursorForeground(QPainter& p, QRect cellRect, QPoint pos, const QString& character) noexcept;
 	void paintUnderline(QPainter& p, const Cell& cell, QRect cellRect) noexcept;
 	void paintUndercurl(QPainter& p, const Cell& cell, QRect cellRect) noexcept;
+	void paintStrikeThrough(QPainter& p, const Cell& cell, QRect cellRect) noexcept;
 	void paintBackgroundClearCell(QPainter& p, const Cell& cell, QRect cellRect, bool isCursorCell) noexcept;
 	void paintForegroundCellText(QPainter& p, const Cell& cell, QRect cellRect, bool isCursorCell) noexcept;
 
