@@ -125,9 +125,20 @@ QString convertMouse(
 		GetEventString(type), xPos, yPos);
 }
 
-QString ToKeyString(const QString& modPrefix, const QString& key) noexcept
+static QString ToKeyString(const QString& modPrefix, const QString& key) noexcept
 {
 	return QString{ "<%1%2>" }.arg(modPrefix, key);
+}
+
+static QString KeyToText(int key, Qt::KeyboardModifiers mod) noexcept
+{
+	QString text{ QChar{ key } };
+
+	if (!(mod & Qt::ShiftModifier)) {
+		text = text.toLower();
+	}
+
+	return text;
 }
 
 QString convertKey(const QKeyEvent& ev) noexcept
@@ -219,25 +230,20 @@ QString convertKey(const QKeyEvent& ev) noexcept
 			return {};
 		}
 
-		// If QKeyEvent does not provide text, then use the value of key
-		//   Issue#579: Cannot map <A-...> on MacOS
-		text = QChar{ key };
-		if (!(mod & Qt::ShiftModifier))
-		{
-			text = text.toLower();
-		}
+		text = KeyToText(key, mod);
 	}
 
 	const QChar c{ text.at(0) };
 
-	// Remove Shift
-	if (c.unicode() >= 0x80 || c.isPrint()) {
+	// Remove Shift, skip when ALT or CTRL are pressed
+	if ((c.unicode() >= 0x80 || c.isPrint())
+		&& !(mod & ControlModifier()) && !(mod & CmdModifier())) {
 		mod &= ~Qt::ShiftModifier;
 	}
 
-	// Remove Ctrl empty characters at the start of the ASCII range
+	// Ignore empty characters at the start of the ASCII range
 	if (c.unicode() < 0x20) {
-		mod &= ~ControlModifier();
+		text = KeyToText(key, mod);
 	}
 
 	// Perform any platform specific QKeyEvent modifications
