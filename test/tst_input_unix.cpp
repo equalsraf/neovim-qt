@@ -10,6 +10,7 @@ private slots:
 	void LessThanModifierKeys() noexcept;
 	void SpecialKeys() noexcept;
 	void CtrlCaretWellFormed() noexcept;
+	void ShiftModifierLetter() noexcept;
 };
 
 void TestInputUnix::LessThanModifierKeys() noexcept
@@ -55,6 +56,18 @@ void TestInputUnix::CtrlCaretWellFormed() noexcept
 	QKeyEvent evCtrlShiftMeta6{ QEvent::KeyPress, Qt::Key_AsciiCircum,
 		Qt::MetaModifier | Qt::ShiftModifier | Qt::ControlModifier , { "\u001E" } };
 	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftMeta6), QString{ "<C-^>" });
+}
+
+void TestInputUnix::ShiftModifierLetter() noexcept
+{
+	// CTRL + B
+	QKeyEvent evCtrlB{ QEvent::KeyPress, Qt::Key_B, Qt::ControlModifier, QString{ "\u0002" } };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlB), QString{ "<C-b>" });
+
+	// CTRL + SHIFT + B
+	QKeyEvent evCtrlShiftB{ QEvent::KeyPress, Qt::Key_B, Qt::ControlModifier | Qt::ShiftModifier,
+		QString{ "\u0002" } };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftB), QString{ "<C-S-B>" });
 }
 
 #include "tst_input_unix.moc"

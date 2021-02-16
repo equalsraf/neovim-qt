@@ -12,6 +12,7 @@ private slots:
 	void SpecialKeys() noexcept;
 	void KeyboardLayoutUnicodeHexInput() noexcept;
 	void CtrlCaretWellFormed() noexcept;
+	void ShiftModifierLetter() noexcept;
 };
 
 void TestInputMac::AltSpecialCharacters() noexcept
@@ -73,7 +74,7 @@ void TestInputMac::KeyboardLayoutUnicodeHexInput() noexcept
 
 	QKeyEvent evCtrlAltShiftA{ QEvent::KeyPress, Qt::Key_A,
 		Qt::MetaModifier | Qt::AltModifier | Qt::ShiftModifier };
-	QCOMPARE(NeovimQt::Input::convertKey(evCtrlAltShiftA), QString{ "<C-A-A>" });
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlAltShiftA), QString{ "<C-S-A-A>" });
 }
 
 void TestInputMac::CtrlCaretWellFormed() noexcept
@@ -87,6 +88,20 @@ void TestInputMac::CtrlCaretWellFormed() noexcept
 	QKeyEvent evCtrlShiftMeta6{ QEvent::KeyPress, Qt::Key_AsciiCircum,
 		Qt::MetaModifier | Qt::ShiftModifier | Qt::ControlModifier };
 	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftMeta6), QString{ "<C-^>" });
+}
+
+void TestInputMac::ShiftModifierLetter() noexcept
+{
+	// Issue#817: Shift should be sent if modifier keys are present
+	// For example, Ctrl + Shift + A is <C-S-A> and not <C-A>
+
+	// CTRL + B
+	QKeyEvent evCtrlB{ QEvent::KeyPress, Qt::Key_B, Qt::MetaModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlB), QString{ "<C-b>" });
+
+	// CTRL + SHIFT + B
+	QKeyEvent evCtrlShiftB{ QEvent::KeyPress, Qt::Key_B, Qt::MetaModifier | Qt::ShiftModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftB), QString{ "<C-S-B>" });
 }
 
 #include "tst_input_mac.moc"
