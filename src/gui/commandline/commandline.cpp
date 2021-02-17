@@ -1,4 +1,4 @@
-#include "extcmdlinewidget.h"
+#include "commandline.h"
 
 #include <QCoreApplication>
 #include <QDebug>

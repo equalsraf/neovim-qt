@@ -33,7 +33,7 @@ else()
 		)
 endif()
 
-add_subdirectory(cmdline)
+add_subdirectory(commandline)
 add_subdirectory(shellwidget)
 
 include(GNUInstallDirs)
@@ -51,7 +51,7 @@ add_library(neovim-qt-gui
 	treeview.cpp
 	${SRCS_PLATFORM}
 	${NEOVIM_RCC_SOURCES})
-target_link_libraries(neovim-qt-gui ${QTLIBS} extcmdline qshellwidget neovim-qt)
+target_link_libraries(neovim-qt-gui ${QTLIBS} commandline qshellwidget neovim-qt)
 
 if(APPLE)
 	set_property(SOURCE app.cpp PROPERTY COMPILE_DEFINITIONS

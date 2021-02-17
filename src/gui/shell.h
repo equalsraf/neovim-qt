@@ -11,7 +11,7 @@
 #include <QList>
 #include <QMap>
 #include <QMenu>
-#include "cmdline/extcmdlinewidget.h"
+#include "commandline/commandline.h"
 #include "neovimconnector.h"
 #include "shellwidget/highlight.h"
 #include "shellwidget/shellwidget.h"
