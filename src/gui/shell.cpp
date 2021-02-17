@@ -589,7 +589,7 @@ void Shell::handlePopupMenuShow(const QVariantList& opargs)
 	const int64_t selected = opargs.at(1).toULongLong();
 	const int64_t row = opargs.at(2).toULongLong();
 	const int64_t col = opargs.at(3).toULongLong();
-	const int64_t grid = (opargs.size() < 5) ? 0 : opargs.at(4).toULongLong();
+	//const int64_t grid = (opargs.size() < 5) ? 0 : opargs.at(4).toULongLong();
 
 	QList<PopupMenuItem> model;
 	for (const auto& v : items) {
@@ -881,7 +881,7 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 	} else if (name == "Wildmenu") {
 	} else if (name == "RenderLigatures"){
 		setLigatureMode(value.toBool());
-	} else if (name == "Cmdline") {
+	} else if (name == "Commandline") {
 		m_nvim->api2()->nvim_ui_set_option("ext_cmdline", value.toBool());
 	} else {
 		qDebug() << "Unknown GUI Option" << name << value;
