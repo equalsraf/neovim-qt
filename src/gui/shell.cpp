@@ -567,9 +567,6 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 
 void Shell::handlePopupMenuShow(const QVariantList& opargs)
 {
-	qDebug() << "Shell::handlePopupMenuShow()";
-	qDebug() << opargs;
-
 	// The 'popupmenu_show' API is not consistent across NeoVim versions!
 	// A 5th argument was introduced in neovim/neovim@16c3337
 	if (opargs.size() < 4
@@ -1284,7 +1281,6 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 }
 void Shell::mousePressEvent(QMouseEvent *ev)
 {
-	qDebug() << "mousePressEvent";
 	m_mouseclick_timer.start();
 	mouseClickIncrement(ev->button());
 	neovimMouseEvent(ev);
