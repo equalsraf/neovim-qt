@@ -1,6 +1,3 @@
-
-Neovim client library and GUI, in Qt5.
-
 [![Build Status](https://circleci.com/gh/equalsraf/neovim-qt.svg?style=svg)](https://circleci.com/gh/equalsraf/neovim-qt)
 [![Build status](https://ci.appveyor.com/api/projects/status/c252f54mfjcuud8x/branch/master?svg=true)](https://ci.appveyor.com/project/equalsraf/neovim-qt/branch/master)
 [![Build Status](https://travis-ci.org/equalsraf/neovim-qt.svg?branch=master)](https://travis-ci.org/equalsraf/neovim-qt)
@@ -8,92 +5,226 @@ Neovim client library and GUI, in Qt5.
 [![Build Status](https://dev.azure.com/equalsraf/neovim-qt/_apis/build/status/equalsraf.neovim-qt?branchName=master)](https://dev.azure.com/equalsraf/neovim-qt/_build/latest?definitionId=1&branchName=master)
 [![Downloads](https://img.shields.io/github/downloads/equalsraf/neovim-qt/total.svg?maxAge=2592000)](https://github.com/equalsraf/neovim-qt/releases)
 
-## Requirements
+# Neovim Qt
+Neovim Qt is a lightweight cross-platform Neovim GUI written in C++ with Qt.
 
-* Qt5
-* Neovim
+![NeovimQt Screenshot](https://user-images.githubusercontent.com/11207308/108295028-f79f1b80-7164-11eb-8420-e9950fa97cd0.png)
 
-## Building
 
-You can build using CMake and your build system of choice. It should build in any
-system where Qt5 and Msgpack can build.
+## Installing Neovim Qt
 
-For Unix call
+Neovim Qt is available on all platforms supported by Qt.
 
-    $ mkdir build
-    $ cd build
-    $ cmake -DCMAKE_BUILD_TYPE=Release ..
-    $ make
+Instructions for common platforms are listed below.
 
-for Windows both MSVC and Mingw are supported. Use the following
+### Windows
+A Neovim Qt is bundled with all releases of Neovim on Windows.
 
-    $ mkdir build
-    $ cd build
-    $ cmake -DCMAKE_BUILD_TYPE=Release ..
-    $ cmake --build .
+See the Neovim release page:
 
-For MSVC build you may have to specify the VS version and build type. Always make sure the VS versions matches your Qt libraries.
+ - [Nighly Release](https://github.com/neovim/neovim/releases/nightly)
+ - [Stable Release](https://github.com/neovim/neovim/releases/latest)
 
-	$ mkdir build
-	$ cd build
-	$ cmake -G "Visual Studio 14" -DCMAKE_BUILD_TYPE=Release ..
-	$ cmake --build . --config Release --target install
+Noevim is available as a [Chocolatey Package](https://chocolatey.org/packages/neovim/).
 
-The binaries will be under build/bin/. The GUI binary is called nvim-qt. Run `make install` to install it, or execute from the source setting the environment variable `NVIM_QT_RUNTIME` as the path holding the GUI shim plugin
+Stable Neovim + Neovim-Qt:
+```
+choco install neovim
+```
 
-	$ NVIM_QT_RUNTIME_PATH=../src/gui/runtime bin/nvim-qt
+Pre-Release Neovim + Stable Neovim-Qt:
+```
+choco install neovim --pre
+```
 
-See the [wiki](https://github.com/equalsraf/neovim-qt/wiki/Build) for detailed build instructions.
+Nightly versions of Neovim-Qt require manual download + installation.
 
-## Using the GUI
+Pre-built Windows binaries are provided for all recent commits:  
+[AppVeyor Commit Build Wiki Instructions](https://github.com/equalsraf/neovim-qt/wiki/Windows-AppVeyor-Builds)
 
-Run **nvim-qt**, the **nvim** binary must be in your $PATH. Check `nvim-qt --help` for additional options.
+### MacOS
 
-Commands for interacting with the GUI are regular commands, available in the documentation [:help nvim-gui-shim](./src/gui/runtime/doc/nvim_gui_shim.txt). For example to change the font call
+You can use HomeBrew to install Neovim Qt: https://github.com/equalsraf/homebrew-neovim-qt.
 
-	:Guifont DejaVu Sans Mono:h13
+To install the latest release:
+```
+$ brew tap equalsraf/neovim-qt
+$ brew install neovim-qt
+```
 
-To disable the GUI tabline and use the nvim TUI tabline, call
+To install the latest development version:
+```
+$ brew tap equalsraf/neovim-qt
+$ brew install neovim-qt
+```
 
-	:GuiTabline 0
+### Linux
 
-You can set GUI options on startup, in the GUI configuration file (:help ginit.vim).
+Neovim Qt is packaged for many distributions, use your favorite package manager.
 
-In recent versions of Neovim you can also use regular options (in init.vim) that have the same effect:
+If your distribution is not listed here, please create an Issue with instructions.
 
-- set guifont=DejaVu\ Sans\ Mono:h11
-- set linespace=4
+#### ArchLinux
 
-## Development
+NeovimQt is available from this [Community Repository](https://archlinux.org/packages/community/x86_64/neovim-qt/).
 
-The *NeovimConnector* class is used to setup the connection to Neovim. It also
-provides you with low level methods for RPC - in general you should be using
-the signals/slots in the QObject returned by NeovimConnector::neovimObject()
+#### Gentoo
 
-1. To call a function call the corresponding slot
-2. The result of the call is delivered by the corresponding signal,
-   by convention these signals are named 'on\_' + slot\_name
-3. The Neovim() class is automagically generated from the Neovim
-   metadata
-5. For Neovim functions that take the **Object** type we use **QVariant**
-6. To catch Neovim Notifications connect to the Neovim::neovimNotification
-   signal
+NeovimQt is available from this [Portage Ebuild](https://github.com/jgehrig/gentoo/blob/master/app-editors/neovim-qt/neovim-qt-9999.ebuild).
 
-### To Update the RPC bindings
+Alternatively, you can add the entire overlay:
+```
+$ eselect repository add jgehrig git https://github.com/jgehrig/gentoo.git
+$ emerge --sync
+$ emerge -av neovim-qt
+```
 
-Part of the code is auto-generated by calling Neovim to get the API metadata,
-and generating C++ code. This is done using a python script
-(generate\_bindings.py) if you just want to use neovim-qt as is you don't need
-to worry about this, I already include the generated code in the repository.
+#### OpenSuse
 
-The bindings source templates are stored under the bindings/ folder the 
-generated code is in src/auto/.
+NeovimQt is available from this [Community Package](https://build.opensuse.org/package/show/home%3AAptrug/neovim-qt).
 
-To generate the bindings yourself you need
+#### Ubuntu
 
-- python
-- python-msgpack
-- jinja2
+`sudo apt-get install neovim-qt`
 
-Just run `make bindings` in Unix or the equivalent build command in Windows.
 
+## Configuration
+
+NeovimQt can be configured through the `ginit.vim` file.
+
+The default locations are:
+ - Windows: `%LOCALAPPDATA%\nvim\ginit.vim`
+ - MacOS: `~/.config/nvim/ginit.vim`
+ - Linux: `~/.config/nvim/ginit.vim`
+
+Recommended `ginit.vim`
+```
+" Enable Mouse
+set mouse=a
+
+" Set Editor Font
+if exists(':GuiFont')
+    " Use GuiFont! to ignore font errors
+    GuiFont {font_name}:h{size}
+endif
+
+" Disable GUI Tabline
+if exists(':GuiTabline')
+    GuiTabline 0
+endif
+
+" Disable GUI Popupmenu
+if exists(':GuiPopupmenu')
+    GuiPopupmenu 0
+endif
+
+" Enable GUI ScrollBar
+if exists(':GuiScrollBar')
+    GuiScrollBar 1
+endif
+
+" Right Click Context Menu (Copy-Cut-Paste)
+nnoremap <silent><RightMouse> :call GuiShowContextMenu()<CR>
+inoremap <silent><RightMouse> <Esc>:call GuiShowContextMenu()<CR>
+vnoremap <silent><RightMouse> :call GuiShowContextMenu()<CR>gv
+
+```
+
+For more options, try `:help nvim_gui_shim` and scroll down to `Commands`.
+
+More detailed information can be found on the [Configuration Wiki Page](https://github.com/equalsraf/neovim-qt/wiki/Configuration-Options).
+
+
+## Frequently Asked Questions
+
+### Why are the :Gui commands missing?
+You need the NeovimQt runtime to use commands like `:GuiFont`.
+
+You can manually specify the path with `NVIM_QT_RUNTIME_PATH`.
+
+Alternatively, you can install the NeovimQt Plugin:
+`Plugin 'equalsraf/neovim-gui-shim`
+
+On recent releases, you can check if the runtime is loaded with `nvim-qt --version`:
+```
+$ nvim-qt --version
+NVIM-QT v0.2.16.1
+Build type: Release
+Compilation:-march=native -O2 -pipe -Wall -Wextra -Wno-unused-parameter -Wunused-variable -std=c++11
+Qt Version: 5.15.2
+Environment:
+  nvim: nvim
+    args: --cmd let &rtp.=',/usr/share/nvim-qt/runtime' --cmd set termguicolors
+      runtime: /usr/share/nvim-qt/runtime
+...
+```
+
+Notice `runtime:` is non-empty and points to a folder with `nvim_gui_shim.vim`.
+
+### Why does :Gui not work in init.vim?
+
+The `:Gui...` commands are not loaded when `init.vim` runs.
+
+These options must be configured from `ginit.vim`. The file should be placed in the same directory as `init.vim`.
+
+Alternatively, NeovimQt responds to some vim options. You can `:set guifont=...` directly in `init.vim`.
+
+### How do I disable the GUI Tabs?
+Try `:GuiTabline 0`. This option can be added to `ginit.vim`.
+
+To prevent startup flicker, see [Wiki - Configuration Options](https://github.com/equalsraf/neovim-qt/wiki/Configuration-Options)
+
+### Why does the popup menu look different?
+
+Try `:GuiPopupmenu 0`. This option can be added to `ginit.vim`.
+
+The menu looks different because it is a widget rendered via Qt. Many users expect the `nvim` TUI (Terminal UI) menu instead.
+
+### How do I change the font?
+`:GuiFont Fira Code:h12`
+`:set guifont=Hack:h12`
+
+### Why does guifont throw an error?
+
+You may see these errors:
+
+- `{Font Name} is not a fixed pitch Font`
+- ` Warning: Font {Font Name} reports bad fixed pitch metrics`
+
+You can override this warning with `:GuiFont! {Font Name}`.
+
+These warnings displays for fonts containing variable-width characters.
+
+They are safe to ignore, but you may notice font spacing and clipping issues.
+
+### Why is nvim unable to start?
+
+The `nvim` binary must be in your `$PATH`. You can manually provide a path to Neovim:
+```
+nvim-qt --nvim {path_to_nvim}
+```
+
+In recent versions, `nvim-qt --version` reports the `nvim` binary path:
+```
+$ nvim-qt --version
+...
+Environment:
+  nvim: nvim
+...
+```
+
+
+## Building From Source
+
+Detailed build instructions can be found at the [Wiki](https://github.com/equalsraf/neovim-qt/wiki/Build).
+
+Simplified Build Commands:
+```
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_BUILD_TYPE=Release ..
+$ cmake --build .
+$ NVIM_QT_RUNTIME_PATH=../src/gui/runtime bin/nvim-qt
+```
+
+NOTE: `NVIM_QT_RUNTIME` must be set for commands such as `:GuiFont` to work.
