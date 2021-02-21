@@ -13,8 +13,6 @@
 
 namespace NeovimQt {
 
-static ShellOptions GetShellOptionsFromQSettings() noexcept;
-
 /// A log handler for Qt messages, all messages are dumped into the file
 /// passed via the NVIM_QT_LOG variable. Some information is only available
 /// in debug builds (e.g. qDebug is only called in debug builds).
@@ -95,16 +93,6 @@ bool App::event(QEvent *event) noexcept
 
 void App::showUi() noexcept
 {
-	ShellOptions opts{ GetShellOptionsFromQSettings() };
-
-	if (m_parser.isSet("no-ext-tabline")) {
-		opts.enable_ext_tabline = false;
-	}
-
-	if (m_parser.isSet("no-ext-popupmenu")) {
-		opts.enable_ext_popupmenu = false;
-	}
-
 #ifdef NEOVIMQT_GUI_WIDGET
 	NeovimQt::Shell *win = new NeovimQt::Shell(c);
 	win->show();
@@ -116,7 +104,7 @@ void App::showUi() noexcept
 		win->show();
 	}
 #else
-	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(m_connector.get(), opts);
+	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(m_connector.get());
 
 	QObject::connect(instance(), SIGNAL(openFilesTriggered(QList<QUrl>)),
 		win->shell(), SLOT(openFiles(QList<QUrl>)));
@@ -178,10 +166,6 @@ void App::processCommandlineOptions(QCommandLineParser& parser, QStringList argu
 				QCoreApplication::translate("main", "stylesheet")));
 	parser.addOption(QCommandLineOption("maximized",
 				QCoreApplication::translate("main", "Maximize the window on startup")));
-	parser.addOption(QCommandLineOption("no-ext-tabline",
-				QCoreApplication::translate("main", "Disable the external GUI tabline")));
-	parser.addOption(QCommandLineOption("no-ext-popupmenu",
-				QCoreApplication::translate("main", "Disable the external GUI popup menu")));
 	parser.addOption(QCommandLineOption("fullscreen",
 				QCoreApplication::translate("main", "Open the window in fullscreen on startup")));
 	parser.addOption(QCommandLineOption("embed",
@@ -314,33 +298,6 @@ void App::connectToRemoteNeovim() noexcept
 	m_connector = std::unique_ptr<NeovimConnector>{  NeovimQt::NeovimConnector::spawn(neovimArgs, m_parser.value("nvim")) };
 	setupRequestTimeout();
 	return;
-}
-
-static ShellOptions GetShellOptionsFromQSettings() noexcept
-{
-	ShellOptions opts{};
-	QSettings settings("nvim-qt", "nvim-qt");
-
-	QVariant ext_linegrid{ settings.value("ext_linegrid", opts.enable_ext_linegrid) };
-	QVariant ext_popupmenu{ settings.value("ext_popupmenu", opts.enable_ext_popupmenu) };
-	QVariant ext_tabline{ settings.value("ext_tabline", opts.enable_ext_popupmenu) };
-
-	if (ext_linegrid.canConvert<bool>())
-	{
-		opts.enable_ext_linegrid = ext_linegrid.toBool();
-	}
-
-	if (ext_popupmenu.canConvert<bool>())
-	{
-		opts.enable_ext_popupmenu = ext_popupmenu.toBool();
-	}
-
-	if (ext_tabline.canConvert<bool>())
-	{
-		opts.enable_ext_tabline= ext_tabline.toBool();
-	}
-
-	return opts;
 }
 
 static QString GetNeovimVersionInfo(const QString& nvim) noexcept
