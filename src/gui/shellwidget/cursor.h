@@ -35,6 +35,17 @@ public:
 		m_foreground = highlight.GetForegroundColor();
 	}
 
+	void CopyCursorStyle(const Cursor& cursor) noexcept
+	{
+		m_background = cursor.GetBackgroundColor();
+		m_foreground = cursor.GetForegroundColor();
+		m_shape = cursor.GetShape();
+		m_percentage = cursor.GetPercentage();
+		// FIXME Invislbe without hard-code true?
+		//m_styleEnabled = cursor.m_styleEnabled;
+		m_styleEnabled = true;
+	}
+
 	void SetStyle(Shape cursorShape, uint8_t cellPercentage) noexcept
 	{
 		m_shape = cursorShape;
@@ -53,7 +64,7 @@ public:
 
 	bool IsStyleEnabled() const noexcept
 	{
-		return m_styleEnabled && !m_isBusy;
+		return m_styleEnabled;
 	}
 
 	bool IsVisible() const noexcept

@@ -10,12 +10,14 @@
 #include <QKeyEvent>
 #include <QMimeData>
 #include <QClipboard>
-#include "msgpackrequest.h"
+#include <QSettings>
+
+#include "helpers.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
+#include "msgpackrequest.h"
 #include "util.h"
 #include "version.h"
-#include "helpers.h"
 
 namespace NeovimQt {
 
@@ -24,6 +26,8 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	, m_nvim{ nvim }
 	, m_options{ opts }
 {
+	m_cmdlineWidget = new Cmdline::ExtCmdlineWidget(nvim, this); // FIXME ugly?
+
 	setAttribute(Qt::WA_KeyCompression, false);
 
 	setAcceptDrops(true);
@@ -128,6 +132,10 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 	if (isGuiDialogRequest || updateOption) {
 		m_nvim->api0()->vim_set_option("guifont", fontDesc());
 	}
+
+	// Update ext_cmdline font to match ShellWidget
+	// FIXME Location? setShellFontSuccess check?
+	m_cmdlineWidget->setFont(font());// FIXME nullptr deref!
 
 	return true;
 }
@@ -236,6 +244,9 @@ void Shell::init()
 		&& m_nvim->hasUIOption("ext_linegrid")) {
 		// Modern Grid UI API is optionally enabled via cmdline
 		options.insert("ext_linegrid", true);
+	}
+	if (m_options.enable_ext_cmdline) {
+		options.insert("ext_cmdline", true);
 	}
 	options.insert("rgb", true);
 
@@ -403,6 +414,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		qint64 val = opargs.at(0).toLongLong();
 		if (val != -1) {
 			setForeground(QRgb(val));
+			m_cmdlineWidget->updatePalette();// FIXME nullptr deref!
 		}
 		m_hg_foreground = foreground();
 	} else if (name == "update_bg") {
@@ -413,6 +425,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		qint64 val = opargs.at(0).toLongLong();
 		if (val != -1) {
 			setBackground(QRgb(val));
+			m_cmdlineWidget->updatePalette();// FIXME nullptr deref!
 		}
 		m_hg_background = background();
 		update();
@@ -536,14 +549,27 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "hl_group_set") {
 		handleHighlightGroupSet(opargs);
 	} else if (name == "win_viewport") {
+	} else if (name == "cmdline_show") {
+		// FIXME doesn't quite work... This prevent modeline from updating cmdline
+		// cursor style block vs insert. Same below.
+		m_cursor.SetIsBusy(true);
+	} else if (name == "cmdline_pos") {
+	} else if (name == "cmdline_special_char") {
+	} else if (name == "cmdline_hide") {
+		m_cursor.SetIsBusy(false);
+	} else if (name == "cmdline_block_show") {
+	} else if (name == "cmdline_block_append") {
+	} else if (name == "cmdline_block_hide") {
 	} else {
 		qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
-
 }
 
 void Shell::handlePopupMenuShow(const QVariantList& opargs)
 {
+	qDebug() << "Shell::handlePopupMenuShow()";
+	qDebug() << opargs;
+
 	// The 'popupmenu_show' API is not consistent across NeoVim versions!
 	// A 5th argument was introduced in neovim/neovim@16c3337
 	if (opargs.size() < 4
@@ -563,7 +589,7 @@ void Shell::handlePopupMenuShow(const QVariantList& opargs)
 	const int64_t selected = opargs.at(1).toULongLong();
 	const int64_t row = opargs.at(2).toULongLong();
 	const int64_t col = opargs.at(3).toULongLong();
-	//const int64_t grid = (opargs.size() < 5) ? 0 : opargs.at(4).toULongLong();
+	const int64_t grid = (opargs.size() < 5) ? 0 : opargs.at(4).toULongLong();
 
 	QList<PopupMenuItem> model;
 	for (const auto& v : items) {
@@ -699,6 +725,10 @@ void Shell::handleModeChange(const QVariantList& opargs)
 	m_cursor.SetTimer(blinkWaitTime, blinkOnTime, blinkOffTime);
 
 	update(neovimCursorRect());
+
+	// FIXME This should be an emit signal, handle slot in cmdlinewidget.
+	m_cmdlineWidget->setCursorStyle(getCursor()); // FIXME! nultpr deref!
+	qDebug() << "MODELINE GUICMDLINE WIDGET!";
 }
 
 void Shell::handleModeInfoSet(const QVariantList& opargs)
@@ -737,7 +767,7 @@ void Shell::handleBusy(bool busy)
 
 	m_neovimBusy = busy;
 
-	setCursorFromBusyState();
+	setMouseCursorFromBusyState();
 	emit neovimBusy(busy);
 }
 
@@ -849,10 +879,11 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 		m_nvim->api2()->nvim_ui_set_option("ext_tabline", value.toBool());
 	} else if (name == "Popupmenu") {
 		m_nvim->api2()->nvim_ui_set_option("ext_popupmenu", value.toBool());
-	} else if (name == "Cmdline") {
 	} else if (name == "Wildmenu") {
 	} else if (name == "RenderLigatures"){
 		setLigatureMode(value.toBool());
+	} else if (name == "Cmdline") {
+		m_nvim->api2()->nvim_ui_set_option("ext_cmdline", value.toBool());
 	} else {
 		qDebug() << "Unknown GUI Option" << name << value;
 	}
@@ -879,10 +910,7 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 	} else if (name == "emoji") {
 	} else if (name == "termguicolors") {
 	} else if (name == "ext_cmdline") {
-	} else if (name == "ext_wildmenu") {
 	} else if (name == "ext_linegrid") {
-	} else {
-		qDebug() << "Received unknown option" << name << value;
 	}
 }
 
@@ -894,7 +922,7 @@ void Shell::handleMouse(bool enabled)
 
 void Shell::handleGuiFontFunction(const QVariantList& args)
 {
-	if (args.size() < 2
+	if (args.size() < 2 
 		|| !args.at(1).canConvert<QByteArray>())
 	{
 		return;
@@ -991,6 +1019,9 @@ void Shell::handleDefaultColorsSet(const QVariantList& opargs)
 	setForeground(foregroundColor);
 	setBackground(backgroundColor);
 	setSpecial(specialColor);
+
+	// GuiCmdline uses nvim theming, update when default colors change.
+	m_cmdlineWidget->updatePalette(); // FIXME nullptr deref!
 
 	// Cells drawn with the default colors require a re-paint
 	update();
@@ -1254,6 +1285,7 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 }
 void Shell::mousePressEvent(QMouseEvent *ev)
 {
+	qDebug() << "mousePressEvent";
 	m_mouseclick_timer.start();
 	mouseClickIncrement(ev->button());
 	neovimMouseEvent(ev);
@@ -1291,7 +1323,7 @@ void Shell::mouseReleaseEvent(QMouseEvent *ev)
 
 void Shell::mouseMoveEvent(QMouseEvent *ev)
 {
-	setCursorFromBusyState();
+	setMouseCursorFromBusyState();
 
 	QPoint pos(ev->x()/cellSize().width(),
 			ev->y()/cellSize().height());
@@ -1302,7 +1334,7 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 	}
 }
 
-void Shell::setCursorFromBusyState() noexcept
+void Shell::setMouseCursorFromBusyState() noexcept
 {
 	Qt::CursorShape desiredCursor{};
 
@@ -1452,6 +1484,11 @@ void Shell::resizeNeovim(int n_cols, int n_rows)
 	} else {
 		m_nvim->api0()->ui_try_resize(n_cols, n_rows);
 		m_resizing = true;
+	}
+
+	// When the ShellWidget is resized, the GuiCmdline should be adjusted to fit too.
+	if (m_options.enable_ext_cmdline) {
+		m_cmdlineWidget->updateGeometry(); // FIXME nullptr deref!
 	}
 }
 

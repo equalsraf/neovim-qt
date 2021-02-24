@@ -9,7 +9,7 @@
 #include "helpers.h"
 
 ShellWidget::ShellWidget(QWidget* parent)
-	: QWidget(parent)
+	: QFrame{ parent }
 {
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	setAttribute(Qt::WA_KeyCompression, false);
@@ -158,7 +158,8 @@ void ShellWidget::paintNeovimCursorBackground(QPainter& p, QRect cellRect) noexc
 	}
 
 	// If the window does not have focus, draw an outline around the cursor cell.
-	if (!hasFocus()) {
+	//if (this->parentWidget()->hasFocus()) {
+	if (!m_ignoreFocus && !hasFocus()) {
 		QRect noFocusCursorRect{ cellRect };
 		noFocusCursorRect.adjust(-1, -1, -1, -1);
 
@@ -180,7 +181,8 @@ void ShellWidget::paintNeovimCursorForeground(
 	const QString& character) noexcept
 {
 	// No focus: cursor is outline with default foreground color.
-	if (!hasFocus()) {
+	//if (this->parentWidget()->hasFocus()) {
+	if (!m_ignoreFocus && !hasFocus()) {
 		return;
 	}
 
@@ -687,6 +689,11 @@ QSize ShellWidget::sizeHint() const
 {
 	return QSize(m_cellSize.width()*m_contents.columns(),
 				m_cellSize.height()*m_contents.rows());
+}
+
+void ShellWidget::resizeShell(QSize size) noexcept
+{
+	resizeShell(size.height(), size.width());
 }
 
 void ShellWidget::resizeShell(int n_rows, int n_columns)
