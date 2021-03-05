@@ -23,10 +23,11 @@ public:
 		bool italic,
 		bool underline,
 		bool undercurl,
+		bool strikethrough,
 		bool reverse) noexcept :
 		Cell{
 			character,
-			{ fgColor, bgColor, spColor, reverse, italic, bold, underline, undercurl } }
+			{ fgColor, bgColor, spColor, reverse, italic, bold, underline, undercurl, strikethrough } }
 	{
 	}
 
@@ -34,7 +35,7 @@ public:
 	Cell(QColor bgColor) noexcept :
 		Cell{
 			' ',
-			{ QColor::Invalid, bgColor, QColor::Invalid, false, false, false, false, false } }
+			{ QColor::Invalid, bgColor, QColor::Invalid, false, false, false, false, false, false } }
 	{
 	}
 
@@ -65,6 +66,8 @@ public:
 	bool IsUnderline() const { return m_highlight.IsUnderline(); }
 
 	bool IsUndercurl() const { return m_highlight.IsUndercurl(); }
+
+	bool IsStrikeThrough() const { return m_highlight.IsStrikeThrough(); }
 
 	/// Checks two cells for style equivalence, ignore differences in `m_character`
 	bool IsStyleEquivalent(const Cell& other) const;

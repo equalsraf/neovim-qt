@@ -229,14 +229,7 @@ void ShellWidget::paintUnderline(
 		return;
 	}
 
-	QPen pen;
-	if (cell.GetForegroundColor().isValid()) {
-		pen.setColor(cell.GetForegroundColor());
-	} else {
-		pen.setColor(foreground());
-	}
-
-	p.setPen(pen);
+	p.setPen(getForegroundPen(cell));
 
 	p.drawLine(GetUnderline(cellRect));
 }
@@ -297,6 +290,31 @@ void ShellWidget::paintUndercurl(
 	p.drawPath(GetUndercurlPath(cellRect));
 }
 
+static QLine GetStrikeThrough(QRect cellRect) noexcept
+{
+	QPoint start{ cellRect.bottomLeft() };
+	start.ry() -= (cellRect.bottom() - cellRect.top()) / 2 + 1;
+
+	QPoint end{ cellRect.bottomRight() };
+	end.ry() -= (cellRect.bottom() - cellRect.top()) / 2 + 1;
+
+	return { start, end };
+}
+
+void ShellWidget::paintStrikeThrough(
+	QPainter& p,
+	const Cell& cell,
+	QRect cellRect) noexcept
+{
+	if (!cell.IsStrikeThrough()) {
+		return;
+	}
+
+	p.setPen(getForegroundPen(cell));
+
+	p.drawLine(GetStrikeThrough(cellRect));
+}
+
 void ShellWidget::paintBackgroundClearCell(
 	QPainter& p,
 	const Cell& cell,
@@ -349,6 +367,18 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 	cellFont.setKerning(false);
 
 	return cellFont;
+}
+
+QPen ShellWidget::getForegroundPen(const Cell& cell) noexcept
+{
+	QPen pen;
+	if (cell.GetForegroundColor().isValid()) {
+		pen.setColor(cell.GetForegroundColor());
+	} else {
+		pen.setColor(foreground());
+	}
+
+	return pen;
 }
 
 void ShellWidget::paintForegroundCellText(
@@ -605,8 +635,8 @@ void ShellWidget::paintRectNoLigatures(QPainter& p, const QRect rect) noexcept
 			}
 
 			paintUnderline(p, cell, r);
-
 			paintUndercurl(p, cell, r);
+			paintStrikeThrough(p, cell, r);
 		}
 	}
 }
@@ -671,6 +701,7 @@ void ShellWidget::paintRectLigatures(QPainter& p, const QRect rect) noexcept
 			paintForegroundTextBlock(p, firstCell, blockRect, blockText, blockCursorPos);
 			paintUnderline(p, firstCell, blockRect);
 			paintUndercurl(p, firstCell, blockRect);
+			paintStrikeThrough(p, firstCell, blockRect);
 		}
 	}
 }
@@ -778,10 +809,11 @@ int ShellWidget::put(
 	bool italic,
 	bool underline,
 	bool undercurl,
+	bool strikethrough,
 	bool reverse)
 {
 	HighlightAttribute hl_attr = { fg, bg, sp,
-		reverse, italic, bold, underline, undercurl };
+		reverse, italic, bold, underline, undercurl, strikethrough };
 	return put(text, row, column, hl_attr);
 }
 

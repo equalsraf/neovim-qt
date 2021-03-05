@@ -211,6 +211,7 @@ private:
 	bool m_font_italic{ false };
 	bool m_font_underline{ false };
 	bool m_font_undercurl{ false };
+	bool m_font_strikethrough{ false };
 	bool m_mouseHide{ true };
 
 	// highlight fg/bg - from redraw:highlightset - by default we

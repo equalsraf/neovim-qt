@@ -29,13 +29,13 @@ private slots:
 	void cellValue() {
 		QBENCHMARK {
 			Cell c('z', Qt::black, Qt::white, QColor(),
-					false, false, false, false, false);
+					false, false, false, false, false, false);
 		}
 	}
 	void cellValueRgb() {
 		QBENCHMARK {
 			Cell c('z', QRgb(33), QRgb(66), QColor(),
-					false, false, false, false, false);
+					false, false, false, false, false, false);
 		}
 	}
 
@@ -70,6 +70,7 @@ void Test::cellOperatorEquals() noexcept
 		false /*italic*/,
 		false /*underline*/,
 		false /*undercurl*/,
+		false /*strikethrough*/,
 		false /*reverse*/ };
 
 	const HighlightAttribute hlTextWhiteFillBlack{
@@ -80,6 +81,7 @@ void Test::cellOperatorEquals() noexcept
 		false /*italic*/,
 		false /*underline*/,
 		false /*undercurl*/,
+		false /*strikethrough*/,
 		false /*reverse*/ };
 
 	const HighlightAttribute hlInvTextWhiteFillBlack{
@@ -90,6 +92,7 @@ void Test::cellOperatorEquals() noexcept
 		false /*italic*/,
 		false /*underline*/,
 		false /*undercurl*/,
+		false /*strikethrough*/,
 		true /*reverse*/ };
 
 	const HighlightAttribute hlBoldTextWhiteFillBlack{
@@ -100,6 +103,7 @@ void Test::cellOperatorEquals() noexcept
 		false /*italic*/,
 		false /*underline*/,
 		false /*undercurl*/,
+		false /*strikethrough*/,
 		false /*reverse*/ };
 
 	bool textDifferent{
@@ -135,6 +139,7 @@ void Test::cellStyleEquivalent() noexcept
 		false /*italic*/,
 		false /*underline*/,
 		false /*undercurl*/,
+		false /*strikethrough*/,
 		false /*reverse*/ };
 
 	const HighlightAttribute styleB{
@@ -145,6 +150,7 @@ void Test::cellStyleEquivalent() noexcept
 		false /*italic*/,
 		false /*underline*/,
 		false /*undercurl*/,
+		false /*strikethrough*/,
 		false /*reverse*/ };
 
 	Cell cellStyleATextA{ 'A', styleA };

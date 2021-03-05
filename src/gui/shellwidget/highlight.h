@@ -13,7 +13,8 @@ public:
 		bool italic,
 		bool bold,
 		bool underline,
-		bool undercurl) noexcept :
+		bool undercurl,
+		bool strikethrough) noexcept :
 		m_foreground{ foreground },
 		m_background{ background },
 		m_special{ special },
@@ -21,7 +22,8 @@ public:
 		m_italic{ italic },
 		m_bold{ bold },
 		m_underline{ underline },
-		m_undercurl{ undercurl }
+		m_undercurl{ undercurl },
+		m_strikethrough{ strikethrough }
 	{
 	}
 
@@ -47,6 +49,8 @@ public:
 
 	bool IsUndercurl() const noexcept { return m_undercurl; }
 
+	bool IsStrikeThrough() const noexcept { return m_strikethrough; }
+
 	bool operator==(const HighlightAttribute& other) const noexcept;
 
 private:
@@ -59,4 +63,5 @@ private:
 	bool m_bold{ false };
 	bool m_underline{ false };
 	bool m_undercurl{ false };
+	bool m_strikethrough{ false };
 };
