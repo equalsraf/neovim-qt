@@ -229,14 +229,7 @@ void ShellWidget::paintUnderline(
 		return;
 	}
 
-	QPen pen;
-	if (cell.GetForegroundColor().isValid()) {
-		pen.setColor(cell.GetForegroundColor());
-	} else {
-		pen.setColor(foreground());
-	}
-
-	p.setPen(pen);
+	p.setPen(getForegroundPen(cell));
 
 	p.drawLine(GetUnderline(cellRect));
 }
@@ -297,7 +290,6 @@ void ShellWidget::paintUndercurl(
 	p.drawPath(GetUndercurlPath(cellRect));
 }
 
-// FIXME Copy-Pasted Code! Refactor with Underline? This and below
 static QLine GetStrikeThrough(QRect cellRect) noexcept
 {
 	QPoint start{ cellRect.bottomLeft() };
@@ -318,14 +310,7 @@ void ShellWidget::paintStrikeThrough(
 		return;
 	}
 
-	QPen pen;
-	if (cell.GetForegroundColor().isValid()) {
-		pen.setColor(cell.GetForegroundColor());
-	} else {
-		pen.setColor(foreground());
-	}
-
-	p.setPen(pen);
+	p.setPen(getForegroundPen(cell));
 
 	p.drawLine(GetStrikeThrough(cellRect));
 }
@@ -368,10 +353,10 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 		}
 	}
 
-	cellFont.setBold(cell.IsBold());
-	cellFont.setItalic(cell.IsItalic());
-	// FIXME!
-	//cellFont.setStrikeOut(cell.IsStrikeThrough()); // FIXME :s striktrought in guifont!
+	if (cell.IsBold() || cell.IsItalic()) {
+		cellFont.setBold(cell.IsBold());
+		cellFont.setItalic(cell.IsItalic());
+	}
 
 	// Issue #575: Clear style name. The KDE/Plasma theme plugin may set this
 	// but we want to match the family name with the bold/italic attributes.
@@ -382,6 +367,18 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 	cellFont.setKerning(false);
 
 	return cellFont;
+}
+
+QPen ShellWidget::getForegroundPen(const Cell& cell) noexcept
+{
+	QPen pen;
+	if (cell.GetForegroundColor().isValid()) {
+		pen.setColor(cell.GetForegroundColor());
+	} else {
+		pen.setColor(foreground());
+	}
+
+	return pen;
 }
 
 void ShellWidget::paintForegroundCellText(

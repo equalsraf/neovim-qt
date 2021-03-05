@@ -180,6 +180,7 @@ private:
 		int cursorPos) noexcept;
 
 	QFont GetCellFont(const Cell& cell) const noexcept;
+	QPen getForegroundPen(const Cell& cell) noexcept;
 
 	ShellContents m_contents{ 0, 0 };
 	QSize m_cellSize;
