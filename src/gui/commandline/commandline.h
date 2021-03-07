@@ -9,6 +9,7 @@
 
 #include "blockdisplay.h"
 #include "linemodel.h"
+#include "mode.h"
 #include "neovimconnector.h"
 #include "position.h"
 
@@ -39,6 +40,7 @@ public:
 
 	// FIXME Label GUI Command events
 	void handleGuiCommandlinePosition(const QVariantList& args) noexcept;
+	void handleGuiCommandlineMode(const QVariantList& args) noexcept;
 
 	// FIXME label ??? functions below
 	void updateGeometry() noexcept;
@@ -77,6 +79,7 @@ private:
 	double m_minWidth{ 300 };
 
 	Position m_position{ Position::Top };
+	Mode m_displayMode{ Mode::Dynamic };
 };
 
 } } // namespace NeovimQt::Cmdline

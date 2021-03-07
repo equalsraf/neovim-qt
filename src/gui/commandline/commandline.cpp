@@ -320,6 +320,7 @@ void ExtCmdlineWidget::handleGuiCommandlinePosition(const QVariantList& args) no
 		qWarning() << "Unexpected arguments for GuiCommandlinePosition:" << args;
 	}
 
+	// FIXME PositionFromString?
 	const QString position{ m_nvim->decode(args.at(1).toByteArray()).toLower() };
 
 	if (position == "top") {
@@ -333,6 +334,44 @@ void ExtCmdlineWidget::handleGuiCommandlinePosition(const QVariantList& args) no
 	else if (position == "bottom") {
 		m_position = Position::Bottom;
 		WriteCommandlinePositionSetting(position);
+	}
+}
+
+static void WriteCommandlineModeSetting(const QString& mode) noexcept
+{
+	QSettings settings("nvim-qt", "nvim-qt");
+
+	if (!settings.isWritable()) {
+		return;
+	}
+
+	settings.setValue("Commandline/display_mode", mode);
+}
+
+void ExtCmdlineWidget::handleGuiCommandlineMode(const QVariantList& args) noexcept
+{
+	if (args.size() < 2
+		|| !args.at(1).canConvert<QByteArray>()) {
+		qWarning() << "Unexpected arguments for GuiCommandlineMode:" << args;
+	}
+
+	const Mode mode{ ModeFromString(m_nvim->decode(args.at(1).toByteArray())) };
+
+	m_displayMode = mode;
+
+	switch (mode)
+	{
+		case Mode::Dynamic:
+		{
+			WriteCommandlineModeSetting(QStringLiteral("dynamic"));
+			return;
+		}
+
+		case Mode::Fixed:
+		{
+			WriteCommandlineModeSetting(QStringLiteral("fixed"));
+			return;
+		}
 	}
 }
 

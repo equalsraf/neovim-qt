@@ -12,6 +12,7 @@ set(SOURCES
   blockdisplay.cpp
   commandline.cpp
   linemodel.cpp
+  mode.cpp
   position.cpp
   )
 
