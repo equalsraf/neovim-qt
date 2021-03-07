@@ -399,6 +399,11 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 		case 2:
 			m_tabline_bar->setVisible(true);
 			break;
+
+		// Fallback: show tabline for two or more tabs
+		default:
+			m_tabline_bar->setVisible(tabs.size() >= 2);
+			break;
 	}
 }
 
