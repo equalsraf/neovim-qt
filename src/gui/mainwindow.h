@@ -26,7 +26,7 @@ public:
 		FullScreen,
 	};
 
-	MainWindow(NeovimConnector *, ShellOptions opts, QWidget *parent=0);
+	MainWindow(NeovimConnector *, QWidget *parent=0);
 	bool neovimAttached() const;
 	Shell* shell();
 	void restoreWindowGeometry();
@@ -80,7 +80,6 @@ private:
 	QStackedWidget m_stack;
 	QTabBar* m_tabline{ nullptr };
 	QToolBar* m_tabline_bar{ nullptr };
-	ShellOptions m_shell_options;
 
 	bool m_neovim_requested_close{ false };
 	QMenu* m_contextMenu{ nullptr };

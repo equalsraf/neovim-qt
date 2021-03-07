@@ -8,9 +8,8 @@
 
 namespace NeovimQt {
 
-MainWindow::MainWindow(NeovimConnector* c, ShellOptions opts, QWidget* parent)
+MainWindow::MainWindow(NeovimConnector* c, QWidget* parent)
 	: QMainWindow(parent)
-	, m_shell_options(opts)
 	, m_defaultFont{ font() }
 	, m_defaultPalette{ palette() }
 {
@@ -29,9 +28,12 @@ void MainWindow::init(NeovimConnector *c)
 		m_shell->deleteLater();
 		m_stack.removeWidget(m_shell);
 	}
+
 	if (m_nvim) {
 		m_nvim->deleteLater();
 	}
+
+	m_shell = new Shell(c);
 
 	m_tabline_bar = addToolBar("tabline");
 	m_tabline_bar->setObjectName("tabline");
@@ -50,7 +52,7 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::changeTab);
 
 	m_tabline_bar->addWidget(m_tabline);
-	m_tabline_bar->setVisible(m_shell_options.enable_ext_tabline);
+	m_tabline_bar->setVisible(m_shell->GetShellOptions().IsTablineEnabled());
 
 	// Context menu and actions for right-click
 	m_contextMenu = new QMenu();
@@ -68,7 +70,6 @@ void MainWindow::init(NeovimConnector *c)
 	m_nvim = c;
 
 	m_tree = new TreeView(c);
-	m_shell = new Shell(c, m_shell_options);
 
 	// GuiScrollBar
 	m_scrollbar = new ScrollBar{ m_nvim };
@@ -333,23 +334,25 @@ Shell* MainWindow::shell()
 
 void MainWindow::extTablineSet(bool val)
 {
-	bool old = m_shell_options.enable_ext_tabline;
-	m_shell_options.enable_ext_tabline = val;
-	// redraw if state changed
-	if (old != m_shell_options.enable_ext_tabline) {
-		if (!val) m_tabline_bar->setVisible(false);
-		m_nvim->api0()->vim_command("silent! redraw!");
+	ShellOptions& shellOptions{ m_shell->GetShellOptions() };
+
+	// We can ignore events where the value does not change.
+	if (val == shellOptions.IsTablineEnabled()) {
+		return;
 	}
+
+	shellOptions.SetIsTablineEnabled(val);
+	m_nvim->api0()->vim_command("silent! redraw!");
 }
 
 void MainWindow::neovimShowtablineSet(int val)
 {
-	m_shell_options.nvim_show_tabline = val;
+	m_shell->GetShellOptions().SetOptionShowTabline(val);
 }
 
 void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 {
-	if (!m_shell_options.enable_ext_tabline) {
+	if (!m_shell->GetShellOptions().IsTablineEnabled()) {
 		return;
 	}
 
@@ -378,16 +381,30 @@ void MainWindow::neovimTablineUpdate(int64_t curtab, QList<Tab> tabs)
 		}
 	}
 
-	// hide/show the tabline toolbar
-	if (m_shell_options.nvim_show_tabline==0) {
-		m_tabline_bar->setVisible(false);
-	} else if (m_shell_options.nvim_show_tabline==2) {
-		m_tabline_bar->setVisible(true);
-	} else {
-		m_tabline_bar->setVisible(tabs.size() > 1);
-	}
-
 	Q_ASSERT(tabs.size() == m_tabline->count());
+
+	switch(m_shell->GetShellOptions().GetOptionShowTabline())
+	{
+		// Never show tabline
+		case 0:
+			m_tabline_bar->setVisible(false);
+			break;
+
+		// Show tabline for two or more tabs.
+		case 1:
+			m_tabline_bar->setVisible(tabs.size() >= 2);
+			break;
+
+		// Always show tabline
+		case 2:
+			m_tabline_bar->setVisible(true);
+			break;
+
+		// Fallback: show tabline for two or more tabs
+		default:
+			m_tabline_bar->setVisible(tabs.size() >= 2);
+			break;
+	}
 }
 
 void MainWindow::neovimShowContextMenu()
@@ -417,7 +434,7 @@ void MainWindow::neovimSendSelectAll()
 
 void MainWindow::changeTab(int index)
 {
-	if (!m_shell_options.enable_ext_tabline) {
+	if (!m_shell->GetShellOptions().IsTablineEnabled()) {
 		return;
 	}
 

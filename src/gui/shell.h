@@ -13,11 +13,12 @@
 #include <QMenu>
 
 #include "neovimconnector.h"
-#include "shellwidget/highlight.h"
-#include "shellwidget/shellwidget.h"
-#include "shellwidget/cursor.h"
 #include "popupmenu.h"
 #include "popupmenumodel.h"
+#include "shelloptions.h"
+#include "shellwidget/cursor.h"
+#include "shellwidget/highlight.h"
+#include "shellwidget/shellwidget.h"
 
 namespace NeovimQt {
 
@@ -32,21 +33,13 @@ public:
 	QString name;
 };
 
-class ShellOptions {
-public:
-	bool enable_ext_tabline{ true };
-	bool enable_ext_popupmenu{ true };
-	bool enable_ext_linegrid{ true };
-	int nvim_show_tabline{ 1 };
-};
-
 class Shell: public ShellWidget
 {
 	Q_OBJECT
 	Q_PROPERTY(bool neovimBusy READ neovimBusy() NOTIFY neovimBusy())
 	Q_PROPERTY(bool neovimAttached READ neovimAttached() NOTIFY neovimAttached())
 public:
-	Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent=0);
+	Shell(NeovimConnector *nvim, QWidget *parent=0);
 	~Shell();
 	QSize sizeIncrement() const;
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
@@ -79,6 +72,8 @@ public:
 		const uint64_t hl_id{ m_highlightGroupNameMap.value(name) };
 		return m_highlightMap.contains(hl_id);
 	}
+
+	ShellOptions& GetShellOptions() noexcept { return m_options; }
 
 	/// Dispatches Neovim redraw notifications to T::handleRedraw
 	template <class T>

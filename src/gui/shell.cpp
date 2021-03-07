@@ -1,28 +1,57 @@
 #include "shell.h"
 
 #include <cmath>
-#include <QFontDialog>
-#include <QPainter>
-#include <QPaintEvent>
+#include <QApplication>
+#include <QClipboard>
 #include <QDebug>
 #include <QDesktopWidget>
-#include <QApplication>
+#include <QFontDialog>
 #include <QKeyEvent>
 #include <QMimeData>
-#include <QClipboard>
-#include "msgpackrequest.h"
+#include <QPainter>
+#include <QPaintEvent>
+#include <QSettings>
+
+#include "helpers.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
+#include "msgpackrequest.h"
 #include "util.h"
 #include "version.h"
-#include "helpers.h"
 
 namespace NeovimQt {
 
-Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
+static ShellOptions GetShellOptionsFromQSettings() noexcept
+{
+	ShellOptions opts;
+	QSettings settings("nvim-qt", "nvim-qt");
+
+	QVariant ext_linegrid{ settings.value("ext_linegrid", opts.IsLineGridEnabled()) };
+	QVariant ext_popupmenu{ settings.value("ext_popupmenu", opts.IsPopupmenuEnabled()) };
+	QVariant ext_tabline{ settings.value("ext_tabline", opts.IsTablineEnabled()) };
+
+	if (ext_linegrid.canConvert<bool>())
+	{
+		opts.SetIsLineGridEnabled(ext_linegrid.toBool());
+	}
+
+	if (ext_popupmenu.canConvert<bool>())
+	{
+		opts.SetIsPopupmenuEnabled(ext_popupmenu.toBool());
+	}
+
+	if (ext_tabline.canConvert<bool>())
+	{
+		opts.SetIsTablineEnabled(ext_tabline.toBool());
+	}
+
+	return opts;
+}
+
+Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	: ShellWidget{ parent }
 	, m_nvim{ nvim }
-	, m_options{ opts }
+	, m_options{ GetShellOptionsFromQSettings() }
 {
 	setAttribute(Qt::WA_KeyCompression, false);
 
@@ -226,13 +255,13 @@ void Shell::init()
 	int64_t width = screenRect.width()*0.66/cellSize().width();
 	int64_t height = screenRect.height()*0.66/cellSize().height();
 	QVariantMap options;
-	if (m_options.enable_ext_tabline) {
+	if (m_options.IsTablineEnabled()) {
 		options.insert("ext_tabline", true);
 	}
-	if (m_options.enable_ext_popupmenu) {
+	if (m_options.IsPopupmenuEnabled()) {
 		options.insert("ext_popupmenu", true);
 	}
-	if (m_options.enable_ext_linegrid
+	if (m_options.IsLineGridEnabled()
 		&& m_nvim->hasUIOption("ext_linegrid")) {
 		// Modern Grid UI API is optionally enabled via cmdline
 		options.insert("ext_linegrid", true);
