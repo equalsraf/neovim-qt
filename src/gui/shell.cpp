@@ -24,7 +24,7 @@ namespace NeovimQt {
 static ShellOptions GetShellOptionsFromQSettings() noexcept
 {
 	ShellOptions opts;
-	QSettings settings("nvim-qt", "nvim-qt");
+	QSettings settings{ "nvim-qt", "nvim-qt" };
 
 	QVariant ext_linegrid{ settings.value("ext_linegrid", opts.IsLineGridEnabled()) };
 	QVariant ext_popupmenu{ settings.value("ext_popupmenu", opts.IsPopupmenuEnabled()) };
@@ -70,9 +70,19 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_tooltip->setTextInteractionFlags(Qt::NoTextInteraction);
 	m_tooltip->setAutoFillBackground(true);
 
-	// PUM
+	// Popupmenu
 	m_pum.setParent(this);
 	m_pum.hide();
+
+	QSettings settings{ "nvim-qt", "nvim-qt" };
+
+	// Font
+	QVariant guiFont{ settings.value("Gui/Font") };
+	if (guiFont.canConvert<QString>())
+	{
+		QString fontDescription{ guiFont.toString() };
+		setGuiFont(fontDescription, true /*force*/, true /*updateOption*/);
+	}
 
 	if (!m_nvim) {
 		qWarning() << "Received NULL as Neovim Connector";
@@ -151,6 +161,10 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 	resizeNeovim(size());
 
 	m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
+
+	// Write GuiFont to QSettings, prevent startup font flicker
+	QSettings settings{ "nvim-qt", "nvim-qt" };
+	settings.setValue("Gui/Font", fontDesc());
 
 	// Updating guifont when the user has already called 'set guifont=...' may cause
 	// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
@@ -261,9 +275,7 @@ void Shell::init()
 	if (m_options.IsPopupmenuEnabled()) {
 		options.insert("ext_popupmenu", true);
 	}
-	if (m_options.IsLineGridEnabled()
-		&& m_nvim->hasUIOption("ext_linegrid")) {
-		// Modern Grid UI API is optionally enabled via cmdline
+	if (m_options.IsLineGridEnabled() && m_nvim->hasUIOption("ext_linegrid")) {
 		options.insert("ext_linegrid", true);
 	}
 	options.insert("rgb", true);
@@ -873,11 +885,10 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 
 void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 {
-	if (!m_nvim->api2()) return;
 	if (name == "Tabline") {
-		m_nvim->api2()->nvim_ui_set_option("ext_tabline", value.toBool());
+		handleGuiTabline(value);
 	} else if (name == "Popupmenu") {
-		m_nvim->api2()->nvim_ui_set_option("ext_popupmenu", value.toBool());
+		handleGuiPopupmenu(value);
 	} else if (name == "Cmdline") {
 	} else if (name == "Wildmenu") {
 	} else if (name == "RenderLigatures"){
@@ -901,7 +912,6 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 	} else if (name == "ext_tabline") {
 		emit neovimExtTablineSet(value.toBool());
 	} else if (name == "ext_popupmenu") {
-		emit neovimExtPopupmenuSet(value.toBool());
 	// TODO
 	} else if (name == "arabicshape") {
 	} else if (name == "ambiwidth") {
@@ -985,6 +995,48 @@ void Shell::handleCloseEvent(const QVariantList& args) noexcept
 	}
 
 	emit neovimGuiCloseRequest(status);
+}
+
+void Shell::handleGuiTabline(const QVariant& value) noexcept
+{
+	if (!m_nvim->api1())
+	{
+		qDebug() << "GuiTabline not supported by Neovim API!";
+		return;
+	}
+
+	if (!value.canConvert<bool>())
+	{
+		qDebug() << "GuiTabline value not recognized!";
+		return;
+	}
+
+	const bool isEnabled{ value.toBool() };
+	m_nvim->api1()->nvim_ui_set_option("ext_tabline", isEnabled);
+
+	QSettings settings{ "nvim-qt", "nvim-qt" };
+	settings.setValue("ext_tabline", isEnabled);
+}
+
+void Shell::handleGuiPopupmenu(const QVariant& value) noexcept
+{
+	if (!m_nvim->api1())
+	{
+		qDebug() << "GuiPopupmenu not supported by Neovim API!";
+		return;
+	}
+
+	if (!value.canConvert<bool>())
+	{
+		qDebug() << "GuiPopupmenu value not recognized!";
+		return;
+	}
+
+	const bool isEnabled{ value.toBool() };
+	m_nvim->api1()->nvim_ui_set_option("ext_popupmenu", isEnabled);
+
+	QSettings settings{ "nvim-qt", "nvim-qt" };
+	settings.setValue("ext_popupmenu", isEnabled);
 }
 
 void Shell::handleGridResize(const QVariantList& opargs)

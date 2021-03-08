@@ -346,6 +346,7 @@ void MainWindow::extTablineSet(bool val)
 
 	shellOptions.SetIsTablineEnabled(val);
 	m_nvim->api0()->vim_command("silent! redraw!");
+	m_tabline_bar->setVisible(val);
 }
 
 void MainWindow::neovimShowtablineSet(int val)
