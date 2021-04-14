@@ -12,6 +12,7 @@ private slots:
 	void SpecialKeys() noexcept;
 	void KeyboardLayoutUnicodeHexInput() noexcept;
 	void CtrlCaretWellFormed() noexcept;
+	void GermanCurlyBraces() noexcept;
 };
 
 void TestInputMac::AltSpecialCharacters() noexcept
@@ -87,6 +88,15 @@ void TestInputMac::CtrlCaretWellFormed() noexcept
 	QKeyEvent evCtrlShiftMeta6{ QEvent::KeyPress, Qt::Key_AsciiCircum,
 		Qt::MetaModifier | Qt::ShiftModifier | Qt::ControlModifier };
 	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftMeta6), QString{ "<C-^>" });
+}
+
+void TestInputMac::GermanCurlyBraces() noexcept
+{
+	QKeyEvent evLeftCurlyBrace{ QEvent::KeyPress, Qt::Key_8, Qt::AltModifier, QString{ "{" } };
+	QCOMPARE(NeovimQt::Input::convertKey(evLeftCurlyBrace), QString{ "{" });
+
+	QKeyEvent evRightCurlyBrace{ QEvent::KeyPress, Qt::Key_9, Qt::AltModifier, QString{ "}" } };
+	QCOMPARE(NeovimQt::Input::convertKey(evRightCurlyBrace), QString{ "}" });
 }
 
 #include "tst_input_mac.moc"

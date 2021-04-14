@@ -195,6 +195,12 @@ QString convertKey(const QKeyEvent& ev) noexcept
 		return ToKeyString(GetModifierPrefix(mod), "Bslash");
 	}
 
+	// Issue#833: Handle German layout curly braces
+	if (mod & Qt::AltModifier
+		&& ((key == Qt::Key_8 && text == "{") || (key == Qt::Key_9 && text == "}"))) {
+		mod &= mod & ~Qt::AltModifier;
+	}
+
 	if (text.isEmpty()) {
 		// Ignore all modifier-only key events.
 		//   Issue#344: Ignore Ctrl-Shift, C-S- being treated as C-Space
