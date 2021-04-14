@@ -25,7 +25,7 @@ See the Neovim release page:
  - [Nighly Release](https://github.com/neovim/neovim/releases/nightly)
  - [Stable Release](https://github.com/neovim/neovim/releases/latest)
 
-Noevim is available as a [Chocolatey Package](https://chocolatey.org/packages/neovim/).
+Neovim is available as a [Chocolatey Package](https://chocolatey.org/packages/neovim/).
 
 Stable Neovim + Neovim-Qt:
 ```
