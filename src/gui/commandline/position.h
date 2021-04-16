@@ -2,7 +2,7 @@
 
 #include <QString>
 
-namespace NeovimQt { namespace Cmdline {
+namespace NeovimQt { namespace Commandline {
 
 enum class Position {
 	Center,
@@ -14,4 +14,4 @@ enum class Position {
 /// The fallback/default value is: `Position::Center`
 Position PositionFromString(const QString& position) noexcept;
 
-} } // namespace NeovimQt::Cmdline
+} } // namespace NeovimQt::Commandline

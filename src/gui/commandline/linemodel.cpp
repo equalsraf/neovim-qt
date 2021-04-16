@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-namespace NeovimQt { namespace Cmdline {
+namespace NeovimQt { namespace Commandline {
 
 LineModel::LineModel(
 	const QVariantList& content,
@@ -42,4 +42,4 @@ QString LineModel::getPromptText() const noexcept
 	return { m_firstc + indentString + m_content + spaceForCursor };
 }
 
-}  } // namespace NeovimQt::Cmdline
+}  } // namespace NeovimQt::Commandline

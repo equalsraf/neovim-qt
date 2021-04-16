@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QStringList>
 
-namespace NeovimQt { namespace Cmdline {
+namespace NeovimQt { namespace Commandline {
 
 BlockDisplay::BlockDisplay()
 {
@@ -35,4 +35,4 @@ int BlockDisplay::GetMaxLineLength() const
 	return maxChars;
 }
 
-} } // namespace NeovimQt::Cmdline
+} } // namespace NeovimQt::Commandline

@@ -26,7 +26,7 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	, m_nvim{ nvim }
 	, m_options{ opts }
 {
-	m_cmdlineWidget = new Cmdline::ExtCmdlineWidget(nvim, this); // FIXME ugly?
+	m_cmdlineWidget = new Commandline::ExtCmdlineWidget(nvim, this); // FIXME ugly?
 
 	setAttribute(Qt::WA_KeyCompression, false);
 

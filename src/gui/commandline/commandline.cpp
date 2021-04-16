@@ -6,7 +6,7 @@
 
 #include "../shell.h" // FIXME Ugly
 
-namespace NeovimQt { namespace Cmdline {
+namespace NeovimQt { namespace Commandline {
 
 ExtCmdlineWidget::ExtCmdlineWidget(NeovimConnector* nvim, ShellWidget* parent) noexcept
 	: m_nvim{ nvim }
@@ -473,4 +473,4 @@ void ExtCmdlineWidget::setFont(const QFont &font) noexcept
 	m_cmdTextBox->setShellFont(font, true);
 }
 
-} } // namespace NeovimQt::Cmdline
+} } // namespace NeovimQt::Commandline

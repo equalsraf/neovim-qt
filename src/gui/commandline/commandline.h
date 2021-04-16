@@ -13,7 +13,7 @@
 #include "neovimconnector.h"
 #include "position.h"
 
-namespace NeovimQt { namespace Cmdline {
+namespace NeovimQt { namespace Commandline {
 
 class ExtCmdlineWidget : public QFrame
 {
@@ -82,4 +82,4 @@ private:
 	Mode m_displayMode{ Mode::Dynamic };
 };
 
-} } // namespace NeovimQt::Cmdline
+} } // namespace NeovimQt::Commandline

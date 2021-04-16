@@ -4,7 +4,7 @@
 #include <QTextLayout>
 #include <QVariantList>
 
-namespace NeovimQt { namespace Cmdline {
+namespace NeovimQt { namespace Commandline {
 
 class LineModel final {
 public:
@@ -32,4 +32,4 @@ private:
 	int m_level{ 0 };
 };
 
-} } // namespace NeovimQt::Cmdline
+} } // namespace NeovimQt::Commandline

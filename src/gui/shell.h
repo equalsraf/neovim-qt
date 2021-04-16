@@ -249,7 +249,7 @@ private:
 	PopupMenu m_pum{ this };
 	bool m_mouseEnabled{ true };
 
-	Cmdline::ExtCmdlineWidget* m_cmdlineWidget{ nullptr };
+	Commandline::ExtCmdlineWidget* m_cmdlineWidget{ nullptr };
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler

@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-namespace NeovimQt { namespace Cmdline {
+namespace NeovimQt { namespace Commandline {
 
 /// Converts QSettings string (case insensitive) to `Position`.
 /// The default fallback value is: `Position::Center`.
@@ -24,4 +24,4 @@ Position PositionFromString(const QString& position) noexcept
 	return Position::Center;
 }
 
-} } // namespace NeovimQt::Cmdline
+} } // namespace NeovimQt::Commandline

@@ -2,7 +2,7 @@
 
 #include <QString>
 
-namespace NeovimQt { namespace Cmdline {
+namespace NeovimQt { namespace Commandline {
 
 enum class Mode {
 	Dynamic,
@@ -14,4 +14,4 @@ enum class Mode {
 /// The fallback/default value is: `Mode::Dynamic`
 Mode ModeFromString(const QString& mode) noexcept;
 
-} } // namespace NeovimQt::Cmdline
+} } // namespace NeovimQt::Commandline

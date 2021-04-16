@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-namespace NeovimQt { namespace Cmdline {
+namespace NeovimQt { namespace Commandline {
 
 Mode ModeFromString(const QString& position) noexcept
 {
@@ -18,4 +18,4 @@ Mode ModeFromString(const QString& position) noexcept
 	return Mode::Dynamic;
 }
 
-} } // namespace NeovimQt::Cmdline
+} } // namespace NeovimQt::Commandline

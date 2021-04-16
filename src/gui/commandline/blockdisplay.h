@@ -2,7 +2,7 @@
 
 #include <QTextEdit>
 
-namespace NeovimQt { namespace Cmdline {
+namespace NeovimQt { namespace Commandline {
 
 class BlockDisplay : public QTextEdit {
 	using Super = QTextEdit;
@@ -14,4 +14,4 @@ public:
 	virtual int GetMaxLineLength() const;
 };
 
-} } // namespace NeovimQt::Cmdline
+} } // namespace NeovimQt::Commandline
