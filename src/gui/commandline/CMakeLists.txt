@@ -10,8 +10,8 @@ endif ()
 
 set(SOURCES
   blockwidget.cpp
-  commandline.cpp
   linemodel.cpp
+  mainwidget.cpp
   mode.cpp
   position.cpp
   )

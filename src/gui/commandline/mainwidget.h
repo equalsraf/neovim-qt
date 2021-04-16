@@ -15,12 +15,12 @@
 
 namespace NeovimQt { namespace Commandline {
 
-class ExtCmdlineWidget : public QFrame
+class MainWidget : public QFrame
 {
 	Q_OBJECT
 
 public:
-	ExtCmdlineWidget(NeovimConnector* nvim, ShellWidget* parent) noexcept;
+	MainWidget(NeovimConnector* nvim, ShellWidget* parent) noexcept;
 
 	void handleNeovimNotification(const QByteArray& name, const QVariantList& args) noexcept;
 	void handleRedraw(const QByteArray& name, const QVariantList& opargs) noexcept;

@@ -11,7 +11,7 @@
 #include <QList>
 #include <QMap>
 #include <QMenu>
-#include "commandline/commandline.h"
+#include "commandline/mainwidget.h"
 #include "neovimconnector.h"
 #include "shellwidget/highlight.h"
 #include "shellwidget/shellwidget.h"
@@ -249,7 +249,7 @@ private:
 	PopupMenu m_pum{ this };
 	bool m_mouseEnabled{ true };
 
-	Commandline::ExtCmdlineWidget* m_cmdlineWidget{ nullptr };
+	Commandline::MainWidget * m_commandlineWidget{ nullptr };
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler

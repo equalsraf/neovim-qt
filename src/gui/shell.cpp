@@ -26,7 +26,7 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	, m_nvim{ nvim }
 	, m_options{ opts }
 {
-	m_cmdlineWidget = new Commandline::ExtCmdlineWidget(nvim, this); // FIXME ugly?
+	m_commandlineWidget = new Commandline::MainWidget(nvim, this);
 
 	setAttribute(Qt::WA_KeyCompression, false);
 
@@ -135,7 +135,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 
 	// Update ext_cmdline font to match ShellWidget
 	// FIXME Location? setShellFontSuccess check?
-	m_cmdlineWidget->setFont(font());// FIXME nullptr deref!
+	m_commandlineWidget->setFont(font());// FIXME nullptr deref!
 
 	return true;
 }
@@ -414,7 +414,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		qint64 val = opargs.at(0).toLongLong();
 		if (val != -1) {
 			setForeground(QRgb(val));
-			m_cmdlineWidget->updatePalette();// FIXME nullptr deref!
+			m_commandlineWidget->updatePalette();// FIXME nullptr deref!
 		}
 		m_hg_foreground = foreground();
 	} else if (name == "update_bg") {
@@ -425,7 +425,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		qint64 val = opargs.at(0).toLongLong();
 		if (val != -1) {
 			setBackground(QRgb(val));
-			m_cmdlineWidget->updatePalette();// FIXME nullptr deref!
+			m_commandlineWidget->updatePalette();// FIXME nullptr deref!
 		}
 		m_hg_background = background();
 		update();
@@ -724,7 +724,7 @@ void Shell::handleModeChange(const QVariantList& opargs)
 	update(neovimCursorRect());
 
 	// FIXME This should be an emit signal, handle slot in cmdlinewidget.
-	m_cmdlineWidget->setCursorStyle(getCursor()); // FIXME! nultpr deref!
+	m_commandlineWidget->setCursorStyle(getCursor()); // FIXME! nultpr deref!
 }
 
 void Shell::handleModeInfoSet(const QVariantList& opargs)
@@ -1017,7 +1017,7 @@ void Shell::handleDefaultColorsSet(const QVariantList& opargs)
 	setSpecial(specialColor);
 
 	// GuiCmdline uses nvim theming, update when default colors change.
-	m_cmdlineWidget->updatePalette(); // FIXME nullptr deref!
+	m_commandlineWidget->updatePalette(); // FIXME nullptr deref!
 
 	// Cells drawn with the default colors require a re-paint
 	update();
@@ -1483,7 +1483,7 @@ void Shell::resizeNeovim(int n_cols, int n_rows)
 
 	// When the ShellWidget is resized, the GuiCmdline should be adjusted to fit too.
 	if (m_options.enable_ext_cmdline) {
-		m_cmdlineWidget->updateGeometry(); // FIXME nullptr deref!
+		m_commandlineWidget->updateGeometry(); // FIXME nullptr deref!
 	}
 }
 

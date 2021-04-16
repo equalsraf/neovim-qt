@@ -1,4 +1,4 @@
-#include "commandline.h"
+#include "mainwidget.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -8,14 +8,14 @@
 
 namespace NeovimQt { namespace Commandline {
 
-ExtCmdlineWidget::ExtCmdlineWidget(NeovimConnector* nvim, ShellWidget* parent) noexcept
+MainWidget::MainWidget(NeovimConnector* nvim, ShellWidget* parent) noexcept
 	: m_nvim{ nvim }
 {
 	if (!m_nvim) {
 		qFatal("Fatal Error: ScrollBar must have a valid NeovimConnector!");
 	}
 
-	connect(m_nvim, &NeovimConnector::ready, this, &ExtCmdlineWidget::neovimConnectorReady);
+	connect(m_nvim, &NeovimConnector::ready, this, &MainWidget::neovimConnectorReady);
 
 	setParent(parent);
 	setVisible(false);
@@ -61,15 +61,15 @@ ExtCmdlineWidget::ExtCmdlineWidget(NeovimConnector* nvim, ShellWidget* parent) n
 	}
 }
 
-void ExtCmdlineWidget::neovimConnectorReady() noexcept
+void MainWidget::neovimConnectorReady() noexcept
 {
 	connect(m_nvim->api0(), &NeovimApi0::neovimNotification,
-		this, &ExtCmdlineWidget::handleNeovimNotification);
+		this, &MainWidget::handleNeovimNotification);
 
 	m_nvim->api0()->vim_subscribe("Gui");
 }
 
-void ExtCmdlineWidget::handleNeovimNotification(const QByteArray& name, const QVariantList& args) noexcept
+void MainWidget::handleNeovimNotification(const QByteArray& name, const QVariantList& args) noexcept
 {
 	if (args.size() <= 0) {
 		return;
@@ -85,12 +85,12 @@ void ExtCmdlineWidget::handleNeovimNotification(const QByteArray& name, const QV
 	}
 
 	if (name == "redraw") {
-		Shell::DispatchRedrawNotifications<ExtCmdlineWidget>(this, args);
+		Shell::DispatchRedrawNotifications<MainWidget>(this, args);
 		return;
 	}
 }
 
-void ExtCmdlineWidget::handleRedraw(const QByteArray& name, const QVariantList& args) noexcept
+void MainWidget::handleRedraw(const QByteArray& name, const QVariantList& args) noexcept
 {
 	if (name == "cmdline_show") {
 		handleCmdlineShow(args);
@@ -117,7 +117,7 @@ void ExtCmdlineWidget::handleRedraw(const QByteArray& name, const QVariantList& 
 }
 
 
-QSize ExtCmdlineWidget::getShellSizeForText(const QString& text) const noexcept
+QSize MainWidget::getShellSizeForText(const QString& text) const noexcept
 {
 	const int border_padding{ width() - m_cmdTextBox->width() };
 	const int maxWidth{ maximumWidth() - border_padding };
@@ -132,7 +132,7 @@ QSize ExtCmdlineWidget::getShellSizeForText(const QString& text) const noexcept
 	return { columns, rows};
 };
 
-void ExtCmdlineWidget::handleCmdlineShow(const QVariantList& args) noexcept
+void MainWidget::handleCmdlineShow(const QVariantList& args) noexcept
 {
 	if (args.size() < 6
 		|| static_cast<QMetaType::Type>(args.at(0).type()) != QMetaType::QVariantList
@@ -192,7 +192,7 @@ void ExtCmdlineWidget::handleCmdlineShow(const QVariantList& args) noexcept
 	show();
 }
 
-void ExtCmdlineWidget::handleCmdlinePos(const QVariantList& args) noexcept
+void MainWidget::handleCmdlinePos(const QVariantList& args) noexcept
 {
 	if (args.size() < 2
 		|| !args.at(0).canConvert<int>()
@@ -206,7 +206,7 @@ void ExtCmdlineWidget::handleCmdlinePos(const QVariantList& args) noexcept
 	setCursorPosition(pos);
 }
 
-void ExtCmdlineWidget::handleCmdlineSpecialChar(const QVariantList& args) noexcept
+void MainWidget::handleCmdlineSpecialChar(const QVariantList& args) noexcept
 {
 	if (args.size() < 3
 		|| !args.at(0).canConvert<QString>()
@@ -244,7 +244,7 @@ void ExtCmdlineWidget::handleCmdlineSpecialChar(const QVariantList& args) noexce
 	m_cmdTextBox->put(line.getPromptText(),0,0); // FIXME ???
 }
 
-void ExtCmdlineWidget::handleCmdlineBlockShow(const QVariantList& args) noexcept
+void MainWidget::handleCmdlineBlockShow(const QVariantList& args) noexcept
 {
 	if (args.size() < 1
 		|| static_cast<QMetaType::Type>(args.at(0).type()) != QMetaType::QVariantList) {
@@ -253,7 +253,7 @@ void ExtCmdlineWidget::handleCmdlineBlockShow(const QVariantList& args) noexcept
 
 	const QVariantList lines = args.at(0).toList();
 
-	qDebug() << "ExtCmdlineWidget::handleCmdlineBlockShow()";
+	qDebug() << "MainWidget::handleCmdlineBlockShow()";
 	QString blockText;
 	for (const auto& varLine: lines) {
 		QVariantList line = varLine.toList();
@@ -269,7 +269,7 @@ void ExtCmdlineWidget::handleCmdlineBlockShow(const QVariantList& args) noexcept
 	m_cmdBlockText->show();
 }
 
-void ExtCmdlineWidget::handleCmdlineBlockAppend(const QVariantList& args) noexcept
+void MainWidget::handleCmdlineBlockAppend(const QVariantList& args) noexcept
 {
 	if (args.size() < 1
 		|| static_cast<QMetaType::Type>(args.at(0).type()) != QMetaType::QVariantList) {
@@ -288,7 +288,7 @@ void ExtCmdlineWidget::handleCmdlineBlockAppend(const QVariantList& args) noexce
 	m_cmdBlockText->updateGeometry();
 }
 
-void ExtCmdlineWidget::handleCmdlineHide() noexcept
+void MainWidget::handleCmdlineHide() noexcept
 {
 	if (!m_model.empty()) {
 		m_model.pop_back();
@@ -297,7 +297,7 @@ void ExtCmdlineWidget::handleCmdlineHide() noexcept
 	hide();
 }
 
-void ExtCmdlineWidget::handleCmdlineBlockHide() noexcept
+void MainWidget::handleCmdlineBlockHide() noexcept
 {
 	m_cmdBlockText->hide();
 }
@@ -313,7 +313,7 @@ static void WriteCommandlinePositionSetting(const QString& position) noexcept
 	settings.setValue("Commandline/position", position);
 }
 
-void ExtCmdlineWidget::handleGuiCommandlinePosition(const QVariantList& args) noexcept
+void MainWidget::handleGuiCommandlinePosition(const QVariantList& args) noexcept
 {
 	if (args.size() < 2
 		|| !args.at(1).canConvert<QByteArray>()) {
@@ -348,7 +348,7 @@ static void WriteCommandlineModeSetting(const QString& mode) noexcept
 	settings.setValue("Commandline/display_mode", mode);
 }
 
-void ExtCmdlineWidget::handleGuiCommandlineMode(const QVariantList& args) noexcept
+void MainWidget::handleGuiCommandlineMode(const QVariantList& args) noexcept
 {
 	if (args.size() < 2
 		|| !args.at(1).canConvert<QByteArray>()) {
@@ -375,7 +375,7 @@ void ExtCmdlineWidget::handleGuiCommandlineMode(const QVariantList& args) noexce
 	}
 }
 
-void ExtCmdlineWidget::updateGeometry() noexcept
+void MainWidget::updateGeometry() noexcept
 {
 	ShellWidget* parentShellWidget{ qobject_cast<ShellWidget*>(parentWidget()) };
 	if (!parentShellWidget) {
@@ -416,14 +416,14 @@ void ExtCmdlineWidget::updateGeometry() noexcept
 	QWidget::updateGeometry();
 }
 
-void ExtCmdlineWidget::setCursorPosition(int pos) noexcept
+void MainWidget::setCursorPosition(int pos) noexcept
 {
 	int posWithIndent{ pos + m_model.last().getIndent() };
 	const int cols{ m_cmdTextBox->shellGridSize().width() };
 	m_cmdTextBox->setNeovimCursor((posWithIndent + 1) / cols, (posWithIndent + 1) % cols);
 }
 
-int ExtCmdlineWidget::getMaxPromptLength() const noexcept
+int MainWidget::getMaxPromptLength() const noexcept
 {
 	int maxLineLength = 0;
 	for (const auto& line : m_model) {
@@ -433,7 +433,7 @@ int ExtCmdlineWidget::getMaxPromptLength() const noexcept
 	return qMax(m_cmdBlockText->GetMaxLineLength(), maxLineLength);
 }
 
-QSize ExtCmdlineWidget::sizeHint() const noexcept
+QSize MainWidget::sizeHint() const noexcept
 {
 	// FIXME FIXME This causes issues on +1 row transition
 	QSize sizeHint{ QFrame::sizeHint() };
@@ -448,7 +448,7 @@ QSize ExtCmdlineWidget::sizeHint() const noexcept
 	return sizeHint;
 }
 
-void ExtCmdlineWidget::updatePalette() noexcept
+void MainWidget::updatePalette() noexcept
 {
 	if (!parentWidget()) {
 		qDebug() << "No parentWidget, cannot set palette";
@@ -467,7 +467,7 @@ void ExtCmdlineWidget::updatePalette() noexcept
 	m_cmdTextBox->setForeground(parentShellWidget->foreground());
 }
 
-void ExtCmdlineWidget::setFont(const QFont &font) noexcept
+void MainWidget::setFont(const QFont &font) noexcept
 {
 	m_cmdBlockText->setFont(font);
 	m_cmdTextBox->setShellFont(font, true);
