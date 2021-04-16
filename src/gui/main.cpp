@@ -3,6 +3,10 @@
 #include <QProcess>
 #include <QFile>
 #include <QCommandLineParser>
+#if defined (Q_OS_MAC)
+# include <unistd.h>
+# include <stdio.h>
+#endif
 #include "neovimconnector.h"
 #include "app.h"
 
@@ -66,7 +70,7 @@ int cli_main(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-#if defined (Q_OS_UNIX) && ! defined (Q_OS_MAC)
+#if defined (Q_OS_UNIX)
 	// Do an early check for --nofork. We need to do this here, before
 	// creating a QApplication, since QCommandLineParser requires one
 	bool nofork = false;
@@ -83,6 +87,14 @@ int main(int argc, char **argv)
 			nofork = true;
 		}
 	}
+
+#	if defined (Q_OS_MAC)
+	// In MacOS X do not fork when the process is not launched from a tty
+	if (nofork == false && isatty(fileno(stdin)) != 1) {
+		qDebug() << "stdin is not a tty, forcing --nofork";
+		nofork = true;
+	}
+#	endif
 
 	if (nofork) {
 		return ui_main(argc, argv);
