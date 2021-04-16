@@ -74,7 +74,6 @@ private:
 
 	QList<LineModel> m_model;
 
-	// FIXME const?
 	double m_maxWidth{ .75 };
 	double m_minWidth{ 300 };
 
