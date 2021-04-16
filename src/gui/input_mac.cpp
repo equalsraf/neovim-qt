@@ -49,7 +49,7 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	const QString& text) noexcept
 {
 	
-	std::vector<QString> removeAltCharList  {"¡","“","¶","¢","[","]","|","{","}","≠","¿","±","‘","–","…","∞","µ","~","∫","√","ç","≈","¥","≤","å","‚","∂","ƒ","©","ª","º","∆","@","œ","æ","‘","±","•","π","⁄","¨","Ω","†","®","€","∑","«","„","\"","¿"};
+	std::vector<QChar> removeAltCharList  { '[', ']', '|', '{', '}', '~', '@', '\'' };
 	
 	if (!text.isEmpty())
 	{
@@ -60,7 +60,7 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 		
 		// German MacOS QWERTZ keyboard, remove AltModifier (OPTION KEY)
 		if(mod & Qt::AltModifier) {
-			if (std::find(removeAltCharList.begin(), removeAltCharList.end(), text) != removeAltCharList.end()) {
+			if (std::find(removeAltCharList.begin(), removeAltCharList.end(), c) != removeAltCharList.end()) {
 				mod &= ~Qt::AltModifier;
 			}
 		}
