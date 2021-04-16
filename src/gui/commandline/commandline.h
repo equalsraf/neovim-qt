@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 #include <shellwidget.h>
 
-#include "blockdisplay.h"
+#include "blockwidget.h"
 #include "linemodel.h"
 #include "mode.h"
 #include "neovimconnector.h"
@@ -67,7 +67,7 @@ private:
 
 	QFrame* m_cmdTextBoxFrame;
 	ShellWidget* m_cmdTextBox;
-	BlockDisplay* m_cmdBlockText;
+	BlockWidget* m_cmdBlockText;
 
 	QVBoxLayout* m_vLayout;
 	QPalette m_palette;

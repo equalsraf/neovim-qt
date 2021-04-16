@@ -4,11 +4,11 @@
 
 namespace NeovimQt { namespace Commandline {
 
-class BlockDisplay : public QTextEdit {
+class BlockWidget : public QTextEdit {
 	using Super = QTextEdit;
 
 public:
-	BlockDisplay();
+	BlockWidget();
 
 	virtual QSize sizeHint() const override;
 	virtual int GetMaxLineLength() const;

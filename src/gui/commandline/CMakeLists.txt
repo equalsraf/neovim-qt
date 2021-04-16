@@ -9,7 +9,7 @@ if (WIN32 AND USE_STATIC_QT)
 endif ()
 
 set(SOURCES
-  blockdisplay.cpp
+  blockwidget.cpp
   commandline.cpp
   linemodel.cpp
   mode.cpp

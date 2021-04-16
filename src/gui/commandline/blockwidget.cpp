@@ -1,4 +1,4 @@
-#include "blockdisplay.h"
+#include "blockwidget.h"
 
 #include <QList>
 #include <QDebug>
@@ -6,7 +6,7 @@
 
 namespace NeovimQt { namespace Commandline {
 
-BlockDisplay::BlockDisplay()
+BlockWidget::BlockWidget()
 {
 	setVisible(false);
 	setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
@@ -15,7 +15,7 @@ BlockDisplay::BlockDisplay()
 	setFocusPolicy(Qt::NoFocus);
 }
 
-QSize BlockDisplay::sizeHint() const
+QSize BlockWidget::sizeHint() const
 {
 	QSize parentSizeHint = Super::sizeHint();
 	int padding = contentsMargins().top() + contentsMargins().bottom();
@@ -23,7 +23,7 @@ QSize BlockDisplay::sizeHint() const
 	return parentSizeHint;
 }
 
-int BlockDisplay::GetMaxLineLength() const
+int BlockWidget::GetMaxLineLength() const
 {
 	QStringList allLines = toPlainText().split('\n');
 

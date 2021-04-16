@@ -32,7 +32,7 @@ ExtCmdlineWidget::ExtCmdlineWidget(NeovimConnector* nvim, ShellWidget* parent) n
 	m_cmdTextBox->setSizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
 	frameLayout->addWidget(m_cmdTextBox);
 
-	m_cmdBlockText = new BlockDisplay();
+	m_cmdBlockText = new BlockWidget();
 
 	m_vLayout = new QVBoxLayout();
 	m_vLayout->addWidget(m_cmdBlockText);
