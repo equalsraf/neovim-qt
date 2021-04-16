@@ -1,5 +1,6 @@
 #include "input.h"
-
+#include <QInputMethod>
+#include <QApplication>
 namespace NeovimQt { namespace Input {
 
 Qt::KeyboardModifiers ControlModifier() noexcept
@@ -59,9 +60,12 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 		}
 		
 		// German MacOS QWERTZ keyboard, remove AltModifier (OPTION KEY)
-		if(mod & Qt::AltModifier) {
-			if (std::find(removeAltCharList.begin(), removeAltCharList.end(), c) != removeAltCharList.end()) {
-				mod &= ~Qt::AltModifier;
+		QInputMethod * im = QGuiApplication::inputMethod();
+		if(im->locale().name() == "de_DE") {
+			if(mod & Qt::AltModifier) {
+				if (std::find(removeAltCharList.begin(), removeAltCharList.end(), c) != removeAltCharList.end()) {
+					mod &= ~Qt::AltModifier;
+				}
 			}
 		}
 	}
