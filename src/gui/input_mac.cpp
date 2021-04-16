@@ -48,13 +48,27 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	Qt::KeyboardModifiers mod,
 	const QString& text) noexcept
 {
+	
+	std::vector<QString> removeAltCharList  {"¡","“","¶","¢","[","]","|","{","}","≠","¿","±","‘","–","…","∞","µ","~","∫","√","ç","≈","¥","≤","å","‚","∂","ƒ","©","ª","º","∆","@","œ","æ","‘","±","•","π","⁄","¨","Ω","†","®","€","∑","«","„","\"","¿"};
+	
 	if (!text.isEmpty())
 	{
 		const QChar c{ text.at(0) };
 		if (c.unicode() >= 0x80 && c.isPrint()) {
 			mod &= ~Qt::AltModifier;
 		}
+		
+		// German MacOS QWERTZ keyboard, remove AltModifier (OPTION KEY)
+		if (std::find(removeAltCharList.begin(), removeAltCharList.end(), text) != removeAltCharList.end()) {
+			if(mod & Qt::AltModifier) {
+        		mod &= ~Qt::AltModifier;
+			}
+    	}
 	}
+	
+	
+
+	
 
 	return { type, key, mod, text };
 }
