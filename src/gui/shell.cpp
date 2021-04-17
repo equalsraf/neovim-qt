@@ -1304,7 +1304,6 @@ void Shell::mousePressEvent(QMouseEvent *ev)
 void Shell::updateCurrentLocale() {
 	m_currentInputMethod = QGuiApplication::inputMethod();
 	if(m_currentInputMethod != nullptr) {
-		//QLocale hungary(QLocale::Hungarian);
 		m_currentLocale =  m_currentInputMethod->locale();
 	} 
 }
