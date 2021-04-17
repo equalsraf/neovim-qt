@@ -46,7 +46,8 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	QEvent::Type type,
 	int key,
 	Qt::KeyboardModifiers mod,
-	const QString& text) noexcept
+	const QString& text,
+	Qlocale& locale) noexcept
 {
 	return { type, key, mod, text };
 }

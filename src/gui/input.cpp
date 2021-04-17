@@ -130,7 +130,7 @@ QString ToKeyString(const QString& modPrefix, const QString& key) noexcept
 	return QString{ "<%1%2>" }.arg(modPrefix, key);
 }
 
-QString convertKey(const QKeyEvent& ev) noexcept
+QString convertKey(const QKeyEvent& ev, QLocale& locale) noexcept
 {
 	QString text{ ev.text() };
 	Qt::KeyboardModifiers mod{ ev.modifiers() };
@@ -241,7 +241,7 @@ QString convertKey(const QKeyEvent& ev) noexcept
 	}
 
 	// Perform any platform specific QKeyEvent modifications
-	QKeyEvent evNormalized{ CreatePlatformNormalizedKeyEvent(ev.type(), key, mod, text) };
+	QKeyEvent evNormalized{ CreatePlatformNormalizedKeyEvent(ev.type(), key, mod, text, locale) };
 
 	// Format with prefix if necessary
 	const QString prefix{ GetModifierPrefix(evNormalized.modifiers()) };

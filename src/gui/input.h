@@ -12,7 +12,7 @@ namespace NeovimQt { namespace Input {
 const QMap<int, QString>& GetSpecialKeysMap() noexcept;
 
 /// Convert Qt key input into Neovim key-notation. See QKeyEvent.
-QString convertKey(const QKeyEvent& ev) noexcept;
+QString convertKey(const QKeyEvent& ev, QLocale& locale) noexcept;
 
 /// Return keyboard modifier prefix. Ex) "C-", "A-" or "C-S-A-"
 ///
@@ -53,6 +53,7 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	QEvent::Type type,
 	int key,
 	Qt::KeyboardModifiers mod,
-	const QString& text) noexcept;
+	const QString& text,
+	QLocale& locale) noexcept;
 
 } } // namespace NeovimQt:Input

@@ -10,6 +10,7 @@
 #include <QMimeData>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QInputMethod>
 #include <QSettings>
 
 #include "helpers.h"
@@ -55,12 +56,19 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 {
 	setAttribute(Qt::WA_KeyCompression, false);
 
+	currentInputMethod = QGuiApplication::inputMethod();
+	currentLocale = currentInputMethod->locale();
+
+
 	setAcceptDrops(true);
 	setMouseTracking(true);
 	m_mouseclick_timer.setInterval(QApplication::doubleClickInterval());
 	m_mouseclick_timer.setSingleShot(true);
 	connect(&m_mouseclick_timer, &QTimer::timeout,
 			this, &Shell::mouseClickReset);
+
+ 	connect(currentInputMethod, &QInputMethod::localeChanged,
+			this, &Shell::localeChanged);
 
 	// IM Tooltip
 	setAttribute(Qt::WA_InputMethodEnabled, true);
@@ -1237,11 +1245,12 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 		this->setCursor(Qt::BlankCursor);
 	}
 
-	const QString inp{ Input::convertKey(*ev) };
-
+	const QString inp{ Input::convertKey(*ev, currentLocale) };
+	
 	// Uncomment for key input debugging and unit test writing.
 	// qDebug() << "QKeyEvent ev:" << ev;
 	// qDebug() << "  " << inp;
+	// qDebug() << " Keyboard Locale: " << currentLocale.name();
 
 	if (inp.isEmpty()) {
 		QWidget::keyPressEvent(ev);
@@ -1288,6 +1297,14 @@ void Shell::mousePressEvent(QMouseEvent *ev)
 	mouseClickIncrement(ev->button());
 	neovimMouseEvent(ev);
 }
+
+/** Keyboard Locale has changed */
+void Shell::localeChanged()
+{
+	currentInputMethod = QGuiApplication::inputMethod();
+	currentLocale = currentInputMethod->locale();
+}
+
 /** Reset state for mouse N-click tracking */
 void Shell::mouseClickReset()
 {

@@ -7,6 +7,7 @@
 #include <QBackingStore>
 #include <QLabel>
 #include <QTimer>
+#include <QInputMethod>
 #include <QUrl>
 #include <QList>
 #include <QMap>
@@ -123,6 +124,7 @@ protected slots:
 	void neovimExited(int);
 	void neovimResizeFinished();
 	void mouseClickReset();
+	void localeChanged();
 	void mouseClickIncrement(Qt::MouseButton bt);
 	void init();
 	void fontError(const QString& msg);
@@ -230,6 +232,8 @@ private:
 	QPoint m_mouse_pos;
 	// 2/3/4 mouse click tracking
 	QTimer m_mouseclick_timer;
+	QLocale currentLocale;
+	QInputMethod * currentInputMethod;
 	uint8_t m_mouseclick_count{ 0 };
 	Qt::MouseButton m_mouseclick_pending;
 	// Accumulates remainder of steppy scroll
