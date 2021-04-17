@@ -5,7 +5,7 @@
 #include <QMap>
 #include <QPoint>
 #include <QString>
-#include <Qlocale>
+#include <QLocale>
 
 namespace NeovimQt { namespace Input {
 
