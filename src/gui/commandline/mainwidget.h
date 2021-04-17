@@ -72,8 +72,7 @@ private:
 
 	QList<LineModel> m_model;
 
-	double m_maxWidth{ .75 };
-	double m_minWidth{ 300 };
+	int m_widthPercent{ 75 };
 
 	Position m_position{ Position::Top };
 };

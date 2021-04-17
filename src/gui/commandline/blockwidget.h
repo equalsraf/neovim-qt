@@ -11,7 +11,6 @@ public:
 	BlockWidget();
 
 	virtual QSize sizeHint() const override;
-	virtual int GetMaxLineLength() const;
 };
 
 } } // namespace NeovimQt::Commandline

@@ -22,9 +22,7 @@ MainWidget::MainWidget(NeovimConnector& nvim, ShellWidget& parent) noexcept
 	QVBoxLayout* frameLayout = new QVBoxLayout(m_cmdTextBoxFrame);
 
 	m_cmdTextBox = new ShellWidget();
-	// FIXME The ShellWidget must be given an initial size, prevents 1st init height issues
-	m_cmdTextBox->resizeShell(1, 1);
-	m_cmdTextBox->setSizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
+	m_cmdTextBox->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
 	frameLayout->addWidget(m_cmdTextBox);
 
 	m_cmdBlockText = new BlockWidget();
@@ -36,18 +34,12 @@ MainWidget::MainWidget(NeovimConnector& nvim, ShellWidget& parent) noexcept
 
 	QSettings settings("nvim-qt", "nvim-qt");
 
-	QVariant maxWidth{ settings.value("Commandline/maximum_width", m_maxWidth) };
-	QVariant minWidth{ settings.value("Commandline/minimum_width", m_minWidth) };
+	QVariant widthPercent{ settings.value("Commandline/width_percent", m_widthPercent) };
 	QVariant position{ settings.value("Commandline/position", "center") };
 
-	if (maxWidth.canConvert<double>())
+	if (widthPercent.canConvert<int>())
 	{
-		m_maxWidth = maxWidth.toDouble();
-	}
-
-	if (minWidth.canConvert<double>())
-	{
-		m_minWidth = minWidth.toDouble();
+		m_widthPercent = widthPercent.toInt();
 	}
 
 	if (position.canConvert<QByteArray>())
@@ -111,7 +103,6 @@ void MainWidget::handleRedraw(const QByteArray& name, const QVariantList& args) 
 	}
 }
 
-
 QSize MainWidget::getShellSizeForText(const QString& text) const noexcept
 {
 	const int border_padding{ width() - m_cmdTextBox->width() };
@@ -140,19 +131,17 @@ void MainWidget::handleCmdlineShow(const QVariantList& args) noexcept
 	}
 
 	const QVariantList content = args.at(0).toList();
-	const int pos = args.at(1).toInt();
-	const QString firstc = args.at(2).toString();
-	const QString prompt = args.at(3).toString();
-	const int indent = args.at(4).toInt();
-	const int level = args.at(5).toInt();
+	const int pos{ args.at(1).toInt() };
+	const QString firstc{ args.at(2).toString() };
+	const QString prompt{ args.at(3).toString() };
+	const int indent{ args.at(4).toInt() };
+	const int level{ args.at(5).toInt() };
 
-	// FIXME Copy Cursor Style from parent shell widget
+	// Cursor style should be copied from the parent ShellWidget.
 	ShellWidget* parentShellWidget{ qobject_cast<ShellWidget*>(parentWidget()) };
 	if (parentShellWidget)
 	{
 		m_cmdTextBox->CopyCursorStyle(parentShellWidget->getCursor());
-		// FIXME Cursor hiding logic????
-		//parentWidget->cur
 	}
 
 	LineModel lineModel{ content, pos, firstc, prompt, indent, level };
@@ -178,11 +167,6 @@ void MainWidget::handleCmdlineShow(const QVariantList& args) noexcept
 
 	setCursorPosition(pos);
 
-	// FIXME Is there a way around this ugly hack?
-	// sizeHint depends on rendering info on overflow to the next line.
-	// We're doing: compute -> update -> compute again with know good values
-	updateGeometry();
-	update();
 	updateGeometry();
 	show();
 }
@@ -195,8 +179,8 @@ void MainWidget::handleCmdlinePos(const QVariantList& args) noexcept
 		qWarning() << "Unexpected arguments for cmdline_pos:" << args;
 	}
 
-	const int pos = args.at(0).toULongLong();
-	//const int level = args.at(1).toULongLong();
+	const int pos{ args.at(0).toInt() };
+	//const int level{ args.at(1).toULongLong() };
 
 	setCursorPosition(pos);
 }
@@ -315,21 +299,10 @@ void MainWidget::handleGuiCommandlinePosition(const QVariantList& args) noexcept
 		qWarning() << "Unexpected arguments for GuiCommandlinePosition:" << args;
 	}
 
-	// FIXME PositionFromString?
-	const QString position{ m_nvim.decode(args.at(1).toByteArray()).toLower() };
+	const QString position{ m_nvim.decode(args.at(1).toByteArray()) };
 
-	if (position == "top") {
-		m_position = Position::Top;
-		WriteCommandlinePositionSetting(position);
-	}
-	else if (position == "center") {
-		m_position = Position::Center;
-		WriteCommandlinePositionSetting(position);
-	}
-	else if (position == "bottom") {
-		m_position = Position::Bottom;
-		WriteCommandlinePositionSetting(position);
-	}
+	m_position = PositionFromString(position);
+	WriteCommandlinePositionSetting(position);
 }
 
 void MainWidget::updateGeometry() noexcept
@@ -339,14 +312,14 @@ void MainWidget::updateGeometry() noexcept
 		qFatal("ShellWidget parentWidget() must be defined!");
 	}
 
-	const int maxWidth = parentShellWidget->width() * m_maxWidth;
-	const int maxHeight = parentShellWidget->height() * m_maxWidth;
-	setMaximumWidth(maxWidth);
+	const int width{ parentShellWidget->width() * m_widthPercent / 100};
+	setMaximumWidth(width);
+
+	constexpr int maxHeightPercent{ 75 };
+	const int maxHeight{ parentShellWidget->height() * maxHeightPercent / 100 };
 	setMaximumHeight(maxHeight);
 
-	const QSize sizeHintThis = sizeHint();
-	const int width = qMin(sizeHintThis.width(), maxWidth);
-	const int height = qMin(sizeHintThis.height(), maxHeight);
+	const int height = qMin(sizeHint().height(), maxHeight);
 
 	int anchorX{ (parentShellWidget->width() - width) / 2 };
 	int anchorY{ (parentShellWidget->height() - height) / 2 };
@@ -367,6 +340,7 @@ void MainWidget::updateGeometry() noexcept
 			break;
 	}
 
+	qDebug() << width << height;
 	setGeometry(anchorX, anchorY, width, height);
 	m_cmdTextBox->updateGeometry();
 	QWidget::updateGeometry();
@@ -379,28 +353,16 @@ void MainWidget::setCursorPosition(int pos) noexcept
 	m_cmdTextBox->setNeovimCursor((posWithIndent + 1) / cols, (posWithIndent + 1) % cols);
 }
 
-int MainWidget::getMaxPromptLength() const noexcept
-{
-	int maxLineLength = 0;
-	for (const auto& line : m_model) {
-		maxLineLength = qMax(line.getPromptText().size(), maxLineLength);
-	}
-
-	return qMax(m_cmdBlockText->GetMaxLineLength(), maxLineLength);
-}
-
 QSize MainWidget::sizeHint() const noexcept
 {
-	// FIXME FIXME This causes issues on +1 row transition
+	// FIXME Duplicated code?
+	ShellWidget* parentShellWidget{ qobject_cast<ShellWidget*>(parentWidget()) };
+	if (!parentShellWidget) {
+		qFatal("ShellWidget parentWidget() must be defined!");
+	}
+
 	QSize sizeHint{ QFrame::sizeHint() };
-
-	QFontMetrics fm{ m_cmdTextBox->fontMetrics() };
-
-	const int widthHint = fm.averageCharWidth() * (getMaxPromptLength() + 2) +
-		layout()->contentsMargins().left() + layout()->contentsMargins().right();
-
-	// FIXME unsafe cast
-	sizeHint.setWidth(qMax(widthHint, (int)m_minWidth));
+	sizeHint.setWidth(parentShellWidget->width() * m_widthPercent / 100);
 	return sizeHint;
 }
 

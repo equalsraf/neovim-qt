@@ -24,16 +24,4 @@ QSize BlockWidget::sizeHint() const
 	return sizeHint;
 }
 
-int BlockWidget::GetMaxLineLength() const
-{
-	QStringList allLines = toPlainText().split('\n');
-
-	int maxChars = 0;
-	for (const auto& line : allLines) {
-		maxChars = qMax(line.size(), maxChars);
-	}
-
-	return maxChars;
-}
-
 } } // namespace NeovimQt::Commandline
