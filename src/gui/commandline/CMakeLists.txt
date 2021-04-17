@@ -12,11 +12,10 @@ set(SOURCES
   blockwidget.cpp
   linemodel.cpp
   mainwidget.cpp
-  mode.cpp
   position.cpp
   )
 
 add_library(commandline STATIC ${SOURCES})
 target_link_libraries(commandline Qt5::Widgets Qt5::Network)
+target_include_directories(commandline PUBLIC ../)
 target_include_directories(commandline PUBLIC ../shellwidget)
-

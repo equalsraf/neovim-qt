@@ -17,10 +17,11 @@ BlockWidget::BlockWidget()
 
 QSize BlockWidget::sizeHint() const
 {
-	QSize parentSizeHint = Super::sizeHint();
-	int padding = contentsMargins().top() + contentsMargins().bottom();
-	parentSizeHint.setHeight(document()->size().height() + padding);
-	return parentSizeHint;
+	QSize sizeHint{ Super::sizeHint() };
+
+	int padding{ contentsMargins().top() + contentsMargins().bottom() };
+	sizeHint.setHeight(document()->size().height() + padding);
+	return sizeHint;
 }
 
 int BlockWidget::GetMaxLineLength() const

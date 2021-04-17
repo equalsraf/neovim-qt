@@ -26,8 +26,6 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 	, m_nvim{ nvim }
 	, m_options{ opts }
 {
-	m_commandlineWidget = new Commandline::MainWidget(nvim, this);
-
 	setAttribute(Qt::WA_KeyCompression, false);
 
 	setAcceptDrops(true);
@@ -53,6 +51,8 @@ Shell::Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent)
 		qWarning() << "Received NULL as Neovim Connector";
 		return;
 	}
+
+	m_commandlineWidget = new Commandline::MainWidget(*nvim, *this);
 
 	connect(m_nvim, &NeovimConnector::ready,
 			this, &Shell::init);

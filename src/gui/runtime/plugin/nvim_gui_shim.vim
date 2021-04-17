@@ -280,9 +280,3 @@ function! s:GuiCommandlinePosition(position) abort
 	call rpcnotify(0, 'Gui', 'CommandlinePosition', a:position)
 endfunction
 command! -nargs=1 GuiCommandlinePosition call s:GuiCommandlinePosition("<args>")
-
-" Set external commandline display mode: "Dynamic", "Fixed"
-function! s:GuiCommandlineMode(position) abort
-	call rpcnotify(0, 'Gui', 'CommandlineMode', a:position)
-endfunction
-command! -nargs=1 GuiCommandlineMode call s:GuiCommandlineMode("<args>")

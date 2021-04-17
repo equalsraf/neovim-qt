@@ -9,7 +9,6 @@
 
 #include "blockwidget.h"
 #include "linemodel.h"
-#include "mode.h"
 #include "neovimconnector.h"
 #include "position.h"
 
@@ -20,7 +19,7 @@ class MainWidget : public QFrame
 	Q_OBJECT
 
 public:
-	MainWidget(NeovimConnector* nvim, ShellWidget* parent) noexcept;
+	MainWidget(NeovimConnector& nvim, ShellWidget& parent) noexcept;
 
 	void handleNeovimNotification(const QByteArray& name, const QVariantList& args) noexcept;
 	void handleRedraw(const QByteArray& name, const QVariantList& opargs) noexcept;
@@ -40,7 +39,6 @@ public:
 
 	// FIXME Label GUI Command events
 	void handleGuiCommandlinePosition(const QVariantList& args) noexcept;
-	void handleGuiCommandlineMode(const QVariantList& args) noexcept;
 
 	// FIXME label ??? functions below
 	void updateGeometry() noexcept;
@@ -59,7 +57,7 @@ public:
 	}
 
 private:
-	NeovimConnector *m_nvim{ nullptr };
+	NeovimConnector& m_nvim;
 
 	int getMaxPromptLength() const noexcept;
 
@@ -78,7 +76,6 @@ private:
 	double m_minWidth{ 300 };
 
 	Position m_position{ Position::Top };
-	Mode m_displayMode{ Mode::Dynamic };
 };
 
 } } // namespace NeovimQt::Commandline

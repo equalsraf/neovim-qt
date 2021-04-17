@@ -3,21 +3,16 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QSettings>
-
-#include "../shell.h" // FIXME Ugly
+#include <shell.h>
 
 namespace NeovimQt { namespace Commandline {
 
-MainWidget::MainWidget(NeovimConnector* nvim, ShellWidget* parent) noexcept
+MainWidget::MainWidget(NeovimConnector& nvim, ShellWidget& parent) noexcept
 	: m_nvim{ nvim }
 {
-	if (!m_nvim) {
-		qFatal("Fatal Error: ScrollBar must have a valid NeovimConnector!");
-	}
+	connect(&m_nvim, &NeovimConnector::ready, this, &MainWidget::neovimConnectorReady);
 
-	connect(m_nvim, &NeovimConnector::ready, this, &MainWidget::neovimConnectorReady);
-
-	setParent(parent);
+	setParent(&parent);
 	setVisible(false);
 
 	m_cmdTextBoxFrame = new QFrame();
@@ -63,10 +58,10 @@ MainWidget::MainWidget(NeovimConnector* nvim, ShellWidget* parent) noexcept
 
 void MainWidget::neovimConnectorReady() noexcept
 {
-	connect(m_nvim->api0(), &NeovimApi0::neovimNotification,
+	connect(m_nvim.api0(), &NeovimApi0::neovimNotification,
 		this, &MainWidget::handleNeovimNotification);
 
-	m_nvim->api0()->vim_subscribe("Gui");
+	m_nvim.api0()->vim_subscribe("Gui");
 }
 
 void MainWidget::handleNeovimNotification(const QByteArray& name, const QVariantList& args) noexcept
@@ -76,7 +71,7 @@ void MainWidget::handleNeovimNotification(const QByteArray& name, const QVariant
 	}
 
 	if (name == "Gui") {
-		const QString guiEvName{ m_nvim->decode(args.at(0).toByteArray()) };
+		const QString guiEvName{ m_nvim.decode(args.at(0).toByteArray()) };
 
 		if (guiEvName == "CommandlinePosition") {
 			handleGuiCommandlinePosition(args);
@@ -321,7 +316,7 @@ void MainWidget::handleGuiCommandlinePosition(const QVariantList& args) noexcept
 	}
 
 	// FIXME PositionFromString?
-	const QString position{ m_nvim->decode(args.at(1).toByteArray()).toLower() };
+	const QString position{ m_nvim.decode(args.at(1).toByteArray()).toLower() };
 
 	if (position == "top") {
 		m_position = Position::Top;
@@ -337,50 +332,11 @@ void MainWidget::handleGuiCommandlinePosition(const QVariantList& args) noexcept
 	}
 }
 
-static void WriteCommandlineModeSetting(const QString& mode) noexcept
-{
-	QSettings settings("nvim-qt", "nvim-qt");
-
-	if (!settings.isWritable()) {
-		return;
-	}
-
-	settings.setValue("Commandline/display_mode", mode);
-}
-
-void MainWidget::handleGuiCommandlineMode(const QVariantList& args) noexcept
-{
-	if (args.size() < 2
-		|| !args.at(1).canConvert<QByteArray>()) {
-		qWarning() << "Unexpected arguments for GuiCommandlineMode:" << args;
-	}
-
-	const Mode mode{ ModeFromString(m_nvim->decode(args.at(1).toByteArray())) };
-
-	m_displayMode = mode;
-
-	switch (mode)
-	{
-		case Mode::Dynamic:
-		{
-			WriteCommandlineModeSetting(QStringLiteral("dynamic"));
-			return;
-		}
-
-		case Mode::Fixed:
-		{
-			WriteCommandlineModeSetting(QStringLiteral("fixed"));
-			return;
-		}
-	}
-}
-
 void MainWidget::updateGeometry() noexcept
 {
 	ShellWidget* parentShellWidget{ qobject_cast<ShellWidget*>(parentWidget()) };
 	if (!parentShellWidget) {
-		qDebug() << "No parent ShellWidget, cannot update size/position!";
-		return;
+		qFatal("ShellWidget parentWidget() must be defined!");
 	}
 
 	const int maxWidth = parentShellWidget->width() * m_maxWidth;
