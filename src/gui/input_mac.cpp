@@ -51,7 +51,7 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	QLocale& locale) noexcept
 {
 	
-	std::vector<QChar> removeAltCharList  { '[', ']', '|', '{', '}', '~', '@', '\'' };
+	
 	
 	if (!text.isEmpty())
 	{
@@ -62,6 +62,7 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 		
 		// German MacOS QWERTZ keyboard, remove AltModifier (OPTION KEY)
 		if(locale.name() == "de_DE") {
+			std::vector<QChar> removeAltCharList  { '[', ']', '|', '{', '}', '~', '@', '\'' };
 			if(mod & Qt::AltModifier) {
 				if (std::find(removeAltCharList.begin(), removeAltCharList.end(), c) != removeAltCharList.end()) {
 					mod &= ~Qt::AltModifier;
