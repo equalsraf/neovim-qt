@@ -61,8 +61,7 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 		}
 		
 		// German MacOS QWERTZ keyboard, remove AltModifier (OPTION KEY)
-		QInputMethod * im = QGuiApplication::inputMethod();
-		if(im->locale().name() == "de_DE") {
+		if(locale.name() == "de_DE") {
 			if(mod & Qt::AltModifier) {
 				if (std::find(removeAltCharList.begin(), removeAltCharList.end(), c) != removeAltCharList.end()) {
 					mod &= ~Qt::AltModifier;
