@@ -125,6 +125,7 @@ protected slots:
 	void neovimResizeFinished();
 	void mouseClickReset();
 	void localeChanged();
+	void updateCurrentLocale();
 	void mouseClickIncrement(Qt::MouseButton bt);
 	void init();
 	void fontError(const QString& msg);
@@ -232,8 +233,6 @@ private:
 	QPoint m_mouse_pos;
 	// 2/3/4 mouse click tracking
 	QTimer m_mouseclick_timer;
-	QLocale currentLocale;
-	QInputMethod * currentInputMethod;
 	uint8_t m_mouseclick_count{ 0 };
 	Qt::MouseButton m_mouseclick_pending;
 	// Accumulates remainder of steppy scroll
@@ -242,6 +241,8 @@ private:
 	// Properties
 	bool m_neovimBusy{ false };
 	ShellOptions m_options;
+	QInputMethod * m_currentInputMethod;
+	QLocale m_currentLocale{ QLocale::system()};
 	PopupMenu m_pum{ this };
 	bool m_mouseEnabled{ true };
 };

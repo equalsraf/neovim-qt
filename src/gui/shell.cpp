@@ -53,13 +53,12 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	: ShellWidget{ parent }
 	, m_nvim{ nvim }
 	, m_options{ GetShellOptionsFromQSettings() }
+	, m_currentInputMethod{ QGuiApplication::inputMethod() }
+	, m_currentLocale { m_currentInputMethod->locale() }
 {
 	setAttribute(Qt::WA_KeyCompression, false);
 
-	currentInputMethod = QGuiApplication::inputMethod();
-	currentLocale = currentInputMethod->locale();
-
-
+	
 	setAcceptDrops(true);
 	setMouseTracking(true);
 	m_mouseclick_timer.setInterval(QApplication::doubleClickInterval());
@@ -67,7 +66,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	connect(&m_mouseclick_timer, &QTimer::timeout,
 			this, &Shell::mouseClickReset);
 
- 	connect(currentInputMethod, &QInputMethod::localeChanged,
+ 	connect(m_currentInputMethod, &QInputMethod::localeChanged,
 			this, &Shell::localeChanged);
 
 	// IM Tooltip
@@ -1245,12 +1244,15 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 		this->setCursor(Qt::BlankCursor);
 	}
 
-	const QString inp{ Input::convertKey(*ev, currentLocale) };
+	QLocale* useLocale { &m_currentLocale };
+	const QString inp{ Input::convertKey(*ev, useLocale) };
 	
 	// Uncomment for key input debugging and unit test writing.
-	// qDebug() << "QKeyEvent ev:" << ev;
-	// qDebug() << "  " << inp;
-	// qDebug() << " Keyboard Locale: " << currentLocale.name();
+	//  qDebug() << "QKeyEvent ev:" << ev;
+	//  qDebug() << "  " << inp;
+	//  if(useLocale != nullptr) {
+	//  	qDebug() << " Keyboard Locale: " << useLocale->name();
+	//  }
 
 	if (inp.isEmpty()) {
 		QWidget::keyPressEvent(ev);
@@ -1298,11 +1300,18 @@ void Shell::mousePressEvent(QMouseEvent *ev)
 	neovimMouseEvent(ev);
 }
 
+/** Update Current Locale */
+void Shell::updateCurrentLocale() {
+	m_currentInputMethod = QGuiApplication::inputMethod();
+	if(m_currentInputMethod != nullptr) {
+		//QLocale hungary(QLocale::Hungarian);
+		m_currentLocale =  m_currentInputMethod->locale();
+	} 
+}
 /** Keyboard Locale has changed */
 void Shell::localeChanged()
 {
-	currentInputMethod = QGuiApplication::inputMethod();
-	currentLocale = currentInputMethod->locale();
+	updateCurrentLocale();
 }
 
 /** Reset state for mouse N-click tracking */

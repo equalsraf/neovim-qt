@@ -43,12 +43,23 @@ QString GetModifierPrefix(Qt::KeyboardModifiers mod) noexcept
 	return modprefix;
 }
 
+// Fixup Modifiers, Apples OPTION key
+Qt::KeyboardModifiers de_DE(Qt::KeyboardModifiers mod, QChar c) noexcept
+{
+ 	std::vector<QChar> removeAltCharList  { '[', ']', '|', '{', '}', '~', '@', '\'' };
+	if(mod & Qt::AltModifier) {
+		if (std::find(removeAltCharList.begin(), removeAltCharList.end(), c) != removeAltCharList.end()) {
+			mod &= ~Qt::AltModifier;
+		}
+	}
+	return mod;
+}
 QKeyEvent CreatePlatformNormalizedKeyEvent(
 	QEvent::Type type,
 	int key,
 	Qt::KeyboardModifiers mod,
 	const QString& text,
-	QLocale& locale) noexcept
+	QLocale* locale) noexcept
 {
 	
 	
@@ -60,13 +71,10 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 			mod &= ~Qt::AltModifier;
 		}
 		
-		// German MacOS QWERTZ keyboard, remove AltModifier (OPTION KEY)
-		if(locale.name() == "de_DE") {
-			std::vector<QChar> removeAltCharList  { '[', ']', '|', '{', '}', '~', '@', '\'' };
-			if(mod & Qt::AltModifier) {
-				if (std::find(removeAltCharList.begin(), removeAltCharList.end(), c) != removeAltCharList.end()) {
-					mod &= ~Qt::AltModifier;
-				}
+		// German/Austrian/Swiss MacOS QWERTZ keyboard, remove AltModifier (OPTION KEY)
+		if(locale != nullptr) {
+			if(locale->name() == "de_DE" || locale->name() == "de_AT" || locale->name() == "de_CH") {
+				mod = de_DE(mod, c);
 			}
 		}
 	}
