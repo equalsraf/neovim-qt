@@ -72,8 +72,8 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 		}
 		
 		// German/Austrian/Swiss MacOS QWERTZ keyboard, remove AltModifier (OPTION KEY)
-		if(locale != nullptr) {
-			if(locale->name() == "de_DE" || locale->name() == "de_AT" || locale->name() == "de_CH") {
+		if(locale) {
+			if(locale->name().startsWith("de_", Qt::CaseInsensitive)) {
 				mod = de_DE(mod, c);
 			}
 		}
