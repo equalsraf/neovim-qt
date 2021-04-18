@@ -124,7 +124,7 @@ protected slots:
 	void neovimExited(int);
 	void neovimResizeFinished();
 	void mouseClickReset();
-	void localeChanged();
+	void localeChanged() noexcept;
 	void updateCurrentLocale();
 	void mouseClickIncrement(Qt::MouseButton bt);
 	void init();

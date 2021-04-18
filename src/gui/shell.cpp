@@ -1308,7 +1308,7 @@ void Shell::updateCurrentLocale() {
 	} 
 }
 /** Keyboard Locale has changed */
-void Shell::localeChanged()
+void Shell::localeChanged() noexcept
 {
 	updateCurrentLocale();
 }
