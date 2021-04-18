@@ -57,7 +57,6 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	, m_currentLocale { m_currentInputMethod->locale() }
 {
 	setAttribute(Qt::WA_KeyCompression, false);
-
 	
 	setAcceptDrops(true);
 	setMouseTracking(true);
@@ -1244,8 +1243,7 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 		this->setCursor(Qt::BlankCursor);
 	}
 
-	QLocale* useLocale { &m_currentLocale };
-	const QString inp{ Input::convertKey(*ev, useLocale) };
+	const QString inp{ Input::convertKey(*ev, &m_currentLocale) };
 	
 	// Uncomment for key input debugging and unit test writing.
 	//  qDebug() << "QKeyEvent ev:" << ev;

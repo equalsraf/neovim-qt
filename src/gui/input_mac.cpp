@@ -1,6 +1,5 @@
 #include "input.h"
-#include <QInputMethod>
-#include <QApplication>
+
 namespace NeovimQt { namespace Input {
 
 Qt::KeyboardModifiers ControlModifier() noexcept

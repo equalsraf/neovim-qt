@@ -13,10 +13,10 @@ private slots:
 	void SpecialKeys() noexcept;
 	void KeyboardLayoutUnicodeHexInput() noexcept;
 	void CtrlCaretWellFormed() noexcept;
-	void GermanKeyBoard() noexcept;
+	void GermanKeyboard() noexcept;
 };
 
-void TestInputMac::GermanKeyBoard() noexcept
+void TestInputMac::GermanKeyboard() noexcept
 {
 	QLocale german(QLocale::German);
 	QLocale test_locale = german;
