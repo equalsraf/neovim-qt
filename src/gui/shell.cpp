@@ -49,15 +49,24 @@ static ShellOptions GetShellOptionsFromQSettings() noexcept
 	return opts;
 }
 
+static QLocale GetCurrentLocale() noexcept
+{
+	auto inputMethod{ QGuiApplication::inputMethod() };
+
+	if (!inputMethod) {
+		return QLocale::system();
+	}
+
+	return inputMethod->locale();
+}
+
 Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	: ShellWidget{ parent }
 	, m_nvim{ nvim }
 	, m_options{ GetShellOptionsFromQSettings() }
-	, m_currentInputMethod{ QGuiApplication::inputMethod() }
-	, m_currentLocale { m_currentInputMethod->locale() }
+		, m_currentLocale { GetCurrentLocale() }
 {
 	setAttribute(Qt::WA_KeyCompression, false);
-	
 	setAcceptDrops(true);
 	setMouseTracking(true);
 	m_mouseclick_timer.setInterval(QApplication::doubleClickInterval());
@@ -65,8 +74,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	connect(&m_mouseclick_timer, &QTimer::timeout,
 			this, &Shell::mouseClickReset);
 
- 	connect(m_currentInputMethod, &QInputMethod::localeChanged,
-			this, &Shell::localeChanged);
+ 	connect(QGuiApplication::inputMethod(), &QInputMethod::localeChanged,
+ 			this, &Shell::localeChanged);
 
 	// IM Tooltip
 	setAttribute(Qt::WA_InputMethodEnabled, true);
@@ -1298,17 +1307,10 @@ void Shell::mousePressEvent(QMouseEvent *ev)
 	neovimMouseEvent(ev);
 }
 
-/** Update Current Locale */
-void Shell::updateCurrentLocale() {
-	m_currentInputMethod = QGuiApplication::inputMethod();
-	if(m_currentInputMethod != nullptr) {
-		m_currentLocale =  m_currentInputMethod->locale();
-	} 
-}
 /** Keyboard Locale has changed */
 void Shell::localeChanged() noexcept
 {
-	updateCurrentLocale();
+	m_currentLocale = GetCurrentLocale();
 }
 
 /** Reset state for mouse N-click tracking */

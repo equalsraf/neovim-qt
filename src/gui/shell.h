@@ -125,7 +125,6 @@ protected slots:
 	void neovimResizeFinished();
 	void mouseClickReset();
 	void localeChanged() noexcept;
-	void updateCurrentLocale();
 	void mouseClickIncrement(Qt::MouseButton bt);
 	void init();
 	void fontError(const QString& msg);
@@ -241,8 +240,7 @@ private:
 	// Properties
 	bool m_neovimBusy{ false };
 	ShellOptions m_options;
-	QInputMethod * m_currentInputMethod;
-	QLocale m_currentLocale{ QLocale::system()};
+	QLocale m_currentLocale{ QLocale::system() };
 	PopupMenu m_pum{ this };
 	bool m_mouseEnabled{ true };
 };
