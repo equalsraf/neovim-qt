@@ -1354,42 +1354,22 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	const QString evString{ GetWheelEventStringAndSetScrollRemainder(
 		*ev, m_scrollDeltaRemainder, cellSize()) };
 
-	qDebug() << ev;
-	qDebug() << "  angleDelta:" << ev->angleDelta();
-	qDebug() << "  button:" << ev->buttons();
-	qDebug() << "  globalPosition:" << ev->globalPosition();
-	qDebug() << "  inverted:" << ev->inverted();
-	qDebug() << "  phase:" << ev->phase();
-	qDebug() << "  pixelDelta:" << ev->pixelDelta();
-	qDebug() << "  position:" << ev->position();
-	qDebug() << "  source:" << ev->source();
-	qDebug() << "  deltasPerStep:" << QWheelEvent::DefaultDeltasPerStep;
-	qDebug() << "  m_scrollDeltaRemainder:" << QWheelEvent::DefaultDeltasPerStep;
-	if (!evString.isEmpty()) {
-		qDebug() << "  evString:" << evString;
-	}
-	qDebug();
+	// Uncomment for scroll input debugging and unit test writing.
+	// qDebug() << ev;
+	// qDebug() << "  button:" << ev->buttons();
+	// qDebug() << "  globalPosition:" << ev->globalPosition();
+	// qDebug() << "  inverted:" << ev->inverted();
+	// qDebug() << "  phase:" << ev->phase();
+	// qDebug() << "  position:" << ev->position();
+	// qDebug() << "  source:" << ev->source();
+	// qDebug() << "  deltasPerStep:" << QWheelEvent::DefaultDeltasPerStep;
+	// qDebug() << "  m_scrollDeltaRemainder:" << m_scrollDeltaRemainder;
+	// qDebug() << "  evString:" << evString;
 
+	// Skip sending empty strings to Neovim
 	if (evString.isEmpty()) {
 		return;
 	}
-
-	qDebug() << ev;
-	qDebug() << "  angleDelta:" << ev->angleDelta();
-	qDebug() << "  button:" << ev->buttons();
-	qDebug() << "  globalPosition:" << ev->globalPosition();
-	qDebug() << "  inverted:" << ev->inverted();
-	qDebug() << "  phase:" << ev->phase();
-	qDebug() << "  pixelDelta:" << ev->pixelDelta();
-	qDebug() << "  position:" << ev->position();
-	qDebug() << "  source:" << ev->source();
-	qDebug() << "  deltasPerStep:" << QWheelEvent::DefaultDeltasPerStep;
-	qDebug() << "  m_scrollDeltaRemainder:" << m_scrollDeltaRemainder;
-	if (!evString.isEmpty()) {
-		qDebug() << "    evString:" << evString;
-	}
-	qDebug();
-
 
 	m_nvim->api0()->vim_input(evString.toLatin1());
 }
