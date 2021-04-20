@@ -13,43 +13,9 @@ private slots:
 	void SpecialKeys() noexcept;
 	void KeyboardLayoutUnicodeHexInput() noexcept;
 	void CtrlCaretWellFormed() noexcept;
+	void ShiftModifierLetter() noexcept;
 	void GermanKeyboard() noexcept;
 };
-
-void TestInputMac::GermanKeyboard() noexcept
-{
-	QLocale german(QLocale::German);
-	QLocale test_locale = german;
-	QLocale* locale_ref = &test_locale;
-
-	/// Check if special characters work
-	std::vector<QChar> removeAltCharList  { '[', ']', '|', '{', '}', '~', '@', '\'' };
-	
-	// Verify that we have a DE_de keyboard
-	QCOMPARE(locale_ref->name(), QString{ "de_DE" });
-
-	// Check Keys
-	QKeyEvent evOption5{ QEvent::KeyPress, Qt::Key_5, Qt::AltModifier, "[" };
-	QCOMPARE(NeovimQt::Input::convertKey(evOption5, locale_ref), QString{ "[" });
-	
-	QKeyEvent evOption6{ QEvent::KeyPress, Qt::Key_6, Qt::AltModifier, "]" };
-	QCOMPARE(NeovimQt::Input::convertKey(evOption6, locale_ref), QString{ "]" });
-	
-	QKeyEvent evOption7{ QEvent::KeyPress, Qt::Key_7, Qt::AltModifier, "|" };
-	QCOMPARE(NeovimQt::Input::convertKey(evOption7, locale_ref), QString{ "|" });
-
-	QKeyEvent evOption8{ QEvent::KeyPress, Qt::Key_8, Qt::AltModifier, "{" };
-	QCOMPARE(NeovimQt::Input::convertKey(evOption8, locale_ref), QString{ "{" });
-	
-	QKeyEvent evOption9{ QEvent::KeyPress, Qt::Key_9, Qt::AltModifier, "}" };
-	QCOMPARE(NeovimQt::Input::convertKey(evOption9, locale_ref), QString{ "}" });
-
-	QKeyEvent evOptionTilde{ QEvent::KeyPress, Qt::Key_N, Qt::AltModifier, "~" };
-	QCOMPARE(NeovimQt::Input::convertKey(evOptionTilde, locale_ref), QString{ "~" });
-
-	QKeyEvent evOptionAtSign{ QEvent::KeyPress, Qt::Key_L, Qt::AltModifier, "@" };
-	QCOMPARE(NeovimQt::Input::convertKey(evOptionAtSign, locale_ref), QString{ "@" });
-}
 
 void TestInputMac::AltSpecialCharacters() noexcept
 {
@@ -110,7 +76,7 @@ void TestInputMac::KeyboardLayoutUnicodeHexInput() noexcept
 
 	QKeyEvent evCtrlAltShiftA{ QEvent::KeyPress, Qt::Key_A,
 		Qt::MetaModifier | Qt::AltModifier | Qt::ShiftModifier };
-	QCOMPARE(NeovimQt::Input::convertKey(evCtrlAltShiftA), QString{ "<C-A-A>" });
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlAltShiftA), QString{ "<C-S-A-A>" });
 }
 
 void TestInputMac::CtrlCaretWellFormed() noexcept
@@ -124,6 +90,55 @@ void TestInputMac::CtrlCaretWellFormed() noexcept
 	QKeyEvent evCtrlShiftMeta6{ QEvent::KeyPress, Qt::Key_AsciiCircum,
 		Qt::MetaModifier | Qt::ShiftModifier | Qt::ControlModifier };
 	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftMeta6), QString{ "<C-^>" });
+}
+
+void TestInputMac::ShiftModifierLetter() noexcept
+{
+	// Issue#817: Shift should be sent if modifier keys are present
+	// For example, Ctrl + Shift + A is <C-S-A> and not <C-A>
+
+	// CTRL + B
+	QKeyEvent evCtrlB{ QEvent::KeyPress, Qt::Key_B, Qt::MetaModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlB), QString{ "<C-b>" });
+
+	// CTRL + SHIFT + B
+	QKeyEvent evCtrlShiftB{ QEvent::KeyPress, Qt::Key_B, Qt::MetaModifier | Qt::ShiftModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftB), QString{ "<C-S-B>" });
+}
+
+void TestInputMac::GermanKeyboard() noexcept
+{
+	QLocale german(QLocale::German);
+	QLocale test_locale = german;
+	QLocale* locale_ref = &test_locale;
+
+	/// Check if special characters work
+	std::vector<QChar> removeAltCharList  { '[', ']', '|', '{', '}', '~', '@', '\'' };
+	
+	// Verify that we have a DE_de keyboard
+	QCOMPARE(locale_ref->name(), QString{ "de_DE" });
+
+	// Check Keys
+	QKeyEvent evOption5{ QEvent::KeyPress, Qt::Key_5, Qt::AltModifier, "[" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption5, locale_ref), QString{ "[" });
+	
+	QKeyEvent evOption6{ QEvent::KeyPress, Qt::Key_6, Qt::AltModifier, "]" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption6, locale_ref), QString{ "]" });
+	
+	QKeyEvent evOption7{ QEvent::KeyPress, Qt::Key_7, Qt::AltModifier, "|" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption7, locale_ref), QString{ "|" });
+
+	QKeyEvent evOption8{ QEvent::KeyPress, Qt::Key_8, Qt::AltModifier, "{" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption8, locale_ref), QString{ "{" });
+	
+	QKeyEvent evOption9{ QEvent::KeyPress, Qt::Key_9, Qt::AltModifier, "}" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption9, locale_ref), QString{ "}" });
+
+	QKeyEvent evOptionTilde{ QEvent::KeyPress, Qt::Key_N, Qt::AltModifier, "~" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOptionTilde, locale_ref), QString{ "~" });
+
+	QKeyEvent evOptionAtSign{ QEvent::KeyPress, Qt::Key_L, Qt::AltModifier, "@" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOptionAtSign, locale_ref), QString{ "@" });
 }
 
 #include "tst_input_mac.moc"
