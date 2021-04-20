@@ -60,16 +60,13 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	const QString& text,
 	const QLocale* locale) noexcept
 {
-	
-	
-	
 	if (!text.isEmpty())
 	{
 		const QChar c{ text.at(0) };
 		if (c.unicode() >= 0x80 && c.isPrint()) {
 			mod &= ~Qt::AltModifier;
 		}
-		
+
 		// German/Austrian/Swiss MacOS QWERTZ keyboard, remove AltModifier (OPTION KEY)
 		if(locale) {
 			if(locale->name().startsWith("de_", Qt::CaseInsensitive)) {
@@ -77,10 +74,6 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 			}
 		}
 	}
-	
-	
-
-	
 
 	return { type, key, mod, text };
 }

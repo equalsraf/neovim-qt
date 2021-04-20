@@ -114,23 +114,23 @@ void TestInputMac::GermanKeyboard() noexcept
 
 	/// Check if special characters work
 	std::vector<QChar> removeAltCharList  { '[', ']', '|', '{', '}', '~', '@', '\'' };
-	
+
 	// Verify that we have a DE_de keyboard
 	QCOMPARE(locale_ref->name(), QString{ "de_DE" });
 
 	// Check Keys
 	QKeyEvent evOption5{ QEvent::KeyPress, Qt::Key_5, Qt::AltModifier, "[" };
 	QCOMPARE(NeovimQt::Input::convertKey(evOption5, locale_ref), QString{ "[" });
-	
+
 	QKeyEvent evOption6{ QEvent::KeyPress, Qt::Key_6, Qt::AltModifier, "]" };
 	QCOMPARE(NeovimQt::Input::convertKey(evOption6, locale_ref), QString{ "]" });
-	
+
 	QKeyEvent evOption7{ QEvent::KeyPress, Qt::Key_7, Qt::AltModifier, "|" };
 	QCOMPARE(NeovimQt::Input::convertKey(evOption7, locale_ref), QString{ "|" });
 
 	QKeyEvent evOption8{ QEvent::KeyPress, Qt::Key_8, Qt::AltModifier, "{" };
 	QCOMPARE(NeovimQt::Input::convertKey(evOption8, locale_ref), QString{ "{" });
-	
+
 	QKeyEvent evOption9{ QEvent::KeyPress, Qt::Key_9, Qt::AltModifier, "}" };
 	QCOMPARE(NeovimQt::Input::convertKey(evOption9, locale_ref), QString{ "}" });
 
