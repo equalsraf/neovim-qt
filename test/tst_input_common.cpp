@@ -247,15 +247,15 @@ void TestInputCommon::MouseRightClick() noexcept
 
 void TestInputCommon::MouseMiddleClick() noexcept
 {
-	//Qt::MidButton
+	//Qt::MiddleButton
 	QString middleClickPress{ NeovimQt::Input::convertMouse(
-		Qt::MidButton,
+		Qt::MiddleButton,
 		QEvent::MouseButtonPress,
 		Qt::NoModifier,
 		{ 1, 2 },
 		1 /*clickCount*/) };
 	QString middleClickRelease{ NeovimQt::Input::convertMouse(
-		Qt::MidButton,
+		Qt::MiddleButton,
 		QEvent::MouseButtonRelease,
 		Qt::NoModifier,
 		{ 1, 2 },

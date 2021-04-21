@@ -73,7 +73,7 @@ static QVariant GetButtonName(
 		case Qt::RightButton:
 			return QStringLiteral("Right");
 
-		case Qt::MidButton:
+		case Qt::MiddleButton:
 			return QStringLiteral("Middle");
 
 		case Qt::NoButton:

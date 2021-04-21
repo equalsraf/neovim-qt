@@ -1267,8 +1267,8 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 			bt = Qt::LeftButton;
 		} else if (ev->buttons() & Qt::RightButton) {
 			bt = Qt::RightButton;
-		} else if (ev->buttons() & Qt::MidButton) {
-			bt = Qt::MidButton;
+		} else if (ev->buttons() & Qt::MiddleButton) {
+			bt = Qt::MiddleButton;
 		} else {
 			return;
 		}
