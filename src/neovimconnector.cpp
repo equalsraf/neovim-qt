@@ -353,7 +353,9 @@ NeovimConnector* NeovimConnector::connectToNeovim(const QString& server)
 	int colon_pos = addr.lastIndexOf(':');
 	if (colon_pos != -1 && colon_pos != 0 && addr[colon_pos-1] != ':') {
 		bool ok;
-		int port = addr.midRef(colon_pos+1).toInt(&ok);
+		// TODO: the additional toString() call is needed to be compatible with
+		// both Qt5/6. Remove when the minimum Qt version is 5.15 or above
+		int port = QStringView{addr}.mid(colon_pos+1).toString().toInt(&ok);
 		if (ok) {
 			QString host = addr.mid(0, colon_pos);
 			return connectToHost(host, port);

@@ -543,7 +543,7 @@ void ShellWidget::paintForegroundTextBlock(
 
 		// When the cursor IS within the glyph run, decompose individual characters under the cursor.
 		const int cursorGlyphRunPos { cursorPos - glyphsRendered };
-		const QString textGlyphRun{ QStringRef{ &text, glyphsRendered, sizeGlyphRun }.toString() };
+		const QString textGlyphRun{ QStringView{text}.mid(glyphsRendered, sizeGlyphRun).toString() };
 
 		// Compares a glyph run with and without ligatures. Ligature glyphs are detected as differences
 		// in these two lists. A non-empty newCursorGlyphList indicates glyph substitution is required.
@@ -1007,7 +1007,9 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	for (const auto& attr : attrs) {
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok{ false };
-			qreal height = attr.midRef(1).toFloat(&ok);
+			// TODO: the additional toString() call is needed to be compatible with
+			// both Qt5/6. Remove when the minimum Qt version is 5.15 or above
+			qreal height = QStringView{attr}.mid(1).toString().toFloat(&ok);
 			if (!ok || height < 0) {
 				return QStringLiteral("Invalid font height");
 			}
@@ -1019,7 +1021,9 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 		} else if (attr == "sb") {
 			weight = QFont::DemiBold;
 		} else if (attr.length() > 0 && attr.at(0) == 'w') {
-			weight = (attr.rightRef(attr.length()-1)).toInt();
+			// TODO: the additional toString() call is needed to be compatible
+			// both Qt5/6. Remove when the minimum Qt version is 5.15 or above
+			weight = (QStringView{attr}.right(attr.length()-1)).toString().toInt();
 			if (weight < 0 || weight > 99) {
 				return QStringLiteral("Invalid font weight");
 			}
