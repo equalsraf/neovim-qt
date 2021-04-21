@@ -58,7 +58,7 @@ bool Function::isValid() const
  * Two functions are considered identical if their names
  * argument and return types, and error status are identical
  */
-bool Function::operator==(const Function& other)
+bool Function::operator==(const Function& other) const
 {
 	if ( this->name != other.name ) {
 		return false;
