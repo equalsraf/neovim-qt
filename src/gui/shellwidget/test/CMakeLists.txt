@@ -10,7 +10,7 @@ add_definitions(-DTEST_SOURCE_DIR="${TEST_SOURCE_DIR}")
 
 function(add_xtest SOURCE_NAME)
 	add_executable(${SOURCE_NAME} ${SOURCE_NAME}.cpp)
-	target_link_libraries(${SOURCE_NAME} Qt5::Widgets Qt5::Test qshellwidget)
+	target_link_libraries(${SOURCE_NAME} Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Test qshellwidget)
 	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} ${CTEST_EXE_ARGS})
 endfunction()
 

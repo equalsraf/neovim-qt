@@ -15,11 +15,11 @@ class MsgpackIODevice: public QObject
 	Q_OBJECT
 	Q_PROPERTY(MsgpackError error READ errorCause NOTIFY error)
 public:
-	enum MsgpackError {
-		NoError=0,
+	enum MsgpackError
+	{
+		NoError = 0,
 		InvalidDevice,
 		InvalidMsgpack,
-		UnsupportedEncoding,
 	};
 	Q_ENUM(MsgpackError)
 

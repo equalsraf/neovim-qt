@@ -1,4 +1,6 @@
-set(QTLIBS Qt5::Network Qt5::Svg Qt5::Test)
+set(QTLIBS Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Svg Qt${QT_VERSION_MAJOR}::Test)
+set(QTLIBS_GUI Qt${QT_VERSION_MAJOR}::Widgets)
+set(QTLIBS_TEST Qt${QT_VERSION_MAJOR}::Test)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 add_definitions(-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
@@ -33,14 +35,18 @@ function(add_xtest SOURCE_NAME)
 endfunction()
 
 function(add_xtest_gui SOURCE_NAME)
-	qt5_add_resources(RCC_SOURCES data.qrc)
+	if(${QT_VERSION_MAJOR} VERSION_GREATER_EQUAL 6)
+		qt_add_resources(RCC_SOURCES data.qrc)
+	else()
+		qt5_add_resources(RCC_SOURCES data.qrc)
+	endif()
 	add_executable(${SOURCE_NAME}
 		${RCC_SOURCES}
 		${SOURCE_NAME}.cpp
 		${SOURCES_COMMON}
 		${SOURCES_COMMON_GUI}
 		${ARGV1} ${ARGV2})
-	target_link_libraries(${SOURCE_NAME} ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt Qt5::Widgets neovim-qt-gui)
+	target_link_libraries(${SOURCE_NAME} ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt Qt${QT_VERSION_MAJOR}::Widgets neovim-qt-gui)
 	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} ${CTEST_EXE_ARGS}
 		# Run GUI tests from source dir, they depend on src files
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
@@ -49,8 +55,8 @@ endfunction()
 
 function(add_shared_test SOURCE_NAME)
 	add_executable(${SOURCE_NAME} ${ARGV1} ${ARGV2} ${ARGV3})
-	target_link_libraries(${SOURCE_NAME} Qt5::Network Qt5::Test Qt5::Widgets ${MSGPACK_LIBRARIES} neovim-qt)
-	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} ${CTEST_EXE_ARGS})
+	target_link_libraries(${SOURCE_NAME} Qt${QT_VERSION_MAJOR}::Network ${QTLIBS_TEST} ${QTLIBS_GUI} ${MSGPACK_LIBRARIES} neovim-qt)
+	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME})
 	add_dependencies(check ${SOURCE_NAME})
 endfunction()
 
