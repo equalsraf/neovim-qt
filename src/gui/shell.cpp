@@ -4,16 +4,17 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QFontDialog>
 #include <QKeyEvent>
 #include <QMimeData>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QScreen>
 #include <QSettings>
 #include <QShowEvent>
 
 #include "app.h"
+#include "compat_gui.h"
 #include "helpers.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
@@ -319,9 +320,9 @@ void Shell::init()
 	connect(m_nvim->api0(), &NeovimApi0::on_ui_try_resize,
 			this, &Shell::neovimResizeFinished);
 
-	const int64_t shellWidth{ width() / cellSize().width() };
-	const int64_t shellHeight{ height() / cellSize().height() };
-
+	QRect screenRect = screenAvailableGeometry(this);
+	const int64_t shellWidth = screenRect.width() / cellSize().width();
+	const int64_t shellHeight = screenRect.height() / cellSize().height();
 	QVariantMap options;
 	if (m_options.IsTablineEnabled()) {
 		options.insert("ext_tabline", true);
@@ -1715,7 +1716,8 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 {
 	if ( query == Qt::ImFont) {
 		return font();
-	} else if ( query == Qt::ImMicroFocus || query == Qt::ImCursorRectangle ) {
+	}
+	else if (query == Qt::ImCursorRectangle) {
 		return QRect(neovimCursorTopLeft(), cellSize());
 	}
 

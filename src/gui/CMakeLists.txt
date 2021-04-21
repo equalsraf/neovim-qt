@@ -1,7 +1,15 @@
-set(QTLIBS Qt5::Network Qt5::Svg Qt5::Widgets)
+set(QTLIBS Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Widgets)
 
 include_directories(.. shellwidget)
-qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
+
+if(${QT_VERSION_MAJOR} VERSION_GREATER_EQUAL 6)
+	set(QTLIBS ${QTLIBS} Qt${QT_VERSION_MAJOR}::SvgWidgets)
+	qt_add_resources(NEOVIM_RCC_SOURCES data.qrc)
+else()
+	set(QTLIBS ${QTLIBS} Qt${QT_VERSION_MAJOR}::Svg)
+	qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
+endif()
+
 if(WIN32)
 	set(SRCS_PLATFORM
 		arguments_qwindowgeometry.cpp
@@ -11,7 +19,7 @@ if(WIN32)
 	if (USE_STATIC_QT)
 		add_definitions(-DUSE_STATIC_QT)
 		link_directories(${CMAKE_PREFIX_PATH}/share/qt5/plugins/platforms)
-		set(QTLIBS ${QTLIBS} Qt5PlatformCompositorSupport qwindows)
+		set(QTLIBS ${QTLIBS} Qt${QT_VERSION_MAJOR}PlatformCompositorSupport qwindows)
 	endif()
 	set(RES_FILE "data.rc")
 	enable_language(RC)
@@ -50,9 +58,11 @@ add_library(neovim-qt-gui
 	shell.cpp
 	tabline.cpp
 	treeview.cpp
+	compat_gui_qt${QT_VERSION_MAJOR}.cpp
 	${SRCS_PLATFORM}
 	${NEOVIM_RCC_SOURCES})
 target_link_libraries(neovim-qt-gui ${QTLIBS} qshellwidget neovim-qt)
+target_include_directories(neovim-qt-gui PRIVATE ${CMAKE_SOURCE_DIR}/src/compat/qt${QT_VERSION_MAJOR})
 
 if(APPLE)
 	set_property(SOURCE app.cpp PROPERTY COMPILE_DEFINITIONS
@@ -111,7 +121,13 @@ endif()
 
 if(WIN32 AND NOT CMAKE_CROSSCOMPILING AND NOT DEFINED USE_STATIC_QT)
 	include(WinDeployQt)
-	WinDeployQt(TARGET nvim-qt COMPILER_RUNTIME INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
+
+	set(__QT_EXCLUDE_DEPLOY_MODULES webkit webkit2)
+	if(${QT_VERSION_MAJOR} VERSION_GREATER_EQUAL 6)
+		set(__QT_EXCLUDE_DEPLOY_MODULES )
+	endif()
+
+	WinDeployQt(TARGET nvim-qt COMPILER_RUNTIME INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES ${__QT_EXCLUDE_DEPLOY_MODULES})
 	install(DIRECTORY ${PROJECT_BINARY_DIR}/windeployqt/
 		DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()

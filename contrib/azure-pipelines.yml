@@ -41,7 +41,7 @@ jobs:
       displayName: CMake Build
 
 
-  - job: Apple
+  - job: Apple_qt5
     pool:
       vmImage: 'macOS-latest'
     steps:
@@ -59,7 +59,25 @@ jobs:
       displayName: CMake Build
 
 
-  - job: Windows
+  - job: Apple_qt6
+    pool:
+      vmImage: 'macOS-latest'
+    steps:
+    - script: brew install msgpack neovim ninja qt6
+      displayName: Install Dependencies
+    - task: CMake@1
+      inputs:
+        workingDirectory: $(Build.BinariesDirectory)
+        cmakeArgs: -GNinja -DUSE_SYSTEM_MSGPACK=OFF -DCMAKE_BUILD_TYPE=Debug -DWITH_QT=Qt6 $(Build.SourcesDirectory)
+      displayName: CMake Configure
+    - task: CMake@1
+      inputs:
+        workingDirectory: $(Build.BinariesDirectory)
+        cmakeArgs: --build .
+      displayName: CMake Build
+
+
+  - job: Windows_qt5
     pool:
       vmImage: 'windows-2019'
     steps:
@@ -81,6 +99,35 @@ jobs:
       inputs:
         workingDirectory: $(Build.BinariesDirectory)
         cmakeArgs: -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=$(Build.BinariesDirectory)\5.15.0\msvc2019_64\lib\cmake;$(Build.BinariesDirectory)\5.15.0\msvc2019_64\bin $(Build.SourcesDirectory)
+      displayName: CMake Configure
+    - task: CMake@1
+      inputs:
+        workingDirectory: $(Build.BinariesDirectory)
+        cmakeArgs: --build .
+      displayName: CMake Build
+
+  - job: Windows_qt6
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.8'
+        architecture: 'x64'
+      displayName: Setup Python
+    - script: |
+        cinst --no-progress -y 7zip neovim
+        pip install aqtinstall
+        cd $(Build.BinariesDirectory)
+        python -m aqt install 6.0.0 windows desktop win64_msvc2019_64
+      displayName: Install Dependencies
+    - powershell: |
+        Write-Host "##vso[task.setvariable variable=PATH;]${env:PATH};C:\tools\neovim\nvim-win64\bin";
+      displayName: Add Neovim to PATH
+    - task: CMake@1
+      inputs:
+        workingDirectory: $(Build.BinariesDirectory)
+        cmakeArgs: -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DWITH_QT=Qt6 -DCMAKE_PREFIX_PATH=$(Build.BinariesDirectory)\6.0.0\msvc2019_64\lib\cmake;$(Build.BinariesDirectory)\6.0.0\msvc2019_64\bin $(Build.SourcesDirectory)
       displayName: CMake Configure
     - task: CMake@1
       inputs:

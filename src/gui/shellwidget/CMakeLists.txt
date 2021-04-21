@@ -8,9 +8,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Qt
 set(CMAKE_AUTOMOC ON)
-find_package(Qt5Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR}Widgets REQUIRED)
 if(ENABLE_TESTS)
-	find_package(Qt5Test REQUIRED)
+	find_package(Qt${QT_VERSION_MAJOR}Test REQUIRED)
 endif()
 
 if (WIN32 AND USE_STATIC_QT)
@@ -24,10 +24,11 @@ set(SOURCES
   helpers.cpp
   konsole_wcwidth.cpp
   shellcontents.cpp
-  shellwidget.cpp)
+  shellwidget.cpp
+  compat_shellwidget_qt${QT_VERSION_MAJOR}.cpp)
 
 add_library(qshellwidget STATIC ${SOURCES})
-target_link_libraries(qshellwidget Qt5::Widgets)
+target_link_libraries(qshellwidget Qt${QT_VERSION_MAJOR}::Widgets compat)
 
 add_executable(example EXCLUDE_FROM_ALL example.cpp)
 target_link_libraries(example qshellwidget )
@@ -37,4 +38,4 @@ add_executable(example3 EXCLUDE_FROM_ALL example3.cpp)
 target_link_libraries(example3 qshellwidget )
 
 add_executable(fontinfo EXCLUDE_FROM_ALL fontinfo.cpp)
-target_link_libraries(fontinfo Qt5::Widgets )
+target_link_libraries(fontinfo Qt${QT_VERSION_MAJOR}::Widgets )
