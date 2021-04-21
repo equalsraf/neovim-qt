@@ -525,8 +525,6 @@ static QPalette CreatePaletteFromHighlightGroups(const Shell& shell) noexcept
 	const QColor& foreground{ shell.foreground() };
 
 	QPalette palette;
-	palette.setColor(QPalette::Background, background);
-	palette.setColor(QPalette::Foreground, foreground);
 	palette.setColor(QPalette::Window, background);
 	palette.setColor(QPalette::WindowText, foreground);
 	palette.setColor(QPalette::Base, background);
