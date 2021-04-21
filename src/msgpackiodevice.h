@@ -3,6 +3,8 @@
 
 #include <QIODevice>
 #include <QHash>
+#include <QTextCodec>
+#include <QVariant>
 #include <msgpack.h>
 
 namespace NeovimQt {

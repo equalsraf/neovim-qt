@@ -2,6 +2,7 @@
 #define NEOVIM_QT_UTIL
 
 #include <QDebug>
+#include <QVariant>
 #include <msgpack.h>
 #include "function.h"
 
