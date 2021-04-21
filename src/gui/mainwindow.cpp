@@ -79,7 +79,7 @@ void MainWindow::init(NeovimConnector *c)
 	QWidget* shellScrollable{ new QWidget() };
 	QHBoxLayout* layout{ new QHBoxLayout() };
 	layout->setSpacing(0);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(m_shell);
 	layout->addWidget(m_scrollbar);
 	shellScrollable->setLayout(layout);
