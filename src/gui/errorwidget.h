@@ -3,7 +3,7 @@
 
 #include <QLabel>
 #include <QPushButton>
-#include <QtSvg/QSvgWidget>
+#include <QSvgWidget>
 #include <QWidget>
 
 namespace NeovimQt {
