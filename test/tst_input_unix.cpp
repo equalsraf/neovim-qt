@@ -1,6 +1,7 @@
 #include <QtTest/QtTest>
 
 #include <gui/input.h>
+#include "tst_input.h"
 
 class TestInputUnix : public QObject
 {
@@ -31,16 +32,17 @@ void TestInputUnix::SpecialKeys() noexcept
 
 	for (const auto k : specialKeys) {
 		// On Mac Meta is the Control key, treated as C-.
-		QList<QPair<QKeyEvent, QString>> keyEventList{
-			{ { QEvent::KeyPress, k, Qt::NoModifier, {} },      "<%1>" },
-			{ { QEvent::KeyPress, k, Qt::ControlModifier, {} }, "<C-%1>" },
-			{ { QEvent::KeyPress, k, Qt::AltModifier, {} },     "<A-%1>" },
-			{ { QEvent::KeyPress, k, Qt::MetaModifier, {} },    "<D-%1>" },
+		QList<InputTest> keyEventList{
+			{ QEvent::KeyPress, k, Qt::NoModifier,		"<%1>" },
+			{ QEvent::KeyPress, k, Qt::ControlModifier, "<C-%1>" },
+			{ QEvent::KeyPress, k, Qt::AltModifier,     "<A-%1>" },
+			{ QEvent::KeyPress, k, Qt::MetaModifier,    "<D-%1>" },
 		};
 
-		for (const auto& keyEvent : keyEventList) {
-			QCOMPARE(NeovimQt::Input::convertKey(keyEvent.first),
-				keyEvent.second.arg(NeovimQt::Input::GetSpecialKeysMap().value(k)));
+		for (const auto& keyTest : keyEventList) {
+			auto event = QKeyEvent(keyTest.event_type, keyTest.key, keyTest.modifiers);
+			QCOMPARE(NeovimQt::Input::convertKey(event),
+				keyTest.expected_input.arg(NeovimQt::Input::GetSpecialKeysMap().value(k)));
 		}
 	}
 }
