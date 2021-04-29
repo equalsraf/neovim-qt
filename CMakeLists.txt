@@ -7,8 +7,6 @@ endif (POLICY CMP0048)
 # 9999 = Development Pre-Release
 project(neovim-qt VERSION 0.2.17.9999)
 
-INCLUDE(CPack)
-
 if(NOT EXISTS ${NEOVIM_EXEC})
 	set(NEOVIM_EXEC nvim)
 endif()
@@ -121,4 +119,5 @@ if (PYTHONINTERP_FOUND)
 		)
 endif()
 
+include(CPackOptions)
 

@@ -34,6 +34,7 @@ build_script:
 - cd build
 - cmake -G "%GENERATOR%" -DCMAKE_PREFIX_PATH="%CMAKE_PATH_PREFIX%" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../INSTALL %EXTRA_CMAKE_ARGS% ..
 - cmake --build . --config Release --target install
+- cpack --verbose -G WIX
 test_script:
 - set PATH=%QTPATH%;%QTPATH%/bin;%PATH%
 - echo %PATH%
@@ -43,6 +44,7 @@ test_script:
 artifacts:
 - path: INSTALL
   name: neovim-qt
+- path: build\_CPack_Packages\win64\WIX\neovim-qt-installer.msi
 deploy:
   - provider: GitHub
     description: Automated builds (Appveyor)
