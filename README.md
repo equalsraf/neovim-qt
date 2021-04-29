@@ -22,7 +22,7 @@ A Neovim Qt is bundled with all releases of Neovim on Windows.
 
 See the Neovim release page:
 
- - [Nighly Release](https://github.com/neovim/neovim/releases/nightly)
+ - [Nightly Release](https://github.com/neovim/neovim/releases/nightly)
  - [Stable Release](https://github.com/neovim/neovim/releases/latest)
 
 Neovim is available as a [Chocolatey Package](https://chocolatey.org/packages/neovim/).
@@ -193,7 +193,7 @@ You may see these errors:
 
 You can override this warning with `:GuiFont! {Font Name}`.
 
-These warnings displays for fonts containing variable-width characters.
+These warnings display for fonts containing variable-width characters.
 
 They are safe to ignore, but you may notice font spacing and clipping issues.
 
