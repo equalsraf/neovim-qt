@@ -8,8 +8,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Qt
 set(CMAKE_AUTOMOC ON)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Test REQUIRED)
+find_package(${TARGET_QT}Widgets REQUIRED)
+find_package(${TARGET_QT}Test REQUIRED)
 
 if (WIN32 AND USE_STATIC_QT)
 	add_definitions(-DUSE_STATIC_QT)
@@ -25,7 +25,7 @@ set(SOURCES
   shellwidget.cpp)
 
 add_library(qshellwidget STATIC ${SOURCES})
-target_link_libraries(qshellwidget Qt5::Widgets)
+target_link_libraries(qshellwidget ${TARGET_QT}::Widgets)
 
 add_executable(example EXCLUDE_FROM_ALL example.cpp)
 target_link_libraries(example qshellwidget )
@@ -35,4 +35,4 @@ add_executable(example3 EXCLUDE_FROM_ALL example3.cpp)
 target_link_libraries(example3 qshellwidget )
 
 add_executable(fontinfo EXCLUDE_FROM_ALL fontinfo.cpp)
-target_link_libraries(fontinfo Qt5::Widgets )
+target_link_libraries(fontinfo ${TARGET_QT}::Widgets )

@@ -1,7 +1,15 @@
-set(QTLIBS Qt5::Network Qt5::Svg Qt5::Widgets)
+set(QTLIBS ${TARGET_QT}::Network ${TARGET_QT}::Widgets)
 
 include_directories(.. shellwidget)
-qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
+
+if(${QT_VERSION_MAJOR} VERSION_GREATER_EQUAL 6)
+	set(QTLIBS ${QTLIBS} ${TARGET_QT}::SvgWidgets)
+	qt_add_resources(NEOVIM_RCC_SOURCES data.qrc)
+else()
+	set(QTLIBS ${QTLIBS} ${TARGET_QT}::Svg)
+	qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
+endif()
+
 if(WIN32)
 	set(SRCS_PLATFORM
 		arguments_qwindowgeometry.cpp
@@ -11,7 +19,7 @@ if(WIN32)
 	if (USE_STATIC_QT)
 		add_definitions(-DUSE_STATIC_QT)
 		link_directories(${CMAKE_PREFIX_PATH}/share/qt5/plugins/platforms)
-		set(QTLIBS ${QTLIBS} Qt5PlatformCompositorSupport qwindows)
+		set(QTLIBS ${QTLIBS} Qt5${QT_VERSION_MAJOR}latformCompositorSupport qwindows)
 	endif()
 	set(RES_FILE "data.rc")
 	enable_language(RC)
@@ -32,6 +40,8 @@ else()
 		printinfo_stdout.cpp
 		)
 endif()
+
+list(APPEND SRCS_PLATFORM compat_qt${QT_VERSION_MAJOR}.cpp)
 
 add_subdirectory(shellwidget)
 

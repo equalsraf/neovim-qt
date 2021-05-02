@@ -6,12 +6,15 @@ osx_image: xcode12.2
 compiler:
   - gcc
   - clang
+env:
+  - QTPKG=qt6
+  - QTPKG=qt5
 before_install:
   - brew update
   # Install Neovim for the unit tests
   - brew install neovim
   - brew ls --formula | grep -wq cmake || brew install cmake
-  - brew ls --formula | grep -wq qt5 || brew install qt5
+  - brew ls --formula | grep -wq $QTPKG || brew install $QTPKG
   - brew ls --formula | grep -wq msgpack || brew install msgpack
   # cpp-coveralls https://github.com/eddyxu/cpp-coveralls
   - pip install cpp-coveralls PyYAML
