@@ -123,4 +123,3 @@ if (PYTHONINTERP_FOUND)
 endif()
 
 include(CPackOptions)
-
