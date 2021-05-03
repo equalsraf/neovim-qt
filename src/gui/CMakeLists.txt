@@ -96,6 +96,8 @@ if(NOT APPLE)
 	install(DIRECTORY runtime
 		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt/
 		PATTERN "README.md" EXCLUDE)
+	install(FILES ${PROJECT_SOURCE_DIR}/LICENSE
+		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt/)
 	install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 	install(FILES ${CMAKE_SOURCE_DIR}/third-party/neovim.png
 			RENAME nvim-qt.png
