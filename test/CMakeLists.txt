@@ -38,6 +38,7 @@ add_xtest(tst_callallmethods)
 add_xtest(tst_encoding)
 add_xtest(tst_msgpackiodevice)
 add_xtest_gui(tst_shell)
+add_xtest_gui(tst_scroll)
 add_xtest_gui(tst_main)
 
 # Platform Specific Input Tests

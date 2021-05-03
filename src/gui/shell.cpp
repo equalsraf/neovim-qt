@@ -1354,6 +1354,19 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	const QString evString{ GetWheelEventStringAndSetScrollRemainder(
 		*ev, m_scrollDeltaRemainder, cellSize()) };
 
+	// Uncomment for scroll input debugging and unit test writing.
+	// qDebug() << ev;
+	// qDebug() << "  button:" << ev->buttons();
+	// qDebug() << "  globalPosition:" << ev->globalPosition();
+	// qDebug() << "  inverted:" << ev->inverted();
+	// qDebug() << "  phase:" << ev->phase();
+	// qDebug() << "  position:" << ev->position();
+	// qDebug() << "  source:" << ev->source();
+	// qDebug() << "  deltasPerStep:" << QWheelEvent::DefaultDeltasPerStep;
+	// qDebug() << "  m_scrollDeltaRemainder:" << m_scrollDeltaRemainder;
+	// qDebug() << "  evString:" << evString;
+
+	// Skip sending empty strings to Neovim
 	if (evString.isEmpty()) {
 		return;
 	}
@@ -1374,13 +1387,8 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	scrollRemainderOut.rx() = scrollRemainderAndEvent.x() % deltasPerStep;
 	scrollRemainderOut.ry() = scrollRemainderAndEvent.y() % deltasPerStep;
 
-	const bool isScrollDeltaOverflow{ scrollRemainderAndEvent.x() >= deltasPerStep
-		|| scrollRemainderAndEvent.x() <= -deltasPerStep
-		|| scrollRemainderAndEvent.y() >= deltasPerStep
-		|| scrollRemainderAndEvent.y() <= -deltasPerStep };
-
-	if (!isScrollDeltaOverflow)
-	{
+	// FIXME Comment
+	if (scrollRemainderAndEvent == scrollRemainderOut) {
 		return {};
 	}
 
@@ -1394,18 +1402,18 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	QPoint evCellPos{ evPos.x() / cellSize.width(), evPos.y() / cellSize.height() };
 
 	QString wheelEventString;
-	if (scrollRemainderAndEvent.y() > 0) {
+	if (scrollRemainderAndEvent.y() >= deltasPerStep) {
 		wheelEventString += QStringLiteral("<%1ScrollWheelUp><%2,%3>");
 	}
-	else if (scrollRemainderAndEvent.y() < 0) {
+	else if (scrollRemainderAndEvent.y() <= -deltasPerStep) {
 		wheelEventString += QStringLiteral("<%1ScrollWheelDown><%2,%3>");
 	}
 
-	if (scrollRemainderAndEvent.x() < 0) {
-		wheelEventString += QStringLiteral("<%1ScrollWheelRight><%2,%3>");
-	}
-	else if (scrollRemainderAndEvent.x() > 0) {
+	if (scrollRemainderAndEvent.x() >= deltasPerStep) {
 		wheelEventString += QStringLiteral("<%1ScrollWheelLeft><%2,%3>");
+	}
+	else if (scrollRemainderAndEvent.x() <= -deltasPerStep) {
+		wheelEventString += QStringLiteral("<%1ScrollWheelRight><%2,%3>");
 	}
 
 	return wheelEventString.arg(Input::GetModifierPrefix(ev.modifiers())).arg(evCellPos.x()).arg(evCellPos.y());
