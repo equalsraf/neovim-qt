@@ -12,6 +12,7 @@ private slots:
 	void SpecialKeys() noexcept;
 	void CtrlCaretWellFormed() noexcept;
 	void ShiftModifierLetter() noexcept;
+	void GermanKeyboardLayout() noexcept;
 };
 
 void TestInputUnix::LessThanModifierKeys() noexcept
@@ -70,6 +71,30 @@ void TestInputUnix::ShiftModifierLetter() noexcept
 	QKeyEvent evCtrlShiftB{ QEvent::KeyPress, Qt::Key_B, Qt::ControlModifier | Qt::ShiftModifier,
 		QString{ "\u0002" } };
 	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftB), QString{ "<C-S-B>" });
+}
+
+void TestInputUnix::GermanKeyboardLayout() noexcept
+{
+	QKeyEvent evOption7{ QEvent::KeyPress, Qt::Key_BraceLeft, Qt::GroupSwitchModifier, "{" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption7), QString{ "{" });
+
+	QKeyEvent evOption8{ QEvent::KeyPress, Qt::Key_BracketLeft, Qt::GroupSwitchModifier, "[" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption8), QString{ "[" });
+
+	QKeyEvent evOption9{ QEvent::KeyPress, Qt::Key_BracketRight, Qt::GroupSwitchModifier, "]" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption9), QString{ "]" });
+
+	QKeyEvent evOption0{ QEvent::KeyPress, Qt::Key_BraceRight, Qt::GroupSwitchModifier, "}" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption0), QString{ "}" });
+
+	QKeyEvent evOptionQ{ QEvent::KeyPress, Qt::Key_At, Qt::GroupSwitchModifier, "@" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOptionQ), QString{ "@" });
+
+	QKeyEvent evOptionBeta{ QEvent::KeyPress, Qt::Key_Backslash, Qt::GroupSwitchModifier, "\\" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOptionBeta), QString{ "<Bslash>" });
+
+	QKeyEvent evOptionPlus{ QEvent::KeyPress, Qt::Key_AsciiTilde, Qt::GroupSwitchModifier, "~" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOptionPlus), QString{ "~" });
 }
 
 #include "tst_input_unix.moc"
