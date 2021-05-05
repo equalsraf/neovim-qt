@@ -9,6 +9,18 @@ endif ()
 
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
 
+# Place all platform-specific test definitions here
+if(WIN32)
+	set(SRC_SHELL_PLATFORM tst_shell_win32.cpp)
+	set(SRC_INPUT_PLATFORM ${CMAKE_SOURCE_DIR}/src/gui/input_win32.cpp)
+elseif(APPLE)
+	set(SRC_SHELL_PLATFORM tst_shell_mac.cpp)
+	set(SRC_INPUT_PLATFORM ${CMAKE_SOURCE_DIR}/src/gui/input_mac.cpp)
+else()
+	set(SRC_SHELL_PLATFORM tst_shell_unix.cpp)
+	set(SRC_INPUT_PLATFORM ${CMAKE_SOURCE_DIR}/src/gui/input_unix.cpp)
+endif()
+
 function(add_xtest SOURCE_NAME)
 	add_executable(${SOURCE_NAME} ${SOURCE_NAME}.cpp ${ARGV1} ${ARGV2})
 	target_link_libraries(${SOURCE_NAME} ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt)
@@ -17,7 +29,7 @@ function(add_xtest SOURCE_NAME)
 endfunction()
 
 function(add_xtest_gui SOURCE_NAME)
-	add_executable(${SOURCE_NAME} ${SOURCE_NAME}.cpp)
+	add_executable(${SOURCE_NAME} ${SOURCE_NAME}.cpp ${ARGV1} ${ARGV2})
 	target_link_libraries(${SOURCE_NAME} ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt Qt5::Widgets neovim-qt-gui)
 	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME}
 		# Run GUI tests from source dir, they depend on src files
@@ -37,7 +49,7 @@ add_xtest(tst_neovimconnector)
 add_xtest(tst_callallmethods)
 add_xtest(tst_encoding)
 add_xtest(tst_msgpackiodevice)
-add_xtest_gui(tst_shell)
+add_xtest_gui(tst_shell ${SRC_SHELL_PLATFORM})
 add_xtest_gui(tst_main)
 
 # Platform Specific Input Tests
@@ -55,12 +67,12 @@ add_xtest(tst_input_win32
 add_shared_test(tst_input_common_mac
 	tst_input_common.cpp
 	${CMAKE_SOURCE_DIR}/src/gui/input.cpp
-	${CMAKE_SOURCE_DIR}/src/gui/input_mac.cpp)
+	${SRC_INPUT_PLATFORM})
 add_shared_test(tst_input_common_unix
 	tst_input_common.cpp
 	${CMAKE_SOURCE_DIR}/src/gui/input.cpp
-	${CMAKE_SOURCE_DIR}/src/gui/input_unix.cpp)
+	${SRC_INPUT_PLATFORM})
 add_shared_test(tst_input_common_win32
 	tst_input_common.cpp
 	${CMAKE_SOURCE_DIR}/src/gui/input.cpp
-	${CMAKE_SOURCE_DIR}/src/gui/input_win32.cpp)
+	${SRC_INPUT_PLATFORM})

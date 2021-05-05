@@ -5,7 +5,9 @@
 #include <QClipboard>
 #include <gui/mainwindow.h>
 #include <msgpackrequest.h>
+
 #include "common.h"
+#include "tst_shell.h"
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
 #include <QtPlugin>
@@ -14,7 +16,7 @@ Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
 
 namespace NeovimQt {
 
-class Test: public QObject
+class Test : public QObject
 {
 	Q_OBJECT
 private slots:
@@ -189,35 +191,32 @@ private slots:
 	}
 
 	void CloseEvent_data() {
-		// The status code as carried via msgpack
-		QTest::addColumn<int>("event_status");
-		// The expected process exit status
+		QTest::addColumn<int>("msgpack_status");
 		QTest::addColumn<int>("exit_status");
-		// q/cq command
 		QTest::addColumn<QByteArray>("command");
 
-		QTest::newRow("q")
+		QTest::newRow("Normal Exit: q")
 			<< 0 << 0 << QByteArray("q");
-		QTest::newRow("cq")
+
+		QTest::newRow("Exit with Code 1: cq")
 			<< 1 << 1 << QByteArray("cq");
-		QTest::newRow("2cq")
+
+		QTest::newRow("Exit with Code 2: 2cq")
 			<< 2 << 2 << QByteArray("2cq");
-		QTest::newRow("255cq")
+
+		QTest::newRow("Exit with Code 255: 255cq")
 			<< 255 << 255 << QByteArray("255cq");
-		// Overflow except Windows, this generates an exit code 0, but the
-		// original count is passed to us
-		// Commented out as this test doesn't pass on Windows
-//		QTest::newRow("256cq")
-//			<< 256 << 0 << QByteArray("256cq");
-		// a bit of corner case, but nvim exits with
-		// status 0 and provides us count 0 - calling it with nvim -c
-		// actually causes an error with an invalid range, so it can not run
-//		QTest::newRow("-1cq")
-//			<< 0 << QByteArray("-1cq");
+
+		// FIXME This probably requires a comment... Also expected value is 0 (not -1)?
+		QTest::newRow("Exit with Invalid Code: -1cq")
+			<< -1 << 0 << QByteArray("-1cq");
+
+		// Some exit-status scenarios are platform dependent. Ex) Overflow on Windows
+		AddPlatformSpecificExitCodeCases();
 	}
 
 	void CloseEvent() {
-		QFETCH(int, event_status);
+		QFETCH(int, msgpack_status);
 		QFETCH(int, exit_status);
 		QFETCH(QByteArray, command);
 
@@ -228,8 +227,8 @@ private slots:
 		QStringList args = {"-u", "NONE",
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 
-		NeovimConnector *c = NeovimConnector::spawn(args);
-		MainWindow *s = new MainWindow(c);
+		NeovimConnector* c{ NeovimConnector::spawn(args) };
+		MainWindow* s{ new MainWindow(c) };
 		s->show();
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
@@ -246,10 +245,10 @@ private slots:
 		c->api0()->vim_command(c->encode(command));
 
 		QVERIFY(SPYWAIT(onClose));
-		QCOMPARE(onClose.takeFirst().at(0).toInt(), event_status);
+		QCOMPARE(onClose.takeFirst().at(0).toInt(), msgpack_status);
 
 		QVERIFY(SPYWAIT(onWindowClosing));
-		QCOMPARE(onWindowClosing.takeFirst().at(0).toInt(), event_status);
+		QCOMPARE(onWindowClosing.takeFirst().at(0).toInt(), msgpack_status);
 
 		// and finally a call to nvim-qt
 		QProcess p;
@@ -257,15 +256,11 @@ private slots:
 		QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 		env.insert("NVIM_QT_RUNTIME_PATH", path_to_src_runtime);
 		p.setProcessEnvironment(env);
-#if defined(Q_OS_WIN32)
-		p.setArguments({NVIM_QT_BINARY, "--",  "-c", command});
-#else
-		p.setArguments({NVIM_QT_BINARY, "--nofork", "--",  "-c", command});
-#endif
+		p.setArguments(BinaryAndArgumentsNoForkWithCommand(command));
 		p.start();
 		p.waitForFinished(-1);
 		QCOMPARE(p.exitStatus(), QProcess::NormalExit);
-		int actual_exit_status = p.exitCode();
+		int actual_exit_status{ p.exitCode() };
 
 		QCOMPARE(actual_exit_status, exit_status);
 	}
