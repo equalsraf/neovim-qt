@@ -13,6 +13,7 @@ private slots:
 	void KeyboardLayoutUnicodeHexInput() noexcept;
 	void CtrlCaretWellFormed() noexcept;
 	void ShiftModifierLetter() noexcept;
+	void GermanKeyboardLayout() noexcept;
 };
 
 void TestInputMac::AltSpecialCharacters() noexcept
@@ -102,6 +103,30 @@ void TestInputMac::ShiftModifierLetter() noexcept
 	// CTRL + SHIFT + B
 	QKeyEvent evCtrlShiftB{ QEvent::KeyPress, Qt::Key_B, Qt::MetaModifier | Qt::ShiftModifier };
 	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftB), QString{ "<C-S-B>" });
+}
+
+void TestInputMac::GermanKeyboardLayout() noexcept
+{
+	QKeyEvent evOption5{ QEvent::KeyPress, Qt::Key_5, Qt::AltModifier, "[" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption5), QString{ "[" });
+
+	QKeyEvent evOption6{ QEvent::KeyPress, Qt::Key_6, Qt::AltModifier, "]" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption6), QString{ "]" });
+
+	QKeyEvent evOption7{ QEvent::KeyPress, Qt::Key_7, Qt::AltModifier, "|" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption7), QString{ "|" });
+
+	QKeyEvent evOption8{ QEvent::KeyPress, Qt::Key_8, Qt::AltModifier, "{" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption8), QString{ "{" });
+
+	QKeyEvent evOption9{ QEvent::KeyPress, Qt::Key_9, Qt::AltModifier, "}" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOption9), QString{ "}" });
+
+	QKeyEvent evOptionTilde{ QEvent::KeyPress, Qt::Key_N, Qt::AltModifier, "~" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOptionTilde), QString{ "~" });
+
+	QKeyEvent evOptionAtSign{ QEvent::KeyPress, Qt::Key_L, Qt::AltModifier, "@" };
+	QCOMPARE(NeovimQt::Input::convertKey(evOptionAtSign), QString{ "@" });
 }
 
 #include "tst_input_mac.moc"
