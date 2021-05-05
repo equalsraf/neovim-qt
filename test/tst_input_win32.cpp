@@ -11,6 +11,7 @@ private slots:
 	void SpecialKeys() noexcept;
 	void CtrlCaretWellFormed() noexcept;
 	void ShiftModifierLetter() noexcept;
+	void GermanKeyboardLayout() noexcept;
 };
 
 void TestInputWin32::LessThanModifierKeys() noexcept
@@ -64,6 +65,33 @@ void TestInputWin32::ShiftModifierLetter() noexcept
 	QKeyEvent evCtrlShiftB{ QEvent::KeyPress, Qt::Key_B, Qt::ControlModifier | Qt::ShiftModifier,
 		QString{ "\u0002" } };
 	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftB), QString{ "<C-S-B>" });
+}
+
+void TestInputWin32::GermanKeyboardLayout() noexcept
+{
+	QKeyEvent evAlt7{ QEvent::KeyPress, Qt::Key_BraceLeft, Qt::ControlModifier | Qt::AltModifier, "{" };
+	QCOMPARE(NeovimQt::Input::convertKey(evAlt7), QString{ "{" });
+
+	QKeyEvent evAlt8{ QEvent::KeyPress, Qt::Key_BracketLeft, Qt::ControlModifier | Qt::AltModifier, "[" };
+	QCOMPARE(NeovimQt::Input::convertKey(evAlt8), QString{ "[" });
+
+	QKeyEvent evAlt9{ QEvent::KeyPress, Qt::Key_BracketRight, Qt::ControlModifier | Qt::AltModifier, "]" };
+	QCOMPARE(NeovimQt::Input::convertKey(evAlt9), QString{ "]" });
+
+	QKeyEvent evAlt0{ QEvent::KeyPress, Qt::Key_BraceRight, Qt::ControlModifier | Qt::AltModifier, "}" };
+	QCOMPARE(NeovimQt::Input::convertKey(evAlt0), QString{ "}" });
+
+	QKeyEvent evKeyAt{ QEvent::KeyPress, Qt::Key_At, Qt::ControlModifier | Qt::AltModifier, "@" };
+	QCOMPARE(NeovimQt::Input::convertKey(evKeyAt), QString{ "@" });
+
+	QKeyEvent evKeyBSlash{ QEvent::KeyPress, Qt::Key_Backslash, Qt::ControlModifier | Qt::AltModifier, "\\" };
+	QCOMPARE(NeovimQt::Input::convertKey(evKeyBSlash), QString{ "<Bslash>" });
+
+	QKeyEvent evKeyTilde{ QEvent::KeyPress, Qt::Key_AsciiTilde, Qt::ControlModifier | Qt::AltModifier, "~" };
+	QCOMPARE(NeovimQt::Input::convertKey(evKeyTilde), QString{ "~" });
+
+	QKeyEvent evLeftAlt8{ QEvent::KeyPress, Qt::Key_8, Qt::AltModifier, "8" };
+	QCOMPARE(NeovimQt::Input::convertKey(evLeftAlt8), QString{ "<A-8>" });
 }
 
 #include "tst_input_win32.moc"
