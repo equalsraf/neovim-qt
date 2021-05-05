@@ -968,7 +968,7 @@ void Shell::handleLineSpace(const QVariant& value) noexcept
 	resizeNeovim(size());
 }
 
-void Shell::handleCloseEvent(const QVariantList &args) noexcept
+void Shell::handleCloseEvent(const QVariantList& args) noexcept
 {
 	qDebug() << "Neovim requested a GUI close";
 
