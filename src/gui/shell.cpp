@@ -979,7 +979,7 @@ void Shell::handleCloseEvent(const QVariantList& args) noexcept
 
 	// Decide exit status.  If there is an argument, the exit status is
 	// specified by the argument.
-	int status = 0;
+	int status{ 0 };
 	if (args.size() == 2) {
 		status = args.at(1).toInt();
 	}

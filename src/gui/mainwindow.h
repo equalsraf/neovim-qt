@@ -90,7 +90,7 @@ private:
 	QAction* m_actPaste{ nullptr };
 	QAction* m_actSelectAll{ nullptr };
 	ScrollBar* m_scrollbar{ nullptr };
-	int m_exitStatus = 0;
+	int m_exitStatus{ 0 };
 
 	// GuiAdaptive Color/Font/Style
 	bool m_isAdaptiveColorEnabled{ false };

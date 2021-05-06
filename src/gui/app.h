@@ -33,7 +33,7 @@ private:
 
 	QCommandLineParser m_parser;
 	std::shared_ptr<NeovimConnector> m_connector;
-	int m_exitStatus = 0;
+	int m_exitStatus{ 0 };
 
 public slots:
 	void mainWindowClosing(int);
