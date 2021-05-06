@@ -211,7 +211,8 @@ private slots:
 		QTest::newRow("Exit with Invalid Code: -1cq")
 			<< -1 << 0 << QByteArray("-1cq");
 
-		// Some exit-status scenarios are platform dependent. Ex) Overflow on Windows
+		// Some exit-status scenarios are platform dependent.
+		// Ex) Overflow on UNIX-like operating systems.
 		AddPlatformSpecificExitCodeCases();
 	}
 

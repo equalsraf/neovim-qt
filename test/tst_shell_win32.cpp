@@ -12,9 +12,11 @@ QStringList BinaryAndArgumentsNoForkWithCommand(const QString& command) noexcept
 
 void AddPlatformSpecificExitCodeCases() noexcept
 {
-	// FIXME Add comment
-	QTest::newRow("Exit Code Overflow: 256cq")
-		<< 256 << 0 << QByteArray("256cq");
+	// Unlike UNIX-like operating systems, Windows represents the exit code as
+	// a signed 32-bit integer. 256 doesn't overflows hence :256cq returns
+	// 256.
+	QTest::newRow("Exit with Code 256: 256cq")
+		<< 256 << 256 << QByteArray("256cq");
 }
 
 } // namespace NeovimQt
