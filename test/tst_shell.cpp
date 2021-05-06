@@ -207,10 +207,6 @@ private slots:
 		QTest::newRow("Exit with Code 255: 255cq")
 			<< 255 << 255 << QByteArray("255cq");
 
-		// FIXME This probably requires a comment... Also expected value is 0 (not -1)?
-		QTest::newRow("Exit with Invalid Code: -1cq")
-			<< -1 << 0 << QByteArray("-1cq");
-
 		// Some exit-status scenarios are platform dependent.
 		// Ex) Overflow on UNIX-like operating systems.
 		AddPlatformSpecificExitCodeCases();
