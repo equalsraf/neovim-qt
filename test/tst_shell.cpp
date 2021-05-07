@@ -5,7 +5,9 @@
 #include <QClipboard>
 #include <gui/mainwindow.h>
 #include <msgpackrequest.h>
+
 #include "common.h"
+#include "tst_shell.h"
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
 #include <QtPlugin>
@@ -14,7 +16,7 @@ Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
 
 namespace NeovimQt {
 
-class Test: public QObject
+class Test : public QObject
 {
 	Q_OBJECT
 private slots:
@@ -186,6 +188,78 @@ private slots:
 		// GuiTabline
 		QSignalSpy onOptionSet(s->shell(), &Shell::neovimExtTablineSet);
 		QVERIFY(onOptionSet.isValid());
+	}
+
+	void CloseEvent_data() {
+		QTest::addColumn<int>("msgpack_status");
+		QTest::addColumn<int>("exit_status");
+		QTest::addColumn<QByteArray>("command");
+
+		QTest::newRow("Normal Exit: q")
+			<< 0 << 0 << QByteArray("q");
+
+		QTest::newRow("Exit with Code 1: cq")
+			<< 1 << 1 << QByteArray("cq");
+
+		QTest::newRow("Exit with Code 2: 2cq")
+			<< 2 << 2 << QByteArray("2cq");
+
+		QTest::newRow("Exit with Code 255: 255cq")
+			<< 255 << 255 << QByteArray("255cq");
+
+		// Some exit-status scenarios are platform dependent.
+		// Ex) Overflow on UNIX-like operating systems.
+		AddPlatformSpecificExitCodeCases();
+	}
+
+	void CloseEvent() {
+		QFETCH(int, msgpack_status);
+		QFETCH(int, exit_status);
+		QFETCH(QByteArray, command);
+
+		QString path_to_src_runtime(CMAKE_SOURCE_DIR);
+		path_to_src_runtime.append("/src/gui/runtime");
+		QFileInfo fi = QFileInfo(path_to_src_runtime);
+		QVERIFY2(fi.exists(), "Unable to find GUI runtime");
+		QStringList args = {"-u", "NONE",
+			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
+
+		NeovimConnector* c{ NeovimConnector::spawn(args) };
+		MainWindow* s{ new MainWindow(c) };
+		s->show();
+		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QVERIFY(onAttached.isValid());
+		QVERIFY(SPYWAIT(onAttached));
+		QVERIFY(s->neovimAttached());
+
+		// GUI shim Close event
+		QSignalSpy onClose(s->shell(), &Shell::neovimGuiCloseRequest);
+		QVERIFY(onClose.isValid());
+
+		QSignalSpy onWindowClosing(s, &MainWindow::closing);
+		QVERIFY(onWindowClosing.isValid());
+
+		c->api0()->vim_command(c->encode(command));
+
+		QVERIFY(SPYWAIT(onClose));
+		QCOMPARE(onClose.takeFirst().at(0).toInt(), msgpack_status);
+
+		QVERIFY(SPYWAIT(onWindowClosing));
+		QCOMPARE(onWindowClosing.takeFirst().at(0).toInt(), msgpack_status);
+
+		// and finally a call to nvim-qt
+		QProcess p;
+		p.setProgram(NVIM_QT_BINARY);
+		QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+		env.insert("NVIM_QT_RUNTIME_PATH", path_to_src_runtime);
+		p.setProcessEnvironment(env);
+		p.setArguments(BinaryAndArgumentsNoForkWithCommand(command));
+		p.start();
+		p.waitForFinished(-1);
+		QCOMPARE(p.exitStatus(), QProcess::NormalExit);
+		int actual_exit_status{ p.exitCode() };
+
+		QCOMPARE(actual_exit_status, exit_status);
 	}
 
 	void GetClipboard_data() {

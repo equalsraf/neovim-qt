@@ -106,8 +106,14 @@ void App::showUi() noexcept
 #else
 	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(m_connector.get());
 
-	QObject::connect(instance(), SIGNAL(openFilesTriggered(QList<QUrl>)),
-		win->shell(), SLOT(openFiles(QList<QUrl>)));
+	// delete the main window when closed to emit `destroyed()` signal to
+	// support `:cq` return codes (Pull#644).
+	win->setAttribute(Qt::WA_DeleteOnClose);
+	setQuitOnLastWindowClosed(false);
+
+	connect(this, &App::openFilesTriggered, win->shell(), &Shell::openFiles);
+	connect(win, &MainWindow::closing, this, &App::mainWindowClosing);
+	connect(win, &MainWindow::destroyed, this, &App::exitWithStatus);
 
 	// Window geometry should be restored only when the user does not specify
 	// one of the following command line arguments. Argument "maximized" can
@@ -340,6 +346,14 @@ void App::showVersionInfo(QCommandLineParser& parser) noexcept
 	out << GetNeovimVersionInfo(nvimExecutable) << QT_ENDL;
 
 	PrintInfo(versionInfo);
+}
+
+void App::mainWindowClosing(int status) {
+	m_exitStatus = status;
+}
+
+void App::exitWithStatus() {
+	exit(m_exitStatus);
 }
 
 } // namespace NeovimQt

@@ -808,9 +808,8 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			m_mouseHide = variant_not_zero(args.at(1));
 			int val = m_mouseHide ? 1 : 0;
 			m_nvim->api0()->vim_set_var("GuiMousehide", val);
-		} else if (guiEvName == "Close" && args.size() == 1) {
-			qDebug() << "Neovim requested a GUI close";
-			emit neovimGuiCloseRequest();
+		} else if (guiEvName == "Close") {
+			handleCloseEvent(args);
 		} else if (guiEvName == "Option" && args.size() >= 3) {
 			QString option = m_nvim->decode(args.at(1).toByteArray());
 			handleExtGuiOption(option, args.at(2));
@@ -967,6 +966,25 @@ void Shell::handleLineSpace(const QVariant& value) noexcept
 	setLineSpace(linespace);
 	m_nvim->api0()->vim_set_var("GuiLinespace", linespace);
 	resizeNeovim(size());
+}
+
+void Shell::handleCloseEvent(const QVariantList& args) noexcept
+{
+	qDebug() << "Neovim requested a GUI close";
+
+	if (args.size() >= 2 && !args.at(1).canConvert<int>()) {
+		qWarning() << "Unexpected exit status for close:" << args.at(1);
+		return;
+	}
+
+	// Decide exit status.  If there is an argument, the exit status is
+	// specified by the argument.
+	int status{ 0 };
+	if (args.size() == 2) {
+		status = args.at(1).toInt();
+	}
+
+	emit neovimGuiCloseRequest(status);
 }
 
 void Shell::handleGridResize(const QVariantList& opargs)
