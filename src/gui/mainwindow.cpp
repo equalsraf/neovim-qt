@@ -24,16 +24,10 @@ MainWindow::MainWindow(NeovimConnector* c, QWidget* parent)
 
 void MainWindow::init(NeovimConnector *c)
 {
-	if (m_shell) {
-		m_shell->deleteLater();
-		m_stack.removeWidget(m_shell);
-	}
+	assert(!m_shell);
+	assert(!m_nvim);
 
-	if (m_nvim) {
-		m_nvim->deleteLater();
-	}
-
-	m_shell = new Shell(c);
+	m_shell = new Shell{c, this};
 
 	m_tabline_bar = addToolBar("tabline");
 	m_tabline_bar->setObjectName("tabline");
@@ -68,6 +62,7 @@ void MainWindow::init(NeovimConnector *c)
 	m_contextMenu->addAction(m_actSelectAll);
 
 	m_nvim = c;
+	m_nvim->setParent(this);
 
 	m_tree = new TreeView(c);
 
@@ -249,9 +244,21 @@ void MainWindow::neovimGuiCloseRequest(int status)
 
 void MainWindow::reconnectNeovim()
 {
+	assert(m_nvim);
+	assert(m_shell);
+
 	if (m_nvim->canReconnect()) {
-		init(m_nvim->reconnect());
+		m_shell->deleteLater();
+		m_stack.removeWidget(m_shell);
+		m_shell = nullptr;
+
+		auto connector = m_nvim->reconnect();
+		m_nvim->deleteLater();
+		m_nvim = nullptr;
+
+		init(connector);
 	}
+
 	m_stack.setCurrentIndex(1);
 }
 
