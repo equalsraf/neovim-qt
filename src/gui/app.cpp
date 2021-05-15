@@ -14,7 +14,7 @@
 namespace NeovimQt {
 
 struct ConnectorInitArgs {
-	enum Type {
+	enum class Type {
 		Embed,
 		Server,
 		Spawn,
@@ -29,7 +29,7 @@ struct ConnectorInitArgs {
 	const QStringList neovimArgs;
 };
 
-ConnectorInitArgs::Type getConnectorType(const QCommandLineParser &parser)
+ConnectorInitArgs::Type getConnectorType(const QCommandLineParser& parser)
 {
 	if (parser.isSet("server")) {
 		return ConnectorInitArgs::Type::Server;
@@ -46,7 +46,7 @@ ConnectorInitArgs::Type getConnectorType(const QCommandLineParser &parser)
 	return ConnectorInitArgs::Type::Default;
 }
 
-NeovimConnector *connectoToRemoteNeovim(const ConnectorInitArgs &args)
+NeovimConnector* connectToRemoteNeovim(const ConnectorInitArgs &args)
 {
 	NeovimConnector *connector{nullptr};
 	if (args.type == ConnectorInitArgs::Type::Embed) {
@@ -163,7 +163,7 @@ void App::showUi() noexcept
 		win->show();
 	}
 #else
-	auto connector = connectoToRemoteNeovim(ConnectorInitArgs{
+	auto connector = connectToRemoteNeovim(ConnectorInitArgs{
 		getConnectorType(m_parser),
 		m_parser.value("timeout").toInt(),
 		m_parser.value("server"),
