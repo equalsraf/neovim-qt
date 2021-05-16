@@ -21,30 +21,41 @@ struct ConnectorInitArgs {
 		Default
 	};
 
+	ConnectorInitArgs(const QCommandLineParser& parser, QStringList nvimArgs)
+		: type{getConnectorType(parser)}
+		, timeout{parser.value("timeout").toInt()}
+		, server{parser.value("server")}
+		, nvim{parser.value("nvim")}
+		, positionalArgs{parser.positionalArguments()}
+		, neovimArgs{std::move(nvimArgs)}
+	{
+
+	}
+
 	const Type type;
 	const int timeout;
 	const QString server;
 	const QString nvim;
 	const QStringList positionalArgs;
 	const QStringList neovimArgs;
+
+	Type getConnectorType(const QCommandLineParser &parser)
+	{
+		if (parser.isSet("server")) {
+			return ConnectorInitArgs::Type::Server;
+		}
+
+		if (parser.isSet("embed")) {
+			return ConnectorInitArgs::Type::Embed;
+		}
+
+		if (parser.isSet("spawn") && !parser.positionalArguments().isEmpty()) {
+			return ConnectorInitArgs::Type::Spawn;
+		}
+
+		return ConnectorInitArgs::Type::Default;
+	}
 };
-
-ConnectorInitArgs::Type getConnectorType(const QCommandLineParser& parser)
-{
-	if (parser.isSet("server")) {
-		return ConnectorInitArgs::Type::Server;
-	}
-
-	if (parser.isSet("embed")) {
-		return ConnectorInitArgs::Type::Embed;
-	}
-
-	if (parser.isSet("spawn") && !parser.positionalArguments().isEmpty()) {
-		return ConnectorInitArgs::Type::Spawn;
-	}
-
-	return ConnectorInitArgs::Type::Default;
-}
 
 NeovimConnector* connectToRemoteNeovim(const ConnectorInitArgs &args)
 {
@@ -163,14 +174,7 @@ void App::showUi() noexcept
 		win->show();
 	}
 #else
-	auto connector = connectToRemoteNeovim(ConnectorInitArgs{
-		getConnectorType(m_parser),
-		m_parser.value("timeout").toInt(),
-		m_parser.value("server"),
-		m_parser.value("nvim"),
-		m_parser.positionalArguments(),
-		getNeovimArgs()
-	});
+	auto connector = connectToRemoteNeovim(ConnectorInitArgs{m_parser, getNeovimArgs()});
 	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(connector);
 
 	// delete the main window when closed to emit `destroyed()` signal to
