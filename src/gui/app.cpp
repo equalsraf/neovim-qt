@@ -69,7 +69,7 @@ NeovimConnector* connectToRemoteNeovim(const ConnectorInitArgs &args)
 	}
 
 	if (args.type == ConnectorInitArgs::Type::Spawn) {
-		assert(!args.positionalArgs.isEmpty());
+		Q_ASSERT(!args.positionalArgs.isEmpty());
 		connector = NeovimQt::NeovimConnector::spawn(args.positionalArgs.mid(1),
 				args.positionalArgs.at(0));
 	}
