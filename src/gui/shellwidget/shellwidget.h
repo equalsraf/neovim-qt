@@ -181,6 +181,7 @@ private:
 
 	QFont GetCellFont(const Cell& cell) const noexcept;
 	QPen getForegroundPen(const Cell& cell) noexcept;
+	QPen getSpecialPen(const Cell& cell) noexcept;
 
 	ShellContents m_contents{ 0, 0 };
 	QSize m_cellSize;
