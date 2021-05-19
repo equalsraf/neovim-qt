@@ -342,8 +342,11 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 		}
 	}
 
-	if (cell.IsBold() || cell.IsItalic()) {
+	if (cell.IsBold()) {
 		cellFont.setBold(cell.IsBold());
+	}
+
+	if (cell.IsItalic()) {
 		cellFont.setItalic(cell.IsItalic());
 	}
 
