@@ -229,7 +229,7 @@ void ShellWidget::paintUnderline(
 		return;
 	}
 
-	p.setPen(getForegroundPen(cell));
+	p.setPen(getSpecialPen(cell));
 
 	p.drawLine(GetUnderline(cellRect));
 }
@@ -274,18 +274,7 @@ void ShellWidget::paintUndercurl(
 		return;
 	}
 
-	QPen pen;
-	if (cell.GetSpecialColor().isValid()) {
-		pen.setColor(cell.GetSpecialColor());
-	} else if (special().isValid()) {
-		pen.setColor(special());
-	} else if (cell.GetForegroundColor().isValid()) {
-		pen.setColor(cell.GetForegroundColor());
-	} else {
-		pen.setColor(foreground());
-	}
-
-	p.setPen(pen);
+	p.setPen(getSpecialPen(cell));
 
 	p.drawPath(GetUndercurlPath(cellRect));
 }
@@ -373,6 +362,22 @@ QPen ShellWidget::getForegroundPen(const Cell& cell) noexcept
 {
 	QPen pen;
 	if (cell.GetForegroundColor().isValid()) {
+		pen.setColor(cell.GetForegroundColor());
+	} else {
+		pen.setColor(foreground());
+	}
+
+	return pen;
+}
+
+QPen ShellWidget::getSpecialPen(const Cell& cell) noexcept
+{
+	QPen pen;
+	if (cell.GetSpecialColor().isValid()) {
+		pen.setColor(cell.GetSpecialColor());
+	} else if (special().isValid()) {
+		pen.setColor(special());
+	} else if (cell.GetForegroundColor().isValid()) {
 		pen.setColor(cell.GetForegroundColor());
 	} else {
 		pen.setColor(foreground());
