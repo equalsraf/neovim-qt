@@ -40,6 +40,25 @@ jobs:
         cmakeArgs: --build .
       displayName: CMake Build
 
+  - job: UbuntuBionic
+    pool:
+      vmImage: 'ubuntu-18.04'
+    steps:
+    - script: |
+        sudo add-apt-repository -y ppa:neovim-ppa/stable
+        sudo apt update -y
+        sudo apt install -y libqt5svg5-dev neovim ninja-build qt5-default
+      displayName: Install Dependencies
+    - task: CMake@1
+      inputs:
+        workingDirectory: $(Build.BinariesDirectory)
+        cmakeArgs: -GNinja -DCMAKE_BUILD_TYPE=Debug $(Build.SourcesDirectory)
+      displayName: CMake Configure
+    - task: CMake@1
+      inputs:
+        workingDirectory: $(Build.BinariesDirectory)
+        cmakeArgs: --build .
+      displayName: CMake Build
 
   - job: Apple
     pool:
