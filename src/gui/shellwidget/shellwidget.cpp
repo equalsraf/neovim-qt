@@ -517,7 +517,7 @@ void ShellWidget::paintForegroundTextBlock(
 	int glyphsRendered{ 0 };
 	for (auto& glyphRun : textLayout.glyphRuns()) {
 		auto glyphPositionList{ glyphRun.positions() };
-		qsizetype sizeGlyphRun{ glyphPositionList.size() };
+		auto sizeGlyphRun{ glyphPositionList.size() };
 
 		const int cellWidth{ (cell.IsDoubleWidth()) ?
 			m_cellSize.width() * 2 : m_cellSize.width() };
