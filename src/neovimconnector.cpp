@@ -1,11 +1,14 @@
 #include "neovimconnector.h"
-#include <QtGlobal>
-#include <QMetaMethod>
+
 #include <QLocalSocket>
+#include <QMetaMethod>
+#include <QStringView>
 #include <QTcpSocket>
+#include <QtGlobal>
+
+#include "msgpackiodevice.h"
 #include "msgpackrequest.h"
 #include "neovimconnectorhelper.h"
-#include "msgpackiodevice.h"
 
 namespace NeovimQt {
 
@@ -342,7 +345,7 @@ NeovimConnector* NeovimConnector::connectToHost(const QString& host, int port)
  */
 NeovimConnector* NeovimConnector::connectToNeovim(const QString& server)
 {
-	QString addr = server;
+	QString addr{ server };
 	if (addr.isEmpty()) {
 		 addr = QString::fromLocal8Bit(qgetenv("NVIM_LISTEN_ADDRESS"));
 	}
@@ -350,14 +353,14 @@ NeovimConnector* NeovimConnector::connectToNeovim(const QString& server)
 		return spawn();
 	}
 
-	int colon_pos = addr.lastIndexOf(':');
+	int colon_pos{ addr.lastIndexOf(':') };
 	if (colon_pos != -1 && colon_pos != 0 && addr[colon_pos-1] != ':') {
-		bool ok;
+		bool ok{ false };
 		// TODO: the additional toString() call is needed to be compatible with
 		// both Qt5/6. Remove when the minimum Qt version is 5.15 or above
-		int port = QStringView{addr}.mid(colon_pos+1).toString().toInt(&ok);
+		int port{ QStringView{ addr }.mid(colon_pos+1).toString().toInt(&ok) };
 		if (ok) {
-			QString host = addr.mid(0, colon_pos);
+			const QString host{ addr.mid(0, colon_pos) };
 			return connectToHost(host, port);
 		}
 	}
