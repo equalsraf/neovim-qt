@@ -13,6 +13,9 @@
 
 namespace NeovimQt {
 
+MainWindow* s_lastActiveWindow{nullptr};
+int s_exitStatus{ 0 };
+
 struct ConnectorInitArgs {
 	enum class Type {
 		Embed,
@@ -32,15 +35,15 @@ struct ConnectorInitArgs {
 
 	}
 
-	ConnectorInitArgs(QStringList nvimArgs)
-		: type{Type::Default}
-		, timeout{2000}
-		, server{""}
-		, nvim{"nvim"}
+	ConnectorInitArgs(Type _type, int _timeout, QString _server, QString _nvim,
+					QStringList nvimArgs)
+		: type{_type}
+		, timeout{_timeout}
+		, server{std::move(_server)}
+		, nvim{std::move(_nvim)}
 		, positionalArgs{}
 		, neovimArgs{std::move(nvimArgs)}
 	{
-
 	}
 
 	const Type type;
@@ -92,6 +95,48 @@ NeovimConnector* connectToRemoteNeovim(const ConnectorInitArgs &args)
 
 	connector->setRequestTimeout(args.timeout);
 	return connector;
+}
+
+void onWindowActiveChanged(MainWindow& window)
+{
+	s_lastActiveWindow = &window;
+}
+
+void onFileOpenEvent(MainWindow& window, const QList<QUrl>& files)
+{
+	window.shell()->openFiles(files);
+}
+
+void onWindowClosing(int status) {
+	s_exitStatus = status;
+}
+
+void onWindowDestroyed() {
+	// TODO: On macOS, we can add a setting that dictates if the app should
+	// exit when the last window is closed.
+	if (qApp->topLevelWindows().size() == 1) {
+		qApp->exit(s_exitStatus);
+	}
+}
+
+MainWindow* createWindow(NeovimConnector* connector)
+{
+	Q_ASSERT(connector);
+	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(connector);
+	win->setAttribute(Qt::WA_DeleteOnClose);
+
+	App *app = qobject_cast<App *>(App::instance());
+	Q_ASSERT(app);
+
+	QObject::connect(
+			app, &App::openFilesTriggered, app,
+			[win](const QList<QUrl> &files) { onFileOpenEvent(*win, files); });
+	QObject::connect(win, &MainWindow::closing, app, onWindowClosing);
+	QObject::connect(win, &MainWindow::destroyed, app, onWindowDestroyed);
+	QObject::connect(win, &MainWindow::activeChanged, app, onWindowActiveChanged);
+
+	s_lastActiveWindow = win;
+	return win;
 }
 
 /// A log handler for Qt messages, all messages are dumped into the file
@@ -169,6 +214,7 @@ bool App::event(QEvent *event) noexcept
 			emit openFilesTriggered({fileOpenEvent->url()});
 		}
 	}
+
 	return QApplication::event(event);
 }
 
@@ -185,17 +231,14 @@ void App::showUi() noexcept
 		win->show();
 	}
 #else
-	auto connector = connectToRemoteNeovim(ConnectorInitArgs{m_parser, getNeovimArgs()});
-	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(connector);
+	// FIXME: On macOS, Cmd+q kills the first window that was created.
+	// There doesn't seem to be a good order to how windows are closed.
+	auto *win = createWindow(
+			connectToRemoteNeovim(ConnectorInitArgs{m_parser, getNeovimArgs()}));
 
 	// delete the main window when closed to emit `destroyed()` signal to
 	// support `:cq` return codes (Pull#644).
-	win->setAttribute(Qt::WA_DeleteOnClose);
 	setQuitOnLastWindowClosed(false);
-
-	connect(this, &App::openFilesTriggered, win->shell(), &Shell::openFiles);
-	connect(win, &MainWindow::closing, this, &App::mainWindowClosing);
-	connect(win, &MainWindow::destroyed, this, &App::exitWithStatus);
 
 	// Window geometry should be restored only when the user does not specify
 	// one of the following command line arguments. Argument "maximized" can
@@ -388,20 +431,29 @@ void App::showVersionInfo(QCommandLineParser& parser) noexcept
 	PrintInfo(versionInfo);
 }
 
-void App::openNewWindow() noexcept
+void App::openNewWindow(const QVariantList& args) noexcept
 {
-	auto connector = connectToRemoteNeovim(ConnectorInitArgs{getNeovimArgs()});
-	Q_ASSERT(connector);
-	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(connector);
-	win->show();
-}
+	QString server;
+	QString nvim{"nvim"};
+	ConnectorInitArgs::Type type{ConnectorInitArgs::Type::Default};
+	if (args.size() > 1) {
+		Q_ASSERT(args.at(1).type() == QVariant::Type::Map);
+		auto initMap = args.at(1).toMap();
+		if (initMap.find("nvim") != initMap.end()) {
+			nvim = initMap["nvim"].toString();
+		}
 
-void App::mainWindowClosing(int status) {
-	m_exitStatus = status;
-}
+		if (initMap.find("server") != initMap.end()) {
+			server = initMap["server"].toString();
+			type = ConnectorInitArgs::Type::Server;
+		}
+	}
 
-void App::exitWithStatus() {
-	exit(m_exitStatus);
+	auto connector = connectToRemoteNeovim(ConnectorInitArgs{
+		type, 2000, std::move(server), std::move(nvim), getNeovimArgs()});
+	auto win = createWindow(connector);
+	win->resize(s_lastActiveWindow->size());
+	win->delayedShow();
 }
 
 } // namespace NeovimQt
