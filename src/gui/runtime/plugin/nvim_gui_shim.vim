@@ -21,6 +21,11 @@ function! GuiClose() abort
   call rpcnotify(0, 'Gui', 'Close', v:exiting)
 endfunction
 
+" Open new window
+function! GuiNewWindow() abort
+  call rpcnotify(0, 'Gui', 'NewWindow')
+endfunction
+
 " Notify the GUI when exiting Neovim
 augroup nvim_gui_shim
   autocmd!

@@ -23,6 +23,7 @@ public:
 	QCommandLineParser& commandLineParser() { return m_parser; }
 	static void checkArgumentsMayTerminate(QCommandLineParser&) noexcept;
 	static void processCommandlineOptions(QCommandLineParser&, QStringList) noexcept;
+	static void openNewWindow() noexcept;
 
 private:
 	static QString getRuntimePath() noexcept;

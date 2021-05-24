@@ -32,6 +32,17 @@ struct ConnectorInitArgs {
 
 	}
 
+	ConnectorInitArgs(QStringList nvimArgs)
+		: type{Type::Default}
+		, timeout{2000}
+		, server{""}
+		, nvim{"nvim"}
+		, positionalArgs{}
+		, neovimArgs{std::move(nvimArgs)}
+	{
+
+	}
+
 	const Type type;
 	const int timeout;
 	const QString server;
@@ -375,6 +386,14 @@ void App::showVersionInfo(QCommandLineParser& parser) noexcept
 	out << GetNeovimVersionInfo(nvimExecutable) << QT_ENDL;
 
 	PrintInfo(versionInfo);
+}
+
+void App::openNewWindow() noexcept
+{
+	auto connector = connectToRemoteNeovim(ConnectorInitArgs{getNeovimArgs()});
+	Q_ASSERT(connector);
+	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(connector);
+	win->show();
 }
 
 void App::mainWindowClosing(int status) {
