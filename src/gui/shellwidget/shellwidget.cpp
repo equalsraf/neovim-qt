@@ -230,7 +230,6 @@ void ShellWidget::paintUnderline(
 	}
 
 	p.setPen(getSpecialPen(cell));
-
 	p.drawLine(GetUnderline(cellRect));
 }
 
@@ -275,7 +274,6 @@ void ShellWidget::paintUndercurl(
 	}
 
 	p.setPen(getSpecialPen(cell));
-
 	p.drawPath(GetUndercurlPath(cellRect));
 }
 
@@ -300,7 +298,6 @@ void ShellWidget::paintStrikeThrough(
 	}
 
 	p.setPen(getForegroundPen(cell));
-
 	p.drawLine(GetStrikeThrough(cellRect));
 }
 
@@ -378,8 +375,6 @@ QPen ShellWidget::getSpecialPen(const Cell& cell) noexcept
 	QPen pen;
 	if (cell.GetSpecialColor().isValid()) {
 		pen.setColor(cell.GetSpecialColor());
-	} else if (special().isValid()) {
-		pen.setColor(special());
 	} else if (cell.GetForegroundColor().isValid()) {
 		pen.setColor(cell.GetForegroundColor());
 	} else {
