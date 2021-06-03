@@ -13,6 +13,7 @@ private slots:
 	void CtrlCaretWellFormed() noexcept;
 	void ShiftModifierLetter() noexcept;
 	void GermanKeyboardLayout() noexcept;
+	void SpanishKeyboardLayout() noexcept;
 };
 
 void TestInputUnix::LessThanModifierKeys() noexcept
@@ -100,6 +101,13 @@ void TestInputUnix::GermanKeyboardLayout() noexcept
 
 	QKeyEvent evOptionPlus{ QEvent::KeyPress, Qt::Key_AsciiTilde, Qt::GroupSwitchModifier, "~" };
 	QCOMPARE(NeovimQt::Input::convertKey(evOptionPlus), QString{ "~" });
+}
+
+void TestInputUnix::SpanishKeyboardLayout() noexcept
+{
+	// Linux AltGr (Right Alt) + `. Prints: [
+	QKeyEvent evAltGrSquareBracketLinux{ QKeyEvent::KeyPress, Qt::Key_BracketLeft, Qt::GroupSwitchModifier, QStringLiteral("[") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAltGrSquareBracketLinux), QStringLiteral("["));
 }
 
 #include "tst_input_unix.moc"

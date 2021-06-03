@@ -3,6 +3,8 @@
 #include <QMap>
 #include <QVariant>
 
+#include <QDebug>
+
 namespace NeovimQt { namespace Input {
 
 const QMap<int, QString>& GetSpecialKeysMap() noexcept
@@ -238,6 +240,7 @@ QString convertKey(const QKeyEvent& ev) noexcept
 	}
 
 	if (text == "\\") {
+		qDebug() << "Bail EARLY BACKSLASH!";
 		return ToKeyString(GetModifierPrefix(mod), "Bslash");
 	}
 

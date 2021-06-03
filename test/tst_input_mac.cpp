@@ -15,6 +15,7 @@ private slots:
 	void CtrlCaretWellFormed() noexcept;
 	void ShiftModifierLetter() noexcept;
 	void GermanKeyboardLayout() noexcept;
+	void SpanishKeyboardLayout() noexcept;
 };
 
 void TestInputMac::AltSpecialCharacters() noexcept
@@ -134,6 +135,37 @@ void TestInputMac::GermanKeyboardLayout() noexcept
 
 	QKeyEvent evOptionAtSign{ QEvent::KeyPress, Qt::Key_L, Qt::AltModifier, "@" };
 	QCOMPARE(NeovimQt::Input::convertKey(evOptionAtSign), QString{ "@" });
+}
+
+// FIXME Issue 720: Spanish layout ignores Left Square Bracket [
+void TestInputMac::SpanishKeyboardLayout() noexcept
+{
+	QKeyEvent evBracketRight{ QKeyEvent::KeyPress, Qt::Key_Plus, Qt::AltModifier, QStringLiteral("]") };
+	QCOMPARE(NeovimQt::Input::convertKey(evBracketRight), QStringLiteral("]"));
+
+	QKeyEvent evBracketLeft{ QKeyEvent::KeyPress, Qt::Key_BracketLeft, Qt::AltModifier, QStringLiteral("[") };
+	QCOMPARE(NeovimQt::Input::convertKey(evBracketLeft), QStringLiteral("["));
+
+	QKeyEvent evBraceRight{ QKeyEvent::KeyPress, Qt::Key_Ccedilla, Qt::AltModifier, QStringLiteral("}") };
+	QCOMPARE(NeovimQt::Input::convertKey(evBraceRight), QStringLiteral("}"));
+
+	QKeyEvent evBraceLeft{ QKeyEvent::KeyPress, Qt::Key_BraceLeft, Qt::AltModifier, QStringLiteral("{") };
+	QCOMPARE(NeovimQt::Input::convertKey(evBraceLeft), QStringLiteral("{"));
+
+	QKeyEvent evPipe{ QKeyEvent::KeyPress, Qt::Key_1, Qt::AltModifier, QStringLiteral("|") };
+	QCOMPARE(NeovimQt::Input::convertKey(evPipe), QStringLiteral("|"));
+
+	QKeyEvent evAt{ QKeyEvent::KeyPress, Qt::Key_2, Qt::AltModifier, QStringLiteral("@") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAt), QStringLiteral("@"));
+
+	QKeyEvent evNegation{ QKeyEvent::KeyPress, Qt::Key_6, Qt::AltModifier, QStringLiteral("¬") };
+	QCOMPARE(NeovimQt::Input::convertKey(evNegation), QStringLiteral("¬"));
+
+	QKeyEvent evPound{ QKeyEvent::KeyPress, Qt::Key_3, Qt::AltModifier, QStringLiteral("#") };
+	QCOMPARE(NeovimQt::Input::convertKey(evPound), QStringLiteral("#"));
+
+//	QKeyEvent evBackslash{ QKeyEvent::KeyPress, Qt::Key_masculine, Qt::AltModifier, QStringLiteral("\\") };
+//	QCOMPARE(NeovimQt::Input::convertKey(evBackslash), QStringLiteral("\\"));
 }
 
 #include "tst_input_mac.moc"
