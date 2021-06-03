@@ -14,6 +14,7 @@ private slots:
 	void ShiftModifierLetter() noexcept;
 	void GermanKeyboardLayout() noexcept;
 	void FrenchBepoKeyboardLayout() noexcept;
+	void SpanishKeyboardLayout() noexcept;
 };
 
 void TestInputWin32::LessThanModifierKeys() noexcept
@@ -115,6 +116,44 @@ void TestInputWin32::FrenchBepoKeyboardLayout() noexcept
 
 	QKeyEvent evSpace{ QEvent::KeyPress, Qt::Key_Space, Qt::NoModifier, " " };
 	QCOMPARE(NeovimQt::Input::convertKey(evSpace), QString{ "<Space>" });
+}
+
+void TestInputWin32::SpanishKeyboardLayout() noexcept
+{
+	// Windows ` + Space. Prints: `
+	QKeyEvent evAccentSpace{ QKeyEvent::KeyPress, Qt::Key_Space, Qt::NoModifier, QStringLiteral("`") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAccentSpace), QStringLiteral("`"));
+
+	// Windows ``: two events are sent on the second key event. Prints: ``
+	// NOTE: Linux/MacOS do not send QKeyEvents for this scenario.
+	QKeyEvent evAccentFirst{ QKeyEvent::KeyPress, Qt::Key_QuoteLeft, Qt::NoModifier, QStringLiteral("`") };
+	QKeyEvent evAccentSecond{ QKeyEvent::KeyPress, 0, Qt::NoModifier, QStringLiteral("`") };
+
+	// Windows AltGr (Right Alt) + `. Prints: [
+	QKeyEvent evAltGrSquareBracketWindows{ QKeyEvent::KeyPress, Qt::Key_AsciiCircum, Qt::AltModifier, QStringLiteral("[") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAltGrSquareBracketWindows), QStringLiteral("["));
+
+	// Windows Shift + ` then Space. Prints ^
+	// NOTE: Linux does not send QKeyEvents for this scenario.
+	QKeyEvent evShiftAccentSpace{ QKeyEvent::KeyPress, Qt::Key_Space, Qt::NoModifier, QStringLiteral("^") };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftAccentSpace), QStringLiteral("^"));
+
+	// Windows Shift + ``. Prints ^^ (Windows) and ^ (Linux)
+	// NOTE: Linux/MacOS do not send QKeyEvents for this scenario.
+	QKeyEvent evShiftAccentAccent1{ QKeyEvent::KeyPress, Qt::Key_AsciiCircum, Qt::ShiftModifier, QStringLiteral("^") };
+	QKeyEvent evShiftAccentAccent2{ QKeyEvent::KeyPress, 0, Qt::ShiftModifier, QStringLiteral("^") };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftAccentAccent1), QStringLiteral("^"));
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftAccentAccent2), QStringLiteral("^"));
+
+	// Windows ` then e. Prints: è
+	// NOTE: Linux/MacOS do not send QKeyEvents for this scenario.
+	QKeyEvent evAccentE{ QKeyEvent::KeyPress, Qt::Key_E, Qt::NoModifier, QStringLiteral("ê") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAccentE), QStringLiteral("ê"));
+
+	// Windows Shift + ^ then e. Prints: ê
+	// NOTE: Linux/MacOS do not send QKeyEvents for this scenario.
+	QKeyEvent evShiftAccentE{ QKeyEvent::KeyPress, Qt::Key_E, Qt::NoModifier, QStringLiteral("ê") };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftAccentE), QStringLiteral("ê"));
 }
 
 #include "tst_input_win32.moc"

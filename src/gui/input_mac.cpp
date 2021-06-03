@@ -1,4 +1,5 @@
 #include "input.h"
+#include <QDebug>
 
 namespace NeovimQt { namespace Input {
 
@@ -56,13 +57,14 @@ static bool IsAsciiCharRequiringAlt(int key, Qt::KeyboardModifiers mod, QChar c)
 	}
 
 	// These low-ascii characters may require AltModifier on MacOS
-	if ((c == '[' && key != Qt::Key_BracketLeft)
+	if ((c == '[' /*&& key != Qt::Key_BracketLeft*/) // FIXME
 		|| (c == ']' && key != Qt::Key_BracketRight)
-		|| (c == '{' && key != Qt::Key_BraceLeft)
+		|| (c == '{' /*&& key != Qt::Key_BraceLeft*/) // FIXME
 		|| (c == '}' && key != Qt::Key_BraceRight)
 		|| (c == '|' && key != Qt::Key_Bar)
 		|| (c == '~' && key != Qt::Key_AsciiTilde)
-		|| (c == '@' && key != Qt::Key_At)) {
+		|| (c == '@' && key != Qt::Key_At)
+		|| (c == '#' && key != Qt::Key_NumberSign)) {
 		return true;
 	}
 

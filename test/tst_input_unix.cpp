@@ -14,6 +14,7 @@ private slots:
 	void ShiftModifierLetter() noexcept;
 	void GermanKeyboardLayout() noexcept;
 	void ControlSpace() noexcept;
+	void SpanishKeyboardLayout() noexcept;
 };
 
 void TestInputUnix::LessThanModifierKeys() noexcept
@@ -108,6 +109,13 @@ void TestInputUnix::ControlSpace() noexcept
 	// Intentionally written with QStringLiteral, other alternatives do not create the same QKeyEvent
 	QKeyEvent evControlSpace{ QEvent::KeyPress, Qt::Key_Space, Qt::ControlModifier, QStringLiteral( "\u0000" ) };
 	QCOMPARE(NeovimQt::Input::convertKey(evControlSpace), QString{ "<C-Space>" });
+}
+
+void TestInputUnix::SpanishKeyboardLayout() noexcept
+{
+	// Linux AltGr (Right Alt) + `. Prints: [
+	QKeyEvent evAltGrSquareBracketLinux{ QKeyEvent::KeyPress, Qt::Key_BracketLeft, Qt::GroupSwitchModifier, QStringLiteral("[") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAltGrSquareBracketLinux), QStringLiteral("["));
 }
 
 #include "tst_input_unix.moc"
