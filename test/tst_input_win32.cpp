@@ -13,6 +13,7 @@ private slots:
 	void CtrlCaretWellFormed() noexcept;
 	void ShiftModifierLetter() noexcept;
 	void GermanKeyboardLayout() noexcept;
+	void FrenchBepoKeyboardLayout() noexcept;
 };
 
 void TestInputWin32::LessThanModifierKeys() noexcept
@@ -94,6 +95,21 @@ void TestInputWin32::GermanKeyboardLayout() noexcept
 
 	QKeyEvent evLeftAlt8{ QEvent::KeyPress, Qt::Key_8, Qt::AltModifier, "8" };
 	QCOMPARE(NeovimQt::Input::convertKey(evLeftAlt8), QString{ "<A-8>" });
+}
+
+void TestInputWin32::FrenchBepoKeyboardLayout() noexcept
+{
+	QKeyEvent evTilde{ QEvent::KeyPress, Qt::Key_Space, Qt::NoModifier, "~" };
+	QCOMPARE(NeovimQt::Input::convertKey(evTilde), QString{ "~" });
+
+	QKeyEvent evCircum{ QEvent::KeyPress, Qt::Key_Space, Qt::NoModifier, "^" };
+	QCOMPARE(NeovimQt::Input::convertKey(evCircum), QString{ "^" });
+
+	QKeyEvent evShiftCircum{ QEvent::KeyPress, Qt::Key_Space, Qt::ShiftModifier, "^" };
+	QCOMPARE(NeovimQt::Input::convertKey(evShiftCircum), QString{ "<S-^>" });
+
+	QKeyEvent evSpace{ QEvent::KeyPress, Qt::Key_Space, Qt::NoModifier, " " };
+	QCOMPARE(NeovimQt::Input::convertKey(evSpace), QString{ "<Space>" });
 }
 
 #include "tst_input_win32.moc"

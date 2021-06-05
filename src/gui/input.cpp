@@ -174,6 +174,15 @@ QString convertKey(const QKeyEvent& ev) noexcept
 		return keypadKeys.value(key).arg(GetModifierPrefix(mod));
 	}
 
+	// Issue#864: Some international layouts insert accents (~^`) on Key_Space
+	if (key == Qt::Key_Space && !text.isEmpty() && text != " ") {
+		if (mod != Qt::NoModifier) {
+			return ToKeyString(GetModifierPrefix(mod), text);
+		}
+
+		return text;
+	}
+
 	const QMap<int, QString>& specialKeys { GetSpecialKeysMap() };
 
 	if (specialKeys.contains(key)) {
