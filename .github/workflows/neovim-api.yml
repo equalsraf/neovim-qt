@@ -1,0 +1,160 @@
+name: Bindings
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths: [ 'bindings/*']
+
+jobs:
+  GenerateFromSource:
+    name: API_${{ matrix.version }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - version: 0
+            nvim: 0.1.5
+          - version: 1
+            nvim: 0.1.7
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Download Neovim Source
+        run: |
+          mkdir build
+          cd build
+          wget https://github.com/neovim/neovim/archive/refs/tags/v${{ matrix.nvim }}.zip
+          unzip v${{ matrix.nvim }}.zip
+
+      - name: Patch LuaJIT Download
+        env:
+          FILE: third-party/CMakeLists.txt
+          LUAJIT_URL_OLD: https://github.com/neovim/deps/raw/master/opt/LuaJIT-2.0.4.tar.gz
+          LUAJIT_URL_NEW: https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v2.0.4.tar.gz
+          LUAJIT_SHA_OLD: 620fa4eb12375021bef6e4f237cbd2dd5d49e56beb414bee052c746beef1807d
+          LUAJIT_SHA_NEW: d2abdf16bd3556c41c0aaedad76b6c227ca667be8350111d037a4c54fd43abad
+        working-directory: ${{github.workspace}}/build/neovim-${{ matrix.nvim }}
+        run: |
+          sed -i 's,${{ env.LUAJIT_URL_OLD}},${{ env.LUAJIT_URL_NEW}},g' ${{ env.FILE }}
+          sed -i 's,${{ env.LUAJIT_SHA_OLD}},${{ env.LUAJIT_SHA_NEW}},g' ${{ env.FILE }}
+
+      - name: Patch LuaRocks Build
+        env:
+          FILE: third-party/cmake/BuildLuarocks.cmake
+          LUA_ROCKS_OLD: https://raw.githubusercontent.com/mpeterv/luacheck/.*/luacheck-scm-1.rockspec
+          LUA_ROCKS_NEW: https://raw.githubusercontent.com/mpeterv/luacheck/master/luacheck-dev-1.rockspec
+        working-directory: ${{github.workspace}}/build/neovim-${{ matrix.nvim }}
+        run: |
+          sed -i 's,${{ env.LUA_ROCKS_OLD}},${{ env.LUA_ROCKS_NEW}},g' ${{ env.FILE }}
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get install -y autoconf automake libtool-bin
+          pip install jinja2 msgpack
+
+      - name: Build Neovim
+        env:
+          CFLAGS: -Wno-implicit-fallthrough
+        working-directory: ${{github.workspace}}/build/neovim-${{ matrix.nvim }}
+        run: make
+
+      - name: Generate Bindings
+        env:
+          GEN_CMD: ${{ github.workspace }}/bindings/generate_bindings.py
+          NVIM_EXE: ${{ github.workspace }}/build/neovim-${{ matrix.nvim }}/build/bin/nvim
+          OUTPUT: ${{ github.workspace }}/src/auto
+        run: |
+          ${{ env.NVIM_EXE }} --version
+          python ${{ env.GEN_CMD }} ${{ env.NVIM_EXE }} ${{ env.OUTPUT }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Neovim API ${{ matrix.version}} Bindings
+          path: |
+            src/auto/neovimapi${{ matrix.version }}.cpp
+            src/auto/neovimapi${{ matrix.version }}.h
+
+      - name: Auto-Commit
+        if: contains(github.event.pull_request.labels.*.name, 'auto-commit')
+        run: |
+          git add src/auto/neovimapi${{ matrix.version }}.cpp
+          git add src/auto/neovimapi${{ matrix.version }}.h
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git pull
+          git commit -m "AUTO: Neovim API ${{ matrix.version }}"
+          git push
+
+
+  GenerateFromBinary:
+    name: API_${{ matrix.version }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - version: 2
+            nvim: 0.2.0
+          - version: 3
+            nvim: 0.2.2
+          - version: 4
+            nvim: 0.3.1
+          - version: 5
+            nvim: 0.3.8
+          - version: 6
+            nvim: 0.4.4
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Install Neovim
+        env:
+          URL: https://github.com/neovim/neovim/releases/download/v${{ matrix.nvim }}/nvim-win64.zip
+        run: |
+          New-Item -Path ${{ github.workspace }}\build -Name "build" -ItemType "directory"
+          Invoke-WebRequest ${{ env.url }} -OutFile nvim-win64.zip
+          Expand-Archive -Path nvim-win64.zip -DestinationPath ${{ github.workspace }}\build\
+
+      - name: Install Dependencies
+        run:
+          pip install jinja2 msgpack
+          choco install dos2unix
+
+      - name: Generate Bindings
+        env:
+          GEN_CMD: ${{ github.workspace }}\bindings\generate_bindings.py
+          NVIM_EXE: ${{ github.workspace }}\build\Neovim\bin\nvim.exe
+          OUTPUT: ${{ github.workspace }}\src\auto
+        run: |
+          ${{ env.nvim_exe }} --version
+          python ${{ env.gen_cmd }} ${{ env.nvim_exe }} ${{ env.output }}
+          dos2unix src/auto/neovimapi${{ matrix.version }}.cpp
+          dos2unix src/auto/neovimapi${{ matrix.version }}.h
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Neovim API ${{ matrix.version}} Bindings
+          path: |
+            src/auto/neovimapi${{ matrix.version }}.cpp
+            src/auto/neovimapi${{ matrix.version }}.h
+
+      # This should run under mutex, however GitHub Actions does not appear to
+      # have step mutex mechanism. Instead, using max-parallel: 1
+      - name: Auto-Commit
+        if: contains(github.event.pull_request.labels.*.name, 'auto-commit')
+        run: |
+          git add src/auto/neovimapi${{ matrix.version }}.cpp
+          git add src/auto/neovimapi${{ matrix.version }}.h
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git pull
+          git commit -m "AUTO: Neovim API ${{ matrix.version }}"
+          git push
