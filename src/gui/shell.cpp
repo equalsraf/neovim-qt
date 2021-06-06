@@ -81,7 +81,10 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	if (guiFont.canConvert<QString>())
 	{
 		QString fontDescription{ guiFont.toString() };
-		setGuiFont(fontDescription, true /*force*/, true /*updateOption*/);
+		// We shouldn't update `guifont` because this is just a default font,
+		// not something specified explicitly by the user. In addition to
+		// that, we can't set the option here because Neovim is not ready yet.
+		setGuiFont(fontDescription, true /*force*/, false /*updateOption*/);
 	}
 
 	if (!m_nvim) {
@@ -120,59 +123,75 @@ void Shell::fontError(const QString& msg)
 /// be updated when the user calls from 'set guifont=...'.
 bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 {
-	// Exit early if the font description does not change, prevent loops.
-	if (fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
+	bool fdescChanged{ fdesc.compare(fontDesc(), Qt::CaseInsensitive) != 0 };
+
+	// Exit early if the font description does not change and no need to
+	// update option, prevent loops. This condition can prevent loops because
+	// `updateOption` should be false in the second call of this function
+	// caused by setting guifont inside this function.
+	if (!fdescChanged && !updateOption) {
 		return false;
 	}
 
 	bool setShellFontSuccess{ false };
 	const bool isGuiDialogRequest{ fdesc == "*" };
 
-	if (isGuiDialogRequest) {
-		bool fontDialogSuccess = false;
-		QFont font{ QFontDialog::getFont(&fontDialogSuccess, QWidget::font(), this, {},
-			QFontDialog::MonospacedFonts) };
-
-		// The font selection dialog was canceled by the user.
-		if (!fontDialogSuccess) {
-			return false;
-		}
-
-		setShellFontSuccess = setShellFont(font, force);
+	if (!fdescChanged) {
+		// If fdesc is unchanged, we can say we have already succeeded to set
+		// the shell font.
+		setShellFontSuccess = true;
 	}
 	else {
-		QVariant varFont{ TryGetQFontFromDescription(fdesc) };
+		// fdesc is actually changed, update the font of the shell.
+		if (isGuiDialogRequest) {
+			bool fontDialogSuccess = false;
+			QFont font{ QFontDialog::getFont(
+				&fontDialogSuccess, QWidget::font(), this, {}, QFontDialog::MonospacedFonts) };
 
-		if (!ShellWidget::IsValidFont(varFont)) {
-			m_nvim->api0()->vim_report_error(
-				m_nvim->encode(varFont.toString()));
-			return false;
+			// The font selection dialog was canceled by the user.
+			if (!fontDialogSuccess) {
+				return false;
+			}
+
+			setShellFontSuccess = setShellFont(font, force);
 		}
+		else {
+			QVariant varFont{ TryGetQFontFromDescription(fdesc) };
 
-		setShellFontSuccess = setShellFont(qvariant_cast<QFont>(varFont), force);
+			if (!ShellWidget::IsValidFont(varFont)) {
+				m_nvim->api0()->vim_report_error(m_nvim->encode(varFont.toString()));
+				return false;
+			}
+
+			setShellFontSuccess = setShellFont(qvariant_cast<QFont>(varFont), force);
+		}
 	}
 
-	// Only update the ShellWidget when font changes.
+	// Only update Neovim when the new font can be successfully set as the
+	// shell font.
 	if (!setShellFontSuccess || !m_attached) {
 		return false;
 	}
 
-	// Font changed: trigger resize to update the ShellWidget, and update font variables.
-	resizeNeovim(size());
+	if (fdescChanged) {
+		// Font changed: trigger resize to update the ShellWidget, and update font variables.
+		resizeNeovim(size());
 
-	m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
-
-	// Write GuiFont to QSettings, prevent startup font flicker
-	QSettings settings{ "nvim-qt", "nvim-qt" };
-	settings.setValue("Gui/Font", fontDesc());
+		// Write GuiFont to QSettings, prevent startup font flicker
+		QSettings settings{ "nvim-qt", "nvim-qt" };
+		settings.setValue("Gui/Font", fontDesc());
+	}
 
 	// Updating guifont when the user has already called 'set guifont=...' may cause
 	// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
 	if (isGuiDialogRequest || updateOption) {
+		m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
 		m_nvim->api0()->vim_set_option("guifont", fontDesc());
 	}
 
-	return true;
+	// Even if `guifont` was updated, we return false if fdesc was not
+	// changed.
+	return fdescChanged;
 }
 
 bool Shell::setGuiFontWide(const QString& fdesc) noexcept
