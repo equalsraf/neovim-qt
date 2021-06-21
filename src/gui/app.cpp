@@ -105,9 +105,10 @@ void onWindowActiveChanged(MainWindow& window)
 	s_lastActiveWindow = &window;
 }
 
-void onFileOpenEvent(MainWindow& window, const QList<QUrl>& files)
+void onFileOpenEvent(const QList<QUrl>& files)
 {
-	window.shell()->openFiles(files);
+	Q_ASSERT(s_lastActiveWindow);
+	s_lastActiveWindow->shell()->openFiles(files);
 }
 
 void onWindowClosing(int status) {
@@ -129,9 +130,6 @@ MainWindow* createWindow(NeovimConnector* connector)
 	App *app = qobject_cast<App *>(App::instance());
 	Q_ASSERT(app);
 
-	QObject::connect(
-			app, &App::openFilesTriggered, app,
-			[win](const QList<QUrl> &files) { onFileOpenEvent(*win, files); });
 	QObject::connect(win, &MainWindow::closing, app, onWindowClosing);
 	QObject::connect(win, &MainWindow::destroyed, app, [win]() {
 		Q_ASSERT(std::find(s_windows.cbegin(), s_windows.cend(), win) != s_windows.cend());
@@ -219,8 +217,6 @@ bool App::event(QEvent *event) noexcept
 		if(fileOpenEvent) {
 			emit openFilesTriggered({fileOpenEvent->url()});
 		}
-
-		return true;
 	}
 	else if (event->type() == QEvent::Quit) {
 		for (auto window : s_windows) {
