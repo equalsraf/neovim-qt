@@ -11,9 +11,12 @@
 #include "printinfo.h"
 #include "version.h"
 
+#include <vector>
+
 namespace NeovimQt {
 
 MainWindow* s_lastActiveWindow{nullptr};
+std::vector<MainWindow*> s_windows;
 int s_exitStatus{ 0 };
 
 struct ConnectorInitArgs {
@@ -112,9 +115,7 @@ void onWindowClosing(int status) {
 }
 
 void onWindowDestroyed() {
-	// TODO: On macOS, we can add a setting that dictates if the app should
-	// exit when the last window is closed.
-	if (qApp->topLevelWindows().size() == 1) {
+	if (s_windows.empty()) {
 		qApp->exit(s_exitStatus);
 	}
 }
@@ -132,10 +133,15 @@ MainWindow* createWindow(NeovimConnector* connector)
 			app, &App::openFilesTriggered, app,
 			[win](const QList<QUrl> &files) { onFileOpenEvent(*win, files); });
 	QObject::connect(win, &MainWindow::closing, app, onWindowClosing);
-	QObject::connect(win, &MainWindow::destroyed, app, onWindowDestroyed);
+	QObject::connect(win, &MainWindow::destroyed, app, [win]() {
+		Q_ASSERT(std::find(s_windows.cbegin(), s_windows.cend(), win) != s_windows.cend());
+		s_windows.erase(std::find(s_windows.cbegin(), s_windows.cend(), win));
+		onWindowDestroyed();
+	});
 	QObject::connect(win, &MainWindow::activeChanged, app, onWindowActiveChanged);
 
 	s_lastActiveWindow = win;
+	s_windows.push_back(win);
 	return win;
 }
 
@@ -213,6 +219,17 @@ bool App::event(QEvent *event) noexcept
 		if(fileOpenEvent) {
 			emit openFilesTriggered({fileOpenEvent->url()});
 		}
+
+		return true;
+	}
+	else if (event->type() == QEvent::Quit) {
+		for (auto window : s_windows) {
+			if (!window->close()) {
+				event->setAccepted(false);
+			}
+		}
+
+		return event->isAccepted();
 	}
 
 	return QApplication::event(event);
