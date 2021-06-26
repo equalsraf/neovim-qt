@@ -126,10 +126,11 @@ void onWindowDestroyed() {
 MainWindow* createWindow(NeovimConnector* connector)
 {
 	Q_ASSERT(connector);
-	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(connector);
+
+	NeovimQt::MainWindow *win{new NeovimQt::MainWindow(connector)};
 	win->setAttribute(Qt::WA_DeleteOnClose);
 
-	App *app = qobject_cast<App *>(App::instance());
+	App *app{qobject_cast<App *>(App::instance())};
 	Q_ASSERT(app);
 
 	QObject::connect(win, &MainWindow::closing, app, onWindowClosing);
@@ -248,8 +249,7 @@ void App::showUi() noexcept
 #else
 	// FIXME: On macOS, Cmd+q kills the first window that was created.
 	// There doesn't seem to be a good order to how windows are closed.
-	auto *win = createWindow(
-			connectToRemoteNeovim(ConnectorInitArgs{m_parser, getNeovimArgs()}));
+	auto win{createWindow(connectToRemoteNeovim(ConnectorInitArgs{ m_parser, getNeovimArgs() }))};
 
 	// delete the main window when closed to emit `destroyed()` signal to
 	// support `:cq` return codes (Pull#644).
@@ -464,9 +464,9 @@ void App::openNewWindow(const QVariantList& args) noexcept
 		}
 	}
 
-	auto connector = connectToRemoteNeovim(ConnectorInitArgs{
-		type, 2000, std::move(server), std::move(nvim), getNeovimArgs()});
-	auto win = createWindow(connector);
+	NeovimConnector* connector{connectToRemoteNeovim(
+		ConnectorInitArgs{ type, 2000, std::move(server), std::move(nvim), getNeovimArgs() })};
+	MainWindow* win{createWindow(connector)};
 	win->resize(s_lastActiveWindow->size());
 	win->delayedShow();
 }
