@@ -255,8 +255,6 @@ void App::showUi() noexcept
 		win->show();
 	}
 #else
-	// FIXME: On macOS, Cmd+q kills the first window that was created.
-	// There doesn't seem to be a good order to how windows are closed.
 	auto win{createWindow(connectToRemoteNeovim(ConnectorInitArgs{ m_parser, getNeovimArgs() }))};
 
 	// delete the main window when closed to emit `destroyed()` signal to
