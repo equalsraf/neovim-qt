@@ -13,11 +13,13 @@
 
 #include <vector>
 
-namespace NeovimQt {
+namespace {
+NeovimQt::MainWindow* s_lastActiveWindow{nullptr};
+std::vector<NeovimQt::MainWindow*> s_windows;
+int s_exitStatus{0};
+} // namespace
 
-MainWindow* s_lastActiveWindow{nullptr};
-std::vector<MainWindow*> s_windows;
-int s_exitStatus{ 0 };
+namespace NeovimQt {
 
 struct ConnectorInitArgs {
 	enum class Type {
