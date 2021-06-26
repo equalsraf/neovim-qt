@@ -29,23 +29,23 @@ struct ConnectorInitArgs {
 		Default
 	};
 
-	ConnectorInitArgs(const QCommandLineParser& parser, QStringList nvimArgs)
-		: type{getConnectorType(parser)}
-		, timeout{parser.value("timeout").toInt()}
-		, server{parser.value("server")}
-		, nvim{parser.value("nvim")}
-		, positionalArgs{parser.positionalArguments()}
-		, neovimArgs{std::move(nvimArgs)}
+	ConnectorInitArgs(const QCommandLineParser& parser, QStringList nvimArgs) noexcept
+		: type{ getConnectorType(parser) }
+		, timeout{ parser.value("timeout").toInt() }
+		, server{ parser.value("server") }
+		, nvim{ parser.value("nvim") }
+		, positionalArgs{ parser.positionalArguments() }
+		, neovimArgs{ std::move(nvimArgs) }
 	{
 
 	}
 
-	ConnectorInitArgs(Type _type, int _timeout, QString _server, QString _nvim,
-					QStringList nvimArgs)
-		: type{_type}
-		, timeout{_timeout}
-		, server{std::move(_server)}
-		, nvim{std::move(_nvim)}
+	ConnectorInitArgs(
+		Type _type, int _timeout, QString _server, QString _nvim, QStringList nvimArgs) noexcept
+		: type{ _type }
+		, timeout{ _timeout }
+		, server{ std::move(_server) }
+		, nvim{ std::move(_nvim) }
 		, positionalArgs{}
 		, neovimArgs{std::move(nvimArgs)}
 	{
@@ -58,7 +58,7 @@ struct ConnectorInitArgs {
 	const QStringList positionalArgs;
 	const QStringList neovimArgs;
 
-	Type getConnectorType(const QCommandLineParser &parser)
+	Type getConnectorType(const QCommandLineParser& parser) noexcept
 	{
 		if (parser.isSet("server")) {
 			return ConnectorInitArgs::Type::Server;
@@ -76,7 +76,7 @@ struct ConnectorInitArgs {
 	}
 };
 
-NeovimConnector* connectToRemoteNeovim(const ConnectorInitArgs &args)
+NeovimConnector* connectToRemoteNeovim(const ConnectorInitArgs& args) noexcept
 {
 	NeovimConnector *connector{nullptr};
 	if (args.type == ConnectorInitArgs::Type::Embed) {
@@ -102,28 +102,30 @@ NeovimConnector* connectToRemoteNeovim(const ConnectorInitArgs &args)
 	return connector;
 }
 
-void onWindowActiveChanged(MainWindow& window)
+void onWindowActiveChanged(MainWindow& window) noexcept
 {
 	s_lastActiveWindow = &window;
 }
 
-void onFileOpenEvent(const QList<QUrl>& files)
+void onFileOpenEvent(const QList<QUrl>& files) noexcept
 {
 	Q_ASSERT(s_lastActiveWindow);
 	s_lastActiveWindow->shell()->openFiles(files);
 }
 
-void onWindowClosing(int status) {
+void onWindowClosing(int status) noexcept
+{
 	s_exitStatus = status;
 }
 
-void onWindowDestroyed() {
+void onWindowDestroyed() noexcept
+{
 	if (s_windows.empty()) {
 		qApp->exit(s_exitStatus);
 	}
 }
 
-MainWindow* createWindow(NeovimConnector* connector)
+MainWindow* createWindow(NeovimConnector* connector) noexcept
 {
 	Q_ASSERT(connector);
 

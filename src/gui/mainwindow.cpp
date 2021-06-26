@@ -469,8 +469,7 @@ void MainWindow::restoreWindowGeometry()
 	restoreState(settings.value("window_state").toByteArray());
 }
 
-bool
-MainWindow::active() const
+bool MainWindow::active() const noexcept
 {
 	return m_isActive;
 }

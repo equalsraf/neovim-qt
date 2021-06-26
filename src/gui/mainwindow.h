@@ -31,7 +31,7 @@ public:
 	bool neovimAttached() const;
 	Shell* shell();
 	void restoreWindowGeometry();
-	bool active() const;
+	bool active() const noexcept;
 public slots:
 	void delayedShow(DelayedShow type=DelayedShow::Normal);
 signals:
