@@ -12,10 +12,11 @@
 #include "version.h"
 
 #include <vector>
+#include <functional>
 
 namespace {
 NeovimQt::MainWindow* s_lastActiveWindow{nullptr};
-std::vector<NeovimQt::MainWindow*> s_windows;
+std::vector<std::reference_wrapper<NeovimQt::MainWindow>> s_windows;
 int s_exitStatus{0};
 } // namespace
 
@@ -136,15 +137,20 @@ MainWindow* createWindow(NeovimConnector* connector) noexcept
 	Q_ASSERT(app);
 
 	QObject::connect(win, &MainWindow::closing, app, onWindowClosing);
-	QObject::connect(win, &MainWindow::destroyed, app, [win]() {
-		Q_ASSERT(std::find(s_windows.cbegin(), s_windows.cend(), win) != s_windows.cend());
-		s_windows.erase(std::find(s_windows.cbegin(), s_windows.cend(), win));
+    QObject::connect(win, &MainWindow::destroyed, app, [win]() {
+        auto foundIt = std::find_if(
+            s_windows.cbegin(), s_windows.cend(),
+            [win](const std::reference_wrapper<NeovimQt::MainWindow>& rw) {
+                return win == &rw.get();
+            });
+		Q_ASSERT(foundIt != s_windows.cend());
+		s_windows.erase(foundIt);
 		onWindowDestroyed();
 	});
 	QObject::connect(win, &MainWindow::activeChanged, app, onWindowActiveChanged);
 
 	s_lastActiveWindow = win;
-	s_windows.push_back(win);
+	s_windows.push_back(*win);
 	return win;
 }
 
@@ -225,7 +231,7 @@ bool App::event(QEvent *event) noexcept
 	}
 	else if (event->type() == QEvent::Quit) {
 		for (auto window : s_windows) {
-			if (!window->close()) {
+			if (!window.get().close()) {
 				event->setAccepted(false);
 			}
 		}
