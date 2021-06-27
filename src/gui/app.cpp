@@ -225,9 +225,7 @@ bool App::event(QEvent *event) noexcept
 {
 	if( event->type()  == QEvent::FileOpen) {
 		QFileOpenEvent * fileOpenEvent = static_cast<QFileOpenEvent *>(event);
-		if(fileOpenEvent) {
-			emit openFilesTriggered({fileOpenEvent->url()});
-		}
+		onFileOpenEvent({fileOpenEvent->url()});
 	}
 	else if (event->type() == QEvent::Quit) {
 		for (auto window : s_windows) {
