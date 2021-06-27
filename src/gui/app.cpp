@@ -18,9 +18,6 @@ namespace {
 NeovimQt::MainWindow* s_lastActiveWindow{nullptr};
 std::vector<std::reference_wrapper<NeovimQt::MainWindow>> s_windows;
 int s_exitStatus{0};
-} // namespace
-
-namespace NeovimQt {
 
 struct ConnectorInitArgs {
 	enum class Type {
@@ -59,7 +56,7 @@ struct ConnectorInitArgs {
 	const QStringList positionalArgs;
 	const QStringList neovimArgs;
 
-	Type getConnectorType(const QCommandLineParser& parser) noexcept
+	static Type getConnectorType(const QCommandLineParser& parser) noexcept
 	{
 		if (parser.isSet("server")) {
 			return ConnectorInitArgs::Type::Server;
@@ -77,25 +74,26 @@ struct ConnectorInitArgs {
 	}
 };
 
-NeovimConnector* connectToRemoteNeovim(const ConnectorInitArgs& args) noexcept
+NeovimQt::NeovimConnector* connectToRemoteNeovim(const ConnectorInitArgs& args) noexcept
 {
+	using namespace NeovimQt;
 	NeovimConnector *connector{nullptr};
 	if (args.type == ConnectorInitArgs::Type::Embed) {
-		connector = NeovimQt::NeovimConnector::fromStdinOut();
+		connector = NeovimConnector::fromStdinOut();
 	}
 
 	if (args.type == ConnectorInitArgs::Type::Server) {
-		connector = NeovimQt::NeovimConnector::connectToNeovim(args.server);
+		connector = NeovimConnector::connectToNeovim(args.server);
 	}
 
 	if (args.type == ConnectorInitArgs::Type::Spawn) {
 		Q_ASSERT(!args.positionalArgs.isEmpty());
-		connector = NeovimQt::NeovimConnector::spawn(args.positionalArgs.mid(1),
+		connector = NeovimConnector::spawn(args.positionalArgs.mid(1),
 				args.positionalArgs.at(0));
 	}
 
 	if (!connector) {
-		connector = NeovimQt::NeovimConnector::spawn(
+		connector = NeovimConnector::spawn(
 				args.neovimArgs + args.positionalArgs, args.nvim);
 	}
 
@@ -103,7 +101,7 @@ NeovimConnector* connectToRemoteNeovim(const ConnectorInitArgs& args) noexcept
 	return connector;
 }
 
-void onWindowActiveChanged(MainWindow& window) noexcept
+void onWindowActiveChanged(NeovimQt::MainWindow& window) noexcept
 {
 	s_lastActiveWindow = &window;
 }
@@ -126,11 +124,12 @@ void onWindowDestroyed() noexcept
 	}
 }
 
-MainWindow* createWindow(NeovimConnector* connector) noexcept
+NeovimQt::MainWindow* createWindow(NeovimQt::NeovimConnector* connector) noexcept
 {
+	using namespace NeovimQt;
 	Q_ASSERT(connector);
 
-	NeovimQt::MainWindow *win{new NeovimQt::MainWindow(connector)};
+	MainWindow *win{new MainWindow(connector)};
 	win->setAttribute(Qt::WA_DeleteOnClose);
 
 	App *app{qobject_cast<App *>(App::instance())};
@@ -153,6 +152,9 @@ MainWindow* createWindow(NeovimConnector* connector) noexcept
 	s_windows.push_back(*win);
 	return win;
 }
+} // namespace
+
+namespace NeovimQt {
 
 /// A log handler for Qt messages, all messages are dumped into the file
 /// passed via the NVIM_QT_LOG variable. Some information is only available
