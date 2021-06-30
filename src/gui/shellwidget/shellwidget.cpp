@@ -5,6 +5,7 @@
 #include <QPainterPath>
 #include <QPaintEvent>
 #include <QTextLayout>
+#include <QtMath>
 
 #include "helpers.h"
 
@@ -209,13 +210,13 @@ void ShellWidget::paintNeovimCursorForeground(
 	p.setClipping(oldClippingSetting);
 }
 
-static QLine GetUnderline(QRect cellRect) noexcept
+static QLine GetUnderline(QRect cellRect, qreal penWidth) noexcept
 {
 	QPoint start{ cellRect.bottomLeft() };
-	start.ry()--;
+	start.ry() -= penWidth - 1;
 
 	QPoint end{ cellRect.bottomRight() };
-	end.ry()--;
+	end.ry() -= penWidth - 1;
 
 	return { start, end };
 }
@@ -229,36 +230,28 @@ void ShellWidget::paintUnderline(
 		return;
 	}
 
-	p.setPen(getSpecialPen(cell));
-	p.drawLine(GetUnderline(cellRect));
+	QPen specialPen{ getSpecialPen(cell) };
+	p.setPen(specialPen);
+	p.drawLine(GetUnderline(cellRect, specialPen.widthF()));
 }
 
-static QPainterPath GetUndercurlPath(QRect cellRect) noexcept
+static QPainterPath GetUndercurlPath(QRect cellRect, qreal singleCellWidth, qreal penWidth) noexcept
 {
-	const QLine underline{ GetUnderline(cellRect) };
-	const QPoint& start{ underline.p1() };
-	const QPoint& end{ underline.p2() };
+	// To draw the undercurl, we use a sine curve that is defined in terms of the screen
+	// coordinates. This prevents discontinuities at cell boundaries.
 
-	static constexpr int offset[8]{ 1, 0, 0, 1, 1, 2, 2, 2 };
+	// The parameters are chosen so that the curve crosses the cell boundary at a 45 degree angle.
+	// This looks visually pleasing. The curve is scaled so that 3/2 periods fit in a single cell
+	// (experimentally chosen to obtain a curl that is neither to large nor too small).
+	// The minimum function ensures that the curl doesn't oscillate too
+	// much at small font sizes and remains visible.
+	const qreal scale{ qMin(3 * M_PI / singleCellWidth, M_PI / 2) };
+	const qreal amp{ 1 / scale };
+	const qreal y0{ cellRect.bottom() - amp - penWidth / 2 + 1 };
 
-	// Be careful to set correct offset for the starting point of the undercurl
-	// so that it doesn't make discontinuity at the cell boundary.
-	//
-	// Simply using `start` always set the y offset of starting point to zero,
-	// but it is incorrect in most cases; the ending point of the undercurl on
-	// the previous cell has non-zero offset except
-	// offset[previous_undercurl_ending_x % 8] == 0.
-	//
-	// To make undercurl smoothly connected, we need to set correct offset to
-	// the starting point according to the x coordinate of it.
-	//
-	// See also Pull Request #803 (comment):
-	// https://github.com/equalsraf/neovim-qt/pull/803#issuecomment-751166085
-	QPoint undercurlStart{ start.x(), start.y() - offset[start.x() % 8] };
-
-	QPainterPath path{ undercurlStart };
-	for (int i = start.x() + 1; i <= end.x(); i++) {
-		path.lineTo(QPoint(i, start.y() - offset[i%8]));
+	QPainterPath path{ QPointF(cellRect.left(), y0 + amp * qSin(cellRect.left() * scale)) };
+	for (int x = cellRect.left() + 1; x <= cellRect.right() + 1; x++) {
+		path.lineTo(x, y0 + amp * qSin(x * scale));
 	}
 
 	return path;
@@ -273,8 +266,14 @@ void ShellWidget::paintUndercurl(
 		return;
 	}
 
-	p.setPen(getSpecialPen(cell));
-	p.drawPath(GetUndercurlPath(cellRect));
+	QPen specialPen = getSpecialPen(cell);
+	p.setPen(specialPen);
+	// only enable anti-aliasing for the undercurl (causes rendering
+	// artifacts when rendering the cell background)
+	const auto renderHints{ p.renderHints() };
+	p.setRenderHint(QPainter::Antialiasing);
+	p.drawPath(GetUndercurlPath(cellRect, m_cellSize.width(), specialPen.widthF()));
+	p.setRenderHints(renderHints);
 }
 
 static QLine GetStrikeThrough(QRect cellRect) noexcept
@@ -380,6 +379,8 @@ QPen ShellWidget::getSpecialPen(const Cell& cell) noexcept
 	} else {
 		pen.setColor(foreground());
 	}
+
+	pen.setWidthF(qMax(1.0, m_cellSize.height() / 16.0));
 
 	return pen;
 }
