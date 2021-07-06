@@ -81,7 +81,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	if (guiFont.canConvert<QString>())
 	{
 		QString fontDescription{ guiFont.toString() };
-		setGuiFont(fontDescription, true /*force*/, true /*updateOption*/);
+		setGuiFont(fontDescription, true /*force*/);
 	}
 
 	if (!m_nvim) {
@@ -116,16 +116,16 @@ void Shell::fontError(const QString& msg)
 
 /// Set the GUI font, or display the current font
 ///
-/// @param updateOption controls update of the guifont option, which should not
-/// be updated when the user calls from 'set guifont=...'.
-bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
+/// @param fdesc Neovim font description string, "Fira Code:h11".
+/// @param force used to indicate :GuiFont!, overrides mono space checks.
+/// @returns `true` if the font was successfully set.
+bool Shell::setGuiFont(const QString& fdesc, bool force) noexcept
 {
-	// Exit early if the font description does not change, prevent loops.
+	// Exit early if the font description has not changed
 	if (fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
 		return false;
 	}
 
-	bool setShellFontSuccess{ false };
 	const bool isGuiDialogRequest{ fdesc == "*" };
 
 	if (isGuiDialogRequest) {
@@ -138,7 +138,9 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 			return false;
 		}
 
-		setShellFontSuccess = setShellFont(font, force);
+		if (!setShellFont(font, force)) {
+			return false;
+		}
 	}
 	else {
 		QVariant varFont{ TryGetQFontFromDescription(fdesc) };
@@ -149,28 +151,23 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 			return false;
 		}
 
-		setShellFontSuccess = setShellFont(qvariant_cast<QFont>(varFont), force);
+		if (!setShellFont(qvariant_cast<QFont>(varFont), force)) {
+			return false;
+		}
 	}
 
 	// Only update the ShellWidget when font changes.
-	if (!setShellFontSuccess || !m_attached) {
+	if (!m_attached) {
 		return false;
 	}
 
-	// Font changed: trigger resize to update the ShellWidget, and update font variables.
+	// The font has changed:
+	//  1) Trigger resize to update the ShellWidget
+	//  2) Write QSettings for flicker-free start-up.
+	//  3) Update font variables (as necessary).
 	resizeNeovim(size());
-
-	m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
-
-	// Write GuiFont to QSettings, prevent startup font flicker
-	QSettings settings{ "nvim-qt", "nvim-qt" };
-	settings.setValue("Gui/Font", fontDesc());
-
-	// Updating guifont when the user has already called 'set guifont=...' may cause
-	// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
-	if (isGuiDialogRequest || updateOption) {
-		m_nvim->api0()->vim_set_option("guifont", fontDesc());
-	}
+	writeGuiFontQSettings();
+	updateGuiFontRegisters();
 
 	return true;
 }
@@ -208,6 +205,51 @@ bool Shell::setGuiFontWide(const QString& fdesc) noexcept
 	m_guifontwidelist = std::move(fontList);
 	update();
 	return true;
+}
+
+void Shell::updateGuiFontRegisters() noexcept
+{
+	if (!m_attached || !m_nvim || !m_nvim->api0()) {
+		return;
+	}
+
+	// Update `set guifont=`, but only if value changes
+	MsgpackRequest* getOption{ m_nvim->api0()->vim_get_option("guifont") };
+	connect(getOption, &MsgpackRequest::finished, this, &Shell::handleGuiFontOption);
+
+	// Update `:GuiFont`, but only if value changes
+	MsgpackRequest* getVariable{ m_nvim->api0()->vim_get_var("GuiFont") };
+	connect(getVariable, &MsgpackRequest::finished, this, &Shell::handleGuiFontVariable);
+}
+
+void Shell::writeGuiFontQSettings() noexcept
+{
+	QSettings settings;
+	settings.setValue("Gui/Font", fontDesc());
+}
+
+void Shell::handleGuiFontOption(quint32 msgid, quint64 fun, const QVariant& val) noexcept
+{
+	const QString oldFont{ val.toString() };
+	const QString newFont{ fontDesc() };
+
+	if (newFont.compare(oldFont, Qt::CaseInsensitive) == 0) {
+		return;
+	}
+
+	m_nvim->api0()->vim_set_option("guifont", newFont);
+}
+
+void Shell::handleGuiFontVariable(quint32 msgid, quint64 fun, const QVariant& val) noexcept
+{
+	const QString oldFont{ val.toString() };
+	const QString newFont{ fontDesc() };
+
+	if (newFont.compare(oldFont, Qt::CaseInsensitive) == 0) {
+		return;
+	}
+
+	m_nvim->api0()->vim_set_var("GuiFont", newFont);
 }
 
 Shell::~Shell()
@@ -249,6 +291,11 @@ void Shell::setAttached(bool attached)
 
 	}
 	emit neovimAttached(attached);
+
+	// Issue #868: When GuiFont is loaded on startup, m_nvim is not attached yet.
+	// We are connected now, loop-back and update the registers with the correct values.
+	updateGuiFontRegisters();
+
 	update();
 }
 
@@ -901,7 +948,7 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 void Shell::handleSetOption(const QString& name, const QVariant& value)
 {
 	if (name == "guifont") {
-		setGuiFont(value.toString(), false /*force*/, false /*setOption*/);
+		setGuiFont(value.toString(), false /*force*/);
 	} else if (name == "guifontset") {
 	} else if (name == "guifontwide") {
 		handleGuiFontWide(value);
@@ -947,7 +994,7 @@ void Shell::handleGuiFontFunction(const QVariantList& args)
 		force = args.at(2).toBool();
 	}
 
-	setGuiFont(fdesc, force, true /*setOption*/);
+	setGuiFont(fdesc, force);
 }
 
 void Shell::handleGuiFontWide(const QVariant& value) noexcept
