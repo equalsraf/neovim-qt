@@ -113,7 +113,7 @@ public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
 	void resizeNeovim(int n_cols, int n_rows);
-	bool setGuiFont(const QString& fdesc, bool force, bool updateOption);
+	bool setGuiFont(const QString& fdesc, bool force) noexcept;
 	bool setGuiFontWide(const QString& fdesc) noexcept;
 	void updateGuiWindowState(Qt::WindowStates state);
 	void openFiles(const QList<QUrl> url);
@@ -192,6 +192,12 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	void bailoutIfinputBlocking();
 	void setCursorFromBusyState() noexcept;
+
+	// GuiFont
+	void updateGuiFontRegisters() noexcept;
+	void writeGuiFontQSettings() noexcept;
+	void handleGuiFontOption(quint32 msgid, quint64 fun, const QVariant& val) noexcept;
+	void handleGuiFontVariable(quint32 msgid, quint64 fun, const QVariant& val) noexcept;
 
 	QString neovimErrorToString(const QVariant& err);
 
