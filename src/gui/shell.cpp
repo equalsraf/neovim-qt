@@ -24,7 +24,7 @@ namespace NeovimQt {
 static ShellOptions GetShellOptionsFromQSettings() noexcept
 {
 	ShellOptions opts;
-	QSettings settings{ "nvim-qt", "nvim-qt" };
+	QSettings settings;
 
 	QVariant ext_linegrid{ settings.value("ext_linegrid", opts.IsLineGridEnabled()) };
 	QVariant ext_popupmenu{ settings.value("ext_popupmenu", opts.IsPopupmenuEnabled()) };
@@ -74,7 +74,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_pum.setParent(this);
 	m_pum.hide();
 
-	QSettings settings{ "nvim-qt", "nvim-qt" };
+	QSettings settings;
 
 	// Font
 	QVariant guiFont{ settings.value("Gui/Font") };
@@ -1061,7 +1061,7 @@ void Shell::handleGuiTabline(const QVariant& value) noexcept
 	const bool isEnabled{ value.toBool() };
 	m_nvim->api1()->nvim_ui_set_option("ext_tabline", isEnabled);
 
-	QSettings settings{ "nvim-qt", "nvim-qt" };
+	QSettings settings;
 	settings.setValue("ext_tabline", isEnabled);
 }
 
@@ -1082,7 +1082,7 @@ void Shell::handleGuiPopupmenu(const QVariant& value) noexcept
 	const bool isEnabled{ value.toBool() };
 	m_nvim->api1()->nvim_ui_set_option("ext_popupmenu", isEnabled);
 
-	QSettings settings{ "nvim-qt", "nvim-qt" };
+	QSettings settings;
 	settings.setValue("ext_popupmenu", isEnabled);
 }
 

@@ -56,6 +56,9 @@ App::App(int &argc, char ** argv) noexcept
 	setWindowIcon(QIcon(":/neovim.svg"));
 	setApplicationDisplayName("Neovim");
 
+	setOrganizationName("nvim-qt");
+	setApplicationName("nvim-qt");
+
 #ifdef Q_OS_MAC
 	QByteArray shellPath = qgetenv("SHELL");
 	if (!getLoginEnvironment(shellPath)) {

@@ -452,14 +452,14 @@ void MainWindow::changeTab(int index)
 
 void MainWindow::saveWindowGeometry()
 {
-	QSettings settings{ "nvim-qt", "window-geometry" };
+	QSettings settings{ "window-geometry" };
 	settings.setValue("window_geometry", saveGeometry());
 	settings.setValue("window_state", saveState());
 }
 
 void MainWindow::restoreWindowGeometry()
 {
-	QSettings settings{ "nvim-qt", "window-geometry" };
+	QSettings settings{ "window-geometry" };
 	restoreGeometry(settings.value("window_geometry").toByteArray());
 	restoreState(settings.value("window_state").toByteArray());
 }
