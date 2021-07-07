@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC VERSION="1.0">
+<qresource>
+  <file alias="neovim.svg">../third-party/neovim.svg</file>
+</qresource>
+</RCC>
