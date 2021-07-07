@@ -29,7 +29,8 @@ function(add_xtest SOURCE_NAME)
 endfunction()
 
 function(add_xtest_gui SOURCE_NAME)
-	add_executable(${SOURCE_NAME} ${SOURCE_NAME}.cpp ${ARGV1} ${ARGV2})
+	qt5_add_resources(RCC_SOURCES data.qrc)
+	add_executable(${SOURCE_NAME} ${RCC_SOURCES} ${SOURCE_NAME}.cpp ${ARGV1} ${ARGV2})
 	target_link_libraries(${SOURCE_NAME} ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt Qt5::Widgets neovim-qt-gui)
 	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME}
 		# Run GUI tests from source dir, they depend on src files
