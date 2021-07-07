@@ -557,15 +557,12 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		handleMouse(false);
 	} else if (name == "mode_change"){
 		handleModeChange(opargs);
-	} else if (name == "cursor_on"){
 	} else if (name == "set_title"){
 		handleSetTitle(opargs);
-	} else if (name == "cursor_off"){
 	} else if (name == "busy_start"){
 		handleBusy(true);
 	} else if (name == "busy_stop"){
 		handleBusy(false);
-	} else if (name == "set_icon") {
 	} else if (name == "tabline_update") {
 		if (opargs.size() < 2 || !opargs.at(0).canConvert<int64_t>()) {
 			qWarning() << "Unexpected argument for tabline_update:" << opargs;
@@ -624,11 +621,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		handleGridScroll(opargs);
 	} else if (name == "hl_group_set") {
 		handleHighlightGroupSet(opargs);
-	} else if (name == "win_viewport") {
 	} else {
-		qDebug() << "Received unknown redraw notification" << name << opargs;
+		// qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
-
 }
 
 void Shell::handlePopupMenuShow(const QVariantList& opargs)
@@ -936,12 +931,10 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 		handleGuiTabline(value);
 	} else if (name == "Popupmenu") {
 		handleGuiPopupmenu(value);
-	} else if (name == "Cmdline") {
-	} else if (name == "Wildmenu") {
 	} else if (name == "RenderLigatures"){
 		setLigatureMode(value.toBool());
 	} else {
-		qDebug() << "Unknown GUI Option" << name << value;
+		// qDebug() << "Unknown GUI Option" << name << value;
 	}
 }
 
@@ -949,7 +942,6 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 {
 	if (name == "guifont") {
 		setGuiFont(value.toString(), false /*force*/);
-	} else if (name == "guifontset") {
 	} else if (name == "guifontwide") {
 		handleGuiFontWide(value);
 	} else if (name == "linespace") {
@@ -958,17 +950,8 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 		emit neovimShowtablineSet(value.toString().toInt());
 	} else if (name == "ext_tabline") {
 		emit neovimExtTablineSet(value.toBool());
-	} else if (name == "ext_popupmenu") {
-	// TODO
-	} else if (name == "arabicshape") {
-	} else if (name == "ambiwidth") {
-	} else if (name == "emoji") {
-	} else if (name == "termguicolors") {
-	} else if (name == "ext_cmdline") {
-	} else if (name == "ext_wildmenu") {
-	} else if (name == "ext_linegrid") {
 	} else {
-		qDebug() << "Received unknown option" << name << value;
+		// qDebug() << "Received unknown option" << name << value;
 	}
 }
 
