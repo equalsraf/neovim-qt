@@ -216,7 +216,7 @@ Environment:
 
 ## Building From Source
 
-Detailed build instructions can be found at the [Wiki](https://github.com/equalsraf/neovim-qt/wiki/Build).
+Detailed build instructions can be found at the [Wiki](https://github.com/equalsraf/neovim-qt/wiki/Build-Instructions).
 
 Simplified Build Commands:
 ```
