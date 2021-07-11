@@ -55,7 +55,7 @@ $ brew install neovim-qt
 To install the latest development version:
 ```
 $ brew tap equalsraf/neovim-qt
-$ brew install neovim-qt
+$ brew install --HEAD neovim-qt
 ```
 
 ### Linux
