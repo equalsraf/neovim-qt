@@ -95,8 +95,6 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 			this, &Shell::neovimError);
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &Shell::neovimExited);
-	connect(this, &ShellWidget::shellFontChanged,
-			this, &Shell::fontChanged);
 	connect(this, &ShellWidget::fontError,
 			this, &Shell::fontError);
 

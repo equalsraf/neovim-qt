@@ -100,7 +100,6 @@ signals:
 	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
 	void neovimShowtablineSet(int);
 	void neovimShowContextMenu();
-	void fontChanged();
 	void colorsChanged();
 
 	// GuiAdaptive Color/Font Signals
