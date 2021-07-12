@@ -37,14 +37,15 @@ class Shell: public ShellWidget
 {
 	Q_OBJECT
 	Q_PROPERTY(bool neovimBusy READ neovimBusy() NOTIFY neovimBusy())
-	Q_PROPERTY(bool neovimAttached READ neovimAttached() NOTIFY neovimAttached())
+	Q_PROPERTY(bool isNeovimAttached READ isNeovimAttached() NOTIFY neovimAttachmentChanged(bool))
 public:
 	Shell(NeovimConnector *nvim, QWidget *parent=0);
 	~Shell();
 	QSize sizeIncrement() const;
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
-	bool neovimAttached() const;
+
+	bool isNeovimAttached() const noexcept { return m_attached; }
 
 	PopupMenu& getPopupMenu() noexcept
 	{
@@ -84,7 +85,7 @@ signals:
 	void neovimTitleChanged(const QString &title);
 	void neovimBusy(bool);
 	void neovimResized(int rows, int cols);
-	void neovimAttached(bool);
+	void neovimAttachmentChanged(bool);
 	void neovimMaximized(bool);
 	void neovimForeground();
 	void neovimOpacity(double);
@@ -194,7 +195,7 @@ protected:
 	QString neovimErrorToString(const QVariant& err);
 
 private slots:
-        void setAttached(bool attached=true);
+	void setAttached(bool attached);
 
 private:
 	bool m_attached{ false };
