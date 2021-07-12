@@ -51,10 +51,10 @@ private slots:
 		args << "-u" << "NONE";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c);
-		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QSignalSpy onAttached(s, SIGNAL(neovimAttachmentChanged(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		s->repaint();
 
@@ -67,10 +67,10 @@ private slots:
 		QStringList args = {"-u", "NONE"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c);
-		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QSignalSpy onAttached(s, SIGNAL(neovimAttachmentChanged(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 		checkStartVars(c);
 	}
 
@@ -79,10 +79,10 @@ private slots:
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c);
 		s->show();
-		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QSignalSpy onAttached(s, SIGNAL(neovimAttachmentChanged(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 		checkStartVars(c);
 	}
 
@@ -103,10 +103,10 @@ private slots:
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c);
 
-		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QSignalSpy onAttached(s, SIGNAL(neovimAttachmentChanged(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		auto req = c->api0()->vim_command_output(c->encode("echo g:test_gviminit"));
 		QSignalSpy cmd(req, SIGNAL(finished(quint32, quint64, QVariant)));
@@ -128,10 +128,10 @@ private slots:
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c);
-		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QSignalSpy onAttached(s, SIGNAL(neovimAttachmentChanged(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, [](QString msg, const QVariant& err) {
 				qDebug() << msg << err;
@@ -227,10 +227,10 @@ private slots:
 		NeovimConnector* c{ NeovimConnector::spawn(args) };
 		MainWindow* s{ new MainWindow(c) };
 		s->show();
-		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QSignalSpy onAttached(s, SIGNAL(neovimAttachmentChanged(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		// GUI shim Close event
 		QSignalSpy onClose(s->shell(), &Shell::neovimGuiCloseRequest);
@@ -294,10 +294,10 @@ private slots:
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c);
-		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QSignalSpy onAttached(s, SIGNAL(neovimAttachmentChanged(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, [](QString msg, const QVariant& err) {
 				qDebug() << msg << err;
@@ -355,10 +355,10 @@ private slots:
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c);
-		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
+		QSignalSpy onAttached(s, SIGNAL(neovimAttachmentChanged(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
-		QVERIFY(s->neovimAttached());
+		QVERIFY(s->isNeovimAttached());
 
 		QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, [](QString msg, const QVariant& err) {
 				qDebug() << msg << err;

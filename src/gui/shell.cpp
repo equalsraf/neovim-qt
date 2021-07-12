@@ -246,7 +246,7 @@ void Shell::setAttached(bool attached)
 		}
 
 	}
-	emit neovimAttached(attached);
+	emit neovimAttachmentChanged(attached);
 	update();
 }
 
@@ -278,19 +278,19 @@ void Shell::init()
 	}
 	options.insert("rgb", true);
 
-	MsgpackRequest *req;
+	MsgpackRequest* req{ nullptr };
 	if (m_nvim->api2()) {
 		req = m_nvim->api2()->nvim_ui_attach(width, height, options);
-	} else {
+	}
+	else {
 		req = m_nvim->api0()->ui_attach(width, height, true);
 	}
-	connect(req, &MsgpackRequest::timeout,
-			m_nvim, &NeovimConnector::fatalTimeout);
-	// FIXME grab timeout from connector
+
+	connect(req, &MsgpackRequest::timeout, m_nvim, &NeovimConnector::fatalTimeout);
+	// TODO Issue#880: Grab timeout from connector
 	req->setTimeout(10000);
 
-	connect(req, &MsgpackRequest::finished,
-			this, &Shell::setAttached);
+	connect(req, &MsgpackRequest::finished, this, &Shell::setAttached);
 
 	// Subscribe to GUI events
 	m_nvim->api0()->vim_subscribe("Gui");
@@ -1677,11 +1677,6 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 bool Shell::neovimBusy() const
 {
 	return m_neovimBusy;
-}
-
-bool Shell::neovimAttached() const
-{
-	return m_attached;
 }
 
 void Shell::dragEnterEvent(QDragEnterEvent *ev)
