@@ -1,6 +1,12 @@
 #include "shell.h"
 
-#include <cmath>
+#include "helpers.h"
+#include "input.h"
+#include "konsole_wcwidth.h"
+#include "msgpackrequest.h"
+#include "util.h"
+#include "version.h"
+
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
@@ -8,16 +14,11 @@
 #include <QFontDialog>
 #include <QKeyEvent>
 #include <QMimeData>
-#include <QPainter>
 #include <QPaintEvent>
+#include <QPainter>
 #include <QSettings>
-
-#include "helpers.h"
-#include "input.h"
-#include "konsole_wcwidth.h"
-#include "msgpackrequest.h"
-#include "util.h"
-#include "version.h"
+#include <QShowEvent>
+#include <cmath>
 
 namespace NeovimQt {
 
@@ -89,8 +90,6 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 		return;
 	}
 
-	connect(m_nvim, &NeovimConnector::ready,
-			this, &Shell::init);
 	connect(m_nvim, &NeovimConnector::error,
 			this, &Shell::neovimError);
 	connect(m_nvim, &NeovimConnector::processExited,
@@ -101,10 +100,6 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 			this, &Shell::fontError);
 
 	m_nvim->setRequestHandler(new ShellRequestHandler(this));
-
-	if (m_nvim->isReady()) {
-		init();
-	}
 }
 
 void Shell::fontError(const QString& msg)
@@ -254,6 +249,12 @@ void Shell::setAttached(bool attached)
 
 void Shell::init()
 {
+	// Prevent init() from being called multiple times
+	if (m_init_called) {
+		return;
+	}
+	m_init_called = true;
+
 	// Make sure the connector provides us with an api object
 	if (!m_nvim || !m_nvim->api0()) {
 		emit neovimIsUnsupported();
@@ -265,9 +266,9 @@ void Shell::init()
 	connect(m_nvim->api0(), &NeovimApi0::on_ui_try_resize,
 			this, &Shell::neovimResizeFinished);
 
-	QRect screenRect = QApplication::desktop()->availableGeometry(this);
-	int64_t width = screenRect.width()*0.66/cellSize().width();
-	int64_t height = screenRect.height()*0.66/cellSize().height();
+	int64_t width = this->width() / cellSize().width();
+	int64_t height = this->height() / cellSize().height();
+	qDebug() << "width: " << width << " height: " << height;
 	QVariantMap options;
 	if (m_options.IsTablineEnabled()) {
 		options.insert("ext_tabline", true);
@@ -1282,6 +1283,19 @@ void Shell::handleGuiAdaptiveStyle(const QVariantList& opargs) noexcept
 void Shell::handleGuiAdaptiveStyleList() noexcept
 {
 	emit showGuiAdaptiveStyleList();
+}
+
+void Shell::showEvent(QShowEvent* ev)
+{
+	// Prevent init() from being called multiple times
+	if (m_init_called) {
+		return;
+	}
+
+	connect(m_nvim, &NeovimConnector::ready, this, &Shell::init);
+	if (m_nvim->isReady()) {
+		init();
+	}
 }
 
 void Shell::paintEvent(QPaintEvent *ev)

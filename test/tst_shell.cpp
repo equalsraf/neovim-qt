@@ -40,6 +40,7 @@ private slots:
 			QVERIFY(SPYWAIT(onReady));
 
 			Shell *s = new Shell(c);
+			s->show(); // To emit Shell::showEvent()
 			QSignalSpy onResize(s, SIGNAL(neovimResized(int, int)));
 			QVERIFY(onResize.isValid());
 			QVERIFY(SPYWAIT(onResize));
@@ -51,6 +52,7 @@ private slots:
 		args << "-u" << "NONE";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c);
+		s->show(); // To emit Shell::showEvent()
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
@@ -60,13 +62,13 @@ private slots:
 
 		QPixmap p = s->grab();
 		p.save("tst_shell_start.jpg");
-
 	}
 
 	void startVarsShellWidget() {
 		QStringList args = {"-u", "NONE"};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c);
+		s->show(); // To emit Shell::showEvent()
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
@@ -91,6 +93,7 @@ private slots:
 		args << "-u" << "NONE";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c);
+		s->show(); // To emit Shell::showEvent()
 		QSignalSpy onOptionSet(s, &Shell::neovimExtTablineSet);
 		QVERIFY(onOptionSet.isValid());
 		QVERIFY(SPYWAIT(onOptionSet));
@@ -102,6 +105,7 @@ private slots:
 		args << "-u" << "NONE";
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		Shell *s = new Shell(c);
+		s->show(); // To emit Shell::showEvent()
 
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
@@ -128,6 +132,16 @@ private slots:
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c);
+
+		// Show the window in order to emit Shell::showEvent(). It should be
+		// maximized to avoid hit-enter-prompt as much as possible.
+		// `:GuiFont` shows warning message "Warning: Font {fontname} reports
+		// bad fixed pitch metrics" (only on Windows?). If the shown window is
+		// too small (and it's often the case, the default window size is too
+		// small), this message causes hit-enter-prompt and make the test
+		// fail.
+		s->showMaximized();
+
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
@@ -226,7 +240,7 @@ private slots:
 
 		NeovimConnector* c{ NeovimConnector::spawn(args) };
 		MainWindow* s{ new MainWindow(c) };
-		s->show();
+		s->show(); // To emit Shell::showEvent()
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
@@ -294,6 +308,7 @@ private slots:
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c);
+		s->show(); // To emit Shell::showEvent()
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
@@ -355,6 +370,7 @@ private slots:
 			"--cmd", "set rtp+=" + fi.absoluteFilePath()};
 		NeovimConnector *c = NeovimConnector::spawn(args);
 		MainWindow *s = new MainWindow(c);
+		s->show(); // To emit Shell::showEvent()
 		QSignalSpy onAttached(s, SIGNAL(neovimAttached(bool)));
 		QVERIFY(onAttached.isValid());
 		QVERIFY(SPYWAIT(onAttached));
