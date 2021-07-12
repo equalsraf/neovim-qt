@@ -154,7 +154,7 @@ private slots:
 		QVERIFY(cmd_gf.isValid());
 		QVERIFY(SPYWAIT(cmd_gf));
 
-		QSignalSpy spy_fontchange(s->shell(), &Shell::fontChanged);
+		QSignalSpy spy_fontchange(s->shell(), &ShellWidget::shellFontChanged);
 
 		// Test Performance: timeout occurs often, set value carefully.
 		SPYWAIT(spy_fontchange, 2500 /*msec*/);
@@ -174,7 +174,7 @@ private slots:
 		QVERIFY(cmd_gf2.isValid());
 		QVERIFY(SPYWAIT(cmd_gf2));
 
-		QSignalSpy spy_fontchange2(s->shell(), &Shell::fontChanged);
+		QSignalSpy spy_fontchange2(s->shell(), &ShellWidget::shellFontChanged);
 
 		// Test Performance: timeout occurs often, set value carefully.
 		SPYWAIT(spy_fontchange2, 2500 /*msec*/);
