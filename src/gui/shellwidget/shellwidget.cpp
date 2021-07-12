@@ -35,7 +35,8 @@ ShellWidget* ShellWidget::fromFile(const QString& path)
 void ShellWidget::setDefaultFont()
 {
 	static const QFont font{ getDefaultFontFamily(), 11 /*pointSize*/, -1 /*weight*/, false /*italic*/ };
-	setShellFont(font, true /*force*/);
+	setFont(font);
+	setCellSize();
 }
 
 /*static*/ QString ShellWidget::getDefaultFontFamily() noexcept
@@ -61,13 +62,13 @@ bool ShellWidget::setShellFont(const QFont& font, bool force) noexcept
 	QFontInfo fi(font);
 	if (fi.family().compare(font.family(), Qt::CaseInsensitive) != 0 &&
 			font.family().compare("Monospace", Qt::CaseInsensitive) != 0) {
-		emit fontError(QString("Unknown font: %1").arg(font.family()));
+		emit fontError(QStringLiteral("Unknown font: %1").arg(font.family()));
 		return false;
 	}
 
 	if (!force) {
 		if (!fi.fixedPitch()) {
-			emit fontError(QString("%1 is not a fixed pitch font").arg(font.family()));
+			emit fontError(QStringLiteral("%1 is not a fixed pitch font").arg(font.family()));
 			return false;
 		}
 
