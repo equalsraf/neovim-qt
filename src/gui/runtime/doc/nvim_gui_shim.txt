@@ -178,8 +178,8 @@ Supported arguments are:
 The following parameters desceibe the fields in {opts}.
 
 Parameters: ~
-    {server} (optional, string): Server to connect to for the new window.
-    {nvim} (optional, string): Path to nvim instance.
+	{server} (optional, string): Server to connect to for the new window.
+	{nvim} (optional, string): Path to nvim instance.
 
 							*GuiName()*
 Returns the name of the GUI client. If multiple GUIs are connected the last

@@ -22,8 +22,11 @@ function! GuiClose() abort
 endfunction
 
 " Open new window
-function! GuiNewWindow(args) abort
-  call rpcnotify(0, 'Gui', 'NewWindow', a:args)
+function! GuiNewWindow(...) abort
+	let server = get(a:, 0, 0)
+	let nvim = get(a:, 1, 0)
+
+	call rpcnotify(0, 'Gui', 'NewWindow', server, nvim)
 endfunction
 
 " Notify the GUI when exiting Neovim

@@ -31,13 +31,19 @@ public:
 	bool neovimAttached() const;
 	Shell* shell();
 	void restoreWindowGeometry();
-	bool active() const noexcept;
+
+	bool active() const noexcept
+	{
+		return m_isActive;
+	}
+
 public slots:
 	void delayedShow(DelayedShow type=DelayedShow::Normal);
 signals:
 	void neovimAttached(bool);
 	void closing(int);
-	void activeChanged(MainWindow& window, QPrivateSignal);
+	void activeChanged(MainWindow& window);
+
 protected:
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;

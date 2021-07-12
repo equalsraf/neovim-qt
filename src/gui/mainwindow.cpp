@@ -24,7 +24,6 @@ MainWindow::MainWindow(NeovimConnector* c, QWidget* parent)
 
 void MainWindow::init(NeovimConnector *c)
 {
-	Q_ASSERT(c);
 	if (m_shell) {
 		m_shell->deleteLater();
 		m_stack.removeWidget(m_shell);
@@ -277,13 +276,13 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 		ev->ignore();
 	}
 }
-void MainWindow::changeEvent( QEvent *ev)
+void MainWindow::changeEvent(QEvent *ev)
 {
 	if (ev->type() == QEvent::WindowStateChange && isWindow()) {
 		m_shell->updateGuiWindowState(windowState());
 
-		m_isActive = windowState() == Qt::WindowState::WindowActive;
-		emit activeChanged(*this, QPrivateSignal{});
+		m_isActive = (windowState() == Qt::WindowState::WindowActive);
+		emit activeChanged(*this);
 	}
 	QWidget::changeEvent(ev);
 }
@@ -467,11 +466,6 @@ void MainWindow::restoreWindowGeometry()
 	QSettings settings{ "nvim-qt", "window-geometry" };
 	restoreGeometry(settings.value("window_geometry").toByteArray());
 	restoreState(settings.value("window_state").toByteArray());
-}
-
-bool MainWindow::active() const noexcept
-{
-	return m_isActive;
 }
 
 void MainWindow::setGuiAdaptiveColorEnabled(bool isEnabled)
