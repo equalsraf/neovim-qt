@@ -20,35 +20,35 @@ jobs:
             cc: gcc
             cxx: g++
 
-          - name: Linux_LLVM
-            flavor: Debug
-            runner: ubuntu-latest
-            generator: Ninja
-            cc: clang
-            cxx: clang++
-
-          - name: Linux_Release
-            flavor: Release
-            runner: ubuntu-18.04
-            generator: Ninja
-            cc: gcc
-            cxx: g++
-            publish: true
-
-          - name: MacOS_GCC
-            flavor: Debug
-            runner: macos-latest
-            generator: Ninja
-            cc: gcc-11
-            cxx: g++-11
-
-          - name: MacOS_Release
-            flavor: Release
-            runner: macos-latest
-            generator: Ninja
-            cc: clang
-            cxx: clang++
-            publish: true
+            #          - name: Linux_LLVM
+            #            flavor: Debug
+            #            runner: ubuntu-latest
+            #            generator: Ninja
+            #            cc: clang
+            #            cxx: clang++
+            #
+            #          - name: Linux_Release
+            #            flavor: Release
+            #            runner: ubuntu-18.04
+            #            generator: Ninja
+            #            cc: gcc
+            #            cxx: g++
+            #            publish: true
+            #
+            #          - name: MacOS_GCC
+            #            flavor: Debug
+            #            runner: macos-latest
+            #            generator: Ninja
+            #            cc: gcc-11
+            #            cxx: g++-11
+            #
+            #          - name: MacOS_Release
+            #            flavor: Release
+            #            runner: macos-latest
+            #            generator: Ninja
+            #            cc: clang
+            #            cxx: clang++
+            #            publish: true
 
           - name: Windows_MingGW
             flavor: Debug
@@ -182,3 +182,5 @@ jobs:
             neovim-qt.dmg
             neovim-qt-installer.msi
             neovim-qt.zip
+            build/test_*
+            build/tst_*
