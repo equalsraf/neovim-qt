@@ -20,35 +20,35 @@ jobs:
             cc: gcc
             cxx: g++
 
-          - name: Linux_LLVM
-            flavor: Debug
-            runner: ubuntu-latest
-            generator: Ninja
-            cc: clang
-            cxx: clang++
-
-          - name: Linux_Release
-            flavor: Release
-            runner: ubuntu-18.04
-            generator: Ninja
-            cc: gcc
-            cxx: g++
-            publish: true
-
-          - name: MacOS_GCC
-            flavor: Debug
-            runner: macos-latest
-            generator: Ninja
-            cc: gcc-11
-            cxx: g++-11
-
-          - name: MacOS_Release
-            flavor: Release
-            runner: macos-latest
-            generator: Ninja
-            cc: clang
-            cxx: clang++
-            publish: true
+            #          - name: Linux_LLVM
+            #            flavor: Debug
+            #            runner: ubuntu-latest
+            #            generator: Ninja
+            #            cc: clang
+            #            cxx: clang++
+            #
+            #          - name: Linux_Release
+            #            flavor: Release
+            #            runner: ubuntu-18.04
+            #            generator: Ninja
+            #            cc: gcc
+            #            cxx: g++
+            #            publish: true
+            #
+            #          - name: MacOS_GCC
+            #            flavor: Debug
+            #            runner: macos-latest
+            #            generator: Ninja
+            #            cc: gcc-11
+            #            cxx: g++-11
+            #
+            #          - name: MacOS_Release
+            #            flavor: Release
+            #            runner: macos-latest
+            #            generator: Ninja
+            #            cc: clang
+            #            cxx: clang++
+            #            publish: true
 
           - name: Windows_MingGW
             flavor: Debug
@@ -136,8 +136,31 @@ jobs:
       - name: Build
         run: cmake --build ${{ github.workspace }}/build
 
+      - name: Windows - Publish Release Build
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
+        run: |
+          cmake --build ./build --target install
+          Push-Location ${{ github.workspace }}/build
+          cpack --verbose -G WIX
+          Pop-Location
+          Compress-Archive -Path ./install -DestinationPath neovim-qt.zip
+          Move-Item -Path ./build/neovim-qt-installer.msi -Destination neovim-qt-installer.msi
+
+      - name: Upload Artifacts
+        if: ${{ matrix.publish }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.name }}
+          if-no-files-found: ignore
+          path: |
+            Neovim-Qt-*-x86_64.AppImage
+            neovim-qt.dmg
+            neovim-qt-installer.msi
+            neovim-qt.zip
+            build/test_*
+            build/tst_*
+
       - name: Test
-        if: ${{ !startsWith(matrix.runner, 'windows') }}
         uses: GabrielBB/xvfb-action@v1 # Required by Linux, no X11 $DISPLAY
         with:
           working-directory: ${{ github.workspace }}/build
@@ -162,24 +185,3 @@ jobs:
           macdeployqt ./build/bin/nvim-qt.app -dmg
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
 
-      - name: Windows - Publish Release Build
-        if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
-        run: |
-          cmake --build ./build --target install
-          Push-Location ${{ github.workspace }}/build
-          cpack --verbose -G WIX
-          Pop-Location
-          Compress-Archive -Path ./install -DestinationPath neovim-qt.zip
-          Move-Item -Path ./build/neovim-qt-installer.msi -Destination neovim-qt-installer.msi
-
-      - name: Upload Artifacts
-        if: ${{ matrix.publish }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.name }}
-          if-no-files-found: ignore
-          path: |
-            Neovim-Qt-*-x86_64.AppImage
-            neovim-qt.dmg
-            neovim-qt-installer.msi
-            neovim-qt.zip

@@ -53,6 +53,7 @@ void TestEncoding::map()
 			});
 	QVERIFY(SPYWAIT(onVimGetVar));
 	disconnect(conn);
+	QVERIFY(false); // FIXME Intentional Test Failure Added!
 }
 
 // A reminder that Strings in the Neovim API are binary data

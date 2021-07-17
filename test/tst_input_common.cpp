@@ -29,6 +29,7 @@ void TestInputCommon::LessThanKey() noexcept
 	// Issue#607: Shift is implied with "<", send "<lt>" instead.
 	QKeyEvent evIssue607{ QEvent::KeyPress, Qt::Key::Key_Less, Qt::KeyboardModifier::ShiftModifier, "<" };
 	QCOMPARE(NeovimQt::Input::convertKey(evIssue607), QString{ "<lt>" });
+	QVERIFY(false); // FIXME Intentional Test Failure Added!
 }
 
 void TestInputCommon::ModifierOnlyKeyEventsIgnored() noexcept
