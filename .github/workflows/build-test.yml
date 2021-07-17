@@ -136,6 +136,30 @@ jobs:
       - name: Build
         run: cmake --build ${{ github.workspace }}/build
 
+      - name: Windows - Publish Release Build
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
+        run: |
+          cmake --build ./build --target install
+          Push-Location ${{ github.workspace }}/build
+          cpack --verbose -G WIX
+          Pop-Location
+          Compress-Archive -Path ./install -DestinationPath neovim-qt.zip
+          Move-Item -Path ./build/neovim-qt-installer.msi -Destination neovim-qt-installer.msi
+
+      - name: Upload Artifacts
+        if: ${{ matrix.publish }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.name }}
+          if-no-files-found: ignore
+          path: |
+            Neovim-Qt-*-x86_64.AppImage
+            neovim-qt.dmg
+            neovim-qt-installer.msi
+            neovim-qt.zip
+            build/test_*
+            build/tst_*
+
       - name: Test
         uses: GabrielBB/xvfb-action@v1 # Required by Linux, no X11 $DISPLAY
         with:
@@ -161,26 +185,3 @@ jobs:
           macdeployqt ./build/bin/nvim-qt.app -dmg
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
 
-      - name: Windows - Publish Release Build
-        if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
-        run: |
-          cmake --build ./build --target install
-          Push-Location ${{ github.workspace }}/build
-          cpack --verbose -G WIX
-          Pop-Location
-          Compress-Archive -Path ./install -DestinationPath neovim-qt.zip
-          Move-Item -Path ./build/neovim-qt-installer.msi -Destination neovim-qt-installer.msi
-
-      - name: Upload Artifacts
-        if: ${{ matrix.publish }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.name }}
-          if-no-files-found: ignore
-          path: |
-            Neovim-Qt-*-x86_64.AppImage
-            neovim-qt.dmg
-            neovim-qt-installer.msi
-            neovim-qt.zip
-            build/test_*
-            build/tst_*
