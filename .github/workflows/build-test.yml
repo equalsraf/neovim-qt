@@ -137,7 +137,6 @@ jobs:
         run: cmake --build ${{ github.workspace }}/build
 
       - name: Test
-        if: ${{ !startsWith(matrix.runner, 'windows') }}
         uses: GabrielBB/xvfb-action@v1 # Required by Linux, no X11 $DISPLAY
         with:
           working-directory: ${{ github.workspace }}/build
