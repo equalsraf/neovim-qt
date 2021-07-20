@@ -1,4 +1,4 @@
-// Auto generated 2019-01-13 02:04:50.926393 from nvim API level:6
+// Auto generated 2021-07-20 02:42:32.035419 from nvim API level:6
 #include "auto/neovimapi6.h"
 #include "neovimconnector.h"
 #include "msgpackrequest.h"
@@ -198,6 +198,30 @@ MsgpackRequest* NeovimApi6::nvim_buf_get_keymap(int64_t buffer, QByteArray mode)
 	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
 	m_c->m_dev->send(buffer);
 	m_c->m_dev->send(mode);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_buf_set_keymap(int64_t buffer, QByteArray mode, QByteArray lhs, QByteArray rhs, QVariantMap opts)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_buf_set_keymap", 5);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_BUF_SET_KEYMAP);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(buffer);
+	m_c->m_dev->send(mode);
+	m_c->m_dev->send(lhs);
+	m_c->m_dev->send(rhs);
+	m_c->m_dev->send(opts);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_buf_del_keymap(int64_t buffer, QByteArray mode, QByteArray lhs)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_buf_del_keymap", 3);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_BUF_DEL_KEYMAP);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(buffer);
+	m_c->m_dev->send(mode);
+	m_c->m_dev->send(lhs);
 	return r;
 }
 MsgpackRequest* NeovimApi6::nvim_buf_get_commands(int64_t buffer, QVariantMap opts)
@@ -540,6 +564,15 @@ MsgpackRequest* NeovimApi6::nvim_ui_try_resize_grid(int64_t grid, int64_t width,
 	m_c->m_dev->send(height);
 	return r;
 }
+MsgpackRequest* NeovimApi6::nvim_ui_pum_set_height(int64_t height)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_ui_pum_set_height", 1);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_UI_PUM_SET_HEIGHT);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(height);
+	return r;
+}
 MsgpackRequest* NeovimApi6::nvim_command(QByteArray command)
 {
 	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_command", 1);
@@ -587,6 +620,20 @@ MsgpackRequest* NeovimApi6::nvim_input(QByteArray keys)
 	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
 	m_c->m_dev->send(keys);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_input_mouse(QByteArray button, QByteArray action, QByteArray modifier, int64_t grid, int64_t row, int64_t col)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_input_mouse", 6);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_INPUT_MOUSE);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(button);
+	m_c->m_dev->send(action);
+	m_c->m_dev->send(modifier);
+	m_c->m_dev->send(grid);
+	m_c->m_dev->send(row);
+	m_c->m_dev->send(col);
 	return r;
 }
 MsgpackRequest* NeovimApi6::nvim_replace_termcodes(QByteArray str, bool from_part, bool do_lt, bool special)
@@ -757,6 +804,16 @@ MsgpackRequest* NeovimApi6::nvim_get_vvar(QByteArray name)
 	m_c->m_dev->send(name);
 	return r;
 }
+MsgpackRequest* NeovimApi6::nvim_set_vvar(QByteArray name, QVariant value)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_set_vvar", 2);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_SET_VVAR);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(name);
+	m_c->m_dev->send(value);
+	return r;
+}
 MsgpackRequest* NeovimApi6::nvim_get_option(QByteArray name)
 {
 	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_get_option", 1);
@@ -853,6 +910,27 @@ MsgpackRequest* NeovimApi6::nvim_set_current_win(int64_t window)
 	m_c->m_dev->send(window);
 	return r;
 }
+MsgpackRequest* NeovimApi6::nvim_create_buf(bool listed, bool scratch)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_create_buf", 2);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_CREATE_BUF);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(listed);
+	m_c->m_dev->send(scratch);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_open_win(int64_t buffer, bool enter, QVariantMap config)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_open_win", 3);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_OPEN_WIN);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(buffer);
+	m_c->m_dev->send(enter);
+	m_c->m_dev->send(config);
+	return r;
+}
 MsgpackRequest* NeovimApi6::nvim_list_tabpages()
 {
 	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_list_tabpages", 0);
@@ -895,6 +973,29 @@ MsgpackRequest* NeovimApi6::nvim_get_namespaces()
 	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
 	return r;
 }
+MsgpackRequest* NeovimApi6::nvim_paste(QByteArray data, bool crlf, int64_t phase)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_paste", 3);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_PASTE);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(data);
+	m_c->m_dev->send(crlf);
+	m_c->m_dev->send(phase);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_put(QList<QByteArray> lines, QByteArray type, bool after, bool follow)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_put", 4);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_PUT);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->sendArrayOf(lines);
+	m_c->m_dev->send(type);
+	m_c->m_dev->send(after);
+	m_c->m_dev->send(follow);
+	return r;
+}
 MsgpackRequest* NeovimApi6::nvim_subscribe(QByteArray event)
 {
 	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_subscribe", 1);
@@ -930,6 +1031,24 @@ MsgpackRequest* NeovimApi6::nvim_get_color_map()
 	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
 	return r;
 }
+MsgpackRequest* NeovimApi6::nvim_get_context(QVariantMap opts)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_get_context", 1);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_GET_CONTEXT);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(opts);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_load_context(QVariantMap dict)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_load_context", 1);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_LOAD_CONTEXT);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(dict);
+	return r;
+}
 MsgpackRequest* NeovimApi6::nvim_get_mode()
 {
 	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_get_mode", 0);
@@ -945,6 +1064,28 @@ MsgpackRequest* NeovimApi6::nvim_get_keymap(QByteArray mode)
 	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
 	m_c->m_dev->send(mode);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_set_keymap(QByteArray mode, QByteArray lhs, QByteArray rhs, QVariantMap opts)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_set_keymap", 4);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_SET_KEYMAP);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(mode);
+	m_c->m_dev->send(lhs);
+	m_c->m_dev->send(rhs);
+	m_c->m_dev->send(opts);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_del_keymap(QByteArray mode, QByteArray lhs)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_del_keymap", 2);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_DEL_KEYMAP);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(mode);
+	m_c->m_dev->send(lhs);
 	return r;
 }
 MsgpackRequest* NeovimApi6::nvim_get_commands(QVariantMap opts)
@@ -1235,6 +1376,35 @@ MsgpackRequest* NeovimApi6::nvim_win_is_valid(int64_t window)
 	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
 	m_c->m_dev->send(window);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_win_set_config(int64_t window, QVariantMap config)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_win_set_config", 2);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_WIN_SET_CONFIG);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(window);
+	m_c->m_dev->send(config);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_win_get_config(int64_t window)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_win_get_config", 1);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_WIN_GET_CONFIG);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(window);
+	return r;
+}
+MsgpackRequest* NeovimApi6::nvim_win_close(int64_t window, bool force)
+{
+	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("nvim_win_close", 2);
+	r->setFunction(NeovimApi6::NEOVIM_FN_NVIM_WIN_CLOSE);
+	connect(r, &MsgpackRequest::finished, this, &NeovimApi6::handleResponse);
+	connect(r, &MsgpackRequest::error, this, &NeovimApi6::handleResponseError);
+	m_c->m_dev->send(window);
+	m_c->m_dev->send(force);
 	return r;
 }
 MsgpackRequest* NeovimApi6::buffer_line_count(int64_t buffer)
@@ -1908,6 +2078,12 @@ void NeovimApi6::handleResponseError(quint32 msgid, quint64 fun, const QVariant&
 	case NeovimApi6::NEOVIM_FN_NVIM_BUF_GET_KEYMAP:
 		emit err_nvim_buf_get_keymap(errMsg, res);
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_BUF_SET_KEYMAP:
+		emit err_nvim_buf_set_keymap(errMsg, res);
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_BUF_DEL_KEYMAP:
+		emit err_nvim_buf_del_keymap(errMsg, res);
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_BUF_GET_COMMANDS:
 		emit err_nvim_buf_get_commands(errMsg, res);
 		break;
@@ -2007,6 +2183,9 @@ void NeovimApi6::handleResponseError(quint32 msgid, quint64 fun, const QVariant&
 	case NeovimApi6::NEOVIM_FN_NVIM_UI_TRY_RESIZE_GRID:
 		emit err_nvim_ui_try_resize_grid(errMsg, res);
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_UI_PUM_SET_HEIGHT:
+		emit err_nvim_ui_pum_set_height(errMsg, res);
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_COMMAND:
 		emit err_nvim_command(errMsg, res);
 		break;
@@ -2021,6 +2200,9 @@ void NeovimApi6::handleResponseError(quint32 msgid, quint64 fun, const QVariant&
 		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_INPUT:
 		emit err_nvim_input(errMsg, res);
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_INPUT_MOUSE:
+		emit err_nvim_input_mouse(errMsg, res);
 		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_REPLACE_TERMCODES:
 		emit err_nvim_replace_termcodes(errMsg, res);
@@ -2076,6 +2258,9 @@ void NeovimApi6::handleResponseError(quint32 msgid, quint64 fun, const QVariant&
 	case NeovimApi6::NEOVIM_FN_NVIM_GET_VVAR:
 		emit err_nvim_get_vvar(errMsg, res);
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_SET_VVAR:
+		emit err_nvim_set_vvar(errMsg, res);
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_GET_OPTION:
 		emit err_nvim_get_option(errMsg, res);
 		break;
@@ -2109,6 +2294,12 @@ void NeovimApi6::handleResponseError(quint32 msgid, quint64 fun, const QVariant&
 	case NeovimApi6::NEOVIM_FN_NVIM_SET_CURRENT_WIN:
 		emit err_nvim_set_current_win(errMsg, res);
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_CREATE_BUF:
+		emit err_nvim_create_buf(errMsg, res);
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_OPEN_WIN:
+		emit err_nvim_open_win(errMsg, res);
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_LIST_TABPAGES:
 		emit err_nvim_list_tabpages(errMsg, res);
 		break;
@@ -2124,6 +2315,12 @@ void NeovimApi6::handleResponseError(quint32 msgid, quint64 fun, const QVariant&
 	case NeovimApi6::NEOVIM_FN_NVIM_GET_NAMESPACES:
 		emit err_nvim_get_namespaces(errMsg, res);
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_PASTE:
+		emit err_nvim_paste(errMsg, res);
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_PUT:
+		emit err_nvim_put(errMsg, res);
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_SUBSCRIBE:
 		emit err_nvim_subscribe(errMsg, res);
 		break;
@@ -2136,11 +2333,23 @@ void NeovimApi6::handleResponseError(quint32 msgid, quint64 fun, const QVariant&
 	case NeovimApi6::NEOVIM_FN_NVIM_GET_COLOR_MAP:
 		emit err_nvim_get_color_map(errMsg, res);
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_GET_CONTEXT:
+		emit err_nvim_get_context(errMsg, res);
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_LOAD_CONTEXT:
+		emit err_nvim_load_context(errMsg, res);
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_GET_MODE:
 		emit err_nvim_get_mode(errMsg, res);
 		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_GET_KEYMAP:
 		emit err_nvim_get_keymap(errMsg, res);
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_SET_KEYMAP:
+		emit err_nvim_set_keymap(errMsg, res);
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_DEL_KEYMAP:
+		emit err_nvim_del_keymap(errMsg, res);
 		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_GET_COMMANDS:
 		emit err_nvim_get_commands(errMsg, res);
@@ -2231,6 +2440,15 @@ void NeovimApi6::handleResponseError(quint32 msgid, quint64 fun, const QVariant&
 		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_WIN_IS_VALID:
 		emit err_nvim_win_is_valid(errMsg, res);
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_WIN_SET_CONFIG:
+		emit err_nvim_win_set_config(errMsg, res);
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_WIN_GET_CONFIG:
+		emit err_nvim_win_get_config(errMsg, res);
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_WIN_CLOSE:
+		emit err_nvim_win_close(errMsg, res);
 		break;
 	case NeovimApi6::NEOVIM_FN_BUFFER_LINE_COUNT:
 		emit err_buffer_line_count(errMsg, res);
@@ -2579,6 +2797,18 @@ void NeovimApi6::handleResponse(quint32 msgid, quint64 fun, const QVariant& res)
 
 		}
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_BUF_SET_KEYMAP:
+		{
+			emit on_nvim_buf_set_keymap();
+
+		}
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_BUF_DEL_KEYMAP:
+		{
+			emit on_nvim_buf_del_keymap();
+
+		}
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_BUF_GET_COMMANDS:
 		{
 			QVariantMap data;
@@ -2885,6 +3115,12 @@ void NeovimApi6::handleResponse(quint32 msgid, quint64 fun, const QVariant& res)
 
 		}
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_UI_PUM_SET_HEIGHT:
+		{
+			emit on_nvim_ui_pum_set_height();
+
+		}
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_COMMAND:
 		{
 			emit on_nvim_command();
@@ -2930,6 +3166,12 @@ void NeovimApi6::handleResponse(quint32 msgid, quint64 fun, const QVariant& res)
 			} else {
 				emit on_nvim_input(data);
 			}
+
+		}
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_INPUT_MOUSE:
+		{
+			emit on_nvim_input_mouse();
 
 		}
 		break;
@@ -3119,6 +3361,12 @@ void NeovimApi6::handleResponse(quint32 msgid, quint64 fun, const QVariant& res)
 
 		}
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_SET_VVAR:
+		{
+			emit on_nvim_set_vvar();
+
+		}
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_GET_OPTION:
 		{
 			QVariant data;
@@ -3215,6 +3463,30 @@ void NeovimApi6::handleResponse(quint32 msgid, quint64 fun, const QVariant& res)
 
 		}
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_CREATE_BUF:
+		{
+			int64_t data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for nvim_create_buf");
+				return;
+			} else {
+				emit on_nvim_create_buf(data);
+			}
+
+		}
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_OPEN_WIN:
+		{
+			int64_t data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for nvim_open_win");
+				return;
+			} else {
+				emit on_nvim_open_win(data);
+			}
+
+		}
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_LIST_TABPAGES:
 		{
 			QList<int64_t> data;
@@ -3269,6 +3541,24 @@ void NeovimApi6::handleResponse(quint32 msgid, quint64 fun, const QVariant& res)
 
 		}
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_PASTE:
+		{
+			bool data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for nvim_paste");
+				return;
+			} else {
+				emit on_nvim_paste(data);
+			}
+
+		}
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_PUT:
+		{
+			emit on_nvim_put();
+
+		}
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_SUBSCRIBE:
 		{
 			emit on_nvim_subscribe();
@@ -3305,6 +3595,30 @@ void NeovimApi6::handleResponse(quint32 msgid, quint64 fun, const QVariant& res)
 
 		}
 		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_GET_CONTEXT:
+		{
+			QVariantMap data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for nvim_get_context");
+				return;
+			} else {
+				emit on_nvim_get_context(data);
+			}
+
+		}
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_LOAD_CONTEXT:
+		{
+			QVariant data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for nvim_load_context");
+				return;
+			} else {
+				emit on_nvim_load_context(data);
+			}
+
+		}
+		break;
 	case NeovimApi6::NEOVIM_FN_NVIM_GET_MODE:
 		{
 			QVariantMap data;
@@ -3326,6 +3640,18 @@ void NeovimApi6::handleResponse(quint32 msgid, quint64 fun, const QVariant& res)
 			} else {
 				emit on_nvim_get_keymap(data);
 			}
+
+		}
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_SET_KEYMAP:
+		{
+			emit on_nvim_set_keymap();
+
+		}
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_DEL_KEYMAP:
+		{
+			emit on_nvim_del_keymap();
 
 		}
 		break;
@@ -3632,6 +3958,30 @@ void NeovimApi6::handleResponse(quint32 msgid, quint64 fun, const QVariant& res)
 			} else {
 				emit on_nvim_win_is_valid(data);
 			}
+
+		}
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_WIN_SET_CONFIG:
+		{
+			emit on_nvim_win_set_config();
+
+		}
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_WIN_GET_CONFIG:
+		{
+			QVariantMap data;
+			if (decode(res, data)) {
+				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for nvim_win_get_config");
+				return;
+			} else {
+				emit on_nvim_win_get_config(data);
+			}
+
+		}
+		break;
+	case NeovimApi6::NEOVIM_FN_NVIM_WIN_CLOSE:
+		{
+			emit on_nvim_win_close();
 
 		}
 		break;
@@ -4376,6 +4726,20 @@ bool NeovimApi6::checkFunctions(const QVariantList& ftable)
 						<< QString("Buffer")
 						<< QString("String")
 						, false)
+		<< Function("void", "nvim_buf_set_keymap",
+			QList<QString>()
+						<< QString("Buffer")
+						<< QString("String")
+						<< QString("String")
+						<< QString("String")
+						<< QString("Dictionary")
+						, false)
+		<< Function("void", "nvim_buf_del_keymap",
+			QList<QString>()
+						<< QString("Buffer")
+						<< QString("String")
+						<< QString("String")
+						, false)
 		<< Function("Dictionary", "nvim_buf_get_commands",
 			QList<QString>()
 						<< QString("Buffer")
@@ -4551,6 +4915,10 @@ bool NeovimApi6::checkFunctions(const QVariantList& ftable)
 						<< QString("Integer")
 						<< QString("Integer")
 						, false)
+		<< Function("void", "nvim_ui_pum_set_height",
+			QList<QString>()
+						<< QString("Integer")
+						, false)
 		<< Function("void", "nvim_command",
 			QList<QString>()
 						<< QString("String")
@@ -4574,6 +4942,15 @@ bool NeovimApi6::checkFunctions(const QVariantList& ftable)
 		<< Function("Integer", "nvim_input",
 			QList<QString>()
 						<< QString("String")
+						, false)
+		<< Function("void", "nvim_input_mouse",
+			QList<QString>()
+						<< QString("String")
+						<< QString("String")
+						<< QString("String")
+						<< QString("Integer")
+						<< QString("Integer")
+						<< QString("Integer")
 						, false)
 		<< Function("String", "nvim_replace_termcodes",
 			QList<QString>()
@@ -4653,6 +5030,11 @@ bool NeovimApi6::checkFunctions(const QVariantList& ftable)
 			QList<QString>()
 						<< QString("String")
 						, false)
+		<< Function("void", "nvim_set_vvar",
+			QList<QString>()
+						<< QString("String")
+						<< QString("Object")
+						, false)
 		<< Function("Object", "nvim_get_option",
 			QList<QString>()
 						<< QString("String")
@@ -4694,6 +5076,17 @@ bool NeovimApi6::checkFunctions(const QVariantList& ftable)
 			QList<QString>()
 						<< QString("Window")
 						, false)
+		<< Function("Buffer", "nvim_create_buf",
+			QList<QString>()
+						<< QString("Boolean")
+						<< QString("Boolean")
+						, false)
+		<< Function("Window", "nvim_open_win",
+			QList<QString>()
+						<< QString("Buffer")
+						<< QString("Boolean")
+						<< QString("Dictionary")
+						, false)
 		<< Function("ArrayOf(Tabpage)", "nvim_list_tabpages",
 			QList<QString>()
 						, false)
@@ -4711,6 +5104,19 @@ bool NeovimApi6::checkFunctions(const QVariantList& ftable)
 		<< Function("Dictionary", "nvim_get_namespaces",
 			QList<QString>()
 						, false)
+		<< Function("Boolean", "nvim_paste",
+			QList<QString>()
+						<< QString("String")
+						<< QString("Boolean")
+						<< QString("Integer")
+						, false)
+		<< Function("void", "nvim_put",
+			QList<QString>()
+						<< QString("ArrayOf(String)")
+						<< QString("String")
+						<< QString("Boolean")
+						<< QString("Boolean")
+						, false)
 		<< Function("void", "nvim_subscribe",
 			QList<QString>()
 						<< QString("String")
@@ -4726,11 +5132,31 @@ bool NeovimApi6::checkFunctions(const QVariantList& ftable)
 		<< Function("Dictionary", "nvim_get_color_map",
 			QList<QString>()
 						, false)
+		<< Function("Dictionary", "nvim_get_context",
+			QList<QString>()
+						<< QString("Dictionary")
+						, false)
+		<< Function("Object", "nvim_load_context",
+			QList<QString>()
+						<< QString("Dictionary")
+						, false)
 		<< Function("Dictionary", "nvim_get_mode",
 			QList<QString>()
 						, false)
 		<< Function("ArrayOf(Dictionary)", "nvim_get_keymap",
 			QList<QString>()
+						<< QString("String")
+						, false)
+		<< Function("void", "nvim_set_keymap",
+			QList<QString>()
+						<< QString("String")
+						<< QString("String")
+						<< QString("String")
+						<< QString("Dictionary")
+						, false)
+		<< Function("void", "nvim_del_keymap",
+			QList<QString>()
+						<< QString("String")
 						<< QString("String")
 						, false)
 		<< Function("Dictionary", "nvim_get_commands",
@@ -4872,6 +5298,20 @@ bool NeovimApi6::checkFunctions(const QVariantList& ftable)
 		<< Function("Boolean", "nvim_win_is_valid",
 			QList<QString>()
 						<< QString("Window")
+						, false)
+		<< Function("void", "nvim_win_set_config",
+			QList<QString>()
+						<< QString("Window")
+						<< QString("Dictionary")
+						, false)
+		<< Function("Dictionary", "nvim_win_get_config",
+			QList<QString>()
+						<< QString("Window")
+						, false)
+		<< Function("void", "nvim_win_close",
+			QList<QString>()
+						<< QString("Window")
+						<< QString("Boolean")
 						, false)
 		<< Function("Integer", "buffer_line_count",
 			QList<QString>()
