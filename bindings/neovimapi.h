@@ -1,13 +1,15 @@
 // Auto generated {{date}} from nvim API level:{{api_level}}
-#ifndef NEOVIM_QT_NEOVIMAPI{{api_level}}
-#define NEOVIM_QT_NEOVIMAPI{{api_level}}
-#include "msgpack.h"
+#pragma once
+
 #include <QObject>
-#include <QVariant>
 #include <QPoint>
+#include <QVariant>
+
 #include "function.h"
+#include "msgpack.h"
 
 namespace NeovimQt {
+
 class NeovimConnector;
 class MsgpackRequest;
 
@@ -43,7 +45,7 @@ public slots:
 	// DEPRECATED
 {% endif %}
 	// {{f.signature()}}
-	MsgpackRequest* {{f.name}}({{f.argstring}});
+	NeovimQt::MsgpackRequest* {{f.name}}({{f.argstring}});
 {% endfor %}
 
 signals:
@@ -53,5 +55,5 @@ signals:
 
 {% endfor %}
 };
-} // namespace
-#endif
+
+} // namespace NeovimQt

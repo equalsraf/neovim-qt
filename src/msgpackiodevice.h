@@ -71,7 +71,7 @@ public:
 
 	QList<quint32> pendingRequests() const;
 signals:
-	void error(MsgpackError);
+	void error(NeovimQt::MsgpackIODevice::MsgpackError);
 	/** A notification with the given name and arguments was received */
 	void notification(const QByteArray &name, const QVariantList& args);
 
@@ -94,7 +94,7 @@ protected:
 	bool decodeMsgpack(const msgpack_object& in, QPoint& out);
 
 protected slots:
-	void setError(MsgpackError err, const QString& msg);
+	void setError(NeovimQt::MsgpackIODevice::MsgpackError err, const QString& msg);
 
 	void dataAvailable();
 	void dataAvailableStdin(const QByteArray&);

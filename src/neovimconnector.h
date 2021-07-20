@@ -103,7 +103,7 @@ public:
 signals:
 	/** Emitted when Neovim is ready @see ready */
 	void ready();
-	void error(NeovimError);
+	void error(NeovimQt::NeovimConnector::NeovimError);
 	void processExited(int exitCode);
 
 public slots:
