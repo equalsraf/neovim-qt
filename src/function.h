@@ -12,7 +12,6 @@
 namespace NeovimQt {
 
 class Function {
-	Q_ENUMS(FunctionId)
 public:
 
 	Function();

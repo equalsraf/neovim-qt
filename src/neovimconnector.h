@@ -49,11 +49,7 @@ public:
 		MsgpackError,
 		RuntimeMsgpackError,
 	};
-#ifdef Q_ENUM
 	Q_ENUM(NeovimError)
-#else
-	Q_ENUMS(NeovimError)
-#endif
 
 	/** Underlying connection used to read Neovim */
         enum NeovimConnectionType {

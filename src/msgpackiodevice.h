@@ -23,11 +23,8 @@ public:
 		InvalidMsgpack,
 		UnsupportedEncoding,
 	};
-#ifdef Q_ENUM
 	Q_ENUM(MsgpackError)
-#else
-	Q_ENUMS(MsgpackError)
-#endif
+
 	MsgpackIODevice(QIODevice *, QObject *parent=0);
 	~MsgpackIODevice();
         static MsgpackIODevice* fromStdinOut(QObject *parent=0);
