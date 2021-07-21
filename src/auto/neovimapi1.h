@@ -1,4 +1,4 @@
-// Auto generated 2021-07-20 02:45:08.775105 from nvim API level:1
+// Auto generated 2021-07-21 04:46:51.484084 from nvim API level:1
 #pragma once
 
 #include <QObject>
@@ -16,7 +16,6 @@ class MsgpackRequest;
 class NeovimApi1: public QObject
 {
 	Q_OBJECT
-	Q_ENUMS(FunctionId)
 
 public:
 
@@ -182,6 +181,7 @@ public:
 				NEOVIM_FN_WINDOW_GET_TABPAGE,
 				NEOVIM_FN_WINDOW_IS_VALID,
 			};
+	Q_ENUM(FunctionId)
 
 	static bool checkFunctions(const QVariantList& ftable);
 	static FunctionId functionId(const Function& f);

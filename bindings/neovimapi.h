@@ -16,7 +16,6 @@ class MsgpackRequest;
 class NeovimApi{{api_level}}: public QObject
 {
 	Q_OBJECT
-	Q_ENUMS(FunctionId)
 
 public:
 
@@ -26,6 +25,7 @@ public:
 		NEOVIM_FN_{{ f.name.upper() }},
 		{% endfor %}
 	};
+	Q_ENUM(FunctionId)
 
 	static bool checkFunctions(const QVariantList& ftable);
 	static FunctionId functionId(const Function& f);
