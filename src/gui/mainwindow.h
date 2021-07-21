@@ -28,13 +28,15 @@ public:
 	};
 
 	MainWindow(NeovimConnector *, QWidget *parent=0);
-	bool neovimAttached() const;
+
+	bool isNeovimAttached() const noexcept { return m_shell && m_shell->isNeovimAttached(); }
+
 	Shell* shell();
 	void restoreWindowGeometry();
 public slots:
 	void delayedShow(NeovimQt::MainWindow::DelayedShow type=DelayedShow::Normal);
 signals:
-	void neovimAttached(bool);
+	void neovimAttachmentChanged(bool);
 	void closing(int);
 protected:
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
@@ -51,7 +53,7 @@ private slots:
 	void neovimError(NeovimConnector::NeovimError);
 	void reconnectNeovim();
 	void showIfDelayed();
-	void neovimAttachmentChanged(bool);
+	void handleNeovimAttachment(bool);
 	void neovimIsUnsupported();
 	void neovimShowtablineSet(int);
 	void neovimTablineUpdate(int64_t curtab, QList<NeovimQt::Tab> tabs);

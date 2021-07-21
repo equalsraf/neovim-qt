@@ -24,7 +24,7 @@ namespace NeovimQt {
 static ShellOptions GetShellOptionsFromQSettings() noexcept
 {
 	ShellOptions opts;
-	QSettings settings{ "nvim-qt", "nvim-qt" };
+	QSettings settings;
 
 	QVariant ext_linegrid{ settings.value("ext_linegrid", opts.IsLineGridEnabled()) };
 	QVariant ext_popupmenu{ settings.value("ext_popupmenu", opts.IsPopupmenuEnabled()) };
@@ -74,14 +74,14 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_pum.setParent(this);
 	m_pum.hide();
 
-	QSettings settings{ "nvim-qt", "nvim-qt" };
+	QSettings settings;
 
 	// Font
 	QVariant guiFont{ settings.value("Gui/Font") };
 	if (guiFont.canConvert<QString>())
 	{
 		QString fontDescription{ guiFont.toString() };
-		setGuiFont(fontDescription, true /*force*/, true /*updateOption*/);
+		setGuiFont(fontDescription, true /*force*/);
 	}
 
 	if (!m_nvim) {
@@ -95,8 +95,6 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 			this, &Shell::neovimError);
 	connect(m_nvim, &NeovimConnector::processExited,
 			this, &Shell::neovimExited);
-	connect(this, &ShellWidget::shellFontChanged,
-			this, &Shell::fontChanged);
 	connect(this, &ShellWidget::fontError,
 			this, &Shell::fontError);
 
@@ -116,16 +114,16 @@ void Shell::fontError(const QString& msg)
 
 /// Set the GUI font, or display the current font
 ///
-/// @param updateOption controls update of the guifont option, which should not
-/// be updated when the user calls from 'set guifont=...'.
-bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
+/// @param fdesc Neovim font description string, "Fira Code:h11".
+/// @param force used to indicate :GuiFont!, overrides mono space checks.
+/// @returns `true` if the font was successfully set.
+bool Shell::setGuiFont(const QString& fdesc, bool force) noexcept
 {
-	// Exit early if the font description does not change, prevent loops.
+	// Exit early if the font description has not changed
 	if (fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
 		return false;
 	}
 
-	bool setShellFontSuccess{ false };
 	const bool isGuiDialogRequest{ fdesc == "*" };
 
 	if (isGuiDialogRequest) {
@@ -138,7 +136,9 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 			return false;
 		}
 
-		setShellFontSuccess = setShellFont(font, force);
+		if (!setShellFont(font, force)) {
+			return false;
+		}
 	}
 	else {
 		QVariant varFont{ TryGetQFontFromDescription(fdesc) };
@@ -149,28 +149,23 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool updateOption)
 			return false;
 		}
 
-		setShellFontSuccess = setShellFont(qvariant_cast<QFont>(varFont), force);
+		if (!setShellFont(qvariant_cast<QFont>(varFont), force)) {
+			return false;
+		}
 	}
 
 	// Only update the ShellWidget when font changes.
-	if (!setShellFontSuccess || !m_attached) {
+	if (!m_attached) {
 		return false;
 	}
 
-	// Font changed: trigger resize to update the ShellWidget, and update font variables.
+	// The font has changed:
+	//  1) Trigger resize to update the ShellWidget
+	//  2) Write QSettings for flicker-free start-up.
+	//  3) Update font variables (as necessary).
 	resizeNeovim(size());
-
-	m_nvim->api0()->vim_set_var("GuiFont", fontDesc());
-
-	// Write GuiFont to QSettings, prevent startup font flicker
-	QSettings settings{ "nvim-qt", "nvim-qt" };
-	settings.setValue("Gui/Font", fontDesc());
-
-	// Updating guifont when the user has already called 'set guifont=...' may cause
-	// unwanted recursion. Only update this option for ':GuiFont', and dialog calls.
-	if (isGuiDialogRequest || updateOption) {
-		m_nvim->api0()->vim_set_option("guifont", fontDesc());
-	}
+	writeGuiFontQSettings();
+	updateGuiFontRegisters();
 
 	return true;
 }
@@ -208,6 +203,51 @@ bool Shell::setGuiFontWide(const QString& fdesc) noexcept
 	m_guifontwidelist = std::move(fontList);
 	update();
 	return true;
+}
+
+void Shell::updateGuiFontRegisters() noexcept
+{
+	if (!m_attached || !m_nvim || !m_nvim->api0()) {
+		return;
+	}
+
+	// Update `set guifont=`, but only if value changes
+	MsgpackRequest* getOption{ m_nvim->api0()->vim_get_option("guifont") };
+	connect(getOption, &MsgpackRequest::finished, this, &Shell::handleGuiFontOption);
+
+	// Update `:GuiFont`, but only if value changes
+	MsgpackRequest* getVariable{ m_nvim->api0()->vim_get_var("GuiFont") };
+	connect(getVariable, &MsgpackRequest::finished, this, &Shell::handleGuiFontVariable);
+}
+
+void Shell::writeGuiFontQSettings() noexcept
+{
+	QSettings settings;
+	settings.setValue("Gui/Font", fontDesc());
+}
+
+void Shell::handleGuiFontOption(quint32 msgid, quint64 fun, const QVariant& val) noexcept
+{
+	const QString oldFont{ val.toString() };
+	const QString newFont{ fontDesc() };
+
+	if (newFont.compare(oldFont, Qt::CaseInsensitive) == 0) {
+		return;
+	}
+
+	m_nvim->api0()->vim_set_option("guifont", newFont);
+}
+
+void Shell::handleGuiFontVariable(quint32 msgid, quint64 fun, const QVariant& val) noexcept
+{
+	const QString oldFont{ val.toString() };
+	const QString newFont{ fontDesc() };
+
+	if (newFont.compare(oldFont, Qt::CaseInsensitive) == 0) {
+		return;
+	}
+
+	m_nvim->api0()->vim_set_var("GuiFont", newFont);
 }
 
 Shell::~Shell()
@@ -248,7 +288,12 @@ void Shell::setAttached(bool attached)
 		}
 
 	}
-	emit neovimAttached(attached);
+
+	// Issue #868: When GuiFont is loaded on startup, m_nvim is not attached yet.
+	// We are connected now, loop-back and update the registers with the correct values.
+	updateGuiFontRegisters();
+
+	emit neovimAttachmentChanged(attached);
 	update();
 }
 
@@ -280,19 +325,19 @@ void Shell::init()
 	}
 	options.insert("rgb", true);
 
-	MsgpackRequest *req;
+	MsgpackRequest* req{ nullptr };
 	if (m_nvim->api2()) {
 		req = m_nvim->api2()->nvim_ui_attach(width, height, options);
-	} else {
-		req = m_nvim->api0()->ui_attach(width, height, true);
 	}
-	connect(req, &MsgpackRequest::timeout,
-			m_nvim, &NeovimConnector::fatalTimeout);
-	// FIXME grab timeout from connector
+	else {
+		m_nvim->api0()->ui_attach(width, height, true);
+	}
+
+	connect(req, &MsgpackRequest::timeout, m_nvim, &NeovimConnector::fatalTimeout);
+	// TODO Issue#880: Grab timeout from connector
 	req->setTimeout(10000);
 
-	connect(req, &MsgpackRequest::finished,
-			this, &Shell::setAttached);
+	connect(req, &MsgpackRequest::finished, this, &Shell::setAttached);
 
 	// Subscribe to GUI events
 	m_nvim->api0()->vim_subscribe("Gui");
@@ -510,15 +555,12 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		handleMouse(false);
 	} else if (name == "mode_change"){
 		handleModeChange(opargs);
-	} else if (name == "cursor_on"){
 	} else if (name == "set_title"){
 		handleSetTitle(opargs);
-	} else if (name == "cursor_off"){
 	} else if (name == "busy_start"){
 		handleBusy(true);
 	} else if (name == "busy_stop"){
 		handleBusy(false);
-	} else if (name == "set_icon") {
 	} else if (name == "tabline_update") {
 		if (opargs.size() < 2 || !opargs.at(0).canConvert<int64_t>()) {
 			qWarning() << "Unexpected argument for tabline_update:" << opargs;
@@ -577,11 +619,9 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		handleGridScroll(opargs);
 	} else if (name == "hl_group_set") {
 		handleHighlightGroupSet(opargs);
-	} else if (name == "win_viewport") {
 	} else {
-		qDebug() << "Received unknown redraw notification" << name << opargs;
+		// qDebug() << "Received unknown redraw notification" << name << opargs;
 	}
-
 }
 
 void Shell::handlePopupMenuShow(const QVariantList& opargs)
@@ -889,20 +929,17 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 		handleGuiTabline(value);
 	} else if (name == "Popupmenu") {
 		handleGuiPopupmenu(value);
-	} else if (name == "Cmdline") {
-	} else if (name == "Wildmenu") {
 	} else if (name == "RenderLigatures"){
 		setLigatureMode(value.toBool());
 	} else {
-		qDebug() << "Unknown GUI Option" << name << value;
+		// qDebug() << "Unknown GUI Option" << name << value;
 	}
 }
 
 void Shell::handleSetOption(const QString& name, const QVariant& value)
 {
 	if (name == "guifont") {
-		setGuiFont(value.toString(), false /*force*/, false /*setOption*/);
-	} else if (name == "guifontset") {
+		setGuiFont(value.toString(), false /*force*/);
 	} else if (name == "guifontwide") {
 		handleGuiFontWide(value);
 	} else if (name == "linespace") {
@@ -911,17 +948,8 @@ void Shell::handleSetOption(const QString& name, const QVariant& value)
 		emit neovimShowtablineSet(value.toString().toInt());
 	} else if (name == "ext_tabline") {
 		emit neovimExtTablineSet(value.toBool());
-	} else if (name == "ext_popupmenu") {
-	// TODO
-	} else if (name == "arabicshape") {
-	} else if (name == "ambiwidth") {
-	} else if (name == "emoji") {
-	} else if (name == "termguicolors") {
-	} else if (name == "ext_cmdline") {
-	} else if (name == "ext_wildmenu") {
-	} else if (name == "ext_linegrid") {
 	} else {
-		qDebug() << "Received unknown option" << name << value;
+		// qDebug() << "Received unknown option" << name << value;
 	}
 }
 
@@ -947,7 +975,7 @@ void Shell::handleGuiFontFunction(const QVariantList& args)
 		force = args.at(2).toBool();
 	}
 
-	setGuiFont(fdesc, force, true /*setOption*/);
+	setGuiFont(fdesc, force);
 }
 
 void Shell::handleGuiFontWide(const QVariant& value) noexcept
@@ -1014,7 +1042,7 @@ void Shell::handleGuiTabline(const QVariant& value) noexcept
 	const bool isEnabled{ value.toBool() };
 	m_nvim->api1()->nvim_ui_set_option("ext_tabline", isEnabled);
 
-	QSettings settings{ "nvim-qt", "nvim-qt" };
+	QSettings settings;
 	settings.setValue("ext_tabline", isEnabled);
 }
 
@@ -1035,7 +1063,7 @@ void Shell::handleGuiPopupmenu(const QVariant& value) noexcept
 	const bool isEnabled{ value.toBool() };
 	m_nvim->api1()->nvim_ui_set_option("ext_popupmenu", isEnabled);
 
-	QSettings settings{ "nvim-qt", "nvim-qt" };
+	QSettings settings;
 	settings.setValue("ext_popupmenu", isEnabled);
 }
 
@@ -1693,11 +1721,6 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 bool Shell::neovimBusy() const
 {
 	return m_neovimBusy;
-}
-
-bool Shell::neovimAttached() const
-{
-	return m_attached;
 }
 
 void Shell::dragEnterEvent(QDragEnterEvent *ev)

@@ -1,9 +1,18 @@
 #include "tst_shell.h"
 
-#include <QStringList>
 #include <QTest>
 
 namespace NeovimQt {
+
+QClipboard::Mode GetClipboardMode(char /*reg*/) noexcept
+{
+	return QClipboard::Clipboard;
+}
+
+QString GetPlatformTestFont() noexcept
+{
+	return QStringLiteral("Monaco");
+}
 
 QStringList BinaryAndArgumentsNoForkWithCommand(const QString& command) noexcept
 {
