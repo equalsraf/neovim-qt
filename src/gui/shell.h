@@ -38,12 +38,14 @@ class Shell: public ShellWidget
 	Q_OBJECT
 	Q_PROPERTY(bool neovimBusy READ neovimBusy() NOTIFY neovimBusy())
 	Q_PROPERTY(bool neovimAttached READ neovimAttached() NOTIFY neovimAttached())
+	Q_PROPERTY(bool neovimResizing READ neovimResizing() NOTIFY neovimResizing())
 public:
 	Shell(NeovimConnector *nvim, QWidget *parent=0);
 	~Shell();
 	QSize sizeIncrement() const;
 	virtual QVariant inputMethodQuery(Qt::InputMethodQuery) const Q_DECL_OVERRIDE;
 	bool neovimBusy() const;
+	bool neovimResizing() const;
 	bool neovimAttached() const;
 
 	PopupMenu& getPopupMenu() noexcept
@@ -84,6 +86,7 @@ signals:
 	void neovimTitleChanged(const QString &title);
 	void neovimBusy(bool);
 	void neovimResized(int rows, int cols);
+	void neovimResizing(bool);
 	void neovimAttached(bool);
 	void neovimMaximized(bool);
 	void neovimForeground();

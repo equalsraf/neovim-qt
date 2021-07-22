@@ -28,6 +28,7 @@ public:
 	};
 
 	MainWindow(NeovimConnector *, QWidget *parent=0);
+	bool neovimResizing() const;
 	bool neovimAttached() const;
 	Shell* shell();
 	void restoreWindowGeometry();

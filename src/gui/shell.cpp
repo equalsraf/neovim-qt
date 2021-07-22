@@ -241,7 +241,7 @@ void Shell::setAttached(bool attached)
 			m_nvim->api0()->vim_command(gviminit);
 		}
 
-		// Noevim was not able to open urls till now. Check if we have any to open.
+		// Neovim was not able to open urls till now. Check if we have any to open.
 		if(!m_deferredOpen.isEmpty()){
 			openFiles(m_deferredOpen);
 			m_deferredOpen.clear();    //Neovim may change state. Clear to prevent reopening.
@@ -1577,6 +1577,8 @@ void Shell::neovimResizeFinished()
 				m_resize_neovim_pending.height());
 		m_resize_neovim_pending = QSize();
 	}
+
+	emit neovimResized(rows(), columns());
 }
 
 void Shell::changeEvent( QEvent *ev)
@@ -1693,6 +1695,11 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 bool Shell::neovimBusy() const
 {
 	return m_neovimBusy;
+}
+
+bool Shell::neovimResizing() const
+{
+	return m_resizing;
 }
 
 bool Shell::neovimAttached() const
