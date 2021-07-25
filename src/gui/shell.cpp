@@ -774,7 +774,7 @@ void Shell::handleBusy(bool busy)
 	m_neovimBusy = busy;
 
 	setCursorFromBusyState();
-	emit neovimBusy(busy);
+	emit neovimBusyChanged(busy);
 }
 
 // FIXME: fix QVariant type conversions
@@ -1672,11 +1672,6 @@ QVariant Shell::inputMethodQuery(Qt::InputMethodQuery query) const
 	}
 
 	return QVariant();
-}
-
-bool Shell::neovimBusy() const
-{
-	return m_neovimBusy;
 }
 
 void Shell::dragEnterEvent(QDragEnterEvent *ev)

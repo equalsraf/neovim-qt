@@ -21,7 +21,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 	if(ENABLE_CLAZY)
 		string(CONCAT CLAZY_CHECKS
 			"level0,"
-			"no-overloaded-signal,"
 			"level1,"
 			"no-connect-3arg-lambda,"
 			"no-inefficient-qlist-soft,"
