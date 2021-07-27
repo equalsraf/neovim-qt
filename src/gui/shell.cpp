@@ -12,6 +12,7 @@
 #include <QPaintEvent>
 #include <QSettings>
 
+#include "app.h"
 #include "helpers.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
@@ -864,6 +865,8 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			m_nvim->api0()->vim_set_var("GuiMousehide", val);
 		} else if (guiEvName == "Close") {
 			handleCloseEvent(args);
+		} else if (guiEvName == "NewWindow") {
+			App::openNewWindow(args);
 		} else if (guiEvName == "Option" && args.size() >= 3) {
 			QString option = m_nvim->decode(args.at(1).toByteArray());
 			handleExtGuiOption(option, args.at(2));

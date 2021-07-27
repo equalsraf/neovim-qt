@@ -36,8 +36,6 @@ int ui_main(int argc, char **argv)
 
 	app.checkArgumentsMayTerminate(app.commandLineParser());
 
-	app.connectToRemoteNeovim();
-
 	app.showUi();
 	return app.exec();
 }

@@ -68,6 +68,7 @@ void MainWindow::init(NeovimConnector *c)
 	m_contextMenu->addAction(m_actSelectAll);
 
 	m_nvim = c;
+	m_nvim->setParent(this);
 
 	m_tree = new TreeView(c);
 
@@ -269,10 +270,13 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 		ev->ignore();
 	}
 }
-void MainWindow::changeEvent( QEvent *ev)
+void MainWindow::changeEvent(QEvent* ev)
 {
 	if (ev->type() == QEvent::WindowStateChange && isWindow()) {
 		m_shell->updateGuiWindowState(windowState());
+
+		m_isActive = (windowState() == Qt::WindowState::WindowActive);
+		emit activeChanged(*this);
 	}
 	QWidget::changeEvent(ev);
 }

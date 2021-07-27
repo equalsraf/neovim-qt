@@ -1,10 +1,12 @@
 #include "app.h"
 
+#include <algorithm>
 #include <QDir>
 #include <QFileInfo>
 #include <QFileOpenEvent>
 #include <QSettings>
 #include <QTextStream>
+#include <vector>
 
 #include "arguments.h"
 #include "mainwindow.h"
@@ -12,6 +14,151 @@
 #include "version.h"
 
 namespace NeovimQt {
+
+namespace {
+
+// TODO Issue#900: Cleanup Clazy warning. Optional: remove global statics.
+MainWindow* s_lastActiveWindow;
+std::vector<MainWindow*> s_windows; // clazy:exclude=non-pod-global-static
+int s_exitStatus{ 0 };
+
+struct ConnectorInitArgs
+{
+	enum class Type
+	{
+		Embed,
+		Server,
+		Spawn,
+		Default
+	};
+
+	const Type type{ Type ::Default };
+	const int timeout{ 10000 };
+	const QString server;
+	const QString nvim;
+	const QStringList positionalArgs;
+	const QStringList neovimArgs;
+
+	ConnectorInitArgs(const QCommandLineParser& parser, QStringList nvimArgs) noexcept;
+
+	ConnectorInitArgs(
+		Type _type, int _timeout, QString _server, QString _nvim, QStringList nvimArgs) noexcept;
+};
+
+ConnectorInitArgs::Type getConnectorType(const QCommandLineParser& parser) noexcept
+{
+	if (parser.isSet("server")) {
+		return ConnectorInitArgs::Type::Server;
+	}
+
+	if (parser.isSet("embed")) {
+		return ConnectorInitArgs::Type::Embed;
+	}
+
+	if (parser.isSet("spawn") && !parser.positionalArguments().isEmpty()) {
+		return ConnectorInitArgs::Type::Spawn;
+	}
+
+	return ConnectorInitArgs::Type::Default;
+}
+
+ConnectorInitArgs::ConnectorInitArgs(
+	const QCommandLineParser& parser, QStringList nvimArgs) noexcept
+	: type{ getConnectorType(parser) }
+	, timeout{ parser.value("timeout").toInt() }
+	, server{ parser.value("server") }
+	, nvim{ parser.value("nvim") }
+	, positionalArgs{ parser.positionalArguments() }
+	, neovimArgs{ std::move(nvimArgs) }
+{
+}
+
+ConnectorInitArgs::ConnectorInitArgs(
+	Type _type, int _timeout, QString _server, QString _nvim, QStringList nvimArgs) noexcept
+	: type{ _type }
+	, timeout{ _timeout }
+	, server{ std::move(_server) }
+	, nvim{ std::move(_nvim) }
+	, neovimArgs{ std::move(nvimArgs) }
+{
+}
+
+NeovimConnector& connectToRemoteNeovim(const ConnectorInitArgs& args) noexcept
+{
+	NeovimConnector* connector{ nullptr };
+
+	switch (args.type)
+	{
+		case ConnectorInitArgs::Type::Embed:
+			connector = NeovimConnector::fromStdinOut();
+			break;
+
+		case ConnectorInitArgs::Type::Server:
+			connector = NeovimConnector::connectToNeovim(args.server);
+			break;
+
+		case ConnectorInitArgs::Type::Spawn:
+			if (args.positionalArgs.size() >= 2) {
+				connector =
+					NeovimConnector::spawn(args.positionalArgs.mid(1), args.positionalArgs.at(0));
+			}
+			break;
+
+		case ConnectorInitArgs::Type::Default:
+			break;
+	};
+
+	if (!connector) {
+		connector = NeovimConnector::spawn(args.neovimArgs + args.positionalArgs, args.nvim);
+	}
+
+	connector->setRequestTimeout(args.timeout);
+	return *connector;
+}
+
+void onWindowActiveChanged(MainWindow& window) noexcept
+{
+	s_lastActiveWindow = &window;
+}
+
+void onFileOpenEvent(const QList<QUrl>& files) noexcept
+{
+	s_lastActiveWindow->shell()->openFiles(files);
+}
+
+void onWindowClosing(int status) noexcept
+{
+	s_exitStatus = status;
+}
+
+void onWindowDestroyed(QObject* obj) noexcept
+{
+	s_windows.erase(std::remove(s_windows.begin(), s_windows.end(), (MainWindow*)obj));
+
+	if (s_windows.empty()) {
+		qApp->exit(s_exitStatus);
+	}
+}
+
+MainWindow& createWindow(const ConnectorInitArgs& args) noexcept
+{
+	NeovimConnector& conn{ connectToRemoteNeovim(args) };
+	MainWindow* win{ new MainWindow(&conn) };
+
+	win->setAttribute(Qt::WA_DeleteOnClose);
+
+	App* app{ qobject_cast<App*>(App::instance()) };
+
+	QObject::connect(win, &MainWindow::closing, app, onWindowClosing);
+	QObject::connect(win, &MainWindow::destroyed, app, onWindowDestroyed);
+	QObject::connect(win, &MainWindow::activeChanged, app, onWindowActiveChanged);
+
+	s_lastActiveWindow = win;
+	s_windows.emplace_back(win);
+	return *win;
+}
+
+} // namespace
 
 /// A log handler for Qt messages, all messages are dumped into the file
 /// passed via the NVIM_QT_LOG variable. Some information is only available
@@ -83,14 +230,22 @@ App::App(int &argc, char ** argv) noexcept
 	processCommandlineOptions(m_parser, arguments());
 }
 
-bool App::event(QEvent *event) noexcept
+bool App::event(QEvent* event) noexcept
 {
-	if( event->type()  == QEvent::FileOpen) {
-		QFileOpenEvent * fileOpenEvent = static_cast<QFileOpenEvent *>(event);
-		if(fileOpenEvent) {
-			emit openFilesTriggered({fileOpenEvent->url()});
-		}
+	if (event->type() == QEvent::FileOpen) {
+		QFileOpenEvent* fileOpenEvent{ static_cast<QFileOpenEvent*>(event) };
+		onFileOpenEvent({ fileOpenEvent->url() });
 	}
+	else if (event->type() == QEvent::Quit) {
+		for (auto window : s_windows) {
+			if (!window->close()) {
+				event->setAccepted(false);
+			}
+		}
+
+		return event->isAccepted();
+	}
+
 	return QApplication::event(event);
 }
 
@@ -107,16 +262,13 @@ void App::showUi() noexcept
 		win->show();
 	}
 #else
-	NeovimQt::MainWindow *win = new NeovimQt::MainWindow(m_connector.get());
+
+	ConnectorInitArgs args{ m_parser, getNeovimArgs() };
+	MainWindow* win{ &createWindow(args) };
 
 	// delete the main window when closed to emit `destroyed()` signal to
 	// support `:cq` return codes (Pull#644).
-	win->setAttribute(Qt::WA_DeleteOnClose);
 	setQuitOnLastWindowClosed(false);
-
-	connect(this, &App::openFilesTriggered, win->shell(), &Shell::openFiles);
-	connect(win, &MainWindow::closing, this, &App::mainWindowClosing);
-	connect(win, &MainWindow::destroyed, this, &App::exitWithStatus);
 
 	// Window geometry should be restored only when the user does not specify
 	// one of the following command line arguments. Argument "maximized" can
@@ -237,16 +389,6 @@ void App::checkArgumentsMayTerminate(QCommandLineParser& parser) noexcept
 	}
 }
 
-void App::setupRequestTimeout() noexcept
-{
-	if (!m_connector)
-	{
-		return;
-	}
-
-	m_connector->setRequestTimeout(m_parser.value("timeout").toInt());
-}
-
 /*static*/ QString App::getRuntimePath() noexcept
 {
 	QString path{ QString::fromLocal8Bit(qgetenv("NVIM_QT_RUNTIME_PATH")) };
@@ -275,38 +417,6 @@ void App::setupRequestTimeout() noexcept
 
 	return { "--cmd", QString{ "let &rtp.=',%1'" }.arg(runtimePath),
 		"--cmd","set termguicolors" };
-}
-
-void App::connectToRemoteNeovim() noexcept
-{
-	if (m_parser.isSet("embed")) {
-		m_connector = std::unique_ptr<NeovimConnector>{ NeovimQt::NeovimConnector::fromStdinOut() };
-		setupRequestTimeout();
-		return;
-	}
-
-	if (m_parser.isSet("server")) {
-		QString server = m_parser.value("server");
-		m_connector = std::unique_ptr<NeovimConnector>{ NeovimQt::NeovimConnector::connectToNeovim(server) };
-		setupRequestTimeout();
-		return;
-	}
-
-	if (m_parser.isSet("spawn") && !m_parser.positionalArguments().isEmpty()) {
-		const QStringList& args = m_parser.positionalArguments();
-		m_connector = std::unique_ptr<NeovimConnector> { NeovimQt::NeovimConnector::spawn(args.mid(1), args.at(0)) };
-		setupRequestTimeout();
-		return;
-	}
-
-	QStringList neovimArgs{ getNeovimArgs() };
-
-	// Append positional file arguments to nvim.
-	neovimArgs.append(m_parser.positionalArguments());
-
-	m_connector = std::unique_ptr<NeovimConnector>{  NeovimQt::NeovimConnector::spawn(neovimArgs, m_parser.value("nvim")) };
-	setupRequestTimeout();
-	return;
 }
 
 static QString GetNeovimVersionInfo(const QString& nvim) noexcept
@@ -351,12 +461,28 @@ void App::showVersionInfo(QCommandLineParser& parser) noexcept
 	PrintInfo(versionInfo);
 }
 
-void App::mainWindowClosing(int status) {
-	m_exitStatus = status;
-}
+void App::openNewWindow(const QVariantList& args) noexcept
+{
+	QString server;
+	QString nvim{ "nvim" };
+	ConnectorInitArgs::Type type{ ConnectorInitArgs::Type::Default };
+	if (args.size() > 1 && args.at(1).type() == QVariant::Type::Map) {
+		const QVariantMap initMap{ args.at(1).toMap() };
 
-void App::exitWithStatus() {
-	exit(m_exitStatus);
+		if (initMap.contains("nvim")) {
+			nvim = initMap.value("nvim").toString();
+		}
+
+		if (initMap.contains("server")) {
+			server = initMap.value("server").toString();
+			type = ConnectorInitArgs::Type::Server;
+		}
+	}
+
+	ConnectorInitArgs params{ type, 2000, std::move(server), std::move(nvim), getNeovimArgs() };
+	MainWindow* win{ &createWindow(params) };
+	win->resize(s_lastActiveWindow->size());
+	win->delayedShow();
 }
 
 } // namespace NeovimQt

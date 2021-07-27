@@ -33,11 +33,16 @@ public:
 
 	Shell* shell();
 	void restoreWindowGeometry();
+
+	bool active() const noexcept { return m_isActive; }
+
 public slots:
 	void delayedShow(NeovimQt::MainWindow::DelayedShow type=DelayedShow::Normal);
 signals:
 	void neovimAttachmentChanged(bool);
 	void closing(int);
+	void activeChanged(NeovimQt::MainWindow& window);
+
 protected:
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;
@@ -99,6 +104,8 @@ private:
 	bool m_isAdaptiveFontEnabled{ false };
 	QFont m_defaultFont;
 	QPalette m_defaultPalette;
+
+	bool m_isActive{ false };
 
 	void updateAdaptiveColor() noexcept;
 	void updateAdaptiveFont() noexcept;

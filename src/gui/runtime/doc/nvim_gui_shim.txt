@@ -171,6 +171,16 @@ GuiClose() notifies the GUI that it should close. The GUI may or may not
 respect this request. The shim setups an autocommand to call this function
 when the |'VimLeave'| event occurs.
 
+							*GuiNewWindow(opts)*
+|GuiNewWindow()| creates a new window with the given map of arguments.
+Supported arguments are:
+
+The following parameters desceibe the fields in {opts}.
+
+Parameters: ~
+	{server} (optional, string): Server to connect to for the new window.
+	{nvim} (optional, string): Path to nvim instance.
+
 							*GuiName()*
 Returns the name of the GUI client. If multiple GUIs are connected the last
 one is used. If no name is available an empty string is returned.
