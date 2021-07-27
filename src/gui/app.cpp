@@ -17,9 +17,9 @@ namespace NeovimQt {
 
 namespace {
 
+// TODO Issue#900: Cleanup Clazy warning. Optional: remove global statics.
 MainWindow* s_lastActiveWindow;
-std::vector<MainWindow*> s_windows;
-
+std::vector<MainWindow*> s_windows; // clazy:exclude=non-pod-global-static
 int s_exitStatus{ 0 };
 
 struct ConnectorInitArgs
@@ -62,7 +62,8 @@ ConnectorInitArgs::Type getConnectorType(const QCommandLineParser& parser) noexc
 	return ConnectorInitArgs::Type::Default;
 }
 
-ConnectorInitArgs::ConnectorInitArgs(const QCommandLineParser& parser, QStringList nvimArgs) noexcept
+ConnectorInitArgs::ConnectorInitArgs(
+	const QCommandLineParser& parser, QStringList nvimArgs) noexcept
 	: type{ getConnectorType(parser) }
 	, timeout{ parser.value("timeout").toInt() }
 	, server{ parser.value("server") }
@@ -97,9 +98,9 @@ NeovimConnector& connectToRemoteNeovim(const ConnectorInitArgs& args) noexcept
 			break;
 
 		case ConnectorInitArgs::Type::Spawn:
-			if (args.positionalArgs.size() >= 2)
-			{
-				connector = NeovimConnector::spawn(args.positionalArgs.mid(1), args.positionalArgs.at(0));
+			if (args.positionalArgs.size() >= 2) {
+				connector =
+					NeovimConnector::spawn(args.positionalArgs.mid(1), args.positionalArgs.at(0));
 			}
 			break;
 
@@ -463,7 +464,6 @@ void App::openNewWindow(const QVariantList& args) noexcept
 	QString nvim{ "nvim" };
 	ConnectorInitArgs::Type type{ ConnectorInitArgs::Type::Default };
 	if (args.size() > 1 && args.at(1).type() == QVariant::Type::Map) {
-
 		const QVariantMap initMap{ args.at(1).toMap() };
 
 		if (initMap.contains("nvim")) {

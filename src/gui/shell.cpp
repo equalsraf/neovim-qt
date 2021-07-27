@@ -825,8 +825,7 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			handleCloseEvent(args);
 		} else if (guiEvName == "NewWindow") {
 			App::openNewWindow(args);
-		}
-		else if (guiEvName == "Option" && args.size() >= 3) {
+		} else if (guiEvName == "Option" && args.size() >= 3) {
 			QString option = m_nvim->decode(args.at(1).toByteArray());
 			handleExtGuiOption(option, args.at(2));
 		} else if (guiEvName == "SetClipboard" && args.size() >= 4) {

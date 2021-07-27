@@ -32,10 +32,7 @@ public:
 	Shell* shell();
 	void restoreWindowGeometry();
 
-	bool active() const noexcept
-	{
-		return m_isActive;
-	}
+	bool active() const noexcept { return m_isActive; }
 
 public slots:
 	void delayedShow(DelayedShow type=DelayedShow::Normal);

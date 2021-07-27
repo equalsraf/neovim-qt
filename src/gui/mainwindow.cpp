@@ -276,7 +276,7 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 		ev->ignore();
 	}
 }
-void MainWindow::changeEvent(QEvent *ev)
+void MainWindow::changeEvent(QEvent* ev)
 {
 	if (ev->type() == QEvent::WindowStateChange && isWindow()) {
 		m_shell->updateGuiWindowState(windowState());
