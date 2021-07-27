@@ -39,7 +39,7 @@ public slots:
 signals:
 	void neovimAttached(bool);
 	void closing(int);
-	void activeChanged(MainWindow& window);
+	void activeChanged(NeovimQt::MainWindow& window);
 
 protected:
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
