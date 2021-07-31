@@ -1774,19 +1774,25 @@ void Shell::openFiles(QList<QUrl> urls)
 
 // If neovim is blocked waiting for input, attempt to bailout from
 // whatever neovim is doing by pressing Ctrl-C.
-void Shell::bailoutIfinputBlocking()
+void Shell::bailoutIfinputBlocking() noexcept
 {
-	auto api = m_nvim->api2();
-	if (api) {
-		auto req = api->nvim_get_mode();
+	auto api2{ m_nvim->api2() };
 
-		connect(req, &MsgpackRequest::finished, [api](quint32 msgid, quint64 f, const QVariant& r) {
-				auto map = r.toMap();
-				if (map.value("blocking", false) == true) {
-					api->nvim_input("<C-c>");
-				}
-		});
+	if (!api2) {
+		return;
 	}
+
+	auto req{ api2->nvim_get_mode() };
+
+	auto sendCtrlC = [api2](quint32 msgid, quint64 f, const QVariant& r) noexcept {
+		const QMap<QString, QVariant> map{ r.toMap() };
+
+		if (map.value("blocking", false) == true) {
+			api2->nvim_input("<C-c>");
+		}
+	};
+
+	connect(req, &MsgpackRequest::finished, this, sendCtrlC);
 }
 
 ShellRequestHandler::ShellRequestHandler(Shell *parent)
