@@ -8,6 +8,11 @@
 
 namespace NeovimQt {
 
+static QString DefaultWindowTitle() noexcept
+{
+	return "Neovim";
+}
+
 MainWindow::MainWindow(NeovimConnector* c, QWidget* parent)
 	: QMainWindow(parent)
 	, m_defaultFont{ font() }
@@ -18,6 +23,8 @@ MainWindow::MainWindow(NeovimConnector* c, QWidget* parent)
 	connect(m_errorWidget, &ErrorWidget::reconnectNeovim,
 			this, &MainWindow::reconnectNeovim);
 	setCentralWidget(&m_stack);
+
+	setWindowTitle(DefaultWindowTitle());
 
 	init(c);
 }
@@ -195,7 +202,12 @@ void MainWindow::neovimIsUnsupported()
 
 void MainWindow::neovimSetTitle(const QString &title)
 {
-	this->setWindowTitle(title);
+	if (title.isEmpty()) {
+		setWindowTitle(DefaultWindowTitle());
+		return;
+	}
+
+	setWindowTitle(title);
 }
 
 void MainWindow::neovimWidgetResized()

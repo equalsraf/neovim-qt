@@ -807,7 +807,8 @@ void Shell::handleSetTitle(const QVariantList& opargs)
 		qWarning() << "Unexpected arguments for set_title:" << opargs;
 		return;
 	}
-	QString title = m_nvim->decode(opargs.at(0).toByteArray());
+
+	const QString title{ m_nvim->decode(opargs.at(0).toByteArray()) };
 	emit neovimTitleChanged(title);
 }
 

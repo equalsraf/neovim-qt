@@ -201,7 +201,6 @@ App::App(int &argc, char ** argv) noexcept
 :QApplication(argc, argv)
 {
 	setWindowIcon(QIcon(":/neovim.svg"));
-	setApplicationDisplayName("Neovim");
 
 	setOrganizationName("nvim-qt");
 	setApplicationName("nvim-qt");
