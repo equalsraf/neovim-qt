@@ -14,10 +14,15 @@ if(NOT EXISTS ${NEOVIM_EXEC})
 	set(NEOVIM_EXEC nvim)
 endif()
 
+option(USE_GCOV "Enable gcov support" OFF)
+option(ENABLE_CLAZY "Build with KDE Clang Clazy Linter" OFF)
+option(ENABLE_TIDY "Build with Clang Tidy Linter" OFF)
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 		"${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wunused-variable -std=c++11")
 
+	# Qt Static Analysis - Clang-Tidy based extension
 	if(ENABLE_CLAZY)
 		string(CONCAT CLAZY_CHECKS
 			"level0,"
@@ -27,14 +32,91 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -plugin-arg-clazy -Xclang ${CLAZY_CHECKS} -Wno-deprecated-declarations -Werror")
 	endif()
-endif()
 
-option(USE_GCOV "Enable gcov support" OFF)
-if(USE_GCOV)
-	message(STATUS "Enabling coverage")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+	# Clang-Tidy Static Analysis
+	if(ENABLE_TIDY)
+		string(CONCAT TIDY_CHECKS
+			"-*,"
+			"bugprone-*,"
+			"-bugprone-branch-clone,"
+			"-bugprone-inaccurate-erase,"
+			"-bugprone-narrowing-conversions,"
+			"-bugprone-parent-virtual-call,"
+			"-bugprone-suspicious-include,"
+			"-bugprone-undefined-memory-manipulation,"
+			"cppcoreguidelines-*,"
+			"-cppcoreguidelines-avoid-c-arrays,"
+			"-cppcoreguidelines-avoid-goto,"
+			"-cppcoreguidelines-avoid-magic-numbers,"
+			"-cppcoreguidelines-avoid-non-const-global-variables,"
+			"-cppcoreguidelines-explicit-virtual-functions,"
+			"-cppcoreguidelines-init-variables,"
+			"-cppcoreguidelines-macro-usage,"
+			"-cppcoreguidelines-narrowing-conversions,"
+			"-cppcoreguidelines-non-private-member-variables-in-classes,"
+			"-cppcoreguidelines-owning-memory,"
+			"-cppcoreguidelines-pro-bounds-array-to-pointer-decay,"
+			"-cppcoreguidelines-pro-bounds-pointer-arithmetic,"
+			"-cppcoreguidelines-pro-type-cstyle-cast,"
+			"-cppcoreguidelines-pro-type-member-init,"
+			"-cppcoreguidelines-pro-type-static-cast-downcast,"
+			"-cppcoreguidelines-pro-type-vararg,"
+			"-cppcoreguidelines-special-member-functions,"
+			"modernize-*,"
+			"-modernize-avoid-c-arrays,"
+			"-modernize-loop-convert,"
+			"-modernize-pass-by-value,"
+			"-modernize-raw-string-literal,"
+			"-modernize-return-braced-init-list,"
+			"-modernize-use-auto,"
+			"-modernize-use-nullptr,"
+			"-modernize-use-override,"
+			"-modernize-use-trailing-return-type,"
+			"-modernize-use-using,"
+			"performance-*,"
+			"-performance-no-automatic-move,"
+			"-performance-unnecessary-copy-initialization,"
+			"-performance-unnecessary-value-param,"
+			"readability-*,"
+			"-readability-braces-around-statements,"
+			"-readability-braces-around-statements,"
+			"-readability-container-size-empty,"
+			"-readability-convert-member-functions-to-static,"
+			"-readability-delete-null-pointer,"
+			"-readability-else-after-return,"
+			"-readability-function-cognitive-complexity,"
+			"-readability-function-size,"
+			"-readability-identifier-naming,"
+			"-readability-implicit-bool-cast,"
+			"-readability-implicit-bool-conversion,"
+			"-readability-inconsistent-declaration-parameter-name,"
+			"-readability-isolate-declaration,"
+			"-readability-magic-numbers,"
+			"-readability-make-member-function-const,"
+			"-readability-named-parameter,"
+			"-readability-qualified-auto,"
+			"-readability-redundant-access-specifiers,"
+			"-readability-redundant-control-flow,"
+			"-readability-redundant-member-init,"
+			"-readability-simplify-boolean-expr,"
+			"-readability-static-accessed-through-instance,"
+			"-readability-uppercase-literal-suffix,"
+			)
+		if(${CMAKE_VERSION} VERSION_LESS "3.6.0")
+			message("ENABLE_TIDY requires CMake >= 3.6.0")
+		else()
+			set(CMAKE_CXX_CLANG_TIDY clang-tidy "-checks=${TIDY_CHECKS};-warnings-as-errors=*")
+		endif()
+	endif()
+
+	# Code Coverage Report
+	if(USE_GCOV)
+		message(STATUS "Enabling coverage")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+	endif()
+
 endif()
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
