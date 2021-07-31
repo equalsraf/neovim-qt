@@ -26,7 +26,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"no-inefficient-qlist-soft,"
 			"no-overridden-signal,"
 			"no-qproperty-without-notify,"
-			"no-range-loop,"
 			)
 
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -plugin-arg-clazy -Xclang ${CLAZY_CHECKS} -Wno-deprecated-declarations -Werror")
