@@ -190,7 +190,7 @@ protected:
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseMoveEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
-	void bailoutIfinputBlocking();
+	void bailoutIfinputBlocking() noexcept;
 	void setCursorFromBusyState() noexcept;
 
 	// GuiFont
