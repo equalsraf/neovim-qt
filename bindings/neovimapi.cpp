@@ -1,15 +1,15 @@
 // Auto generated {{date}} from nvim API level:{{api_level}}
 #include "auto/neovimapi{{api_level}}.h"
-#include "neovimconnector.h"
-#include "msgpackrequest.h"
+
 #include "msgpackiodevice.h"
+#include "msgpackrequest.h"
+#include "neovimconnector.h"
 #include "util.h"
 
 namespace NeovimQt {
-/* Unpack Neovim EXT types Window, Buffer Tabpage which are all
- * uint64_t see Neovim:msgpack_rpc_to_
- */
-QVariant unpackBufferApi{{api_level}}(MsgpackIODevice *dev, const char* in, quint32 size)
+
+// Unpack Neovim EXT types Window, Buffer Tabpage which are all uint64_t see Neovim:msgpack_rpc_to_
+static QVariant unpackBufferApi{{api_level}}(MsgpackIODevice *dev, const char* in, quint32 size) noexcept
 {
 	msgpack_unpacked result;
 	msgpack_unpacked_init(&result);
@@ -34,25 +34,34 @@ QVariant unpackBufferApi{{api_level}}(MsgpackIODevice *dev, const char* in, quin
 	msgpack_unpacked_destroy(&result);
 	return variant;
 }
-#define unpackWindowApi{{api_level}} unpackBufferApi{{api_level}}
-#define unpackTabpageApi{{api_level}} unpackBufferApi{{api_level}}
 
-NeovimApi{{api_level}}::NeovimApi{{api_level}}(NeovimConnector *c)
-:m_c(c)
+static QVariant unpackWindowApi{{api_level}}(MsgpackIODevice *dev, const char* in, quint32 size) noexcept
+{
+	return unpackBufferApi{{api_level}}(dev, in, size);
+}
+
+static QVariant unpackTabpageApi{{api_level}}(MsgpackIODevice* dev, const char* in, quint32 size) noexcept
+{
+	return unpackBufferApi{{api_level}}(dev, in, size);
+}
+
+NeovimApi{{api_level}}::NeovimApi{{api_level}}(NeovimConnector* c) noexcept
+	: m_c{ c }
 {
 	// EXT types
-	{% for typename in exttypes %}
+{% for typename in exttypes %}
 	m_c->m_dev->registerExtType({{exttypes[typename]}}, unpack{{typename}}Api{{api_level}});
-	{% endfor %}
+{% endfor %}
+
 	connect(m_c->m_dev, &MsgpackIODevice::notification,
-			this, &NeovimApi{{api_level}}::neovimNotification);
+		this, &NeovimApi{{api_level}}::neovimNotification);
 }
 
 // Slots
 {% for f in functions %}
-MsgpackRequest* NeovimApi{{api_level}}::{{f.name}}({{f.argstring}})
+MsgpackRequest* NeovimApi{{api_level}}::{{f.name}}({{f.argstring}}) noexcept
 {
-	MsgpackRequest *r = m_c->m_dev->startRequestUnchecked("{{f.name}}", {{f.argcount}});
+	MsgpackRequest* r{ m_c->m_dev->startRequestUnchecked("{{f.name}}", {{f.argcount}}) };
 	r->setFunction(NeovimApi{{api_level}}::NEOVIM_FN_{{f.name.upper()}});
 	connect(r, &MsgpackRequest::finished, this, &NeovimApi{{api_level}}::handleResponse);
 	connect(r, &MsgpackRequest::error, this, &NeovimApi{{api_level}}::handleResponseError);
@@ -64,10 +73,8 @@ MsgpackRequest* NeovimApi{{api_level}}::{{f.name}}({{f.argstring}})
 {% endfor %}
 
 // Handlers
-
-void NeovimApi{{api_level}}::handleResponseError(quint32 msgid, quint64 fun, const QVariant& res)
+void NeovimApi{{api_level}}::handleResponseError(quint32 msgid, quint64 fun, const QVariant& res) noexcept
 {
-
 	// TODO: support Neovim error types Exception/Validation/etc
 	QString errMsg;
 	const QVariantList asList = res.toList();
@@ -79,25 +86,28 @@ void NeovimApi{{api_level}}::handleResponseError(quint32 msgid, quint64 fun, con
 		}
 	}
 
-	switch(fun) {
+	switch(fun)
+	{
 {% for f in functions %}
-	case NeovimApi{{api_level}}::NEOVIM_FN_{{f.name.upper()}}:
-		emit err_{{f.name}}(errMsg, res);
-		break;
+		case NeovimApi{{api_level}}::NEOVIM_FN_{{f.name.upper()}}:
+			emit err_{{f.name}}(errMsg, res);
+			break;
+
 {% endfor %}
 	default:
 		m_c->setError(NeovimConnector::RuntimeMsgpackError, QString("Received error for function that should not fail: %s").arg(fun));
 	}
 }
 
-void NeovimApi{{api_level}}::handleResponse(quint32 msgid, quint64 fun, const QVariant& res)
+void NeovimApi{{api_level}}::handleResponse(quint32 msgid, quint64 fun, const QVariant& res) noexcept
 {
-	switch(fun) {
+	switch(fun)
+	{
 {% for f in functions %}
-	case NeovimApi{{api_level}}::NEOVIM_FN_{{f.name.upper()}}:
+		case NeovimApi{{api_level}}::NEOVIM_FN_{{f.name.upper()}}:
 		{
 {% if f.return_type.native_type != 'void' %}
-			{{f.return_type.native_type}} data;
+			{{f.return_type.native_type}} data{};
 			if (decode(res, data)) {
 				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for {{f.name}}");
 				return;
@@ -107,9 +117,9 @@ void NeovimApi{{api_level}}::handleResponse(quint32 msgid, quint64 fun, const QV
 {% else %}
 			emit on_{{f.name}}();
 {% endif %}
-
 		}
 		break;
+
 {% endfor %}
 	default:
 		qWarning() << "Received unexpected response";
@@ -124,25 +134,13 @@ void NeovimApi{{api_level}}::handleResponse(quint32 msgid, quint64 fun, const QV
  *
  * Returns false if there is an API mismatch
  */
-bool NeovimApi{{api_level}}::checkFunctions(const QVariantList& ftable)
+static QVector<Function> GetSupportedList(const QVariantList& ftable,
+	const QVector<Function>& required) noexcept
 {
+	QVector<Function> supported;
 
-	QList<Function> required;
-	required
-	{% for f in functions %}
-	<< Function("{{f.return_type.neovim_type}}", "{{f.name}}",
-			QList<QString>()
-			{% for param in f.parameters %}
-			<< QString("{{param.neovim_type}}")
-			{% endfor %}
-			, false)
-	{% endfor %}
-	;
-
-
-	QList<Function> supported;
-	foreach(const QVariant& val, ftable) {
-		auto f = Function::fromVariant(val);
+	for (const auto& val : ftable) {
+		Function f{ Function::fromVariant(val) };
 		if (!f.isValid()) {
 			qDebug() << "Invalid function in metadata" << f;
 			continue;
@@ -154,9 +152,28 @@ bool NeovimApi{{api_level}}::checkFunctions(const QVariantList& ftable)
 		}
 	}
 
-	bool ok = true;
-	foreach(const Function& f, required) {
-		if (!supported.contains(f)) {
+	return supported;
+}
+
+bool NeovimApi{{api_level}}::checkFunctions(const QVariantList& ftable) noexcept
+{
+	static const QVector<Function> cs_required {
+{% for f in functions %}
+		Function{ "{{f.return_type.neovim_type}}", "{{f.name}}",
+			QVector<QString>{
+{% for param in f.parameters %}
+				"{{param.neovim_type}}",
+{% endfor %}
+			}
+			, false },
+{% endfor %}
+		};
+
+	static const QVector<Function> cs_supported{ GetSupportedList(ftable, cs_required) };
+
+	bool ok{ true };
+	for (const auto& f : cs_required) {
+		if (!cs_supported.contains(f)) {
 			qDebug() << "- instance DOES NOT support API{{api_level}}:" << f;
 			ok = false;
 		}
@@ -164,4 +181,4 @@ bool NeovimApi{{api_level}}::checkFunctions(const QVariantList& ftable)
 	return ok;
 }
 
-} // Namespace
+} // namespace NeovimQt

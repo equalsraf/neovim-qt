@@ -154,15 +154,17 @@ class Function:
             params += '%s %s' % (p.native_type, p.name)
             params += ', '
         notes = ''
-        return '%s %s(%s) %s' % (self.return_type.native_type,self.name,params, notes)
+        signature = '%s %s(%s) %s' % (self.return_type.neovim_type,self.name,params, notes)
+        return signature.rstrip()
+
     def signature(self):
         params = ''
         for p in self.parameters:
             params += '%s %s' % (p.neovim_type, p.name)
             params += ', '
         notes = ''
-        return '%s %s(%s) %s' % (self.return_type.neovim_type,self.name,params, notes)
-
+        signature = '%s %s(%s) %s' % (self.return_type.neovim_type,self.name,params, notes)
+        return signature.rstrip()
 
 def print_api(api):
 

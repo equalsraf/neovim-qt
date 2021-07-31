@@ -4,81 +4,24 @@
 
 namespace NeovimQt {
 
-typedef QPair<QString,QString> StringPair;
-
-/**
- * \class NeovimQt::Function
- *
- * \brief Representation of a Neovim API function signature
- */
-
-/**
- * Construct invalid function
- */
-Function::Function()
-:can_fail(false), m_valid(false)
+bool Function::operator==(const Function& other) const noexcept
 {
-}
-
-/**
- * Construct new function with the given return type, name, parameters and error
- */
-Function::Function(const QString& ret, const QString& name, QList<QPair<QString,QString> > params, bool can_fail)
-:m_valid(true)
-{
-	this->return_type = ret;
-	this->name = name;
-	this->parameters = params;
-	this->can_fail = can_fail;
-}
-
-/**
- * Construct new function with the given return type, name, parameters and error
- */
-Function::Function(const QString& ret, const QString& name, QList<QString> paramTypes, bool can_fail)
-:m_valid(true)
-{
-	this->return_type = ret;
-	this->name = name;
-	foreach (QString type, paramTypes) {
-		this->parameters .append(QPair<QString,QString>(type, ""));
-	}
-	this->can_fail = can_fail;
-}
-
-/**
- * Returns true if this function has all the necessary attributes
- */
-bool Function::isValid() const
-{
-	return m_valid;
-}
-
-/**
- * Two functions are considered identical if their names
- * argument and return types, and error status are identical
- */
-bool Function::operator==(const Function& other) const
-{
-	if ( this->name != other.name ) {
+	if (m_name != other.m_name) {
 		return false;
 	}
 
-	if ( this->return_type != other.return_type ) {
+	if (m_returnType != other.m_returnType) {
 		return false;
 	}
-	if (this->parameters.size() != other.parameters.size()) {
+
+	if (m_parameters.size() != other.m_parameters.size()) {
 		return false;
 	}
-	for (int i=0; i<this->parameters.size(); i++) {
-		if ( this->parameters.at(i).first != other.parameters.at(i).first ) {
-			return false;
-		}
-	}
-	return true;
+
+	return std::equal(m_parameters.begin(), m_parameters.end(), other.m_parameters.begin());
 }
 
-Function Function::fromVariant(const QVariant& fun)
+Function Function::fromVariant(const QVariant& fun) noexcept
 {
 	Function f;
 	if (!fun.canConvert<QVariantMap>()) {
@@ -86,50 +29,59 @@ Function Function::fromVariant(const QVariant& fun)
 		return f;
 	}
 
-	const QVariantMap& m = fun.toMap();
-	QMapIterator<QString,QVariant> it(m);
-	while(it.hasNext()) {
-		it.next();
+	const QVariantMap m{ fun.toMap() };
+	for (auto it = m.begin(); it != m.end(); ++it) {
 
-		if ( it.key() == "return_type" ) {
+		if (it.key() == "return_type") {
 			if (!it.value().canConvert<QByteArray>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.return_type = QString::fromUtf8(it.value().toByteArray());
-		} else if ( it.key() == "name" ) {
+			f.m_returnType = QString::fromUtf8(it.value().toByteArray());
+		}
+		else if (it.key() == "name") {
 			if (!it.value().canConvert<QByteArray>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.name = QString::fromUtf8(it.value().toByteArray());
-		} else if ( it.key() == "can_fail" ) {
+			f.m_name = QString::fromUtf8(it.value().toByteArray());
+		}
+		else if (it.key() == "can_fail") {
 			if (!it.value().canConvert<bool>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.can_fail = it.value().toBool();
-		} else if ( it.key() == "parameters" ) {
+			f.m_canFail = it.value().toBool();
+		}
+		else if (it.key() == "parameters") {
 			if (!it.value().canConvert<QVariantList>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
 				return f;
 			}
-			f.parameters = parseParameters(it.value().toList());
-		} else if ( it.key() == "id" ) {
+			f.m_parameters = parseParameters(it.value().toList());
+		}
+		else if (it.key() == "id") {
 			// Deprecated
-		} else if ( it.key() == "receives_channel_id" ) {
+		}
+		else if (it.key() == "receives_channel_id") {
 			// Internal
-		} else if ( it.key() == "impl_name" ) {
+		}
+		else if (it.key() == "impl_name") {
 			// Internal
-		} else if ( it.key() == "method" ) {
+		}
+		else if (it.key() == "method") {
 			// Internal
-		} else if ( it.key() == "noeval" ) {
+		}
+		else if (it.key() == "noeval") {
 			// API only function
-		} else if ( it.key() == "deferred" || it.key() == "async" ) {
+		}
+		else if (it.key() == "deferred" || it.key() == "async") {
 			// Internal, "deferred" renamed "async" in neovim/ccdeb91
-		} else if ( it.key() == "deprecated_since" || it.key() == "since" ) {
+		}
+		else if (it.key() == "deprecated_since" || it.key() == "since") {
 			// Creation/Deprecation
-		} else {
+		}
+		else {
 			qDebug() << "Unsupported function attribute"<< it.key() << it.value();
 		}
 	}
@@ -138,49 +90,49 @@ Function Function::fromVariant(const QVariant& fun)
 	return f;
 }
 
-/**
- * Retrieve parameter types from a list of function parameters in the metadata
- * object. Basically retrieves the even numbered elements of the array (types)
- * i.e. [Type0 name0 Type1 name1 ... ] -> [Type0 Type1 ...]
- *
- */
-QList<QPair<QString,QString> > Function::parseParameters(const QVariantList& obj)
+QVector<QStringPair> Function::parseParameters(const QVariantList& obj) noexcept
 {
-	QList<QPair<QString,QString> > fail;
-	QList<QPair<QString,QString> > res;
-	foreach(const QVariant& val, obj) {
+	QVector<QStringPair> result;
+
+	for (const auto& val : obj) {
 
 		const QVariantList& params = val.toList();
-		if ( params.size() % 2 != 0 ) {
-			return fail;
+		if (params.size() % 2 != 0 ) {
+			return {};
 		}
 
-		for (int j=0; j<params.size(); j+=2) {
-			if (!params.at(j).canConvert<QByteArray>() ||
-					!params.at(j+1).canConvert<QByteArray>()) {
-				return fail;
+		for (auto it = params.begin(); it != params.begin(); it+=2) {
+			auto first{ it };
+			auto second{ it + 1 };
+
+			if (!first->canConvert<QByteArray>()
+				|| !second->canConvert<QByteArray>()) {
+				return {};
 			}
-			QPair<QString,QString> arg(
-					QString::fromUtf8(params.at(j).toByteArray()),
-					QString::fromUtf8(params.at(j+1).toByteArray()));
-			res.append(arg);
+
+			QStringPair arg{ QString::fromUtf8(first->toByteArray()),
+				QString::fromUtf8(second->toByteArray()) };
+
+			result.append(arg);
 		}
 	}
-	return res;
+
+	return result;
 }
 
-QString Function::signature() const
+QString Function::signature() const noexcept
 {
 	QStringList sigparams;
-	foreach(const StringPair p, parameters) {
-		sigparams.append(QString("%1 %2").arg(p.first, p.second));
+	for (const auto& p : m_parameters) {
+		sigparams.append(QStringLiteral("%1 %2").arg(p.first, p.second));
 	}
 
 	QString notes;
-	if (can_fail) {
+	if (m_canFail) {
 		notes += " !fail";
 	}
-	return  QString("%1 %2(%3)%4").arg(return_type, name, sigparams.join(", "), notes);
+
+	return QStringLiteral("%1 %2(%3)%4").arg(m_returnType, m_name, sigparams.join(", "), notes);
 }
 
 } // Namespace
