@@ -1,5 +1,4 @@
-#ifndef QSHELLWIDGET2_SHELLWIDGET
-#define QSHELLWIDGET2_SHELLWIDGET
+#pragma once
 
 #include <QWidget>
 
@@ -9,12 +8,13 @@
 class ShellWidget: public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY(QColor background READ background WRITE setBackground)
-	Q_PROPERTY(QColor foreground READ foreground WRITE setForeground)
-	Q_PROPERTY(int rows READ rows)
-	Q_PROPERTY(int columns READ columns)
-	Q_PROPERTY(QSize cellSize READ cellSize)
-	Q_PROPERTY(bool ligatureMode MEMBER m_isLigatureModeEnabled READ isLigatureModeEnabled WRITE setLigatureMode)
+	Q_PROPERTY(QColor background READ background WRITE setBackground NOTIFY backgroundChanged)
+	Q_PROPERTY(QColor foreground READ foreground WRITE setForeground NOTIFY foregroundChanged)
+	Q_PROPERTY(int rows READ rows NOTIFY rowsChanged)
+	Q_PROPERTY(int columns READ columns NOTIFY columnsChanged)
+	Q_PROPERTY(QSize cellSize READ cellSize NOTIFY cellSizeChanged)
+	Q_PROPERTY(bool ligatureMode MEMBER m_isLigatureModeEnabled READ isLigatureModeEnabled WRITE setLigatureMode NOTIFY ligatureModeChanged)
+
 public:
 	ShellWidget(QWidget *parent=0);
 
@@ -84,6 +84,13 @@ public:
 signals:
 	void shellFontChanged();
 	void fontError(const QString& msg);
+	void backgroundChanged(QColor bgColor);
+	void foregroundChanged(QColor fgColor);
+	void rowsChanged(int rows);
+	void columnsChanged(int cols);
+	void cellSizeChanged(QSize size);
+	void ligatureModeChanged(bool isEnabled);
+
 public slots:
 	void resizeShell(int rows, int columns);
 	void setSpecial(const QColor& color);
@@ -194,5 +201,3 @@ private:
 
 	Background m_background{ Background::Dark };
 };
-
-#endif

@@ -15,7 +15,7 @@ class MsgpackIODevice: public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(MsgpackError error READ errorCause NOTIFY error)
-	Q_PROPERTY(QByteArray encoding READ encoding WRITE setEncoding)
+	Q_PROPERTY(QByteArray encoding READ encoding WRITE setEncoding NOTIFY encodingChanged)
 public:
 	enum MsgpackError {
 		NoError=0,
@@ -71,6 +71,7 @@ signals:
 	void error(NeovimQt::MsgpackIODevice::MsgpackError);
 	/** A notification with the given name and arguments was received */
 	void notification(const QByteArray &name, const QVariantList& args);
+	void encodingChanged(const QByteArray& encoding);
 
 protected:
 	void sendError(const msgpack_object& req, const QString& msg);
