@@ -1,29 +1,33 @@
-#ifndef TREEVIEW
-#define TREEVIEW
+#pragma once
 
 #include <QFileSystemModel>
 #include <QTreeView>
 #include <QUrl>
+
 #include "neovimconnector.h"
 
 namespace NeovimQt {
 
 class TreeView : public QTreeView {
-    Q_OBJECT
- public:
-	TreeView(NeovimConnector *, QWidget *parent = 0);
+	Q_OBJECT
 
- public slots:
-	void open(const QModelIndex &);
-	void setDirectory(const QString &, bool notify = true);
-	void handleNeovimNotification(const QByteArray &, const QVariantList &);
-	void connector_ready_cb();
+public:
+	TreeView(NeovimConnector* nvim, QWidget* parent) noexcept;
 
- protected:
-	QFileSystemModel *model;
-	NeovimConnector *m_nvim;
+public slots:
+	void open(const QModelIndex& index) noexcept;
+	void handleNeovimNotification(const QByteArray& name, const QVariantList& args) noexcept;
+	void handleDirectoryChanged(const QVariantList& args) noexcept;
+	void handleGuiTreeView(const QVariantList& args) noexcept;
+	void handleShowHide(const QVariantList& args) noexcept;
+
+	void neovimConnectorReady() noexcept;
+
+private:
+	void toggleVisibility() noexcept;
+
+	QFileSystemModel m_model;
+	NeovimConnector* m_nvim;
 };
 
-}  // namespace NeovimQt
-
-#endif  // TREEVIEW
+} // namespace NeovimQt

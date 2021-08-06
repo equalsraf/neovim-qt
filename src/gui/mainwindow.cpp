@@ -61,7 +61,7 @@ void MainWindow::init(NeovimConnector *c)
 	m_nvim = c;
 	m_nvim->setParent(this);
 
-	m_tree = new TreeView(c);
+	m_tree = new TreeView(c, this);
 
 	// GuiScrollBar
 	m_scrollbar = new ScrollBar{ m_nvim };
@@ -80,6 +80,9 @@ void MainWindow::init(NeovimConnector *c)
 	m_window->addWidget(m_tree);
 	m_tree->hide();
 	m_window->addWidget(shellScrollable);
+
+	const int splitterWidth{ m_window->width() };
+	m_window->setSizes({ splitterWidth * 25 / 100, splitterWidth * 75 / 100 });
 
 	m_stack.insertWidget(1, m_window);
 	m_stack.setCurrentIndex(1);
