@@ -6,6 +6,7 @@
 #include <QStackedWidget>
 #include <QTabBar>
 
+#include "contextmenu.h"
 #include "errorwidget.h"
 #include "neovimconnector.h"
 #include "scrollbar.h"
@@ -59,11 +60,6 @@ private slots:
 	void showIfDelayed();
 	void handleNeovimAttachment(bool);
 	void neovimIsUnsupported();
-	void neovimShowContextMenu();
-	void neovimSendCut();
-	void neovimSendCopy();
-	void neovimSendPaste();
-	void neovimSendSelectAll();
 	void saveWindowGeometry();
 
 	// GuiAdaptive Color/Font/Style Slots
@@ -84,11 +80,7 @@ private:
 	QStackedWidget m_stack;
 
 	bool m_neovim_requested_close{ false };
-	QMenu* m_contextMenu{ nullptr };
-	QAction* m_actCut{ nullptr };
-	QAction* m_actCopy{ nullptr };
-	QAction* m_actPaste{ nullptr };
-	QAction* m_actSelectAll{ nullptr };
+	ContextMenu* m_contextMenu{ nullptr };
 	ScrollBar* m_scrollbar{ nullptr };
 	Tabline m_tabline;
 	int m_exitStatus{ 0 };

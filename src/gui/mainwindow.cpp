@@ -45,26 +45,17 @@ void MainWindow::init(NeovimConnector *c)
 
 	addToolBar(&m_tabline);
 
-	// Context menu and actions for right-click
-	m_contextMenu = new QMenu();
-	m_actCut = new QAction(QIcon::fromTheme("edit-cut"), QString("Cut"), nullptr /*parent*/);
-	m_actCopy = new QAction(QIcon::fromTheme("edit-copy"), QString("Copy"), nullptr /*parent*/);
-	m_actPaste = new QAction(QIcon::fromTheme("edit-paste"), QString("Paste"), nullptr /*parent*/);
-	m_actSelectAll = new QAction(QIcon::fromTheme("edit-select-all"), QString("Select All"),
-		nullptr /*parent*/);
-	m_contextMenu->addAction(m_actCut);
-	m_contextMenu->addAction(m_actCopy);
-	m_contextMenu->addAction(m_actPaste);
-	m_contextMenu->addSeparator();
-	m_contextMenu->addAction(m_actSelectAll);
-
 	m_nvim = c;
 	m_nvim->setParent(this);
 
+	// GuiShowContextMenu - right click context menu and actions.
+	m_contextMenu = new ContextMenu(c, this);
+
+	// GuiTreeview - side pane file explorer tree view.
 	m_tree = new TreeView(c, this);
 
-	// GuiScrollBar
-	m_scrollbar = new ScrollBar{ m_nvim };
+	// GuiScrollBar - scroll bar for active buffer.
+	m_scrollbar = new ScrollBar{ m_nvim, this };
 
 	// ShellWidget + GuiScrollBar Layout
 	// QSplitter does not allow layouts directly: QWidget { HLayout { ShellWidget, QScrollBar } }
@@ -110,16 +101,7 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimError);
 	connect(m_shell, &Shell::neovimIsUnsupported,
 			this, &MainWindow::neovimIsUnsupported);
-	connect(m_shell, &Shell::neovimShowContextMenu,
-			this, &MainWindow::neovimShowContextMenu);
-	connect(m_actCut, &QAction::triggered,
-			this, &MainWindow::neovimSendCut);
-	connect(m_actCopy, &QAction::triggered,
-			this, &MainWindow::neovimSendCopy);
-	connect(m_actPaste, &QAction::triggered,
-			this, &MainWindow::neovimSendPaste);
-	connect(m_actSelectAll, &QAction::triggered,
-			this, &MainWindow::neovimSendSelectAll);
+	connect(m_shell, &Shell::neovimShowContextMenu, m_contextMenu, &ContextMenu::showContextMenu);
 
 	// GuiAdaptive Color/Font/Style Signal/Slot Connections
 	connect(m_shell, &Shell::setGuiAdaptiveColorEnabled,
@@ -324,31 +306,6 @@ void MainWindow::handleNeovimAttachment(bool attached)
 Shell* MainWindow::shell()
 {
 	return m_shell;
-}
-
-void MainWindow::neovimShowContextMenu()
-{
-	m_contextMenu->popup(QCursor::pos());
-}
-
-void MainWindow::neovimSendCut()
-{
-	m_nvim->api0()->vim_command_output(R"(normal! "+x)");
-}
-
-void MainWindow::neovimSendCopy()
-{
-	m_nvim->api0()->vim_command(R"(normal! "+y)");
-}
-
-void MainWindow::neovimSendPaste()
-{
-	m_nvim->api0()->vim_command(R"(normal! "+gP)");
-}
-
-void MainWindow::neovimSendSelectAll()
-{
-	m_nvim->api0()->vim_command("normal! ggVG");
 }
 
 void MainWindow::saveWindowGeometry()
