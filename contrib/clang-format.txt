@@ -1,6 +1,6 @@
 ﻿---
 AccessModifierOffset: '-4'
-AlignAfterOpenBracket: DontAlign
+AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveMacros: 'true'
 AlignConsecutiveAssignments: 'false'
 AlignConsecutiveDeclarations: 'false'
@@ -32,6 +32,7 @@ BraceWrapping:
     AfterExternBlock: true
     BeforeCatch: true
     BeforeElse: true
+    BeforeLambdaBody: true
     IndentBraces: false
     SplitEmptyFunction: true
     SplitEmptyRecord: true
@@ -49,6 +50,11 @@ Cpp11BracedListStyle: 'false'
 DerivePointerAlignment: 'false'
 FixNamespaceComments: 'true'
 IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '^<.*'
+    Priority:        1
+  - Regex:           '^".*'
+    Priority:        2
 IndentCaseLabels: 'true'
 IndentPPDirectives: None
 IndentWidth: '4'
@@ -59,7 +65,6 @@ MaxEmptyLinesToKeep: '2'
 NamespaceIndentation: None
 PointerAlignment: Left
 ReflowComments: 'true'
-SortIncludes: 'true'
 SortUsingDeclarations: 'true'
 SpaceAfterCStyleCast: 'false'
 SpaceAfterLogicalNot: 'false'
