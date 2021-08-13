@@ -13,6 +13,7 @@ private slots:
 	void CtrlCaretWellFormed() noexcept;
 	void ShiftModifierLetter() noexcept;
 	void GermanKeyboardLayout() noexcept;
+	void ControlSpace() noexcept;
 };
 
 void TestInputUnix::LessThanModifierKeys() noexcept
@@ -95,6 +96,13 @@ void TestInputUnix::GermanKeyboardLayout() noexcept
 
 	QKeyEvent evOptionPlus{ QEvent::KeyPress, Qt::Key_AsciiTilde, Qt::GroupSwitchModifier, "~" };
 	QCOMPARE(NeovimQt::Input::convertKey(evOptionPlus), QString{ "~" });
+}
+
+void TestInputUnix::ControlSpace() noexcept
+{
+	// Intentionally written with QStringLiteral, other alternatives do not create the same QKeyEvent
+	QKeyEvent evControlSpace{ QEvent::KeyPress, Qt::Key_Space, Qt::ControlModifier, QStringLiteral( "\u0000" ) };
+	QCOMPARE(NeovimQt::Input::convertKey(evControlSpace), QString{ "<C-Space>" });
 }
 
 #include "tst_input_unix.moc"
