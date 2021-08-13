@@ -174,6 +174,11 @@ QString convertKey(const QKeyEvent& ev) noexcept
 		return keypadKeys.value(key).arg(GetModifierPrefix(mod));
 	}
 
+	// Issue#917: On Linux, Control + Space sends text as "\u0000"
+	if (key == Qt::Key_Space && text.size() > 0 && !text.at(0).isPrint()) {
+		text = " ";
+	}
+
 	// Issue#864: Some international layouts insert accents (~^`) on Key_Space
 	if (key == Qt::Key_Space && !text.isEmpty() && text != " ") {
 		if (mod != Qt::NoModifier) {
