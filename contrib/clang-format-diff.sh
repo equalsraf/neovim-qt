@@ -26,11 +26,11 @@ if [ -z ${CLANG_FORMAT_DIFF} ] || [ ! -x ${CLANG_FORMAT_DIFF} ]; then
 fi
 
 if [ -z ${DIFF_FILTER_LIST} ]; then
-	DIFF_FILTER_LIST="*.cpp *.c *.h"
+	DIFF_FILTER_LIST="*.cpp *.c *.h :^bindings/* :^src/auto/*"
 fi
 
 if [ -z ${BRANCH_POINT} ]; then
-	BRANCH_POINT=$(git merge-base --fork-point ${BRANCH_POINT})
+	BRANCH_POINT=$(git merge-base --fork-point master)
 fi
 
 # Copy `.clang-format`, skipping if one already exists
