@@ -1,0 +1,74 @@
+name: Format
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  ClangFormatDiff:
+    name: ClangFormat
+    if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+    env:
+      CLANG_FORMAT_DIFF: /usr/share/clang/clang-format-12/clang-format-diff.py
+      BRANCH_POINT: ${{ github.base_ref }}
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/actions/checkout/issues/416
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup PR Branch
+        run: git branch ${{ github.base_ref }} origin/${{ github.base_ref }}
+
+      - name: Run ClangFormatDiff Script
+        run: contrib/clang-format-diff.sh
+
+      - name: Detect ClangFormat Changes
+        run: |
+          if [ -s clang_format.patch ]; then
+            echo "changes_detected=true" >> $GITHUB_ENV
+          else
+            echo "changes_detected=false" >> $GITHUB_ENV
+          fi
+
+      - name: Upload Artifacts
+        if: fromJSON(env.changes_detected)
+        uses: actions/upload-artifact@v2
+        with:
+          name: ClangFormat Patch
+          path: clang_format.patch
+
+      - name: Patch File
+        run: |
+          if [ -s clang_format.patch ]; then
+            cat clang_format.patch
+          fi
+
+      - name: Check Validity
+        run: |
+          if [ -s clang_format.patch ]; then
+            echo "---------------------------------------------------------------------------"
+            echo "|                          CLANG FORMAT FAILURE                           |"
+            echo "---------------------------------------------------------------------------"
+            echo "|                                                                         |"
+            echo "| Your changes are not clang-format compliant!                            |"
+            echo "|                                                                         |"
+            echo "| An Artifact 'ClangFormat Patch' was uploaded.                           |"
+            echo "|                                                                         |"
+            echo "| Consider inspecting and applying 'clang_format.patch':                  |"
+            echo "|   git apply clang_format.patch                                          |"
+            echo "|                                                                         |"
+            echo "| The contents of 'clang_format.patch' is printed below.                  |"
+            echo "|                                                                         |"
+            echo "---------------------------------------------------------------------------"
+            cat clang_format.patch
+            echo "---------------------------------------------------------------------------"
+            exit 1
+          fi
