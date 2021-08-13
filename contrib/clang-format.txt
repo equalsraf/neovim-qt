@@ -46,7 +46,7 @@ CompactNamespaces: 'true'
 ConstructorInitializerAllOnOneLineOrOnePerLine: 'false'
 ConstructorInitializerIndentWidth: '4'
 ContinuationIndentWidth: '4'
-Cpp11BracedListStyle: 'false'
+Cpp11BracedListStyle: 'true'
 DerivePointerAlignment: 'false'
 FixNamespaceComments: 'true'
 IncludeBlocks: Regroup
@@ -66,6 +66,7 @@ NamespaceIndentation: None
 PointerAlignment: Left
 ReflowComments: 'true'
 SortUsingDeclarations: 'true'
+SortIncludes: CaseInsensitive
 SpaceAfterCStyleCast: 'false'
 SpaceAfterLogicalNot: 'false'
 SpaceAfterTemplateKeyword: 'false'
