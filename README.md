@@ -85,7 +85,9 @@ NeovimQt is available from this [Community Package](https://build.opensuse.org/p
 
 #### Ubuntu
 
-`sudo apt-get install neovim-qt`
+```
+sudo apt-get install neovim-qt
+```
 
 
 ## Configuration
@@ -98,7 +100,7 @@ The default locations are:
  - Linux: `~/.config/nvim/ginit.vim`
 
 Recommended `ginit.vim`
-```
+```vim
 " Enable Mouse
 set mouse=a
 
