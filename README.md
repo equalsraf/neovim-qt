@@ -28,12 +28,12 @@ See the Neovim release page:
 Neovim is available as a [Chocolatey Package](https://chocolatey.org/packages/neovim/).
 
 Stable Neovim + Neovim-Qt:
-```powershell
+```
 choco install neovim
 ```
 
 Pre-Release Neovim + Stable Neovim-Qt:
-```powershell
+```
 choco install neovim --pre
 ```
 
@@ -47,13 +47,13 @@ Pre-built Windows binaries are provided for all recent commits:
 You can use HomeBrew to install Neovim Qt: https://github.com/equalsraf/homebrew-neovim-qt.
 
 To install the latest release:
-```shell
+```
 $ brew tap equalsraf/neovim-qt
 $ brew install neovim-qt
 ```
 
 To install the latest development version:
-```shell
+```
 $ brew tap equalsraf/neovim-qt
 $ brew install --HEAD neovim-qt
 ```
@@ -73,7 +73,7 @@ NeovimQt is available from this [Community Repository](https://archlinux.org/pac
 NeovimQt is available from this [Portage Ebuild](https://github.com/jgehrig/gentoo/blob/master/app-editors/neovim-qt/neovim-qt-9999.ebuild).
 
 Alternatively, you can add the entire overlay:
-```shell
+```
 $ eselect repository add jgehrig git https://github.com/jgehrig/gentoo.git
 $ emerge --sync
 $ emerge -av neovim-qt
@@ -85,7 +85,7 @@ NeovimQt is available from this [Community Package](https://build.opensuse.org/p
 
 #### Ubuntu
 
-```shell
+```
 sudo apt-get install neovim-qt
 ```
 
@@ -148,7 +148,7 @@ Alternatively, you can install the NeovimQt Plugin:
 `Plugin 'equalsraf/neovim-gui-shim`
 
 On recent releases, you can check if the runtime is loaded with `nvim-qt --version`:
-```shell
+```
 $ nvim-qt --version
 NVIM-QT v0.2.16.1
 Build type: Release
@@ -202,12 +202,12 @@ They are safe to ignore, but you may notice font spacing and clipping issues.
 ### Why is nvim unable to start?
 
 The `nvim` binary must be in your `$PATH`. You can manually provide a path to Neovim:
-```shell
+```
 nvim-qt --nvim {path_to_nvim}
 ```
 
 In recent versions, `nvim-qt --version` reports the `nvim` binary path:
-```shell
+```
 $ nvim-qt --version
 ...
 Environment:
@@ -221,7 +221,7 @@ Environment:
 Detailed build instructions can be found at the [Wiki](https://github.com/equalsraf/neovim-qt/wiki/Build-Instructions).
 
 Simplified Build Commands:
-```shell
+```
 $ mkdir build
 $ cd build
 $ cmake -DCMAKE_BUILD_TYPE=Release ..
