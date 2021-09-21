@@ -269,12 +269,13 @@ void ShellWidget::paintUndercurl(
 
 	QPen specialPen = getSpecialPen(cell);
 	p.setPen(specialPen);
-	// only enable anti-aliasing for the undercurl (causes rendering
-	// artifacts when rendering the cell background)
-	const auto renderHints{ p.renderHints() };
-	p.setRenderHint(QPainter::Antialiasing);
+
+	// Issue #923: Antialiasing should only be set for undercurl,
+	// otherwise rendering artifacts appear in the cell background
+	bool isAntialiasingSet{ p.testRenderHint(QPainter::Antialiasing) };
+	p.setRenderHint(QPainter::Antialiasing, true);
 	p.drawPath(GetUndercurlPath(cellRect, m_cellSize.width(), specialPen.widthF()));
-	p.setRenderHints(renderHints);
+	p.setRenderHint(QPainter::Antialiasing, isAntialiasingSet);
 }
 
 static QLine GetStrikeThrough(QRect cellRect) noexcept
