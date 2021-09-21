@@ -44,17 +44,15 @@ Pre-built Windows binaries are provided for all recent commits:
 
 ### MacOS
 
-You can use HomeBrew to install Neovim Qt: https://github.com/equalsraf/homebrew-neovim-qt.
+NeovimQt is available in the Homebrew package manager.
 
 To install the latest release:
 ```
-$ brew tap equalsraf/neovim-qt
 $ brew install neovim-qt
 ```
 
 To install the latest development version:
 ```
-$ brew tap equalsraf/neovim-qt
 $ brew install --HEAD neovim-qt
 ```
 
