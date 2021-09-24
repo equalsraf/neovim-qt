@@ -8,25 +8,25 @@
 
 namespace NeovimQt {
 
-// Unpack Neovim EXT types Window, Buffer Tabpage which are all uint64_t see Neovim:msgpack_rpc_to_
 static QVariant unpackBufferApi{{api_level}}(MsgpackIODevice *dev, const char* in, quint32 size) noexcept
 {
 	msgpack_unpacked result;
 	msgpack_unpacked_init(&result);
-	msgpack_unpack_return ret = msgpack_unpack_next(&result, in, size, NULL);
+	msgpack_unpack_return ret{ msgpack_unpack_next(&result, in, size, nullptr) };
 
 	QVariant variant;
 
 	if (ret == MSGPACK_UNPACK_SUCCESS) {
 		switch (result.data.type) {
 			case MSGPACK_OBJECT_NEGATIVE_INTEGER:
-				variant = (qint64)result.data.via.i64;
+				variant = static_cast<int64_t>(result.data.via.i64);
 				break;
+
 			case MSGPACK_OBJECT_POSITIVE_INTEGER:
-				variant = (quint64)result.data.via.u64;
+				variant = static_cast<uint64_t>(result.data.via.u64);
 				break;
+
 			default:
-				// TODO it would be nice if we could call back MsgpackIoDevice method or primitive types here
 				qWarning() << "Unsupported type found for EXT type" << result.data.type << result.data;
 		}
 	}
@@ -70,12 +70,11 @@ MsgpackRequest* NeovimApi{{api_level}}::{{f.name}}({{f.argstring}}) noexcept
 {% endfor %}
 	return r;
 }
-{% endfor %}
 
+{% endfor %}
 // Handlers
-void NeovimApi{{api_level}}::handleResponseError(quint32 msgid, quint64 fun, const QVariant& res) noexcept
+void NeovimApi{{api_level}}::handleResponseError(int32_t msgid, int64_t fun, const QVariant& res) noexcept
 {
-	// TODO: support Neovim error types Exception/Validation/etc
 	QString errMsg;
 	const QVariantList asList = res.toList();
 	if (asList.size() >= 2) {
@@ -95,11 +94,12 @@ void NeovimApi{{api_level}}::handleResponseError(quint32 msgid, quint64 fun, con
 
 {% endfor %}
 	default:
-		m_c->setError(NeovimConnector::RuntimeMsgpackError, QString("Received error for function that should not fail: %s").arg(fun));
+		m_c->setError(NeovimConnector::RuntimeMsgpackError,
+			QStringLiteral("Received error for function that should not fail: %s").arg(fun));
 	}
 }
 
-void NeovimApi{{api_level}}::handleResponse(quint32 msgid, quint64 fun, const QVariant& res) noexcept
+void NeovimApi{{api_level}}::handleResponse(uint32_t msgid, uint64_t fun, const QVariant& res) noexcept
 {
 	switch(fun)
 	{
@@ -109,11 +109,12 @@ void NeovimApi{{api_level}}::handleResponse(quint32 msgid, quint64 fun, const QV
 {% if f.return_type.native_type != 'void' %}
 			{{f.return_type.native_type}} data{};
 			if (decode(res, data)) {
-				m_c->setError(NeovimConnector::RuntimeMsgpackError, "Error unpacking return type for {{f.name}}");
+				m_c->setError(NeovimConnector::RuntimeMsgpackError,
+					"Error unpacking return type for {{f.name}}");
 				return;
-			} else {
-				emit on_{{f.name}}(data);
 			}
+
+			emit on_{{f.name}}(data);
 {% else %}
 			emit on_{{f.name}}();
 {% endif %}
@@ -125,60 +126,4 @@ void NeovimApi{{api_level}}::handleResponse(quint32 msgid, quint64 fun, const QV
 		qWarning() << "Received unexpected response";
 	}
 }
-
-/**
- * Check function table from api_metadata[1]
- *
- * This checks the API metadata build from the bindings against the metadata
- * passed as argument.
- *
- * Returns false if there is an API mismatch
- */
-static QVector<Function> GetSupportedList(const QVariantList& ftable,
-	const QVector<Function>& required) noexcept
-{
-	QVector<Function> supported;
-
-	for (const auto& val : ftable) {
-		Function f{ Function::fromVariant(val) };
-		if (!f.isValid()) {
-			qDebug() << "Invalid function in metadata" << f;
-			continue;
-		}
-		supported.append(f);
-
-		if (!required.contains(f)) {
-			qDebug() << "Unknown function(api {{api_level}})" << f;
-		}
-	}
-
-	return supported;
-}
-
-bool NeovimApi{{api_level}}::checkFunctions(const QVariantList& ftable) noexcept
-{
-	static const QVector<Function> cs_required {
-{% for f in functions %}
-		Function{ "{{f.return_type.neovim_type}}", "{{f.name}}",
-			QVector<QString>{
-{% for param in f.parameters %}
-				"{{param.neovim_type}}",
-{% endfor %}
-			}
-			, false },
-{% endfor %}
-		};
-
-	static const QVector<Function> cs_supported{ GetSupportedList(ftable, cs_required) };
-
-	bool ok{ true };
-	for (const auto& f : cs_required) {
-		if (!cs_supported.contains(f)) {
-			qDebug() << "- instance DOES NOT support API{{api_level}}:" << f;
-			ok = false;
-		}
-	}
-	return ok;
-}
-
 } // namespace NeovimQt
