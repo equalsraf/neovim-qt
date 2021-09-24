@@ -31,7 +31,6 @@ Function Function::fromVariant(const QVariant& fun) noexcept
 
 	const QVariantMap m{ fun.toMap() };
 	for (auto it = m.begin(); it != m.end(); ++it) {
-
 		if (it.key() == "return_type") {
 			if (!it.value().canConvert<QByteArray>()) {
 				qDebug() << "Found unexpected data type when unpacking function" << fun;
@@ -95,18 +94,16 @@ QVector<QStringPair> Function::parseParameters(const QVariantList& obj) noexcept
 	QVector<QStringPair> result;
 
 	for (const auto& val : obj) {
-
 		const QVariantList& params = val.toList();
-		if (params.size() % 2 != 0 ) {
+		if (params.size() % 2 != 0) {
 			return {};
 		}
 
-		for (auto it = params.begin(); it != params.begin(); it+=2) {
+		for (auto it = params.begin(); it != params.begin(); it += 2) {
 			auto first{ it };
 			auto second{ it + 1 };
 
-			if (!first->canConvert<QByteArray>()
-				|| !second->canConvert<QByteArray>()) {
+			if (!first->canConvert<QByteArray>() || !second->canConvert<QByteArray>()) {
 				return {};
 			}
 

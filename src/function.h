@@ -2,11 +2,11 @@
 
 #include <QByteArray>
 #include <QDebug>
-#include <QVector>
 #include <QPair>
 #include <QPoint>
 #include <QStringList>
 #include <QtGlobal>
+#include <QVector>
 
 namespace NeovimQt {
 
