@@ -165,11 +165,10 @@ void TestShell::guiShimCommands() noexcept
 	QVERIFY2(SPYWAIT(cmd_ls), "Waiting for GuiLinespace");
 
 	// Test font attributes
-#ifdef Q_OS_MAC
-	QSignalSpy cmd_gf(c->neovimObject()->vim_command_output(c->encode("GuiFont Monaco:h14")), &MsgpackRequest::finished);
-#else
-	QSignalSpy cmd_gf(c->neovimObject()->vim_command_output(c->encode("GuiFont DejaVu Sans Mono:h14")), &MsgpackRequest::finished);
-#endif
+	const QString cmdFontSize14{ QStringLiteral("GuiFont %1:h14").arg(GetPlatformTestFont()) };
+	const QString expectedFontSize14{ QStringLiteral("%1:h14").arg(GetPlatformTestFont()) };
+	QSignalSpy cmd_gf{ c->neovimObject()->vim_command_output(c->encode(cmdFontSize14)),
+		&MsgpackRequest::finished };
 	QVERIFY(cmd_gf.isValid());
 	QVERIFY(SPYWAIT(cmd_gf));
 
@@ -178,31 +177,21 @@ void TestShell::guiShimCommands() noexcept
 	// Test Performance: timeout occurs often, set value carefully.
 	SPYWAIT(spy_fontchange, 2500 /*msec*/);
 
-#ifdef Q_OS_MAC
-	QCOMPARE(s->shell()->fontDesc(), QString("Monaco:h14"));
-#else
-	QCOMPARE(s->shell()->fontDesc(), QString("DejaVu Sans Mono:h14"));
-#endif
+	QCOMPARE(s->shell()->fontDesc(), expectedFontSize14);
 
 	// Normalization removes the :b attribute
-#ifdef Q_OS_MAC
-	QSignalSpy cmd_gf2(c->neovimObject()->vim_command_output(c->encode("GuiFont Monaco:h14:b:l")), &MsgpackRequest::finished);
-#else
-	QSignalSpy cmd_gf2(c->neovimObject()->vim_command_output(c->encode("GuiFont DejaVu Sans Mono:h14:b:l")), &MsgpackRequest::finished);
-#endif
+	const QString cmdFontBoldRemoved{ QStringLiteral("GuiFont %1:h14:b:l").arg(GetPlatformTestFont()) };
+	const QString expectedFontBoldRemoved{ QStringLiteral("%1:h14:l").arg(GetPlatformTestFont()) };
+	QSignalSpy spy_fontchange2(s->shell(), &ShellWidget::shellFontChanged);
+	QSignalSpy cmd_gf2{ c->neovimObject()->vim_command_output(c->encode(cmdFontBoldRemoved)),
+		&MsgpackRequest::finished };
 	QVERIFY(cmd_gf2.isValid());
 	QVERIFY(SPYWAIT(cmd_gf2));
-
-	QSignalSpy spy_fontchange2(s->shell(), &ShellWidget::shellFontChanged);
 
 	// Test Performance: timeout occurs often, set value carefully.
 	SPYWAIT(spy_fontchange2, 2500 /*msec*/);
 
-#ifdef Q_OS_MAC
-	QCOMPARE(s->shell()->fontDesc(), QString("Monaco:h14:l"));
-#else
-	QCOMPARE(s->shell()->fontDesc(), QString("DejaVu Sans Mono:h14:l"));
-#endif
+	QCOMPARE(s->shell()->fontDesc(), expectedFontBoldRemoved);
 }
 
 void TestShell::CloseEvent_data() noexcept
@@ -315,15 +304,7 @@ void TestShell::GetClipboard() noexcept
 	// provided by the GUI shim
 	c->api0()->vim_command(c->encode("call GuiClipboard()"));
 
-#if defined(Q_OS_MAC) || defined(Q_OS_WIN32)
-	QGuiApplication::clipboard()->setText(register_data, QClipboard::Clipboard);
-#else
-	if (reg == '+') {
-		QGuiApplication::clipboard()->setText(register_data, QClipboard::Clipboard);
-	} else {
-		QGuiApplication::clipboard()->setText(register_data, QClipboard::Selection);
-	}
-#endif
+	QGuiApplication::clipboard()->setText(register_data, GetClipboardMode(reg));
 
 	QString getreg_cmd = QString("getreg('%1')").arg(reg);
 	QSignalSpy cmd_clip(c->api1()->nvim_eval(c->encode(getreg_cmd)), &MsgpackRequest::finished);
@@ -379,15 +360,7 @@ void TestShell::SetClipboard() noexcept
 	QVERIFY(spy_sync.isValid());
 	QVERIFY(SPYWAIT(spy_sync));
 
-#if defined(Q_OS_MAC) || defined(Q_OS_WIN32)
-	QString data = QGuiApplication::clipboard()->text(QClipboard::Clipboard);
-#else
-	if (reg == '+') {
-		QGuiApplication::clipboard()->text(QClipboard::Clipboard);
-	} else {
-		QGuiApplication::clipboard()->text(QClipboard::Selection);
-	}
-#endif
+	QGuiApplication::clipboard()->setText(register_data, GetClipboardMode(reg));
 
 	// the additional \n seems to be a side effect from vim_command_output()
 //		QCOMPARE(cmd_clip.takeFirst().at(2), QVariant(register_data + "\n"));
