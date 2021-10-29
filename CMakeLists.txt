@@ -151,7 +151,7 @@ else()
 endif()
 include_directories(${MSGPACK_INCLUDE_DIRS})
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DQT_NO_DEBUG_OUTPUT)
 endif()
 
