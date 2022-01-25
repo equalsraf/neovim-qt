@@ -112,6 +112,11 @@ g:GuiWindowFullScreen indicates whether the GUI window is maximized. In some
 system (X11) this not a reliable indicator, since the window manager can
 override the window behaviour.
 
+							*g:GuiWindowFrameless*
+g:GuiWindowFrameless indicates whether the GUI window is frameless. In some
+system (X11) this not a reliable indicator, since the window manager can
+override the window behaviour.
+
 							*g:GuiWindowId*
 g:GuiWindowId holds the window id (X11) or the window handle (Windows).
 This was an alternative to v:windowid, but since nvim 0.1.4, v:windowid can
@@ -143,6 +148,10 @@ to work.
 
 							*GuiWindowFullScreen()*
 GuiWindowFullScreen(enabled) sets the window fullscreen state, 1 means
+enabled and 0 disabled.
+
+							*GuiWindowFrameless()*
+GuiWindowFrameless(enabled) sets the window frameless state, 1 means
 enabled and 0 disabled.
 
 							*GuiFont()*

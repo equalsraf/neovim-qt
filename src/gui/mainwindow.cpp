@@ -91,6 +91,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimSuspend);
 	connect(m_shell, &Shell::neovimFullScreen,
 			this, &MainWindow::neovimFullScreen);
+	connect(m_shell, &Shell::neovimFrameless,
+			this, &MainWindow::neovimFrameless);
 	connect(m_shell, &Shell::neovimGuiCloseRequest,
 			this, &MainWindow::neovimGuiCloseRequest);
 	connect(m_shell, &Shell::neovimOpacity,
@@ -185,6 +187,16 @@ void MainWindow::neovimMaximized(bool set)
 	} else {
 		setWindowState(windowState() & ~Qt::WindowMaximized);
 	}
+}
+
+void MainWindow::neovimFrameless(bool set)
+{
+	setWindowFlag(Qt::FramelessWindowHint, set);
+	// DD: Need call show o make the widget visible again.
+	// https://doc.qt.io/qt-5/qwidget.html#windowFlags-prop
+	show();
+	// DD: It seems there is no event representing the change of flags
+	m_nvim->api0()->vim_set_var("GuiWindowFrameless", set ? 1 : 0);
 }
 
 void MainWindow::neovimForeground()

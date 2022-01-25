@@ -47,6 +47,11 @@ function! GuiWindowFullScreen(enabled) abort
   call rpcnotify(0, 'Gui', 'WindowFullScreen', a:enabled)
 endfunction
 
+" Set frameless state for GUI window (1 is enabled, 0 disabled)
+function! GuiWindowFrameless(enabled) abort
+  call rpcnotify(0, 'Gui', 'WindowFrameless', a:enabled)
+endfunction
+
 " Set GUI font
 function! GuiFont(fname, ...) abort
   let force = get(a:000, 0, 0)

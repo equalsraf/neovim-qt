@@ -342,6 +342,9 @@ void Shell::init()
 
 	// Subscribe to GUI events
 	m_nvim->api0()->vim_subscribe("Gui");
+
+	// Set initial value
+	m_nvim->api0()->vim_set_var("GuiWindowFrameless", (windowFlags() & Qt::FramelessWindowHint) ? 1: 0);
 }
 
 void Shell::neovimError(NeovimConnector::NeovimError err)
@@ -834,6 +837,18 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 					windowState() & ~Qt::WindowFullScreen);
 			} else {
 				emit neovimFullScreen(variant_not_zero(args.at(1)));
+			}
+		} else if (guiEvName == "WindowFrameless" && args.size() == 2) {
+			if (isWindow()) {
+				auto isOn = variant_not_zero(args.at(1));
+				setWindowFlag(Qt::FramelessWindowHint, isOn);
+				// DD: Need call show o make the widget visible again.
+				// https://doc.qt.io/qt-5/qwidget.html#windowFlags-prop
+				show();
+				// DD: It seems there is no event representing the change of flags
+				m_nvim->api0()->vim_set_var("GuiWindowFrameless", isOn ? 1 : 0);
+			} else {
+				emit neovimFrameless(variant_not_zero(args.at(1)));
 			}
 		} else if (guiEvName == "Linespace" && args.size() == 2) {
 			handleLineSpace(args.at(1));

@@ -80,6 +80,7 @@ signals:
 	void neovimOpacity(double);
 	void neovimSuspend();
 	void neovimFullScreen(bool);
+	void neovimFrameless(bool);
 	void neovimGuiCloseRequest(int status = 0);
 	/// This signal is emmited if the running neovim version is unsupported by the GUI
 	void neovimIsUnsupported();
