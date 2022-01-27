@@ -839,17 +839,7 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 				emit neovimFullScreen(variant_not_zero(args.at(1)));
 			}
 		} else if (guiEvName == "WindowFrameless" && args.size() == 2) {
-			if (isWindow()) {
-				auto isOn = variant_not_zero(args.at(1));
-				setWindowFlag(Qt::FramelessWindowHint, isOn);
-				// DD: Need call show o make the widget visible again.
-				// https://doc.qt.io/qt-5/qwidget.html#windowFlags-prop
-				show();
-				// DD: It seems there is no event representing the change of flags
-				m_nvim->api0()->vim_set_var("GuiWindowFrameless", isOn ? 1 : 0);
-			} else {
-				emit neovimFrameless(variant_not_zero(args.at(1)));
-			}
+			handleWindowFrameless(args.at(1));
 		} else if (guiEvName == "Linespace" && args.size() == 2) {
 			handleLineSpace(args.at(1));
 		} else if (guiEvName == "Mousehide" && args.size() == 2) {
@@ -1008,6 +998,20 @@ void Shell::handleLineSpace(const QVariant& value) noexcept
 	setLineSpace(linespace);
 	m_nvim->api0()->vim_set_var("GuiLinespace", linespace);
 	resizeNeovim(size());
+}
+
+void Shell::handleWindowFrameless(const QVariant& value) noexcept {
+	if (isWindow()) {
+		const bool isWindowFrameOn{variant_not_zero(value)};
+		setWindowFlag(Qt::FramelessWindowHint, isWindowFrameOn );
+		// DD: Need call show o make the widget visible again.
+		// https://doc.qt.io/qt-5/qwidget.html#windowFlags-prop
+		show();
+		// DD: It seems there is no event representing the change of flags
+		m_nvim->api0()->vim_set_var("GuiWindowFrameless", isWindowFrameOn ? 1 : 0);
+	} else {
+		emit neovimFrameless(variant_not_zero(value));
+	}
 }
 
 void Shell::handleCloseEvent(const QVariantList& args) noexcept

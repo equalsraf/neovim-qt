@@ -189,14 +189,14 @@ void MainWindow::neovimMaximized(bool set)
 	}
 }
 
-void MainWindow::neovimFrameless(bool set)
+void MainWindow::neovimFrameless(bool isFrameless)
 {
-	setWindowFlag(Qt::FramelessWindowHint, set);
+	setWindowFlag(Qt::FramelessWindowHint, isFrameless);
 	// DD: Need call show o make the widget visible again.
 	// https://doc.qt.io/qt-5/qwidget.html#windowFlags-prop
 	show();
 	// DD: It seems there is no event representing the change of flags
-	m_nvim->api0()->vim_set_var("GuiWindowFrameless", set ? 1 : 0);
+	m_nvim->api0()->vim_set_var("GuiWindowFrameless", isFrameless ? 1 : 0);
 }
 
 void MainWindow::neovimForeground()
