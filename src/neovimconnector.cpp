@@ -86,6 +86,20 @@ QString NeovimConnector::errorString()
 	return m_errorString;
 }
 
+QString NeovimConnector::connectionDescription()
+{
+	switch (m_ctype) {
+		case SpawnedConnection:
+			return m_spawnExe + " " + m_spawnArgs.join(" ");
+		case HostConnection:
+			return m_connHost + ":" + m_connPort;
+		case SocketConnection:
+			return m_connSocket;
+		default:
+			return "";
+	}
+}
+
 /**
  * Returns the channel id used by Neovim to identify this connection
  */

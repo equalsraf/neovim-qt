@@ -95,6 +95,7 @@ public:
 	quint64 apiCompatibility();
 	quint64 apiLevel();
 	bool hasUIOption(const QByteArray& option);
+	QString connectionDescription();
 
 signals:
 	/** Emitted when Neovim is ready @see ready */
