@@ -142,10 +142,12 @@ void MainWindow::neovimError(NeovimConnector::NeovimError err)
 {
 	switch(err) {
 	case NeovimConnector::FailedToStart:
-		m_errorWidget->setText("Unable to start nvim: " + m_nvim->errorString());
+		m_errorWidget->setText("Unable to start nvim: " + m_nvim->errorString() + "<br>("
+			+ m_nvim->connectionDescription() + ")");
 		break;
 	default:
-		m_errorWidget->setText(m_nvim->errorString());
+		m_errorWidget->setText(
+			m_nvim->errorString() + "<br>(" + m_nvim->connectionDescription() + ")");
 	}
 	m_errorWidget->showReconnect(m_nvim->canReconnect());
 	m_stack.setCurrentIndex(0);
