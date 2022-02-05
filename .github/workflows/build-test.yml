@@ -29,7 +29,7 @@ jobs:
 
           - name: Linux_Release
             flavor: Release
-            runner: ubuntu-18.04
+            runner: ubuntu-20.04
             generator: Ninja
             cc: gcc
             cxx: g++
@@ -54,13 +54,14 @@ jobs:
           # images bundle only 11.2. For now, we must use the older image `windows-2019`.
           - name: Windows_MingGW
             flavor: Debug
-            runner: windows-2019
+            runner: windows-2022
             generator: MinGW Makefiles
             qtver: 5.15.2
             qtdir: mingw81_64
             qtstr: windows desktop win64_mingw81
             cc: gcc
             cxx: g++
+            ctest_exe_args: -tap
 
           - name: Windows_Release
             flavor: Release
@@ -69,6 +70,7 @@ jobs:
             qtver: 5.15.2
             qtdir: msvc2019_64
             qtstr: windows desktop win64_msvc2019_64
+            ctest_exe_args: -tap
             publish: true
 
     runs-on: ${{ matrix.runner }}
@@ -137,12 +139,12 @@ jobs:
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
           -DENABLE_TESTS=ON
+          -DCTEST_EXE_ARGS=${{ matrix.ctest_exe_args }}
 
       - name: Build
         run: cmake --build ${{ github.workspace }}/build
 
       - name: Test
-        if: ${{ !startsWith(matrix.runner, 'windows') }}
         uses: GabrielBB/xvfb-action@v1 # Required by Linux, no X11 $DISPLAY
         with:
           working-directory: ${{ github.workspace }}/build
@@ -151,7 +153,7 @@ jobs:
       #
       # Deploy Release Binaries
       #
-      - name: Linux - Publish Release Build
+      - name: Linux - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'ubuntu') }}
         env:
           ARCH: x86_64
@@ -161,13 +163,13 @@ jobs:
           chmod a+x linuxdeployqt-continuous-x86_64.AppImage
           ./linuxdeployqt-continuous-x86_64.AppImage ./install/share/applications/nvim-qt.desktop -appimage
 
-      - name: MacOS - Publish Release Build
+      - name: MacOS - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
         run: |
           macdeployqt ./build/bin/nvim-qt.app -dmg
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
 
-      - name: Windows - Publish Release Build
+      - name: Windows - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
         run: |
           cmake --build ./build --target install
