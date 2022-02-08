@@ -89,6 +89,43 @@ private slots:
 		c->deleteLater();
 	}
 
+
+#ifdef Q_OS_UNIX
+	void connectToSocket_data() {
+		QTest::addColumn<QString>("socketname");
+
+		QTest::newRow("relative") << "relnvimsock";
+		QTest::newRow("absolute") << QFileInfo("absnvimsock").absoluteFilePath();
+	}
+
+	// https://github.com/equalsraf/neovim-qt/issues/936
+	// QLocalSocket cannot open relative paths. This happens
+	// both in Linux and Mac.
+	void connectToSocket() {
+		QFETCH(QString, socketname);
+
+		// Start nvim
+		QProcess p;
+		p.setProgram("nvim");
+		QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+		env.insert("NVIM_LISTEN_ADDRESS", socketname);
+		p.setProcessEnvironment(env);
+		p.setArguments({"--headless", "-u", "NONE"});
+		p.start();
+		p.waitForStarted();
+
+		QTest::qWait(1500);
+		// connect
+		NeovimConnector *c = NeovimConnector::connectToSocket(socketname);
+		qDebug() << c->connectionDescription();
+		QSignalSpy onReady(c, SIGNAL(ready()));
+		QVERIFY(onReady.isValid());
+		QVERIFY(SPYWAIT(onReady));
+
+		QCOMPARE(c->connectionType(), NeovimConnector::SocketConnection);
+	}
+#endif
+
 	void metadataTimeout() {
 		// Connect to a TCP socket that will never respond, should trigger
 		// a timeout for the discoverMetadata call

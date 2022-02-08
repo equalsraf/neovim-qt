@@ -3,6 +3,7 @@
 #include <QMetaMethod>
 #include <QLocalSocket>
 #include <QTcpSocket>
+#include <QFileInfo>
 #include "msgpackrequest.h"
 #include "neovimconnectorhelper.h"
 #include "msgpackiodevice.h"
@@ -297,15 +298,20 @@ NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 {
 	QLocalSocket *s = new QLocalSocket();
 	NeovimConnector *c = new NeovimConnector(s);
-
 	c->m_ctype = SocketConnection;
+#if defined(Q_OS_UNIX)
+	// #936: Qt assumes paths relative to /tmp
+	// https://bugreports.qt.io/browse/QTBUG-50877
+	c->m_connSocket = QFileInfo(path).absoluteFilePath();
+#else
 	c->m_connSocket = path;
+#endif
 
 	connect(s, SIGNAL(error(QLocalSocket::LocalSocketError)),
 			c, SLOT(socketError()));
 	connect(s, &QLocalSocket::connected,
 			c, &NeovimConnector::discoverMetadata);
-	s->connectToServer(path);
+	s->connectToServer(c->m_connSocket);
 	return c;
 }
 
