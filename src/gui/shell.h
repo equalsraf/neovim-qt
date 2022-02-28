@@ -80,6 +80,7 @@ signals:
 	void neovimOpacity(double);
 	void neovimSuspend();
 	void neovimFullScreen(bool);
+	void neovimFrameless(bool);
 	void neovimGuiCloseRequest(int status = 0);
 	/// This signal is emmited if the running neovim version is unsupported by the GUI
 	void neovimIsUnsupported();
@@ -150,6 +151,7 @@ protected:
 	virtual void handleGuiFontFunction(const QVariantList& args);
 	virtual void handleGuiFontWide(const QVariant& value) noexcept;
 	virtual void handleLineSpace(const QVariant& value) noexcept;
+	virtual void handleWindowFrameless(const QVariant& value) noexcept;
 	virtual void handleCloseEvent(const QVariantList &args) noexcept;
 	virtual void handleGuiTabline(const QVariant& value) noexcept;
 	virtual void handleGuiPopupmenu(const QVariant& value) noexcept;

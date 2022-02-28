@@ -91,6 +91,8 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimSuspend);
 	connect(m_shell, &Shell::neovimFullScreen,
 			this, &MainWindow::neovimFullScreen);
+	connect(m_shell, &Shell::neovimFrameless,
+			this, &MainWindow::neovimFrameless);
 	connect(m_shell, &Shell::neovimGuiCloseRequest,
 			this, &MainWindow::neovimGuiCloseRequest);
 	connect(m_shell, &Shell::neovimOpacity,
@@ -185,6 +187,30 @@ void MainWindow::neovimMaximized(bool set)
 	} else {
 		setWindowState(windowState() & ~Qt::WindowMaximized);
 	}
+}
+
+void MainWindow::neovimFrameless(bool isFrameless)
+{
+	// When minimum Qt 5.9 is supported, use this instead:
+	//  setWindowFlag(Qt::FramelessWindowHint, isFrameless);
+	if (isFrameless)
+	{
+		setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+	}
+	else
+	{
+		setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
+	}
+
+	// Calling setWindowFlags can cause the widget to be hidden, show() must
+	// be called to make the widget visible again. On some platforms, this may
+	// cause focus issue. See Issue#971.
+	//
+	// Details: https://doc.qt.io/qt-5/qwidget.html#windowFlags-prop
+	show();
+
+	m_nvim->api0()->vim_set_var("GuiWindowFrameless", isFrameless ? 1 : 0);
+
 }
 
 void MainWindow::neovimForeground()
