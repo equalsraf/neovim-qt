@@ -32,7 +32,6 @@ private:
 	void handleGuiOption(const QVariantList& args) noexcept;
 	void handleGuiTabline(const QVariantList& args) noexcept;
 	void handleTablineUpdate(const QVariantList& args) noexcept;
-	void handleOptionShowTabline(const QVariantList& args) noexcept;
 	void handleCloseBufferError(quint32 msgid, quint64 fun, const QVariant& err) noexcept;
 
 	void drawTablineUpdates(
@@ -52,13 +51,6 @@ private:
 	void updateTablineVisibilityLegacyMode() noexcept;
 	void updateTablinePathCallback() noexcept;
 
-	enum class OptionShowTabline : int
-	{
-		Never = 0,
-		AtLeastTwo = 1,
-		Always = 2,
-	};
-
 	NeovimConnector& m_nvim;
 	bool m_isEnabled{ cs_defaultIsTablineEnabled };
 
@@ -70,8 +62,6 @@ private:
 
 	QWidget m_spacer;
 	QAction* m_spacerAction{};
-
-	OptionShowTabline m_optionShowTabline{ OptionShowTabline::AtLeastTwo };
 };
 
 } // namespace NeovimQt

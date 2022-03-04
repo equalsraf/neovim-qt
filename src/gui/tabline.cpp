@@ -85,10 +85,6 @@ void Tabline::handleRedraw(const QByteArray& name, const QVariantList& args) noe
 		handleTablineUpdate(args);
 		return;
 	}
-
-	if (name == "option_set") {
-		handleOptionShowTabline(args);
-	}
 }
 
 void Tabline::handleGuiOption(const QVariantList& args) noexcept
@@ -178,44 +174,6 @@ void Tabline::handleTablineUpdate(const QVariantList& args) noexcept
 	const std::vector<Tab> bufferList{ ParseTablineVariant(buffers) };
 
 	drawTablineUpdates(tabList, curtab, bufferList, curbuf);
-}
-
-void Tabline::handleOptionShowTabline(const QVariantList& args) noexcept
-{
-	if (args.size() < 1 || !args.at(0).canConvert<QString>()) {
-		return;
-	}
-
-	const QString optionName{ args.at(0).toString() };
-
-	if (optionName != "showtabline") {
-		return;
-	}
-
-	if (args.size() < 2 || !args.at(1).canConvert<int>()) {
-		qWarning() << "Tabline unexpected format for option showtabline:" << args;
-	}
-
-	const int value{ args.at(1).toInt() };
-
-	auto OptionFromInteger = [](int value) noexcept -> OptionShowTabline
-	{
-		const OptionShowTabline enumValue{ static_cast<OptionShowTabline>(value) };
-
-		switch (enumValue) {
-			case OptionShowTabline::Never:
-			case OptionShowTabline::AtLeastTwo:
-			case OptionShowTabline::Always:
-				return enumValue;
-		}
-
-		// Error: Unrecognized value, fallback to default value 1 (AtLeastTwo)
-		qWarning() << QStringLiteral("Error: unrecognized value for showtabline { %1 }").arg(value);
-		return OptionShowTabline::AtLeastTwo;
-	};
-
-	m_optionShowTabline = OptionFromInteger(value);
-	updateTablineVisibility();
 }
 
 static QIcon GetIconFromFilePath(const QString& path) noexcept
@@ -359,32 +317,14 @@ void Tabline::updateTablineVisibility() noexcept
 
 	const bool isAtLeastTwo{ m_tabline.count() >= 2 };
 
-	switch (m_optionShowTabline) {
-		case OptionShowTabline::Never:
-			setVisible(false);
-			m_bufferlineAction->setVisible(false);
-			m_spacerAction->setVisible(false);
-			m_tablineAction->setVisible(false);
-			break;
-
-		case OptionShowTabline::AtLeastTwo:
-			setVisible(isAtLeastTwo);
-			m_bufferlineAction->setVisible(!isLegacyMode && isAtLeastTwo);
-			m_spacerAction->setVisible(!isLegacyMode && isAtLeastTwo);
-			m_tablineAction->setVisible(isAtLeastTwo);
-			break;
-
-		// Users expect buffers to appear as tabs, similar to vim-airline.
-		// When no vim-tabs are present, we display the vim-buffers on the left.
-		// Once two or more vim-tabs are present, we display vim-tabs on the left
-		// and vim-buffers on the right; similar behavior to vim-airline.
-		case OptionShowTabline::Always:
-			setVisible(true);
-			m_bufferlineAction->setVisible(!isLegacyMode && true);
-			m_spacerAction->setVisible(!isLegacyMode && isAtLeastTwo);
-			m_tablineAction->setVisible(isAtLeastTwo || isLegacyMode);
-			break;
-	}
+	// Users expect buffers to appear as tabs, similar to vim-airline.
+	// When no vim-tabs are present, we display the vim-buffers on the left.
+	// Once two or more vim-tabs are present, we display vim-tabs on the left
+	// and vim-buffers on the right; similar behavior to vim-airline.
+	setVisible(true);
+	m_bufferlineAction->setVisible(!isLegacyMode);
+	m_spacerAction->setVisible(!isLegacyMode && isAtLeastTwo);
+	m_tablineAction->setVisible(isAtLeastTwo || isLegacyMode);
 }
 
 void Tabline::currentChangedTabline(int index) noexcept

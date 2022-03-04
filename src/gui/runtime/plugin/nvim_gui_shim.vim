@@ -96,14 +96,7 @@ function s:GuiLinespaceCommand(height) abort
 endfunction
 command! -nargs=? GuiLinespace call s:GuiLinespaceCommand("<args>")
 
-let s:stl=&showtabline
 function! s:GuiTabline(enable) abort
-  if a:enable
-    let s:stl=&showtabline
-    execute 'set showtabline=2'
-  else
-    execute 'set showtabline=' . s:stl
-  endif
   call rpcnotify(0, 'Gui', 'Option', 'Tabline', a:enable)
 endfunction
 command! -nargs=1 GuiTabline call s:GuiTabline(<args>)
