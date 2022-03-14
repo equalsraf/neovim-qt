@@ -357,7 +357,8 @@ void Tabline::updateTablineVisibility() noexcept
 	// Support for tabs + buffers was added in Neovim API 8
 	const bool isLegacyMode{ m_bufferline.count() == 0 };
 
-	const bool isAtLeastTwo{ m_tabline.count() >= 2 };
+	const bool isAtLeastTwoTabs{ m_tabline.count() >= 2 };
+	const bool isAtLeastTwoBuffers{ m_bufferline.count() >= 2 };
 
 	switch (m_optionShowTabline) {
 		case OptionShowTabline::Never:
@@ -368,10 +369,10 @@ void Tabline::updateTablineVisibility() noexcept
 			break;
 
 		case OptionShowTabline::AtLeastTwo:
-			setVisible(isAtLeastTwo);
-			m_bufferlineAction->setVisible(!isLegacyMode && isAtLeastTwo);
-			m_spacerAction->setVisible(!isLegacyMode && isAtLeastTwo);
-			m_tablineAction->setVisible(isAtLeastTwo);
+			setVisible(isAtLeastTwoTabs || isAtLeastTwoBuffers);
+			m_bufferlineAction->setVisible(!isLegacyMode && isAtLeastTwoBuffers);
+			m_spacerAction->setVisible(!isLegacyMode && isAtLeastTwoTabs);
+			m_tablineAction->setVisible(isAtLeastTwoTabs);
 			break;
 
 		// Users expect buffers to appear as tabs, similar to vim-airline.
@@ -380,9 +381,9 @@ void Tabline::updateTablineVisibility() noexcept
 		// and vim-buffers on the right; similar behavior to vim-airline.
 		case OptionShowTabline::Always:
 			setVisible(true);
-			m_bufferlineAction->setVisible(!isLegacyMode && true);
-			m_spacerAction->setVisible(!isLegacyMode && isAtLeastTwo);
-			m_tablineAction->setVisible(isAtLeastTwo || isLegacyMode);
+			m_bufferlineAction->setVisible(!isLegacyMode);
+			m_spacerAction->setVisible(!isLegacyMode && isAtLeastTwoTabs);
+			m_tablineAction->setVisible(isAtLeastTwoTabs || isLegacyMode);
 			break;
 	}
 }
