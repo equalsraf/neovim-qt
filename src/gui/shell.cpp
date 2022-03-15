@@ -1016,8 +1016,6 @@ void Shell::handleWindowFrameless(const QVariant& value) noexcept {
 
 void Shell::handleCloseEvent(const QVariantList& args) noexcept
 {
-	qDebug() << "Neovim requested a GUI close";
-
 	if (args.size() >= 2 && !args.at(1).canConvert<int>()) {
 		qWarning() << "Unexpected exit status for close:" << args.at(1);
 		return;
@@ -1831,7 +1829,6 @@ void ShellRequestHandler::handleRequest(MsgpackIODevice* dev, quint32 msgid, con
 
 			auto clipboard_data = QGuiApplication::clipboard()->mimeData(mode);
 			auto data = clipboard_data->text();
-			qDebug() << data << "<<<<< clipboard text";
 			// The register data is either a string with a single line,
 			// or a list of strings for multiple lines.
 			if (data.contains("\n")) {
@@ -1850,7 +1847,6 @@ void ShellRequestHandler::handleRequest(MsgpackIODevice* dev, quint32 msgid, con
 				result.append("");
 			}
 
-			qDebug() << "Neovim requested clipboard contents" << args << mode << "->" << result;
 			dev->sendResponse(msgid, QVariant(), result);
 			return;
 		}

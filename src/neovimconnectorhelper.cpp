@@ -50,27 +50,10 @@ void NeovimConnectorHelper::handleMetadata(quint32 msgid, quint64, const QVarian
 
 	const int api_compat = metadata.value("version").toMap().value("api_compatible").toUInt();
 	const int api_level = metadata.value("version").toMap().value("api_level").toUInt();
-	qDebug() << "Neovim API version compatible with" << api_compat << "supported" << api_level;
+	// qDebug() << "Neovim API version compatible with" << api_compat << "supported" << api_level;
 	m_c->m_uiOptions = metadata.value("ui_options").toList();
 	m_c->m_api_compat = api_compat;
 	m_c->m_api_supported = api_level;
-
-#if 0
-	QMapIterator<QString,QVariant> it(metadata);
-	while (it.hasNext()) {
-		it.next();
-		if (it.key() == "functions") {
-			auto api1 = m_c->api1();
-			if (api1 ) {
-				NeovimApi1::checkFunctions(it.value().toList());
-			}
-			auto api2 = m_c->api1();
-			if (api2 ) {
-				NeovimApi2::checkFunctions(it.value().toList());
-			}
-		}
-	}
-#endif
 
 	if (m_c->errorCause() == NeovimConnector::NoError) {
 		// Neovim is always utf8, but this was not the case in the early days of nvim

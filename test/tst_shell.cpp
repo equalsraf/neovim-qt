@@ -296,7 +296,6 @@ void TestShell::checkStartVars(NeovimQt::NeovimConnector* conn) noexcept
 
 	const QStringList vars{ "GuiWindowId", "GuiWindowMaximized", "GuiWindowFullScreen", "GuiFont", "GuiWindowFrameless" };
 	for (const auto& var : vars) {
-		qDebug() << "Checking Neovim for Gui var" << var;
 		QSignalSpy onVar(nvim, SIGNAL(on_vim_get_var(QVariant)));
 		QVERIFY(onVar.isValid());
 		nvim->vim_get_var(conn->encode(var));
