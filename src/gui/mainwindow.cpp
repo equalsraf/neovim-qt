@@ -69,7 +69,6 @@ void MainWindow::init(NeovimConnector *c)
 
 	m_window = new QSplitter();
 	m_window->addWidget(m_tree);
-	m_tree->hide();
 	m_window->addWidget(shellScrollable);
 
 	const int splitterWidth{ m_window->width() };
