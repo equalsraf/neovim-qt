@@ -61,7 +61,7 @@ jobs:
           - name: Windows_Release
             flavor: Release
             runner: windows-latest
-            generator: Visual Studio 16 2019
+            generator: Visual Studio 17 2022
             qtver: 5.15.2
             qtdir: msvc2019_64
             qtstr: windows desktop win64_msvc2019_64
@@ -98,7 +98,7 @@ jobs:
           New-Item -Path .\build -Name "build" -ItemType "directory"
           Invoke-WebRequest https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip -OutFile nvim-win64.zip
           Expand-Archive -Path nvim-win64.zip -DestinationPath .\build\
-          Add-Content -Path $env:GITHUB_PATH -Value ${{ github.workspace }}\build\Neovim\bin\
+          Add-Content -Path $env:GITHUB_PATH -Value ${{ github.workspace }}\build\nvim-win64\bin\
           Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_PREFIX_PATH=$env:QT_DIR;$env:QT_DIR\lib\cmake"
           Add-Content -Path $env:GITHUB_PATH -Value "${{ env.qt_dir }}"
           Add-Content -Path $env:GITHUB_PATH -Value "${{ env.qt_dir }}\bin"
