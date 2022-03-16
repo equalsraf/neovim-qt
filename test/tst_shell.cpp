@@ -9,6 +9,7 @@
 #include <QtTest/QtTest>
 
 #include "common.h"
+#include "common_gui.h"
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
 #include <QtPlugin>
@@ -43,69 +44,6 @@ protected:
 static void SignalPrintError(QString msg, const QVariant& err) noexcept
 {
 	qDebug() << msg << err;
-}
-
-static const QStringList cs_argsNone{ "-u", "NONE" }; // clazy:exclude=non-pod-global-static
-
-template<class T> static void ValidateNeovimConnection(T* obj) noexcept
-{
-	QSignalSpy onAttached{ obj, &T::neovimAttachmentChanged };
-
-	Q_ASSERT(onAttached.isValid());
-
-	const bool signalEmitted{ onAttached.wait() };
-	Q_ASSERT(signalEmitted);
-
-	const int signalCount{ onAttached.count() };
-	Q_ASSERT(signalCount == 1);
-
-	Q_ASSERT(obj->isNeovimAttached());
-}
-
-static std::pair<NeovimConnector*, Shell*> CreateShellWidget() noexcept
-{
-	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
-	Shell* s{ new Shell{ c } };
-
-	ValidateNeovimConnection(s);
-
-	return { c, s };
-}
-
-static std::pair<NeovimConnector*, MainWindow*> CreateMainWindow() noexcept
-{
-	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
-	MainWindow* w{ new MainWindow{ c } };
-
-	ValidateNeovimConnection(w);
-
-	return { c, w };
-}
-
-static QString GetRuntimeAbsolutePath() noexcept
-{
-	static const QFileInfo cs_runtime{
-		QStringLiteral(CMAKE_SOURCE_DIR) + QStringLiteral("/src/gui/runtime") };
-
-	if (!cs_runtime.exists()) {
-		qFatal("Unable to find GUI runtime!");
-	}
-
-	return cs_runtime.absoluteFilePath();
-}
-
-static std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept
-{
-	static const QStringList cs_argsNoneRuntime{
-		"-u", "NONE", "--cmd", "set rtp+=" + GetRuntimeAbsolutePath()
-	};
-
-	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNoneRuntime) };
-	MainWindow* w{ new MainWindow{ c } };
-
-	ValidateNeovimConnection(w);
-
-	return { c, w };
 }
 
 void TestShell::initTestCase() noexcept

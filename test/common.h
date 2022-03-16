@@ -1,10 +1,11 @@
 #pragma once
 
 #include <QSignalSpy>
+#include <QString>
 
-// This is just a fix for QSignalSpy::wait
-// http://stackoverflow.com/questions/22390208/google-test-mock-with-qt-signals
-bool SPYWAIT(QSignalSpy& spy, int timeout = 30000)
-{
-	return spy.count() > 0 || spy.wait(timeout);
-}
+/// Waits for the signal with timeout (default 30s). Works even for signals
+/// that have already been fired. Returns false on timeout.
+bool SPYWAIT(QSignalSpy& spy, int timeout = 30000) noexcept;
+
+/// Returns the filesystem path to the neovim-qt runtime plugin.
+QString GetRuntimeAbsolutePath() noexcept;

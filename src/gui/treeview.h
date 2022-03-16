@@ -24,7 +24,7 @@ public slots:
 	void neovimConnectorReady() noexcept;
 
 private:
-	void toggleVisibility() noexcept;
+	void updateVisibility(bool isVisible) noexcept;
 
 	QFileSystemModel m_model;
 	NeovimConnector* m_nvim;

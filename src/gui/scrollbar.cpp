@@ -1,5 +1,7 @@
 #include "scrollbar.h"
 
+#include <QSettings>
+
 #include "shell.h"
 
 namespace NeovimQt {
@@ -15,7 +17,9 @@ ScrollBar::ScrollBar(NeovimConnector* nvim, QWidget* parent) noexcept
 	connect(m_nvim, &NeovimConnector::ready, this, &ScrollBar::neovimConnectorReady);
 	connect(this, &QScrollBar::valueChanged, this, &ScrollBar::handleValueChanged);
 
-	setVisible(false);
+	QSettings settings;
+	setVisible(settings.value("Gui/ScrollBar", false).toBool());
+
 	setMinimum(1);
 }
 
@@ -196,6 +200,9 @@ void ScrollBar::handleSetScrollBarVisible(const QVariantList& args) noexcept
 
 	const bool isVisible{ args.at(1).toBool() };
 	setVisible(isVisible);
+
+	QSettings settings;
+	settings.setValue("Gui/ScrollBar", isVisible);
 }
 
 void ScrollBar::handleValueChanged(int value)

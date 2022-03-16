@@ -4,6 +4,7 @@
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QProcess>
+#include <QSettings>
 #include <QStandardPaths>
 
 namespace NeovimQt {
@@ -25,6 +26,9 @@ TreeView::TreeView(NeovimConnector* nvim, QWidget* parent) noexcept
 	for (int i = 1; i < columnCount; i++) {
 		hideColumn(i);
 	}
+
+	QSettings settings;
+	setVisible(settings.value("Gui/TreeView", false).toBool());
 
 	connect(m_nvim, &NeovimConnector::ready, this, &TreeView::neovimConnectorReady);
 }
@@ -97,7 +101,7 @@ void TreeView::handleGuiTreeView(const QVariantList& args) noexcept
 
 	const QString action{ args.at(1).toString() };
 	if (action == "Toggle") {
-		toggleVisibility();
+		updateVisibility(!isVisible());
 		return;
 	}
 
@@ -113,17 +117,15 @@ void TreeView::handleShowHide(const QVariantList& args) noexcept
 	}
 
 	const bool isVisible{ args.at(2).toBool() };
-	setVisible(isVisible);
+
+	updateVisibility(isVisible);
 }
 
-void TreeView::toggleVisibility() noexcept
+void TreeView::updateVisibility(bool isVisible) noexcept
 {
-	if (isVisible()) {
-		hide();
-	}
-	else {
-		show();
-	}
+	QSettings settings;
+	settings.setValue("Gui/TreeView", isVisible);
+	setVisible(isVisible);
 }
 
 } // namespace NeovimQt

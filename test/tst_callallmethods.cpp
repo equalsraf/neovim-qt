@@ -97,20 +97,18 @@ void TestCallAllMethods::call_metaobject_slots(QObject *obj)
 			continue;
 		}
 
-		if ( meth.parameterNames().size() == 0 && meth.name() != "deleteLater") {
-			qDebug() << "Calling" << meth.name();
+		if (meth.parameterNames().size() == 0 && meth.name() != "deleteLater") {
 			meth.invoke(obj);
-		} else if ( meth.parameterNames().size() == 1 ) {
+		}
+		else if (meth.parameterNames().size() == 1) {
 			if ( meth.parameterTypes().at(0) == "Window" ) {
 				meth.invoke(obj, Q_ARG(int64_t, 1));
 			}
-		} else {
-			qDebug() << "Skipping" << meth.methodSignature();
 		}
 	}
 
 	// Test Performance: timeout expected, set value carefully.
-	QVERIFY2(!SPYWAIT(neovimErrors, 2500 /*msec*/), "Fatal errors");
+	QVERIFY2(!SPYWAIT(neovimErrors, 250 /*msec*/), "Fatal errors");
 }
 
 /// vim_call_functions() was the first API function
