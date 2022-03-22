@@ -43,7 +43,7 @@ protected:
 
 static void SignalPrintError(QString msg, const QVariant& err) noexcept
 {
-	qDebug() << msg << err;
+	qWarning() << "Error Signal!" << msg << err;
 }
 
 void TestShell::initTestCase() noexcept
@@ -94,8 +94,8 @@ void TestShell::gviminit() noexcept
 	qputenv("GVIMINIT", "let g:test_gviminit = 1");
 	NeovimConnector* c{ CreateShellWidget().first };
 
-	auto req{ c->api0()->vim_command_output(c->encode("echo g:test_gviminit")) };
-	QSignalSpy cmd(req, &MsgpackRequest::finished);
+	MsgpackRequest* req{ c->api0()->vim_command_output(c->encode("echo g:test_gviminit")) };
+	QSignalSpy cmd{ req, &MsgpackRequest::finished };
 	QVERIFY(cmd.isValid());
 	QVERIFY(SPYWAIT(cmd));
 	QCOMPARE(cmd.at(0).at(2).toByteArray(), QByteArray("1"));
@@ -144,7 +144,7 @@ void TestShell::guiShimCommands() noexcept
 	QSignalSpy cmd_gf2{ c->neovimObject()->vim_command_output(c->encode(cmdFontBoldRemoved)),
 						&MsgpackRequest::finished };
 	QVERIFY(cmd_gf2.isValid());
-	QVERIFY(SPYWAIT(cmd_gf2));
+	QVERIFY(SPYWAIT(cmd_gf2, 5000));
 
 	// Test Performance: timeout occurs often, set value carefully.
 	SPYWAIT(spy_fontchange2, 2500 /*msec*/);
