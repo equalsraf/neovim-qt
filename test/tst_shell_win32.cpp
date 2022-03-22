@@ -11,7 +11,7 @@ QClipboard::Mode GetClipboardMode(char /*reg*/) noexcept
 
 QString GetPlatformTestFont() noexcept
 {
-	return QStringLiteral("DejaVu Sans Mono");
+	return QStringLiteral("Consolas");
 }
 
 QStringList BinaryAndArgumentsNoForkWithCommand(const QString& command) noexcept

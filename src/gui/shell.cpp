@@ -252,6 +252,17 @@ Shell::~Shell()
 	}
 }
 
+QByteArray GetGVimInitCommand() noexcept
+{
+	const QByteArray gviminit{ qgetenv("GVIMINIT") };
+
+	if (!gviminit.isEmpty()) {
+		return gviminit;
+	}
+
+	return "runtime! ginit.vim";
+}
+
 void Shell::setAttached(bool attached)
 {
 	m_attached = attached;
@@ -266,15 +277,11 @@ void Shell::setAttached(bool attached)
 
 		updateClientInfo();
 
-		auto req_shim = m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim");
+		MsgpackRequest* req_shim{ m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim") };
 		connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
-		auto gviminit = qgetenv("GVIMINIT");
-		if (gviminit.isEmpty()) {
-			auto req_ginit = m_nvim->api0()->vim_command("runtime! ginit.vim");
-			connect(req_ginit, &MsgpackRequest::error, this, &Shell::handleGinitError);
-		} else {
-			m_nvim->api0()->vim_command(gviminit);
-		}
+
+		MsgpackRequest* req_ginit{ m_nvim->api0()->vim_command(GetGVimInitCommand()) };
+		connect(req_ginit, &MsgpackRequest::error, this, &Shell::handleGinitError);
 
 		// Neovim was not able to open urls till now. Check if we have any to open.
 		if(!m_deferredOpen.isEmpty()){
