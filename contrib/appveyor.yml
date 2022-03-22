@@ -21,7 +21,7 @@ matrix:
 install:
 - ps: appveyor DownloadFile -FileName Neovim.zip "https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip"
 - 7z x Neovim.zip
-- set PATH=%PATH%;%CD%\Neovim\bin;
+- set PATH=%PATH%;%CD%\nvim-win64\bin;
 - nvim --version
 # sh.exe must not be in the PATH
 - if "%PlatformToolset%"=="MinGW-Win64" set PATH=%PATH%;C:\Qt\5.15.1\mingw81_64\bin;C:\Qt\Tools\mingw810_64\bin;C:\Program Files\Git\usr\bin
