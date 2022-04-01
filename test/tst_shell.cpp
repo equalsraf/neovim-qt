@@ -28,7 +28,8 @@ private slots:
 	void startVarsShellWidget() noexcept;
 	void startVarsMainWindow() noexcept;
 	void gviminit() noexcept;
-	void guiShimCommands() noexcept;
+	void GuiLinespaceCommand() noexcept;
+	void GuiFontCommand() noexcept;
 	void CloseEvent_data() noexcept;
 	void CloseEvent() noexcept;
 	void GetClipboard_data() noexcept;
@@ -91,10 +92,12 @@ void TestShell::gviminit() noexcept
 	QSignalSpy cmd{ req, &MsgpackRequest::finished };
 	QVERIFY(cmd.isValid());
 	QVERIFY(SPYWAIT(cmd));
-	QCOMPARE(cmd.at(0).at(2).toByteArray(), QByteArray{ "1" });
+
+	const QByteArray varObserved{ cmd.at(0).at(2).toByteArray() };
+	QCOMPARE(varObserved, QByteArray{ "1" });
 }
 
-void TestShell::guiShimCommands() noexcept
+void TestShell::GuiLinespaceCommand() noexcept
 {
 	auto cw{ CreateMainWindowWithRuntime() };
 	NeovimConnector* c{ cw.first };
@@ -102,49 +105,78 @@ void TestShell::guiShimCommands() noexcept
 
 	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
 
-	QSignalSpy cmd_font(
-		c->neovimObject()->vim_command_output(c->encode("GuiFont!")), &MsgpackRequest::finished);
-	QVERIFY(cmd_font.isValid());
-	QVERIFY2(SPYWAIT(cmd_font), "Waiting for GuiFont");
+	QSignalSpy cmd_ls{ c->neovimObject()->vim_command_output(c->encode("GuiLinespace")),
+		&MsgpackRequest::finished };
 
-	QSignalSpy cmd_ls(
-		c->neovimObject()->vim_command_output(c->encode("GuiLinespace")),
-		&MsgpackRequest::finished);
 	QVERIFY(cmd_ls.isValid());
 	QVERIFY2(SPYWAIT(cmd_ls), "Waiting for GuiLinespace");
+
+	QSignalSpy spyFontChanged{ w->shell(), &ShellWidget::shellFontChanged };
+	QSignalSpy spyLineSpace2{ c->neovimObject()->vim_command_output(c->encode("GuiLinespace 2")),
+		&MsgpackRequest::finished };
+
+	QVERIFY(spyFontChanged.isValid());
+	QVERIFY(SPYWAIT(spyFontChanged));
+
+	QSignalSpy spyLineSpaceValue{ c->neovimObject()->vim_command_output(c->encode("GuiLinespace")),
+		&MsgpackRequest::finished };
+
+	QVERIFY(spyLineSpaceValue.isValid());
+	QVERIFY(SPYWAIT(spyLineSpaceValue));
+
+	QByteArray varObserved{ spyLineSpaceValue.at(0).at(2).toByteArray() };
+	QCOMPARE(varObserved, QByteArray{ "2" });
+}
+
+void TestShell::GuiFontCommand() noexcept
+{
+	auto cw{ CreateMainWindowWithRuntime() };
+	NeovimConnector* c{ cw.first };
+	MainWindow* w{ cw.second };
+
+	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
+
+	QSignalSpy spyGuiFontNoArgs{ c->neovimObject()->vim_command_output(c->encode("GuiFont")),
+		&MsgpackRequest::finished };
+	QVERIFY(spyGuiFontNoArgs.isValid());
+	QVERIFY2(SPYWAIT(spyGuiFontNoArgs), "Waiting for GuiFont");
 
 	// Test font attributes
 	const QString cmdFontSize14{ QStringLiteral("GuiFont! %1:h14").arg(GetPlatformTestFont()) };
 	const QString expectedFontSize14{ QStringLiteral("%1:h14").arg(GetPlatformTestFont()) };
-	QSignalSpy cmd_gf{ c->neovimObject()->vim_command_output(c->encode(cmdFontSize14)),
+
+	// Issue#977: concurrency issue inside of Shell::updateGuiFontRegisters() for guifont.
+	// A call to :GuiFont triggers a call update guifont=. If a second call to :GuiFont is made
+	// while the guifont= callback is still outstanding, the guifont value is mangled. This can be
+	// observed if the test delay below is removed.
+	QTest::qWait(500);
+
+	QSignalSpy spyGuiFontSize14{ c->neovimObject()->vim_command_output(c->encode(cmdFontSize14)),
 		&MsgpackRequest::finished };
-	QVERIFY(cmd_gf.isValid());
-	QVERIFY(SPYWAIT(cmd_gf));
+	QSignalSpy spyFontChangedSize14{ w->shell(), &ShellWidget::shellFontChanged };
 
-	QSignalSpy spy_fontchange(w->shell(), &ShellWidget::shellFontChanged);
-
-	// Test Performance: timeout occurs often, set value carefully.
-	SPYWAIT(spy_fontchange, 2500 /*msec*/);
-
+	QVERIFY(spyGuiFontSize14.isValid());
+	QVERIFY(SPYWAIT(spyGuiFontSize14));
+	QVERIFY(SPYWAIT(spyFontChangedSize14));
 	QCOMPARE(w->shell()->fontDesc(), expectedFontSize14);
 
 	// Normalization removes the :b attribute
 	const QString cmdFontBoldRemoved{
 		QStringLiteral("GuiFont! %1:h16:b:l").arg(GetPlatformTestFont())
 	};
-	const QString expectedFontBoldRemoved{ QStringLiteral("%1:h16:l").arg(GetPlatformTestFont()) };
-	QSignalSpy spy_fontchange2(w->shell(), &ShellWidget::shellFontChanged);
-	QSignalSpy cmd_gf2{ c->neovimObject()->vim_command_output(c->encode(cmdFontBoldRemoved)),
-						&MsgpackRequest::finished };
-	QVERIFY(cmd_gf2.isValid());
-	QVERIFY(SPYWAIT(cmd_gf2, 5000));
 
-	// Test Performance: timeout occurs often, set value carefully.
-	SPYWAIT(spy_fontchange2, 5000 /*msec*/);
+	const QString expectedFontBoldRemoved{ QStringLiteral("%1:h14:l").arg(GetPlatformTestFont()) };
 
+	QSignalSpy spyFontConflictingArgs{ c->neovimObject()->vim_command_output(
+										   c->encode(cmdFontBoldRemoved)),
+		&MsgpackRequest::finished };
+	QSignalSpy spyFontChangedBoldRemoved(w->shell(), &ShellWidget::shellFontChanged);
+
+	QVERIFY(spyFontConflictingArgs.isValid());
+	QVERIFY(SPYWAIT(spyFontConflictingArgs));
+	QVERIFY(SPYWAIT(spyFontChangedBoldRemoved));
 	QCOMPARE(w->shell()->fontDesc(), expectedFontBoldRemoved);
 }
-
 void TestShell::CloseEvent_data() noexcept
 {
 	QTest::addColumn<int>("msgpack_status");
