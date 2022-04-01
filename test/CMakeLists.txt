@@ -19,7 +19,9 @@ else()
 endif()
 
 set(SOURCES_COMMON common.cpp)
-set(SOURCES_COMMON_GUI common_gui.cpp)
+set(SOURCES_COMMON_GUI
+	common_gui.cpp
+	mock_qsettings.cpp)
 
 function(add_xtest SOURCE_NAME)
 	add_executable(${SOURCE_NAME}
@@ -39,6 +41,7 @@ function(add_xtest_gui SOURCE_NAME)
 		${SOURCE_NAME}.cpp
 		${SOURCES_COMMON}
 		${SOURCES_COMMON_GUI}
+		${SRC_SHELL_PLATFORM}
 		${ARGV1} ${ARGV2})
 	target_link_libraries(${SOURCE_NAME} ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt Qt5::Widgets neovim-qt-gui)
 	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} ${CTEST_EXE_ARGS}
@@ -59,11 +62,9 @@ add_xtest(tst_neovimconnector)
 add_xtest(tst_callallmethods)
 add_xtest(tst_encoding)
 add_xtest(tst_msgpackiodevice)
-add_xtest_gui(tst_shell ${SRC_SHELL_PLATFORM})
+add_xtest_gui(tst_shell)
 add_xtest_gui(tst_main)
-add_xtest_gui(tst_qsettings
-	${SRC_SHELL_PLATFORM}
-	mock_qsettings.cpp)
+add_xtest_gui(tst_qsettings)
 
 # Platform Specific Input Tests
 add_xtest(tst_input_mac

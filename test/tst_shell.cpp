@@ -3,13 +3,13 @@
 #include <gui/mainwindow.h>
 #include <msgpackrequest.h>
 #include <QClipboard>
-#include <QFontDatabase>
 #include <QLocalSocket>
 #include <QtGlobal>
 #include <QtTest/QtTest>
 
 #include "common.h"
 #include "common_gui.h"
+#include "mock_qsettings.h"
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
 #include <QtPlugin>
@@ -48,16 +48,9 @@ static void SignalPrintError(QString msg, const QVariant& err) noexcept
 
 void TestShell::initTestCase() noexcept
 {
-	const QStringList fonts{
-		QStringLiteral("third-party/DejaVuSansMono.ttf"),
-		QStringLiteral("third-party/DejaVuSansMono-Bold.ttf"),
-		QStringLiteral("third-party/DejaVuSansMono-BoldOblique.ttf") };
+	NeovimQt::MockQSettings::EnableByDefault();
 
-	for (const auto& path : fonts) {
-		QString abs_path_to_font(CMAKE_SOURCE_DIR);
-		abs_path_to_font.append("/").append(path);
-		QFontDatabase::addApplicationFont(abs_path_to_font);
-	}
+	LoadLocalDejaVuTestFonts();
 }
 
 void TestShell::benchStart() noexcept
@@ -91,14 +84,14 @@ void TestShell::startVarsMainWindow() noexcept
 
 void TestShell::gviminit() noexcept
 {
-	qputenv("GVIMINIT", "let g:test_gviminit = 1");
+	// NOTE: inside CreateShellWidget GVIMINIT is set and g:loaded_test_gviminit is set to "1".
 	NeovimConnector* c{ CreateShellWidget().first };
 
-	MsgpackRequest* req{ c->api0()->vim_command_output(c->encode("echo g:test_gviminit")) };
+	MsgpackRequest* req{ c->api0()->vim_command_output(c->encode("echo g:loaded_test_gviminit")) };
 	QSignalSpy cmd{ req, &MsgpackRequest::finished };
 	QVERIFY(cmd.isValid());
 	QVERIFY(SPYWAIT(cmd));
-	QCOMPARE(cmd.at(0).at(2).toByteArray(), QByteArray("1"));
+	QCOMPARE(cmd.at(0).at(2).toByteArray(), QByteArray{ "1" });
 }
 
 void TestShell::guiShimCommands() noexcept

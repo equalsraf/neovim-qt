@@ -37,6 +37,7 @@ static void SendNeovimCommand(NeovimConnector& connector, const QString& command
 void TestQSettings::initTestCase() noexcept
 {
 	NeovimQt::MockQSettings::EnableByDefault();
+	LoadLocalDejaVuTestFonts();
 }
 
 void TestQSettings::cleanup() noexcept
