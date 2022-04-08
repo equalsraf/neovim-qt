@@ -303,6 +303,10 @@ void MainWindow::saveWindowGeometry()
 
 void MainWindow::restoreWindowGeometry()
 {
+	// Workaround for error `QVariant::save: unable to save type 'QList<int>'`.
+	// This error can occur when calling the two `settings.value(...)` below.
+    qRegisterMetaTypeStreamOperators<QList<int> >("QList<int>");
+
 	QSettings settings{ "window-geometry" };
 	restoreGeometry(settings.value("window_geometry").toByteArray());
 	restoreState(settings.value("window_state").toByteArray());
