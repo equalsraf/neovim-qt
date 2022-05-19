@@ -998,7 +998,7 @@ void Shell::handleLineSpace(const QVariant& value) noexcept
 	bool isValid{ false };
 	int linespace{ value.toInt(&isValid) };
 
-	if (!isValid || linespace < 0) {
+	if (!isValid) {
 		qDebug() << "Invalid GuiLinespace value:" << value;
 		return;
 	}
