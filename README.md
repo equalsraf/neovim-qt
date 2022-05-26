@@ -66,9 +66,13 @@ Neovim Qt is packaged for many distributions, use your favorite package manager.
 
 If your distribution is not listed here, please create an Issue with instructions.
 
-#### ArchLinux
+#### Arch Linux
 
-Neovim Qt is available from this [Community Repository](https://archlinux.org/packages/community/x86_64/neovim-qt/).
+Neovim Qt is available from the Arch [Community Repository](https://archlinux.org/packages/community/x86_64/neovim-qt/).
+
+```
+$ sudo pacman -S neovim-qt
+```
 
 #### Gentoo
 
