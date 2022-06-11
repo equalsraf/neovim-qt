@@ -75,7 +75,7 @@ jobs:
         python -m aqt install 5.15.0 windows desktop win64_msvc2019_64
       displayName: Install Dependencies
     - powershell: |
-        Write-Host "##vso[task.setvariable variable=PATH;]${env:PATH};C:\tools\neovim\Neovim\bin";
+        Write-Host "##vso[task.setvariable variable=PATH;]${env:PATH};C:\tools\neovim\nvim-win64\bin";
       displayName: Add Neovim to PATH
     - task: CMake@1
       inputs:
