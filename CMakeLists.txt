@@ -8,7 +8,7 @@ endif (POLICY CMP0069)
 
 # Neovim-Qt Version, used by --version update before release
 # 9999 = Development Pre-Release
-project(neovim-qt VERSION 0.2.17.9999)
+project(neovim-qt VERSION 0.2.17.0)
 
 if(NOT EXISTS ${NEOVIM_EXEC})
 	set(NEOVIM_EXEC nvim)
