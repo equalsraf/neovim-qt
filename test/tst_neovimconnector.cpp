@@ -104,6 +104,7 @@ private slots:
 	void connectToSocket() {
 		QFETCH(QString, socketname);
 
+		QDir().remove(socketname);
 		// Start nvim
 		QProcess p;
 		p.setProgram("nvim");
@@ -120,7 +121,7 @@ private slots:
 		qDebug() << c->connectionDescription();
 		QSignalSpy onReady(c, SIGNAL(ready()));
 		QVERIFY(onReady.isValid());
-		QVERIFY(SPYWAIT(onReady));
+		QVERIFY(SPYWAIT(onReady, 5000 /*msec*/));
 
 		QCOMPARE(c->connectionType(), NeovimConnector::SocketConnection);
 	}
