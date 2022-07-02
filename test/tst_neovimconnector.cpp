@@ -95,6 +95,7 @@ private slots:
 		QTest::addColumn<QString>("socketname");
 
 		QTest::newRow("relative") << "relnvimsock";
+		QTest::newRow("./relative") << "./relnvimsock";
 		QTest::newRow("absolute") << QFileInfo("absnvimsock").absoluteFilePath();
 	}
 
@@ -109,7 +110,14 @@ private slots:
 		QProcess p;
 		p.setProgram("nvim");
 		QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-		env.insert("NVIM_LISTEN_ADDRESS", socketname);
+
+		auto path_info = QFileInfo(socketname);
+		if (path_info.isAbsolute()) {
+			env.insert("NVIM_LISTEN_ADDRESS", socketname);
+		}
+		else {
+			env.insert("NVIM_LISTEN_ADDRESS", "./" + socketname);
+		}
 		p.setProcessEnvironment(env);
 		p.setArguments({"--headless", "-u", "NONE"});
 		p.start();
