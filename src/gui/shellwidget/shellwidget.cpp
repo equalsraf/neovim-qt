@@ -59,14 +59,15 @@ bool ShellWidget::setShellFont(const QFont& font, bool force) noexcept
 		return false;
 	}
 
-	QFontInfo fi(font);
-	if (fi.family().compare(font.family(), Qt::CaseInsensitive) != 0 &&
+	if (!font.exactMatch() &&
 			font.family().compare("Monospace", Qt::CaseInsensitive) != 0) {
 		emit fontError(QStringLiteral("Unknown font: %1").arg(font.family()));
 		return false;
 	}
 
 	if (!force) {
+		QFontInfo fi(font);
+
 		if (!fi.fixedPitch()) {
 			emit fontError(QStringLiteral("%1 is not a fixed pitch font").arg(font.family()));
 			return false;
