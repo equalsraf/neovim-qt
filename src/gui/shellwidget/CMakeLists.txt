@@ -9,7 +9,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Qt
 set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Test REQUIRED)
+if(ENABLE_TESTS)
+	find_package(Qt5Test REQUIRED)
+endif()
 
 if (WIN32 AND USE_STATIC_QT)
 	add_definitions(-DUSE_STATIC_QT)
