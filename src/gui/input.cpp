@@ -232,7 +232,9 @@ QString convertKey(const QKeyEvent& ev) noexcept
 			|| key == Qt::Key::Key_Meta
 			|| key == Qt::Key::Key_Shift
 			|| key == Qt::Key::Key_Super_L
-			|| key == Qt::Key::Key_Super_R) {
+			|| key == Qt::Key::Key_Super_R
+			|| key == Qt::Key_Hyper_L
+			|| key == Qt::Key_Hyper_R) {
 			return {};
 		}
 

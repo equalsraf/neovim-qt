@@ -17,6 +17,7 @@ private slots:
 	void AltGrKeyEventWellFormed() noexcept;
 	void ShiftSpaceWellFormed() noexcept;
 	void ShiftBackSpaceWellFormed() noexcept;
+	void IgnoreHyperKey() noexcept;
 
 	// Mouse Input
 	void MouseLeftClick() noexcept;
@@ -156,6 +157,17 @@ void TestInputCommon::ShiftBackSpaceWellFormed() noexcept
 	QKeyEvent evShiftBackSpace{ QEvent::KeyPress, Qt::Key_Backspace, Qt::ShiftModifier, "\b" };
 	QCOMPARE(NeovimQt::Input::convertKey(evShiftBackSpace), QString{ "<BS>" });
 }
+
+void TestInputCommon::IgnoreHyperKey() noexcept
+{
+	// Issue#1008: Hyper key should be ignored, but instead inserts "v" instead.
+	QKeyEvent evHyperL{ QEvent::KeyPress, Qt::Key_Hyper_L, Qt::NoModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evHyperL), QString{});
+
+	QKeyEvent evHyperR{ QEvent::KeyPress, Qt::Key_Hyper_R, Qt::NoModifier };
+	QCOMPARE(NeovimQt::Input::convertKey(evHyperR), QString{});
+}
+
 
 void TestInputCommon::MouseLeftClick() noexcept
 {
