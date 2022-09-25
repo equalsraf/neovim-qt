@@ -154,7 +154,6 @@ protected:
 	virtual void handleLineSpace(const QVariant& value) noexcept;
 	virtual void handleWindowFrameless(const QVariant& value) noexcept;
 	virtual void handleCloseEvent(const QVariantList &args) noexcept;
-	virtual void handleGuiTabline(const QVariant& value) noexcept;
 	virtual void handleGuiPopupmenu(const QVariant& value) noexcept;
 
 	// Modern 'ext_linegrid' Grid UI Events

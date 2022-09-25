@@ -12,6 +12,9 @@
 
 #include "msgpackrequest.h"
 
+static constexpr auto cs_showBuffersOptionName { "Tabline/OptionShowBuffers" };
+static constexpr auto cs_showTablineOptionName { "ext_tabline" };
+
 namespace NeovimQt {
 
 Tabline::Tabline(NeovimConnector& nvim, QWidget* parent) noexcept
@@ -55,7 +58,8 @@ Tabline::Tabline(NeovimConnector& nvim, QWidget* parent) noexcept
 	connect(&m_bufferline, &QTabBar::tabCloseRequested, this, &Tabline::closeRequestedBufline);
 
 	QSettings settings;
-	m_isEnabled = settings.value("ext_tabline", cs_defaultIsTablineEnabled).toBool();
+	m_isEnabled = settings.value(cs_showTablineOptionName, cs_defaultIsTablineEnabled).toBool();
+	m_isBufferlineEnabled = settings.value(cs_showBuffersOptionName, true).toBool();
 	updateTablineVisibility();
 }
 
@@ -107,6 +111,11 @@ void Tabline::handleGuiOption(const QVariantList& args) noexcept
 
 	if (option == "Tabline") {
 		handleGuiTabline(args);
+		return;
+	}
+	if (option == "TablineBuffers") {
+		handleGuiTablineBuffers(args);
+		return;
 	}
 }
 
@@ -118,7 +127,34 @@ void Tabline::handleGuiTabline(const QVariantList& args) noexcept
 	}
 
 	const bool isEnabled{ args.at(2).toBool() };
+
 	m_isEnabled = isEnabled;
+
+	QSettings settings;
+	settings.setValue(cs_showTablineOptionName, isEnabled);
+
+	if (m_nvim.api1()) {
+		m_nvim.api1()->nvim_ui_set_option(cs_showTablineOptionName, isEnabled);
+	}
+
+	updateTablineVisibility();
+}
+
+
+void Tabline::handleGuiTablineBuffers(const QVariantList& args) noexcept
+{
+	if (args.size() < 3 || !args.at(2).canConvert<bool>()) {
+		qWarning() << "Unexpected format for GuiTablineBuffers:" << args;
+		return;
+	}
+
+	const bool isEnabled{ args.at(2).toBool() };
+
+	m_isBufferlineEnabled = isEnabled;
+
+	QSettings settings;
+	settings.setValue(cs_showBuffersOptionName, isEnabled);
+
 	updateTablineVisibility();
 }
 
@@ -359,7 +395,7 @@ void Tabline::updateTablineVisibility() noexcept
 
 	// Legacy Mode: Neovim does not provide buffer info to GuiTabline
 	// Support for tabs + buffers was added in Neovim API 8
-	const bool isLegacyMode{ m_bufferline.count() == 0 };
+	const bool isLegacyMode{ !m_isBufferlineEnabled || m_bufferline.count() == 0 };
 
 	const bool isAtLeastTwoTabs{ m_tabline.count() >= 2 };
 	const bool isAtLeastTwoBuffers{ m_bufferline.count() >= 2 };
