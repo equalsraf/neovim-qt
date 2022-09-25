@@ -31,6 +31,7 @@ private:
 
 	void handleGuiOption(const QVariantList& args) noexcept;
 	void handleGuiTabline(const QVariantList& args) noexcept;
+	void handleGuiTablineBuffers(const QVariantList& args) noexcept;
 	void handleTablineUpdate(const QVariantList& args) noexcept;
 	void handleOptionShowTabline(const QVariantList& args) noexcept;
 	void handleCloseBufferError(quint32 msgid, quint64 fun, const QVariant& err) noexcept;
@@ -61,6 +62,7 @@ private:
 
 	NeovimConnector& m_nvim;
 	bool m_isEnabled{ cs_defaultIsTablineEnabled };
+	bool m_isBufferlineEnabled{ true };
 
 	QTabBar m_tabline;
 	QAction* m_tablineAction{};

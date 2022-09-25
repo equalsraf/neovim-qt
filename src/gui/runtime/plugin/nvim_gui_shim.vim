@@ -101,6 +101,11 @@ function! s:GuiTabline(enable) abort
 endfunction
 command! -nargs=1 GuiTabline call s:GuiTabline(<args>)
 
+function! s:GuiTablineBuffers(enable) abort
+	call rpcnotify(0, 'Gui', 'Option', 'TablineBuffers', a:enable)
+endfunction
+command! -nargs=1 GuiTablineBuffers call s:GuiTablineBuffers(<args>)
+
 function! s:GuiPopupmenu(enable) abort
 	call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', a:enable)
 endfunction

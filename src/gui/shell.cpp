@@ -921,9 +921,7 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 
 void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 {
-	if (name == "Tabline") {
-		handleGuiTabline(value);
-	} else if (name == "Popupmenu") {
+	if (name == "Popupmenu") {
 		handleGuiPopupmenu(value);
 	} else if (name == "RenderLigatures"){
 		setLigatureMode(value.toBool());
@@ -1037,27 +1035,6 @@ void Shell::handleCloseEvent(const QVariantList& args) noexcept
 	}
 
 	emit neovimGuiCloseRequest(status);
-}
-
-void Shell::handleGuiTabline(const QVariant& value) noexcept
-{
-	if (!m_nvim->api1())
-	{
-		qDebug() << "GuiTabline not supported by Neovim API!";
-		return;
-	}
-
-	if (!value.canConvert<bool>())
-	{
-		qDebug() << "GuiTabline value not recognized!";
-		return;
-	}
-
-	const bool isEnabled{ value.toBool() };
-	m_nvim->api1()->nvim_ui_set_option("ext_tabline", isEnabled);
-
-	QSettings settings;
-	settings.setValue("ext_tabline", isEnabled);
 }
 
 void Shell::handleGuiPopupmenu(const QVariant& value) noexcept
