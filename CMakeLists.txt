@@ -173,7 +173,7 @@ endif()
 add_subdirectory(src)
 add_subdirectory(doc)
 
-option(ENABLE_TESTS "Build tests" ON)
+option(ENABLE_TESTS "Build tests" OFF)
 if(ENABLE_TESTS)
 	find_package(Qt5Test REQUIRED)
 	enable_testing()
