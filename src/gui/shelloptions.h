@@ -4,7 +4,7 @@ namespace NeovimQt {
 
 constexpr bool cs_defaultIsTablineEnabled{ false };
 constexpr bool cs_defaultIsPopupmenuEnabled{ false };
-constexpr bool cs_defaultIsLineGridEnabled{ false };
+constexpr bool cs_defaultIsLineGridEnabled{ true };
 
 class ShellOptions final {
 public:

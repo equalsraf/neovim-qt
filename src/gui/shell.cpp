@@ -403,7 +403,7 @@ void Shell::handleHighlightSet(const QVariantMap& attrs)
 	if (attrs.contains(("special"))) {
 		m_hg_special = QColor{ attrs.value("special").toUInt() };
 	} else {
-		m_hg_special = special();
+		m_hg_special = QColor::Invalid;
 	}
 
 	if (attrs.contains("reverse")) {
