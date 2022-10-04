@@ -273,6 +273,10 @@ static void SetTabIconAndTooltipCallback(
 
 	const QString bufferPath{ resp.toString() };
 
+	if (bufferPath.isEmpty()) {
+		return;
+	}
+	
 	bufferline->setTabToolTip(bufIndex, bufferPath);
 	bufferline->setTabIcon(bufIndex, GetIconFromFilePath(bufferPath));
 }
