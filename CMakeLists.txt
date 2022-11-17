@@ -121,6 +121,7 @@ endif()
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 
 # to generate a compile_commands.json usable by ycm and other tooling
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
