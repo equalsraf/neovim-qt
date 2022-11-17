@@ -101,10 +101,10 @@ if(NOT APPLE)
 	install(FILES ${PROJECT_SOURCE_DIR}/LICENSE
 		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt/)
 	install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
-	install(FILES ${CMAKE_SOURCE_DIR}/third-party/neovim.png
+    install(FILES ${PROJECT_SOURCE_DIR}/third-party/neovim.png
 			RENAME nvim-qt.png
 			DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/192x192/apps/)
-	install(FILES ${CMAKE_SOURCE_DIR}/third-party/neovim.svg
+    install(FILES ${PROJECT_SOURCE_DIR}/third-party/neovim.svg
 			RENAME nvim-qt.svg
 			DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps/)
 endif()
