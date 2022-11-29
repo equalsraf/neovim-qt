@@ -1,0 +1,17 @@
+target_sources(neovim-qt
+  PRIVATE
+    neovimapi0.cpp
+    neovimapi0.h
+    neovimapi1.cpp
+    neovimapi1.h
+    neovimapi2.cpp
+    neovimapi2.h
+    neovimapi3.cpp
+    neovimapi3.h
+    neovimapi4.cpp
+    neovimapi4.h
+    neovimapi5.cpp
+    neovimapi5.h
+    neovimapi6.cpp
+    neovimapi6.h
+)

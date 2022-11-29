@@ -1,44 +1,31 @@
 set(QTLIBS Qt5::Network Qt5::Svg Qt5::Widgets)
 
 include_directories(.. shellwidget)
-qt5_add_resources(NEOVIM_RCC_SOURCES data.qrc)
+
 if(WIN32)
-	set(SRCS_PLATFORM
-		arguments_qwindowgeometry.cpp
-		input_win32.cpp
-		printinfo_msgbox.cpp
-		)
 	if (USE_STATIC_QT)
 		add_definitions(-DUSE_STATIC_QT)
 		link_directories(${CMAKE_PREFIX_PATH}/share/qt5/plugins/platforms)
-		set(QTLIBS ${QTLIBS} Qt5PlatformCompositorSupport qwindows)
+        list(APPEND QTLIBS Qt5PlatformCompositorSupport qwindows)
 	endif()
 	set(RES_FILE "data.rc")
 	enable_language(RC)
 elseif(APPLE)
-	set(SRCS_PLATFORM
-		arguments_qwindowgeometry.cpp
-		input_mac.cpp
-		printinfo_stdout.cpp
-		)
 	set(ICON_PATH ${PROJECT_SOURCE_DIR}/third-party/neovim.icns)
 	set_source_files_properties(${ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
 	set(MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in)
-else()
-	set(SRCS_PLATFORM
-		arguments_geometry.cpp
-		input_unix.cpp
-		printinfo_stdout.cpp
-		)
 endif()
 
 add_subdirectory(shellwidget)
 
 include(GNUInstallDirs)
-set(RUNTIME_PATH )
+set(RUNTIME_PATH)
 
-add_library(neovim-qt-gui
+add_library(neovim-qt-gui STATIC)
+
+target_sources(neovim-qt-gui
+  PRIVATE
 	app.cpp
 	contextmenu.cpp
 	errorwidget.cpp
@@ -51,8 +38,39 @@ add_library(neovim-qt-gui
 	tabline.cpp
 	treeview.cpp
 	${SRCS_PLATFORM}
-	${NEOVIM_RCC_SOURCES})
-target_link_libraries(neovim-qt-gui ${QTLIBS} qshellwidget neovim-qt)
+    data.qrc
+)
+
+if(WIN32)
+    target_sources(neovim-qt-gui
+      PRIVATE
+        arguments_qwindowgeometry.cpp
+        input_win32.cpp
+        printinfo_msgbox.cpp
+    )
+elseif(APPLE)
+    target_sources(neovim-qt-gui
+      PRIVATE
+        arguments_qwindowgeometry.cpp
+        input_mac.cpp
+        printinfo_stdout.cpp
+    )
+else()
+    target_sources(neovim-qt-gui
+      PRIVATE
+        arguments_geometry.cpp
+        input_unix.cpp
+        printinfo_stdout.cpp
+    )
+endif()
+
+
+target_link_libraries(neovim-qt-gui
+  PUBLIC
+    ${QTLIBS}
+    qshellwidget
+    neovim-qt
+)
 
 if(APPLE)
 	set_property(SOURCE app.cpp PROPERTY COMPILE_DEFINITIONS
@@ -62,12 +80,18 @@ else()
 		NVIM_QT_RELATIVE_RUNTIME_PATH="../share/nvim-qt/runtime")
 endif()
 
-add_executable(nvim-qt WIN32 MACOSX_BUNDLE main.cpp
-	${NEOVIM_RCC_SOURCES}
-	${RES_FILE}
-	${ICON_PATH})
 
-target_link_libraries(nvim-qt ${QTLIBS} neovim-qt-gui)
+add_executable(nvim-qt WIN32 MACOSX_BUNDLE)
+
+target_sources(nvim-qt
+  PRIVATE
+    main.cpp
+    data.qrc
+	${RES_FILE}
+    ${ICON_PATH}
+)
+
+target_link_libraries(nvim-qt PRIVATE neovim-qt-gui)
 
 if(APPLE)
 	add_custom_command(TARGET nvim-qt COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -112,8 +136,10 @@ endif()
 if(WIN32 AND NOT CMAKE_CROSSCOMPILING AND NOT DEFINED USE_STATIC_QT)
 	include(WinDeployQt)
 	WinDeployQt(TARGET nvim-qt COMPILER_RUNTIME INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
-	install(DIRECTORY ${PROJECT_BINARY_DIR}/windeployqt/
-		DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(
+        DIRECTORY ${PROJECT_BINARY_DIR}/windeployqt/
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 endif()
 
 # Generate help tags
