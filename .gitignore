@@ -4,6 +4,3 @@ src/gui/runtime/doc/tags
 third-party/msgpack*
 compile_commands.json
 !.github
-
-# Qt Creator project files
-CMakeLists.txt.user
