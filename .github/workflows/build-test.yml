@@ -78,7 +78,7 @@ jobs:
         if: ${{ startsWith(matrix.runner, 'ubuntu') }}
         run: |
           sudo add-apt-repository -y ppa:neovim-ppa/stable
-          sudo apt-get install -y neovim ninja-build libqt5svg5 libqt5svg5-dev qt5-default
+          sudo apt-get install -y neovim ninja-build libqt5svg5 libqt5svg5-dev qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
           sudo apt-get update -y
 
       - name: MacOS - Setup
