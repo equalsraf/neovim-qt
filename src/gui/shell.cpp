@@ -4,7 +4,6 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QFontDialog>
 #include <QKeyEvent>
 #include <QMimeData>
@@ -103,7 +102,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 void Shell::handleFontError(const QString& msg)
 {
 	if (m_attached) {
-		m_nvim->api0()->vim_report_error(m_nvim->encode(msg));
+		m_nvim->api0()->vim_report_error(msg.toUtf8());
 	}
 }
 
@@ -139,8 +138,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force) noexcept
 		QVariant varFont{ TryGetQFontFromDescription(fdesc) };
 
 		if (!ShellWidget::IsValidFont(varFont)) {
-			m_nvim->api0()->vim_report_error(
-				m_nvim->encode(varFont.toString()));
+			m_nvim->api0()->vim_report_error(varFont.toString().toUtf8());
 			return false;
 		}
 
@@ -187,8 +185,7 @@ bool Shell::setGuiFontWide(const QString& fdesc) noexcept
 		QVariant varFont{ TryGetQFontFromDescription(strFont) };
 
 		if (!ShellWidget::IsValidFont(varFont)) {
-			m_nvim->api0()->vim_report_error(
-				m_nvim->encode(varFont.toString()));
+			m_nvim->api0()->vim_report_error(varFont.toString().toUtf8());
 			return false;
 		}
 
@@ -427,7 +424,7 @@ void Shell::handlePut(const QVariantList& args)
 		return;
 	}
 
-	QString text = m_nvim->decode(args.at(0).toByteArray());
+	QString text = args.at(0).toByteArray();
 	if (text.isEmpty() && m_cursor_pos.x() > 0 &&
 	    contents().constValue(m_cursor_pos.y(), m_cursor_pos.x() - 1).IsDoubleWidth()) {
 		// nvim will seek to the second cell of a wide char and put "",
@@ -688,7 +685,7 @@ void Shell::handleModeChange(const QVariantList& opargs)
 		return;
 	}
 
-	const QString mode{ m_nvim->decode(opargs.at(0).toByteArray()) };
+	const QString mode{ opargs.at(0).toByteArray() };
 	const uint64_t modeIndex{ opargs.at(1).toULongLong() };
 
 	if (!m_cursor.IsStyleEnabled()) {
@@ -797,7 +794,7 @@ void Shell::handleSetTitle(const QVariantList& opargs)
 		return;
 	}
 
-	const QString title{ m_nvim->decode(opargs.at(0).toByteArray()) };
+	const QString title{ opargs.at(0).toByteArray() };
 	emit neovimTitleChanged(title);
 }
 
@@ -819,7 +816,7 @@ void Shell::handleBusy(bool busy)
 void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList& args)
 {
 	if (name == "Gui" && args.size() > 0) {
-		QString guiEvName = m_nvim->decode(args.at(0).toByteArray());
+		QString guiEvName = args.at(0).toByteArray();
 		if (guiEvName == "Font") {
 			handleGuiFontFunction(args);
 		} else if (guiEvName == "Foreground" && args.size() == 1) {
@@ -859,7 +856,7 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		} else if (guiEvName == "NewWindow") {
 			App::openNewWindow(args);
 		} else if (guiEvName == "Option" && args.size() >= 3) {
-			QString option = m_nvim->decode(args.at(1).toByteArray());
+			QString option = args.at(1).toByteArray();
 			handleExtGuiOption(option, args.at(2));
 		} else if (guiEvName == "SetClipboard" && args.size() >= 4) {
 			QStringList lines = args.at(1).toStringList();
@@ -867,7 +864,7 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			QString reg_name = args.at(3).toString();
 
 			if (reg_name != "*" && reg_name != "+") {
-				m_nvim->api0()->vim_report_error(m_nvim->encode("Cannot set register via GUI"));
+				m_nvim->api0()->vim_report_error(QByteArrayLiteral("Cannot set register via GUI"));
 				return;
 			}
 
@@ -967,7 +964,7 @@ void Shell::handleGuiFontFunction(const QVariantList& args)
 		return;
 	}
 
-	const QString fdesc{ m_nvim->decode(args.at(1).toByteArray()) };
+	const QString fdesc{ args.at(1).toByteArray() };
 
 	bool force{ false };
 	if (args.size() >= 3 && args.at(2).canConvert<bool>())
@@ -986,7 +983,7 @@ void Shell::handleGuiFontWide(const QVariant& value) noexcept
 		return;
 	}
 
-	const QString fdesc{ m_nvim->decode(value.toByteArray()) };
+	const QString fdesc{ value.toByteArray() };
 
 	setGuiFontWide(fdesc);
 }
@@ -1145,7 +1142,7 @@ void Shell::handleHighlightGroupSet(const QVariantList& opargs) noexcept
 		return;
 	}
 
-	const QString name{ m_nvim->decode(opargs.at(0).toByteArray()) };
+	const QString name{ opargs.at(0).toByteArray() };
 	const uint64_t hl_id{ opargs.at(1).toULongLong() };
 
 	m_highlightGroupNameMap.insert(name, hl_id);
@@ -1176,7 +1173,7 @@ void Shell::handleGridLine(const QVariantList& opargs)
 	for (const auto& cell : cells) {
 		const QVariantList& cellPropertyList = cell.toList();
 
-		QString text = m_nvim->decode(cellPropertyList[0].toByteArray());
+		QString text = cellPropertyList[0].toByteArray();
 
 		// Optional highlight style, default is the last hl_attr.
 		if (cellPropertyList.size() > 1) {
@@ -1350,7 +1347,7 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 		return;
 	}
 
-	m_nvim->api0()->vim_input(m_nvim->encode(inp));
+	m_nvim->api0()->vim_input(inp.toUtf8());
 	// FIXME: bytes might not be written, and need to be buffered
 }
 
@@ -1703,7 +1700,7 @@ void Shell::inputMethodEvent(QInputMethodEvent *ev)
 		return;
 	}
 	if ( !ev->commitString().isEmpty() ) {
-		QByteArray s = m_nvim->encode(ev->commitString());
+		QByteArray s = ev->commitString().toUtf8();
 		m_nvim->api0()->vim_input(s);
 		tooltip("");
 	} else {

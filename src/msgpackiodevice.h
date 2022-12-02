@@ -1,11 +1,10 @@
 #ifndef NEOVIM_QT_MSGPACKIODEVICE
 #define NEOVIM_QT_MSGPACKIODEVICE
 
-#include <QIODevice>
-#include <QHash>
-#include <QTextCodec>
-#include <QVariant>
 #include <msgpack.h>
+#include <QHash>
+#include <QIODevice>
+#include <QVariant>
 
 namespace NeovimQt {
 
@@ -15,7 +14,6 @@ class MsgpackIODevice: public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(MsgpackError error READ errorCause NOTIFY error)
-	Q_PROPERTY(QByteArray encoding READ encoding WRITE setEncoding NOTIFY encodingChanged)
 public:
 	enum MsgpackError {
 		NoError=0,
@@ -32,9 +30,6 @@ public:
 	bool isOpen();
 	QString errorString() const;
 	MsgpackError errorCause() const {return m_error;};
-
-	QByteArray encoding() const;
-	bool setEncoding(const QByteArray&);
 
 	quint32 msgId();
 	MsgpackRequest* startRequestUnchecked(const QString& method, quint32 argcount);
@@ -53,8 +48,6 @@ public:
 		}
 	}
 
-	QByteArray encode(const QString&);
-	QString decode(const QByteArray&);
 	bool checkVariant(const QVariant&);
 
 	bool sendResponse(uint64_t msgid, const QVariant& err, const QVariant& res);
@@ -70,8 +63,7 @@ public:
 signals:
 	void error(NeovimQt::MsgpackIODevice::MsgpackError);
 	/** A notification with the given name and arguments was received */
-	void notification(const QByteArray &name, const QVariantList& args);
-	void encodingChanged(const QByteArray& encoding);
+	void notification(const QByteArray& name, const QVariantList& args);
 
 protected:
 	void sendError(const msgpack_object& req, const QString& msg);
@@ -105,8 +97,7 @@ private:
 	static int msgpack_write_to_dev(void* data, const char* buf, unsigned long int len);
 
 	quint32 m_reqid;
-	QIODevice *m_dev;
-	QTextCodec *m_encoding;
+	QIODevice* m_dev;
 	msgpack_packer m_pk;
 	msgpack_unpacker m_uk;
 	QHash<quint32, MsgpackRequest*> m_requests;

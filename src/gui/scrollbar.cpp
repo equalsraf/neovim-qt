@@ -44,7 +44,7 @@ void ScrollBar::handleNeovimNotification(const QByteArray& name, const QVariantL
 	}
 
 	if (name == "Gui") {
-		const QString guiEvName{ m_nvim->decode(args.at(0).toByteArray()) };
+		const QString guiEvName{ args.at(0).toByteArray() };
 
 		if (guiEvName == "CursorMoved") {
 			handleCursorMoved(args);

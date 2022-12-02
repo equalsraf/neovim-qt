@@ -1,5 +1,4 @@
 #include <QAbstractSocket>
-#include <QTextCodec>
 #include <QSocketNotifier>
 
 // read/write
@@ -44,8 +43,8 @@ MsgpackIODevice* MsgpackIODevice::fromStdinOut(QObject *parent)
 	return rpc;
 }
 
-MsgpackIODevice::MsgpackIODevice(QIODevice *dev, QObject *parent)
-:QObject(parent), m_reqid(0), m_dev(dev), m_encoding(0), m_reqHandler(0), m_error(NoError)
+MsgpackIODevice::MsgpackIODevice(QIODevice* dev, QObject* parent)
+: QObject(parent), m_reqid(0), m_dev(dev), m_reqHandler(0), m_error(NoError)
 {
 	qRegisterMetaType<MsgpackError>("MsgpackError");
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
@@ -80,31 +79,6 @@ bool MsgpackIODevice::isOpen()
 	} else {
 		return true;
 	}
-}
-
-/** The encoding used by the MsgpackIODevice::encode and MsgpackIODevice::decode methods @see setEncoding */
-QByteArray MsgpackIODevice::encoding() const
-{
-	if (m_encoding) {
-		return m_encoding->name();
-	}
-	return QByteArray();
-}
-
-/**
- * Set encoding for strings in this RPC, if it not set we
- * fall back to utf8
- *
- * \see QTextCode
- */
-bool MsgpackIODevice::setEncoding(const QByteArray& name)
-{
-	m_encoding = QTextCodec::codecForName(name);
-	if (!m_encoding) {
-		setError(UnsupportedEncoding, QString("Unsupported encoding (%1)").arg(QString::fromLatin1(name)));
-		return false;
-	}
-	return true;
 }
 
 int MsgpackIODevice::msgpack_write_to_stdout(void* data, const char* buf, unsigned long int len)
@@ -822,7 +796,7 @@ void MsgpackIODevice::send(const QVariant& var)
 		msgpack_pack_int64(&m_pk, var.toPoint().x());
 		break;
 	case QMetaType::QString:
-		send(encode(var.toString()));
+		send(var.toString().toUtf8());
 		break;
 	default:
 		msgpack_pack_nil(&m_pk);
@@ -851,33 +825,6 @@ fail:
 	qWarning() << "Attempting to decode as QPoint failed" << in.type << in;
 	out =  QPoint();
 	return true;
-}
-
-/**
- * Convert string to the proper encoding
- * \see MsgpackIODevice::setEncoding
- */
-QByteArray MsgpackIODevice::encode(const QString& str)
-{
-	if (m_encoding) {
-		return m_encoding->fromUnicode(str);
-	} else {
-		qWarning() << "Encoding String into MsgpackIODevice without an encoding (defaulting to utf8)";
-		return str.toUtf8();
-	}
-}
-
-/**
- * Decode byte array as string, from Neovim's encoding
- */
-QString MsgpackIODevice::decode(const QByteArray& data)
-{
-	if (m_encoding) {
-		return m_encoding->toUnicode(data);
-	} else {
-		qWarning() << "Decoding String from MsgpackIODevice without an encoding (defaulting to utf8)";
-		return QString::fromUtf8(data);
-	}
 }
 
 /**

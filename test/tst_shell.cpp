@@ -94,7 +94,7 @@ void TestShell::gviminit() noexcept
 	qputenv("GVIMINIT", "let g:test_gviminit = 1");
 	NeovimConnector* c{ CreateShellWidget().first };
 
-	MsgpackRequest* req{ c->api0()->vim_command_output(c->encode("echo g:test_gviminit")) };
+	MsgpackRequest* req{ c->api0()->vim_command_output(QByteArrayLiteral("echo g:test_gviminit")) };
 	QSignalSpy cmd{ req, &MsgpackRequest::finished };
 	QVERIFY(cmd.isValid());
 	QVERIFY(SPYWAIT(cmd));
@@ -109,13 +109,12 @@ void TestShell::guiShimCommands() noexcept
 
 	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
 
-	QSignalSpy cmd_font(
-		c->neovimObject()->vim_command_output(c->encode("GuiFont!")), &MsgpackRequest::finished);
+	QSignalSpy cmd_font(c->neovimObject()->vim_command_output(QByteArrayLiteral("GuiFont!")),
+		&MsgpackRequest::finished);
 	QVERIFY(cmd_font.isValid());
 	QVERIFY2(SPYWAIT(cmd_font), "Waiting for GuiFont");
 
-	QSignalSpy cmd_ls(
-		c->neovimObject()->vim_command_output(c->encode("GuiLinespace")),
+	QSignalSpy cmd_ls(c->neovimObject()->vim_command_output(QByteArrayLiteral("GuiLinespace")),
 		&MsgpackRequest::finished);
 	QVERIFY(cmd_ls.isValid());
 	QVERIFY2(SPYWAIT(cmd_ls), "Waiting for GuiLinespace");
@@ -123,7 +122,7 @@ void TestShell::guiShimCommands() noexcept
 	// Test font attributes
 	const QString cmdFontSize14{ QStringLiteral("GuiFont! %1:h14").arg(GetPlatformTestFont()) };
 	const QString expectedFontSize14{ QStringLiteral("%1:h14").arg(GetPlatformTestFont()) };
-	QSignalSpy cmd_gf{ c->neovimObject()->vim_command_output(c->encode(cmdFontSize14)),
+	QSignalSpy cmd_gf{ c->neovimObject()->vim_command_output(cmdFontSize14.toUtf8()),
 		&MsgpackRequest::finished };
 	QVERIFY(cmd_gf.isValid());
 	QVERIFY(SPYWAIT(cmd_gf));
@@ -141,8 +140,8 @@ void TestShell::guiShimCommands() noexcept
 	};
 	const QString expectedFontBoldRemoved{ QStringLiteral("%1:h16:l").arg(GetPlatformTestFont()) };
 	QSignalSpy spy_fontchange2(w->shell(), &ShellWidget::shellFontChanged);
-	QSignalSpy cmd_gf2{ c->neovimObject()->vim_command_output(c->encode(cmdFontBoldRemoved)),
-						&MsgpackRequest::finished };
+	QSignalSpy cmd_gf2{ c->neovimObject()->vim_command_output(cmdFontBoldRemoved.toUtf8()),
+		&MsgpackRequest::finished };
 	QVERIFY(cmd_gf2.isValid());
 	QVERIFY(SPYWAIT(cmd_gf2, 5000));
 
@@ -188,7 +187,7 @@ void TestShell::CloseEvent() noexcept
 	QSignalSpy onWindowClosing(w, &MainWindow::closing);
 	QVERIFY(onWindowClosing.isValid());
 
-	c->api0()->vim_command(c->encode(command));
+	c->api0()->vim_command(command);
 
 	QVERIFY(SPYWAIT(onClose));
 	QCOMPARE(onClose.takeFirst().at(0).toInt(), msgpack_status);
@@ -238,12 +237,12 @@ void TestShell::GetClipboard() noexcept
 	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
 
 	// provided by the GUI shim
-	c->api0()->vim_command(c->encode("call GuiClipboard()"));
+	c->api0()->vim_command(QByteArrayLiteral("call GuiClipboard()"));
 
 	QGuiApplication::clipboard()->setText(register_data, GetClipboardMode(reg));
 
 	QString getreg_cmd = QString("getreg('%1')").arg(reg);
-	QSignalSpy cmd_clip(c->api1()->nvim_eval(c->encode(getreg_cmd)), &MsgpackRequest::finished);
+	QSignalSpy cmd_clip(c->api1()->nvim_eval(getreg_cmd.toUtf8()), &MsgpackRequest::finished);
 	QVERIFY(cmd_clip.isValid());
 	QVERIFY(SPYWAIT(cmd_clip));
 	QCOMPARE(cmd_clip.takeFirst().at(2), QVariant(register_data));
@@ -276,11 +275,11 @@ void TestShell::SetClipboard() noexcept
 	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
 
 	// provided by the GUI shim
-	c->api0()->vim_command(c->encode("call GuiClipboard()"));
+	c->api0()->vim_command(QByteArrayLiteral("call GuiClipboard()"));
 
 	QString setreg_cmd =
 		QString("setreg('%1', '%2')\n").arg(reg).arg(QString::fromUtf8(register_data));
-	c->neovimObject()->vim_command(c->encode(setreg_cmd));
+	c->neovimObject()->vim_command(setreg_cmd.toUtf8());
 	QSignalSpy spy_sync(c->neovimObject()->vim_feedkeys("", "", false), &MsgpackRequest::finished);
 	SPYWAIT(spy_sync);
 	QVERIFY(spy_sync.isValid());
@@ -298,14 +297,14 @@ void TestShell::checkStartVars(NeovimQt::NeovimConnector* conn) noexcept
 	for (const auto& var : vars) {
 		QSignalSpy onVar(nvim, SIGNAL(on_vim_get_var(QVariant)));
 		QVERIFY(onVar.isValid());
-		nvim->vim_get_var(conn->encode(var));
+		nvim->vim_get_var(var.toUtf8());
 		QVERIFY(SPYWAIT(onVar));
 	}
 
 	// v:windowid
 	QSignalSpy onVarWindowId(nvim, SIGNAL(on_vim_get_vvar(QVariant)));
 	QVERIFY(onVarWindowId.isValid());
-	nvim->vim_get_vvar(conn->encode("windowid"));
+	nvim->vim_get_vvar(QByteArrayLiteral("windowid"));
 	QVERIFY(SPYWAIT(onVarWindowId));
 }
 

@@ -92,7 +92,7 @@ QString NeovimConnector::connectionDescription()
 		case SpawnedConnection:
 			return m_spawnExe + " " + m_spawnArgs.join(" ");
 		case HostConnection:
-			return m_connHost + ":" + m_connPort;
+			return QStringLiteral("%1:%2").arg(m_connHost).arg(m_connPort);
 		case SocketConnection:
 			return m_connSocket;
 		default:
@@ -130,23 +130,6 @@ void NeovimConnector::discoverMetadata()
 bool NeovimConnector::isReady()
 {
 	return m_ready;
-}
-
-/**
- * Decode a byte array as a string according to 'encoding'
- */
-QString NeovimConnector::decode(const QByteArray& in)
-{
-	return m_dev->decode(in);
-}
-/**
- * Encode a string into the appropriate encoding for this Neovim instance
- *
- * see :h 'encoding'
- */
-QByteArray NeovimConnector::encode(const QString& in)
-{
-	return m_dev->encode(in);
 }
 
 /**
@@ -373,7 +356,7 @@ NeovimConnector* NeovimConnector::connectToNeovim(const QString& server)
 	int colon_pos = addr.lastIndexOf(':');
 	if (colon_pos != -1 && colon_pos != 0 && addr[colon_pos-1] != ':') {
 		bool ok;
-		int port = addr.midRef(colon_pos+1).toInt(&ok);
+		int port = addr.mid(colon_pos + 1).toInt(&ok);
 		if (ok) {
 			QString host = addr.mid(0, colon_pos);
 			return connectToHost(host, port);

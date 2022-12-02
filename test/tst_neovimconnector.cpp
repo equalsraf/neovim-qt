@@ -36,23 +36,6 @@ private slots:
 		QVERIFY(c->isReady());
 	}
 
-	void encodeDecode() {
-		NeovimConnector *c = NeovimConnector::spawn({"-u", "NONE"});
-
-		// This will print a warning, but should succeed
-		QString s = "ç日本語";
-		QByteArray bytes = c->encode(s);
-		QCOMPARE(c->decode(bytes), s);
-
-		QSignalSpy onReady(c, SIGNAL(ready()));
-		QVERIFY(onReady.isValid());
-		QVERIFY(SPYWAIT(onReady));
-
-		bytes = c->encode(s);
-		QCOMPARE(c->decode(bytes), s);
-
-	}
-
 	void connectToNeovimTCP() {
 		NeovimConnector *c = NeovimConnector::connectToNeovim("127.0.0.1:64999");
 		QCOMPARE(c->connectionType(), NeovimConnector::HostConnection);

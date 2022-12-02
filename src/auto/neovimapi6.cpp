@@ -2029,7 +2029,7 @@ void NeovimApi6::handleResponseError(quint32 msgid, quint64 fun, const QVariant&
 	const QVariantList asList = res.toList();
 	if (asList.size() >= 2) {
 		if (asList.at(1).canConvert<QByteArray>()) {
-			errMsg = m_c->m_dev->decode(asList.at(1).toByteArray());
+            errMsg = asList.at(1).toByteArray();
 		} else {
 			errMsg = tr("Received unsupported Neovim error type");
 		}

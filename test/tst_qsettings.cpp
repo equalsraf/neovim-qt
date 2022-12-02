@@ -27,7 +27,7 @@ private slots:
 
 static void SendNeovimCommand(NeovimConnector& connector, const QString& command) noexcept
 {
-	QSignalSpy spyCommand{ connector.api0()->vim_command_output(connector.encode(command)),
+	QSignalSpy spyCommand{ connector.api0()->vim_command_output(command.toUtf8()),
 		&MsgpackRequest::finished };
 
 	QVERIFY(spyCommand.isValid());
