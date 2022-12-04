@@ -4,7 +4,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 add_definitions(-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
 add_definitions(-DNVIM_QT_BINARY=\"$<TARGET_FILE:nvim-qt>\")
 if (WIN32 AND USE_STATIC_QT)
-    add_compile_definitions(-DUSE_STATIC_QT)
+	add_compile_definitions(-DUSE_STATIC_QT)
 endif ()
 
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
@@ -34,7 +34,7 @@ endfunction()
 
 function(add_xtest_gui SOURCE_NAME)
 	add_executable(${SOURCE_NAME}
-        data.qrc
+		data.qrc
 		${SOURCE_NAME}.cpp
 		${SOURCES_COMMON}
 		${SOURCES_COMMON_GUI}
@@ -66,25 +66,25 @@ add_xtest_gui(tst_qsettings
 
 # Platform Specific Input Tests
 add_xtest(tst_input_mac
-    ${PROJECT_SOURCE_DIR}/src/gui/input.cpp
-    ${PROJECT_SOURCE_DIR}/src/gui/input_mac.cpp)
+	${PROJECT_SOURCE_DIR}/src/gui/input.cpp
+	${PROJECT_SOURCE_DIR}/src/gui/input_mac.cpp)
 add_xtest(tst_input_unix
-    ${PROJECT_SOURCE_DIR}/src/gui/input.cpp
-    ${PROJECT_SOURCE_DIR}/src/gui/input_unix.cpp)
+	${PROJECT_SOURCE_DIR}/src/gui/input.cpp
+	${PROJECT_SOURCE_DIR}/src/gui/input_unix.cpp)
 add_xtest(tst_input_win32
-    ${PROJECT_SOURCE_DIR}/src/gui/input.cpp
-    ${PROJECT_SOURCE_DIR}/src/gui/input_win32.cpp)
+	${PROJECT_SOURCE_DIR}/src/gui/input.cpp
+	${PROJECT_SOURCE_DIR}/src/gui/input_win32.cpp)
 
 # Platform Agnostic Input Tests
 add_shared_test(tst_input_common_mac
 	tst_input_common.cpp
-    ${PROJECT_SOURCE_DIR}/src/gui/input.cpp
-    ${PROJECT_SOURCE_DIR}/src/gui/input_mac.cpp)
+	${PROJECT_SOURCE_DIR}/src/gui/input.cpp
+	${PROJECT_SOURCE_DIR}/src/gui/input_mac.cpp)
 add_shared_test(tst_input_common_unix
 	tst_input_common.cpp
-    ${PROJECT_SOURCE_DIR}/src/gui/input.cpp
-    ${PROJECT_SOURCE_DIR}/src/gui/input_unix.cpp)
+	${PROJECT_SOURCE_DIR}/src/gui/input.cpp
+	${PROJECT_SOURCE_DIR}/src/gui/input_unix.cpp)
 add_shared_test(tst_input_common_win32
 	tst_input_common.cpp
-    ${PROJECT_SOURCE_DIR}/src/gui/input.cpp
-    ${PROJECT_SOURCE_DIR}/src/gui/input_win32.cpp)
+	${PROJECT_SOURCE_DIR}/src/gui/input.cpp
+	${PROJECT_SOURCE_DIR}/src/gui/input_win32.cpp)

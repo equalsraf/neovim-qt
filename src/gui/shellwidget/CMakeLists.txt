@@ -10,31 +10,31 @@ set(CMAKE_AUTOMOC ON)
 
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 if(ENABLE_TESTS)
-    find_package(Qt5 REQUIRED COMPONENTS Test)
+	find_package(Qt5 REQUIRED COMPONENTS Test)
 endif()
 
 if (WIN32 AND USE_STATIC_QT)
-    add_compile_definitions(-DUSE_STATIC_QT)
+	add_compile_definitions(-DUSE_STATIC_QT)
 endif ()
 
 add_library(qshellwidget STATIC)
 
 target_sources(qshellwidget
-  PRIVATE
-    cell.cpp
-    cell.h
-    cursor.cpp
-    cursor.h
-    helpers.cpp
-    helpers.h
-    highlight.cpp
-    highlight.h
-    konsole_wcwidth.cpp
-    konsole_wcwidth.h
-    shellcontents.cpp
-    shellcontents.h
-    shellwidget.cpp
-    shellwidget.h
+	PRIVATE
+	    cell.cpp
+		cell.h
+		cursor.cpp
+		cursor.h
+		helpers.cpp
+		helpers.h
+		highlight.cpp
+		highlight.h
+		konsole_wcwidth.cpp
+		konsole_wcwidth.h
+		shellcontents.cpp
+		shellcontents.h
+		shellwidget.cpp
+		shellwidget.h
 )
 
 target_link_libraries(qshellwidget PUBLIC Qt5::Widgets)

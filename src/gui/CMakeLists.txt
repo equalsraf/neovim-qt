@@ -6,7 +6,7 @@ if(WIN32)
 	if (USE_STATIC_QT)
 		add_definitions(-DUSE_STATIC_QT)
 		link_directories(${CMAKE_PREFIX_PATH}/share/qt5/plugins/platforms)
-        list(APPEND QTLIBS Qt5PlatformCompositorSupport qwindows)
+		list(APPEND QTLIBS Qt5PlatformCompositorSupport qwindows)
 	endif()
 	set(RES_FILE "data.rc")
 	enable_language(RC)
@@ -25,51 +25,51 @@ set(RUNTIME_PATH)
 add_library(neovim-qt-gui STATIC)
 
 target_sources(neovim-qt-gui
-  PRIVATE
-	app.cpp
-	contextmenu.cpp
-	errorwidget.cpp
-	input.cpp
-	mainwindow.cpp
-	popupmenu.cpp
-	popupmenumodel.cpp
-	scrollbar.cpp
-	shell.cpp
-	tabline.cpp
-	treeview.cpp
-	${SRCS_PLATFORM}
-    data.qrc
+	PRIVATE
+	    app.cpp
+		contextmenu.cpp
+		errorwidget.cpp
+		input.cpp
+		mainwindow.cpp
+		popupmenu.cpp
+		popupmenumodel.cpp
+		scrollbar.cpp
+		shell.cpp
+		tabline.cpp
+		treeview.cpp
+		${SRCS_PLATFORM}
+		data.qrc
 )
 
 if(WIN32)
-    target_sources(neovim-qt-gui
-      PRIVATE
-        arguments_qwindowgeometry.cpp
-        input_win32.cpp
-        printinfo_msgbox.cpp
-    )
+	target_sources(neovim-qt-gui
+		PRIVATE
+		    arguments_qwindowgeometry.cpp
+			input_win32.cpp
+			printinfo_msgbox.cpp
+	)
 elseif(APPLE)
-    target_sources(neovim-qt-gui
-      PRIVATE
-        arguments_qwindowgeometry.cpp
-        input_mac.cpp
-        printinfo_stdout.cpp
-    )
+	target_sources(neovim-qt-gui
+		PRIVATE
+		    arguments_qwindowgeometry.cpp
+			input_mac.cpp
+			printinfo_stdout.cpp
+	)
 else()
-    target_sources(neovim-qt-gui
-      PRIVATE
-        arguments_geometry.cpp
-        input_unix.cpp
-        printinfo_stdout.cpp
-    )
+	target_sources(neovim-qt-gui
+		PRIVATE
+		    arguments_geometry.cpp
+			input_unix.cpp
+			printinfo_stdout.cpp
+	)
 endif()
 
 
 target_link_libraries(neovim-qt-gui
-  PUBLIC
-    ${QTLIBS}
-    qshellwidget
-    neovim-qt
+	PUBLIC
+	    ${QTLIBS}
+		qshellwidget
+		neovim-qt
 )
 
 if(APPLE)
@@ -84,11 +84,11 @@ endif()
 add_executable(nvim-qt WIN32 MACOSX_BUNDLE)
 
 target_sources(nvim-qt
-  PRIVATE
-    main.cpp
-    data.qrc
-	${RES_FILE}
-    ${ICON_PATH}
+	PRIVATE
+	    main.cpp
+		data.qrc
+		${RES_FILE}
+		${ICON_PATH}
 )
 
 target_link_libraries(nvim-qt PRIVATE neovim-qt-gui)
@@ -136,10 +136,7 @@ endif()
 if(WIN32 AND NOT CMAKE_CROSSCOMPILING AND NOT DEFINED USE_STATIC_QT)
 	include(WinDeployQt)
 	WinDeployQt(TARGET nvim-qt COMPILER_RUNTIME INCLUDE_MODULES ${QTLIBS} EXCLUDE_MODULES webkit webkit2)
-    install(
-        DIRECTORY ${PROJECT_BINARY_DIR}/windeployqt/
-        DESTINATION ${CMAKE_INSTALL_BINDIR}
-    )
+	install(DIRECTORY ${PROJECT_BINARY_DIR}/windeployqt/ DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 # Generate help tags

@@ -142,7 +142,7 @@ else()
 endif()
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(-DQT_NO_DEBUG_OUTPUT)
+	add_compile_definitions(-DQT_NO_DEBUG_OUTPUT)
 endif()
 
 # Place targets in bin/ or lib/ for all build configurations
@@ -157,8 +157,8 @@ foreach(CFGNAME ${CMAKE_CONFIGURATION_TYPES})
 endforeach()
 
 if(MSVC)
-  # Allow use of deprecated function names in MSVC (read/write)
-  add_compile_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+	# Allow use of deprecated function names in MSVC (read/write)
+	add_compile_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
 endif()
 
 add_subdirectory(src)
@@ -166,7 +166,7 @@ add_subdirectory(doc)
 
 option(ENABLE_TESTS "Build tests" OFF)
 if(ENABLE_TESTS)
-    find_package(Qt5 REQUIRED COMPONENTS Test)
+	find_package(Qt5 REQUIRED COMPONENTS Test)
 	enable_testing()
 	add_subdirectory(test)
 	add_subdirectory(src/gui/shellwidget/test)
@@ -177,15 +177,15 @@ find_package(PythonInterp)
 if (PYTHONINTERP_FOUND)
 	set(NVIM "nvim" CACHE STRING "Path to nvim executable")
 	add_custom_target(bindings
-        COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/bindings/generate_bindings.py
-          ${NVIM} ${PROJECT_SOURCE_DIR}/src/auto
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/bindings/generate_bindings.py
+		    ${NVIM} ${PROJECT_SOURCE_DIR}/src/auto
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		COMMENT "Generating bindings"
-    )
+	)
 
 	add_custom_target(bindings-preview
-        COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/bindings/generate_bindings.py ${NVIM}
-    )
+		COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/bindings/generate_bindings.py ${NVIM}
+	)
 endif()
 
 include(CPackOptions)
