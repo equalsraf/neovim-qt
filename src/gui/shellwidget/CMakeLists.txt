@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 3.16)
-cmake_policy(SET CMP0048 NEW)
-
+cmake_minimum_required(VERSION 2.8.12)
+if (POLICY CMP0048)
+  cmake_policy(SET CMP0048 NEW)
+endif (POLICY CMP0048)
 project(qshellwidget)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
