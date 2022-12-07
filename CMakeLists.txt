@@ -1,6 +1,10 @@
-cmake_minimum_required(VERSION 3.16)
-cmake_policy(SET CMP0048 NEW)
-cmake_policy(SET CMP0069 NEW)
+cmake_minimum_required(VERSION 2.8.12)
+if (POLICY CMP0048)
+  cmake_policy(SET CMP0048 NEW)
+endif (POLICY CMP0048)
+if (POLICY CMP0069)
+  cmake_policy(SET CMP0069 NEW)
+endif (POLICY CMP0069)
 
 # Neovim-Qt Version, used by --version update before release
 # 9999 = Development Pre-Release
@@ -145,6 +149,7 @@ if(USE_SYSTEM_MSGPACK)
 else()
 	add_subdirectory(third-party)
 endif()
+include_directories(${MSGPACK_INCLUDE_DIRS})
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DQT_NO_DEBUG_OUTPUT)
