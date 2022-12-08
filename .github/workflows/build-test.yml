@@ -134,6 +134,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          -DENABLE_TESTS=ON
 
       - name: Build
         run: cmake --build ${{ github.workspace }}/build
