@@ -37,10 +37,10 @@ jobs:
 
           - name: MacOS_GCC
             flavor: Debug
-            runner: macos-12
+            runner: macos-11
             generator: Ninja
-            cc: gcc-11
-            cxx: g++-11
+            cc: gcc-10
+            cxx: g++-10
 
           - name: MacOS_Release
             flavor: Release
@@ -59,6 +59,8 @@ jobs:
             qtver: 5.15.2
             qtdir: mingw81_64
             qtstr: windows desktop win64_mingw81
+            cc: gcc
+            cxx: g++
 
           - name: Windows_Release
             flavor: Release
