@@ -50,9 +50,11 @@ jobs:
             cxx: clang++
             publish: true
 
+          # Qt 5.15 only supports MinGW 8.11. The `windows-latest` and `windows-2022`
+          # images bundle only 11.2. For now, we must use the older image `windows-2019`.
           - name: Windows_MingGW
             flavor: Debug
-            runner: windows-latest
+            runner: windows-2019
             generator: MinGW Makefiles
             qtver: 5.15.2
             qtdir: mingw81_64
