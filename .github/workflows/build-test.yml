@@ -15,14 +15,14 @@ jobs:
         include:
           - name: Linux_GCC
             flavor: Debug
-            runner: ubuntu-latest
+            runner: ubuntu-22.04
             generator: Ninja
             cc: gcc
             cxx: g++
 
           - name: Linux_LLVM
             flavor: Debug
-            runner: ubuntu-latest
+            runner: ubuntu-22.04
             generator: Ninja
             cc: clang
             cxx: clang++
@@ -37,14 +37,14 @@ jobs:
 
           - name: MacOS_GCC
             flavor: Debug
-            runner: macos-latest
+            runner: macos-12
             generator: Ninja
             cc: gcc-11
             cxx: g++-11
 
           - name: MacOS_Release
             flavor: Release
-            runner: macos-latest
+            runner: macos-12
             generator: Ninja
             cc: clang
             cxx: clang++
@@ -62,7 +62,7 @@ jobs:
 
           - name: Windows_Release
             flavor: Release
-            runner: windows-latest
+            runner: windows-2022
             generator: Visual Studio 17 2022
             qtver: 5.15.2
             qtdir: msvc2019_64
