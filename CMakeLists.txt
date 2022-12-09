@@ -103,6 +103,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"-readability-uppercase-literal-suffix,"
 			"-readability-identifier-length,"
 			"-bugprone-easily-swappable-parameters,"
+			"-bugprone-implicit-widening-of-multiplication-result,"
 			)
 		if(${CMAKE_VERSION} VERSION_LESS "3.6.0")
 			message("ENABLE_TIDY requires CMake >= 3.6.0")
