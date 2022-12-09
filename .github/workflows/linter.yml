@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo add-apt-repository -y ppa:neovim-ppa/unstable
-          sudo apt-get install -y clang-tidy-11 libqt5svg5-dev neovim ninja-build qt5-default
+          sudo apt-get install -y clang-tidy-11 libqt5svg5-dev neovim ninja-build clazy qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
           sudo apt-get update -y
           sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/lib/llvm-11/bin/clang-tidy 100
           mkdir build
