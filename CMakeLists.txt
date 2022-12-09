@@ -104,6 +104,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"-readability-identifier-length,"
 			"-bugprone-easily-swappable-parameters,"
 			"-bugprone-implicit-widening-of-multiplication-result,"
+			"-cppcoreguidelines-prefer-member-initializer,"
 			)
 		if(${CMAKE_VERSION} VERSION_LESS "3.6.0")
 			message("ENABLE_TIDY requires CMake >= 3.6.0")
