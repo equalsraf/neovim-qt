@@ -74,25 +74,7 @@ private slots:
 	}
 
 	void defaultValues() {
-		QVERIFY(one->encoding().isEmpty());
 		QCOMPARE(one->errorCause(), MsgpackIODevice::NoError);
-	}
-
-	void setEncoding() {
-		QCOMPARE(one->setEncoding("utf8"), true);
-		QCOMPARE(one->errorCause(), MsgpackIODevice::NoError);
-		QVERIFY(!one->encoding().isEmpty());
-	}
-
-	void setInvalidEncoding() {
-		QSignalSpy onError(one, SIGNAL(error(MsgpackError)));
-		QVERIFY(onError.isValid());
-
-		// Ignore qWarn
-		QCOMPARE(one->setEncoding("invalid-encoding"), false);
-
-		QVERIFY(SPYWAIT(onError));
-		QCOMPARE(one->errorCause(), MsgpackIODevice::UnsupportedEncoding);
 	}
 
 	/**

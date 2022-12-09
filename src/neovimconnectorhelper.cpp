@@ -56,14 +56,8 @@ void NeovimConnectorHelper::handleMetadata(quint32 msgid, quint64, const QVarian
 	m_c->m_api_supported = api_level;
 
 	if (m_c->errorCause() == NeovimConnector::NoError) {
-		// Neovim is always utf8, but this was not the case in the early days of nvim
-		// these days it should always be utf8
-		if (m_c->m_dev->setEncoding("utf8")) {
-			m_c->m_ready = true;
-			emit m_c->ready();
-		} else {
-			qWarning() << "Unable to set encoding to utf8";
-		}
+		m_c->m_ready = true;
+		emit m_c->ready();
 	} else {
 		qWarning() << "Error retrieving metadata" << m_c->errorString();
 	}

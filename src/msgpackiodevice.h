@@ -3,7 +3,6 @@
 
 #include <QIODevice>
 #include <QHash>
-#include <QTextCodec>
 #include <QVariant>
 #include <msgpack.h>
 
@@ -15,7 +14,6 @@ class MsgpackIODevice: public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(MsgpackError error READ errorCause NOTIFY error)
-	Q_PROPERTY(QByteArray encoding READ encoding WRITE setEncoding NOTIFY encodingChanged)
 public:
 	enum MsgpackError {
 		NoError=0,
@@ -34,7 +32,6 @@ public:
 	MsgpackError errorCause() const {return m_error;};
 
 	QByteArray encoding() const;
-	bool setEncoding(const QByteArray&);
 
 	quint32 msgId();
 	MsgpackRequest* startRequestUnchecked(const QString& method, quint32 argcount);
@@ -106,7 +103,6 @@ private:
 
 	quint32 m_reqid;
 	QIODevice *m_dev;
-	QTextCodec *m_encoding;
 	msgpack_packer m_pk;
 	msgpack_unpacker m_uk;
 	QHash<quint32, MsgpackRequest*> m_requests;
