@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QAbstractSocket>
 #include <QProcess>
-#include <QTextCodec>
 #include "msgpackiodevice.h"
 #include "auto/neovimapi0.h"
 #include "auto/neovimapi1.h"
