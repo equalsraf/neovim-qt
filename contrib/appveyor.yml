@@ -32,7 +32,7 @@ build_script:
 - echo %PATH%
 - mkdir build
 - cd build
-- cmake -G "%GENERATOR%" -DCMAKE_PREFIX_PATH="%CMAKE_PATH_PREFIX%" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../INSTALL %EXTRA_CMAKE_ARGS% ..
+- cmake -G "%GENERATOR%" -DCMAKE_PREFIX_PATH="%CMAKE_PATH_PREFIX%" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../INSTALL -DENABLE_TESTS=ON %EXTRA_CMAKE_ARGS% ..
 - cmake --build . --config Release --target install
 - cpack --verbose -G WIX
 test_script:
