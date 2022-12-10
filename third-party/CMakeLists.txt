@@ -18,6 +18,12 @@ FetchContent_Declare(
     URL_HASH SHA256=ff865a36bad5c72b8e7ebc4b7cf5f27a820fce4faff9c571c1791e3728355a39
 )
 
-set(MSGPACK_BUILD_EXAMPLES OFF)
 
-FetchContent_MakeAvailable(msgpackc)
+FetchContent_GetProperties(msgpackc)
+if(NOT msgpackc_POPULATED)
+  FetchContent_Populate(msgpackc)
+
+  set(MSGPACK_BUILD_EXAMPLES OFF)
+
+  add_subdirectory(${msgpackc_SOURCE_DIR} ${msgpackc_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
