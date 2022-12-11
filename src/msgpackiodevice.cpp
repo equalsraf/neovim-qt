@@ -828,22 +828,6 @@ fail:
 }
 
 /**
- * Convert string to the proper encoding to send to neovim (utf8)
- */
-QByteArray MsgpackIODevice::encode(const QString& str)
-{
-	return str.toUtf8();
-}
-
-/**
- * Decode byte array as string, from Neovim's encoding
- */
-QString MsgpackIODevice::decode(const QByteArray& data)
-{
-	return QString::fromUtf8(data);
-}
-
-/**
  * QVariant can encapsulate some data types that cannot be serialised at as
  * msgpack data..
  *

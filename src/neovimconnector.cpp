@@ -133,23 +133,6 @@ bool NeovimConnector::isReady()
 }
 
 /**
- * Decode a byte array as a string according to 'encoding'
- */
-QString NeovimConnector::decode(const QByteArray& in)
-{
-	return m_dev->decode(in);
-}
-/**
- * Encode a string into the appropriate encoding for this Neovim instance
- *
- * see :h 'encoding'
- */
-QByteArray NeovimConnector::encode(const QString& in)
-{
-	return m_dev->encode(in);
-}
-
-/**
  * @warning Do not call this before NeovimConnector::ready as been signaled
  * @see NeovimConnector::isReady
  */
