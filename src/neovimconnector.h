@@ -83,8 +83,16 @@ public:
 	NeovimApi5 * api5();
 	NeovimApi6 * api6();
 	uint64_t channel();
-	QString decode(const QByteArray&);
-	QByteArray encode(const QString&);
+
+	 // Decode a byte array as a string according to Neovim string encoding
+	inline QString decode(const QByteArray& in) {
+		return m_dev->decode(in);
+	}
+
+	// Encode a string into the appropriate encoding for Neovim
+	inline QByteArray encode(const QString& in) {
+		return m_dev->encode(in);
+	}
 	NeovimConnectionType connectionType();
 	/** Some requests for metadata and ui attachment enforce a timeout in ms */
 	void setRequestTimeout(int);
