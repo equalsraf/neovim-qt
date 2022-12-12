@@ -73,9 +73,7 @@ private slots:
 		QCOMPARE(io->errorCause(), MsgpackIODevice::InvalidDevice);
 	}
 
-	void defaultValues() {
-		QCOMPARE(one->errorCause(), MsgpackIODevice::NoError);
-	}
+	void defaultValues() { QCOMPARE(one->errorCause(), MsgpackIODevice::NoError); }
 
 	/**
 	 * These errors are not fatal but increase coverage

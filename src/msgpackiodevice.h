@@ -1,10 +1,10 @@
 #ifndef NEOVIM_QT_MSGPACKIODEVICE
 #define NEOVIM_QT_MSGPACKIODEVICE
 
-#include <QIODevice>
-#include <QHash>
-#include <QVariant>
 #include <msgpack.h>
+#include <QHash>
+#include <QIODevice>
+#include <QVariant>
 
 namespace NeovimQt {
 
@@ -51,13 +51,9 @@ public:
 	}
 
 	// Convert string to the proper encoding to send to neovim (utf8)
-	inline QByteArray encode(const QString& str) {
-		return str.toUtf8();
-	}
+	inline QByteArray encode(const QString& str) { return str.toUtf8(); }
 	// Decode byte array as string, from Neovim's encoding
-	QString decode(const QByteArray& data) {
-		return QString::fromUtf8(data);
-	}
+	QString decode(const QByteArray& data) { return QString::fromUtf8(data); }
 	bool checkVariant(const QVariant&);
 
 	bool sendResponse(uint64_t msgid, const QVariant& err, const QVariant& res);
@@ -108,7 +104,7 @@ private:
 	static int msgpack_write_to_dev(void* data, const char* buf, unsigned long int len);
 
 	quint32 m_reqid;
-	QIODevice *m_dev;
+	QIODevice* m_dev;
 	msgpack_packer m_pk;
 	msgpack_unpacker m_uk;
 	QHash<quint32, MsgpackRequest*> m_requests;
