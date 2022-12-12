@@ -1,10 +1,10 @@
 #ifndef NEOVIM_QT_CONNECTOR
 #define NEOVIM_QT_CONNECTOR
 
-#include <QObject>
 #include <QAbstractSocket>
+#include <QObject>
 #include <QProcess>
-#include "msgpackiodevice.h"
+
 #include "auto/neovimapi0.h"
 #include "auto/neovimapi1.h"
 #include "auto/neovimapi2.h"
@@ -12,6 +12,7 @@
 #include "auto/neovimapi4.h"
 #include "auto/neovimapi5.h"
 #include "auto/neovimapi6.h"
+#include "msgpackiodevice.h"
 
 namespace NeovimQt {
 
@@ -84,15 +85,11 @@ public:
 	NeovimApi6 * api6();
 	uint64_t channel();
 
-	 // Decode a byte array as a string according to Neovim string encoding
-	inline QString decode(const QByteArray& in) {
-		return m_dev->decode(in);
-	}
+	// Decode a byte array as a string according to Neovim string encoding
+	inline QString decode(const QByteArray& in) { return m_dev->decode(in); }
 
 	// Encode a string into the appropriate encoding for Neovim
-	inline QByteArray encode(const QString& in) {
-		return m_dev->encode(in);
-	}
+	inline QByteArray encode(const QString& in) { return m_dev->encode(in); }
 	NeovimConnectionType connectionType();
 	/** Some requests for metadata and ui attachment enforce a timeout in ms */
 	void setRequestTimeout(int);

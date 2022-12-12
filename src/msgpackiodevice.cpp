@@ -43,8 +43,12 @@ MsgpackIODevice* MsgpackIODevice::fromStdinOut(QObject *parent)
 	return rpc;
 }
 
-MsgpackIODevice::MsgpackIODevice(QIODevice *dev, QObject *parent)
-:QObject(parent), m_reqid(0), m_dev(dev), m_reqHandler(0), m_error(NoError)
+MsgpackIODevice::MsgpackIODevice(QIODevice* dev, QObject* parent)
+	: QObject(parent)
+	, m_reqid(0)
+	, m_dev(dev)
+	, m_reqHandler(0)
+	, m_error(NoError)
 {
 	qRegisterMetaType<MsgpackError>("MsgpackError");
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
