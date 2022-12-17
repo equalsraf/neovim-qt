@@ -92,7 +92,7 @@ QString NeovimConnector::connectionDescription()
 		case SpawnedConnection:
 			return m_spawnExe + " " + m_spawnArgs.join(" ");
 		case HostConnection:
-			return m_connHost + ":" + m_connPort;
+			return m_connHost + ":" + QString::number(m_connPort);
 		case SocketConnection:
 			return m_connSocket;
 		default:
