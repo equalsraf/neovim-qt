@@ -3,6 +3,8 @@
 #include <QMap>
 #include <QVariant>
 
+#include <QDebug>
+
 namespace NeovimQt { namespace Input {
 
 const QMap<int, QString>& GetSpecialKeysMap() noexcept
@@ -141,6 +143,26 @@ static QString KeyToText(int key, Qt::KeyboardModifiers mod) noexcept
 	return text;
 }
 
+static bool IsControlCaretKeyEvent(
+	int key,
+	Qt::KeyboardModifiers mod,
+	const QString& text) noexcept
+{
+	if (key != Qt::Key_6 && key != Qt::Key_AsciiCircum) {
+		return false;
+	}
+
+	if (!(mod & ControlModifier())) {
+		return false;
+	}
+
+	if (text != "\u001E" && text != "^" && text != "6" && !text.isEmpty()) {
+		return false;
+	}
+
+	return true;
+}
+
 QString convertKey(const QKeyEvent& ev) noexcept
 {
 	QString text{ ev.text() };
@@ -191,6 +213,11 @@ QString convertKey(const QKeyEvent& ev) noexcept
 	const QMap<int, QString>& specialKeys { GetSpecialKeysMap() };
 
 	if (specialKeys.contains(key)) {
+		// Issue#720: International keyboards may insert an accent on space.
+		if (key == Qt::Key_Space && text != " ") {
+			return text;
+		}
+
 		// Issue#728: Shift + Space inserts ;2u in `:terminal`. Incorrectly sent as <S-Space>.
 		// Issue#259: Shift + BackSpace inserts 7;2u in `:terminal`. Incorrectly sent as <S-BS>.
 		if (key == Qt::Key_Space
@@ -208,15 +235,26 @@ QString convertKey(const QKeyEvent& ev) noexcept
 		return ToKeyString(GetModifierPrefix(modNoShift), "lt");
 	}
 
+	// Issue#720: Spanish keyboard "[" character insertion
+	if (key == Qt::Key_AsciiCircum && text == "[") {
+		const Qt::KeyboardModifiers modNoAlt{ mod & ~Qt::AltModifier };
+
+		if (modNoAlt == Qt::NoModifier) {
+			return QStringLiteral("[");
+		}
+
+		return ToKeyString(GetModifierPrefix(modNoAlt), "[");
+	}
+
 	// Issue#170: Normalize modifiers, CTRL+^ always sends as <C-^>
-	const bool isCaretKey{ key == Qt::Key_6 || key == Qt::Key_AsciiCircum };
-	if (isCaretKey && mod & ControlModifier()) {
+	if (IsControlCaretKeyEvent(key, mod, text)) {
 		const Qt::KeyboardModifiers modNoShiftMeta{
 			mod & ~Qt::KeyboardModifier::ShiftModifier & ~CmdModifier() };
 		return ToKeyString(GetModifierPrefix(modNoShiftMeta), "^");
 	}
 
 	if (text == "\\") {
+		qDebug() << "Bail EARLY BACKSLASH!";
 		return ToKeyString(GetModifierPrefix(mod), "Bslash");
 	}
 

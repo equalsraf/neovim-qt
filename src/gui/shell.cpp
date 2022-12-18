@@ -1342,8 +1342,8 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 	const QString inp{ Input::convertKey(*ev) };
 
 	// Uncomment for key input debugging and unit test writing.
-	// qDebug() << "QKeyEvent ev:" << ev;
-	// qDebug() << "  " << inp;
+	qDebug() << "QKeyEvent ev:" << ev;
+	qDebug() << "  " << inp;
 
 	if (inp.isEmpty()) {
 		QWidget::keyPressEvent(ev);

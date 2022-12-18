@@ -14,6 +14,7 @@ private slots:
 	void ShiftModifierLetter() noexcept;
 	void GermanKeyboardLayout() noexcept;
 	void ControlSpace() noexcept;
+	void SpanishKeyboardLayout() noexcept;
 };
 
 void TestInputUnix::LessThanModifierKeys() noexcept
@@ -33,17 +34,22 @@ void TestInputUnix::SpecialKeys() noexcept
 	const QList<int> specialKeys{ NeovimQt::Input::GetSpecialKeysMap().keys() };
 
 	for (const auto k : specialKeys) {
+		// Key_Space events send with text=" "
+		QString text;
+		if (k == Qt::Key_Space) {
+			text = QStringLiteral(" ");
+		}
+
 		// On Mac Meta is the Control key, treated as C-.
 		QList<InputTest> keyEventList{
-			{ QEvent::KeyPress, k, Qt::NoModifier,		"<%1>" },
-			{ QEvent::KeyPress, k, Qt::ControlModifier, "<C-%1>" },
-			{ QEvent::KeyPress, k, Qt::AltModifier,     "<A-%1>" },
-			{ QEvent::KeyPress, k, Qt::MetaModifier,    "<D-%1>" },
+			{ { QEvent::KeyPress, k, Qt::NoModifier, text },		"<%1>" },
+			{ { QEvent::KeyPress, k, Qt::ControlModifier, text }, "<C-%1>" },
+			{ { QEvent::KeyPress, k, Qt::AltModifier, text },     "<A-%1>" },
+			{ { QEvent::KeyPress, k, Qt::MetaModifier, text },    "<D-%1>" },
 		};
 
 		for (const auto& keyTest : keyEventList) {
-			auto event = QKeyEvent(keyTest.event_type, keyTest.key, keyTest.modifiers);
-			QCOMPARE(NeovimQt::Input::convertKey(event),
+			QCOMPARE(NeovimQt::Input::convertKey(keyTest.event),
 				keyTest.expected_input.arg(NeovimQt::Input::GetSpecialKeysMap().value(k)));
 		}
 	}
@@ -103,6 +109,13 @@ void TestInputUnix::ControlSpace() noexcept
 	// Intentionally written with QStringLiteral, other alternatives do not create the same QKeyEvent
 	QKeyEvent evControlSpace{ QEvent::KeyPress, Qt::Key_Space, Qt::ControlModifier, QStringLiteral( "\u0000" ) };
 	QCOMPARE(NeovimQt::Input::convertKey(evControlSpace), QString{ "<C-Space>" });
+}
+
+void TestInputUnix::SpanishKeyboardLayout() noexcept
+{
+	// Linux AltGr (Right Alt) + `. Prints: [
+	QKeyEvent evAltGrSquareBracketLinux{ QKeyEvent::KeyPress, Qt::Key_BracketLeft, Qt::GroupSwitchModifier, QStringLiteral("[") };
+	QCOMPARE(NeovimQt::Input::convertKey(evAltGrSquareBracketLinux), QStringLiteral("["));
 }
 
 #include "tst_input_unix.moc"
