@@ -145,9 +145,9 @@ jobs:
         uses: GabrielBB/xvfb-action@v1 # Required by Linux, no X11 $DISPLAY
         with:
           working-directory: ${{ github.workspace }}/build
-          run: ctest --output-on-failure -C ${{ matrix.flavor }}
+          run: ctest -VV --output-on-failure -C ${{ matrix.flavor }}
       - uses: actions/upload-artifact@v3
-        if: failure()
+        name: Publish test results
         with:
           name: test-results
           path: ./**/*.tests.txt
