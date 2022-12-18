@@ -148,6 +148,7 @@ jobs:
           run: ctest -VV --output-on-failure -C ${{ matrix.flavor }}
       - uses: actions/upload-artifact@v3
         name: Publish test results
+        if: always()
         with:
           name: test-results
           path: ./**/*.tests.txt
