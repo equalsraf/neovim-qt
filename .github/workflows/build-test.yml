@@ -147,7 +147,7 @@ jobs:
           working-directory: ${{ github.workspace }}/build
           run: ctest -VV --output-on-failure -C ${{ matrix.flavor }}
       - name: Show windows logs
-        if: ${{ failed() && startsWith(matrix.runner, 'windows') }}
+        if: ${{ failure() && startsWith(matrix.runner, 'windows') }}
         run: Get-EventLog -LogName Application -ET ERROR
       - uses: actions/upload-artifact@v3
         name: Publish test results
