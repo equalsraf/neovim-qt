@@ -61,7 +61,6 @@ jobs:
             qtstr: windows desktop win64_mingw81
             cc: gcc
             cxx: g++
-            ctest_exe_args: -tap
 
           - name: Windows_Release
             flavor: Release
@@ -70,7 +69,6 @@ jobs:
             qtver: 5.15.2
             qtdir: msvc2019_64
             qtstr: windows desktop win64_msvc2019_64
-            ctest_exe_args: -tap
             publish: true
 
     runs-on: ${{ matrix.runner }}
@@ -139,7 +137,6 @@ jobs:
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
           -DENABLE_TESTS=ON
-          -DCTEST_EXE_ARGS=${{ matrix.ctest_exe_args }}
 
       - name: Build
         run: cmake --build ${{ github.workspace }}/build
@@ -149,6 +146,11 @@ jobs:
         with:
           working-directory: ${{ github.workspace }}/build
           run: ctest --output-on-failure -C ${{ matrix.flavor }}
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-results
+          path: ./**/*.tests.txt
 
       #
       # Deploy Release Binaries

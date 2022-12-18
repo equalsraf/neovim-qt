@@ -28,7 +28,7 @@ function(add_xtest SOURCE_NAME)
 		${ARGV1}
 		${ARGV2})
 	target_link_libraries(${SOURCE_NAME} ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt)
-	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} ${CTEST_EXE_ARGS})
+	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} -o -,txt -o ${SOURCE_NAME}.tests.txt,txt)
 	add_dependencies(check ${SOURCE_NAME})
 endfunction()
 
@@ -41,7 +41,7 @@ function(add_xtest_gui SOURCE_NAME)
 		${SOURCES_COMMON_GUI}
 		${ARGV1} ${ARGV2})
 	target_link_libraries(${SOURCE_NAME} ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt Qt5::Widgets neovim-qt-gui)
-	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} ${CTEST_EXE_ARGS}
+	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} -o -,txt -o ${SOURCE_NAME}.tests.txt,txt
 		# Run GUI tests from source dir, they depend on src files
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 	add_dependencies(check ${SOURCE_NAME})
@@ -50,7 +50,7 @@ endfunction()
 function(add_shared_test SOURCE_NAME)
 	add_executable(${SOURCE_NAME} ${ARGV1} ${ARGV2} ${ARGV3})
 	target_link_libraries(${SOURCE_NAME} Qt5::Network Qt5::Test Qt5::Widgets ${MSGPACK_LIBRARIES} neovim-qt)
-	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} ${CTEST_EXE_ARGS})
+	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} -o -,txt -o ${SOURCE_NAME}.tests.txt,txt)
 	add_dependencies(check ${SOURCE_NAME})
 endfunction()
 
