@@ -148,6 +148,9 @@ jobs:
           run: ctest -VV --output-on-failure -C ${{ matrix.flavor }}
       - name: Show windows logs
         if: ${{ failure() && startsWith(matrix.runner, 'windows') }}
+        run: Get-EventLog -List
+      - name: Show windows logs
+        if: ${{ failure() && startsWith(matrix.runner, 'windows') }}
         run: Get-EventLog -LogName Application -ET ERROR
       - uses: actions/upload-artifact@v3
         name: Publish test results
