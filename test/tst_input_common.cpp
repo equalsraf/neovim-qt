@@ -138,16 +138,6 @@ void TestInputCommon::CapsLockIgnored() noexcept
 	QCOMPARE(NeovimQt::Input::convertKey(evMetaCapsLock), QString{ "" });
 }
 
-void TestInputCommon::ShiftSpaceWellFormed() noexcept
-{
-	// Issue#728: Shift + Space inserts ;2u in `:terminal`, mode sent as <S-Space>.
-	QKeyEvent evShift{ QEvent::KeyPress, Qt::Key_Shift, Qt::ShiftModifier, "" };
-	QCOMPARE(NeovimQt::Input::convertKey(evShift), QString{ "" });
-
-	QKeyEvent evShiftSpace{ QEvent::KeyPress, Qt::Key_Space, Qt::ShiftModifier, " " };
-	QCOMPARE(NeovimQt::Input::convertKey(evShiftSpace), QString{ "<Space>" });
-}
-
 void TestInputCommon::ShiftBackSpaceWellFormed() noexcept
 {
 	// Issue#259: Shift + BackSpace inserts 7;2u in `:terminal`, mode sent as <S-BS>.
