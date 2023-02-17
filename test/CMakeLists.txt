@@ -59,8 +59,10 @@ add_xtest(tst_neovimconnector)
 add_xtest(tst_callallmethods)
 add_xtest(tst_encoding)
 add_xtest(tst_msgpackiodevice)
-add_xtest_gui(tst_shell ${SRC_SHELL_PLATFORM})
 add_xtest_gui(tst_main)
+add_xtest_gui(tst_shell
+	${SRC_SHELL_PLATFORM}
+	mock_qsettings.cpp)
 add_xtest_gui(tst_qsettings
 	${SRC_SHELL_PLATFORM}
 	mock_qsettings.cpp)

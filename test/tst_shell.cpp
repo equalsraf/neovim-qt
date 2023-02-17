@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "common_gui.h"
+#include "mock_qsettings.h"
 
 #if defined(Q_OS_WIN) && defined(USE_STATIC_QT)
 #include <QtPlugin>
@@ -24,11 +25,14 @@ class TestShell : public QObject
 
 private slots:
 	void initTestCase() noexcept;
+	void cleanup() noexcept;
+
 	void benchStart() noexcept;
 	void startVarsShellWidget() noexcept;
 	void startVarsMainWindow() noexcept;
 	void gviminit() noexcept;
-	void guiShimCommands() noexcept;
+	void GuiLinespaceCommand() noexcept;
+	void GuiFontCommand() noexcept;
 	void CloseEvent_data() noexcept;
 	void CloseEvent() noexcept;
 	void GetClipboard_data() noexcept;
@@ -48,6 +52,8 @@ static void SignalPrintError(QString msg, const QVariant& err) noexcept
 
 void TestShell::initTestCase() noexcept
 {
+	NeovimQt::MockQSettings::EnableByDefault();
+
 	const QStringList fonts{
 		QStringLiteral("third-party/DejaVuSansMono.ttf"),
 		QStringLiteral("third-party/DejaVuSansMono-Bold.ttf"),
@@ -59,6 +65,12 @@ void TestShell::initTestCase() noexcept
 		QFontDatabase::addApplicationFont(abs_path_to_font);
 	}
 }
+
+void TestShell::cleanup() noexcept
+{
+	NeovimQt::MockQSettings::ClearAllContents();
+}
+
 
 void TestShell::benchStart() noexcept
 {
@@ -101,7 +113,7 @@ void TestShell::gviminit() noexcept
 	QCOMPARE(cmd.at(0).at(2).toByteArray(), QByteArray("1"));
 }
 
-void TestShell::guiShimCommands() noexcept
+void TestShell::GuiLinespaceCommand() noexcept
 {
 	auto cw{ CreateMainWindowWithRuntime() };
 	NeovimConnector* c{ cw.first };
@@ -109,20 +121,45 @@ void TestShell::guiShimCommands() noexcept
 
 	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
 
-	QSignalSpy cmd_font(
-		c->neovimObject()->vim_command_output(c->encode("GuiFont!")), &MsgpackRequest::finished);
-	QVERIFY(cmd_font.isValid());
-	QVERIFY2(SPYWAIT(cmd_font), "Waiting for GuiFont");
+	QSignalSpy cmd_ls{ c->neovimObject()->vim_command_output(c->encode("GuiLinespace")),
+		&MsgpackRequest::finished };
 
-	QSignalSpy cmd_ls(
-		c->neovimObject()->vim_command_output(c->encode("GuiLinespace")),
-		&MsgpackRequest::finished);
 	QVERIFY(cmd_ls.isValid());
 	QVERIFY2(SPYWAIT(cmd_ls), "Waiting for GuiLinespace");
 
+	QSignalSpy spyFontChanged{ w->shell(), &ShellWidget::shellFontChanged };
+	QSignalSpy spyLineSpace2{ c->neovimObject()->vim_command_output(c->encode("GuiLinespace 2")),
+		&MsgpackRequest::finished };
+
+	QVERIFY(spyFontChanged.isValid());
+	QVERIFY(SPYWAIT(spyFontChanged));
+
+	QSignalSpy spyLineSpaceValue{ c->neovimObject()->vim_command_output(c->encode("GuiLinespace")),
+		&MsgpackRequest::finished };
+
+	QVERIFY(spyLineSpaceValue.isValid());
+	QVERIFY(SPYWAIT(spyLineSpaceValue));
+
+	QByteArray varObserved{ spyLineSpaceValue.at(0).at(2).toByteArray() };
+	QCOMPARE(varObserved, QByteArray{ "2" });
+}
+
+void TestShell::GuiFontCommand() noexcept
+{
+	auto cw{ CreateMainWindowWithRuntime() };
+	NeovimConnector* c{ cw.first };
+	MainWindow* w{ cw.second };
+
+	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
+
+	QSignalSpy spyGuiFontNoArgs{ c->neovimObject()->vim_command_output(c->encode("GuiFont")),
+		&MsgpackRequest::finished };
+	QVERIFY(spyGuiFontNoArgs.isValid());
+	QVERIFY2(SPYWAIT(spyGuiFontNoArgs), "Waiting for GuiFont");
+
 	// Test font attributes
-	const QString cmdFontSize14{ QStringLiteral("GuiFont! %1:h14").arg(GetPlatformTestFont()) };
-	const QString expectedFontSize14{ QStringLiteral("%1:h14").arg(GetPlatformTestFont()) };
+	const QString cmdFontSize14{ QStringLiteral("GuiFont! DejaVu Sans Mono:h14") };
+	const QString expectedFontSize14{ QStringLiteral("DejaVu Sans Mono:h14") };
 	QSignalSpy cmd_gf{ c->neovimObject()->vim_command_output(c->encode(cmdFontSize14)),
 		&MsgpackRequest::finished };
 	QVERIFY(cmd_gf.isValid());
@@ -136,10 +173,8 @@ void TestShell::guiShimCommands() noexcept
 	QCOMPARE(w->shell()->fontDesc(), expectedFontSize14);
 
 	// Normalization removes the :b attribute
-	const QString cmdFontBoldRemoved{
-		QStringLiteral("GuiFont! %1:h16:b:l").arg(GetPlatformTestFont())
-	};
-	const QString expectedFontBoldRemoved{ QStringLiteral("%1:h16:l").arg(GetPlatformTestFont()) };
+	const QString cmdFontBoldRemoved{ QStringLiteral("GuiFont! DejaVu Sans Mono:h16:b:l") };
+	const QString expectedFontBoldRemoved{ QStringLiteral("DejaVu Sans Mono:h16:l") };
 	QSignalSpy spy_fontchange2(w->shell(), &ShellWidget::shellFontChanged);
 	QSignalSpy cmd_gf2{ c->neovimObject()->vim_command_output(c->encode(cmdFontBoldRemoved)),
 						&MsgpackRequest::finished };
