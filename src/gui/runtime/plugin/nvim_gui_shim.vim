@@ -283,3 +283,16 @@ function! s:GuiWindowOpacityCommand(value) abort
   call rpcnotify(0, 'Gui', 'WindowOpacity', a:value)
 endfunction
 command! -nargs=1 GuiWindowOpacity call s:GuiWindowOpacityCommand("<args>")
+
+" Issue 728: Terminal reports ';2u' for key sequences such as <S-Space>
+" Force-mapping keys is a less-than ideal workaround, but it is the only
+" option that appeases everyone. Neovim does not report terminal mode.
+"
+" See issues:
+"  - https://github.com/neovim/neovim/issues/20325
+"  - https://github.com/neovim/neovim/issues/19265
+"  - https://github.com/equalsraf/neovim-qt/issues/999
+tnoremap <S-Space> <Space>
+tnoremap <C-Space> <Space>
+tnoremap <S-Backspace> <BackSpace>
+tnoremap <C-Backspace> <Backspace>
