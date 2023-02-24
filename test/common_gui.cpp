@@ -1,6 +1,7 @@
 #include "common_gui.h"
 
 #include <gui/mainwindow.h>
+#include <QFontDatabase>
 
 #include "common.h"
 
@@ -75,6 +76,20 @@ std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept
 	ValidateNeovimConnection(w);
 
 	return { c, w };
+}
+
+void LoadDejaVuSansMonoTestFonts() noexcept
+{
+	const QStringList fonts{
+		QStringLiteral("third-party/DejaVuSansMono.ttf"),
+		QStringLiteral("third-party/DejaVuSansMono-Bold.ttf"),
+		QStringLiteral("third-party/DejaVuSansMono-BoldOblique.ttf") };
+
+	for (const auto& path : fonts) {
+		QString abs_path_to_font(CMAKE_SOURCE_DIR);
+		abs_path_to_font.append("/").append(path);
+		QFontDatabase::addApplicationFont(abs_path_to_font);
+	}
 }
 
 } // namespace NeovimQt

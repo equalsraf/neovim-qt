@@ -13,4 +13,6 @@ std::pair<NeovimConnector*, MainWindow*> CreateMainWindow() noexcept;
 
 std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept;
 
+void LoadDejaVuSansMonoTestFonts() noexcept;
+
 } // namespace NeovimQt
