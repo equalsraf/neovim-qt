@@ -150,30 +150,37 @@ void TestShell::GuiFontCommand() noexcept
 	// Test font attributes
 	const QString cmdFontSize14{ QStringLiteral("GuiFont! DejaVu Sans Mono:h14") };
 	const QString expectedFontSize14{ QStringLiteral("DejaVu Sans Mono:h14") };
-	QSignalSpy cmd_gf{ c->neovimObject()->vim_command_output(c->encode(cmdFontSize14)),
+
+	// Issue#977: concurrency issue inside of Shell::updateGuiFontRegisters() for guifont.
+	// A call to :GuiFont triggers a call update guifont=. If a second call to :GuiFont is made
+	// while the guifont= callback is still outstanding, the guifont value is mangled. This can be
+	// observed if the test delay below is removed.
+	QTest::qWait(500);
+
+	QSignalSpy spyGuiFontSize14{ c->neovimObject()->vim_command_output(c->encode(cmdFontSize14)),
 		&MsgpackRequest::finished };
-	QVERIFY(cmd_gf.isValid());
-	QVERIFY(SPYWAIT(cmd_gf));
+	QSignalSpy spyFontChangedSize14{ w->shell(), &ShellWidget::shellFontChanged };
 
-	QSignalSpy spy_fontchange(w->shell(), &ShellWidget::shellFontChanged);
-
-	// Test Performance: timeout occurs often, set value carefully.
-	SPYWAIT(spy_fontchange, 2500 /*msec*/);
-
+	QVERIFY(spyGuiFontSize14.isValid());
+	QVERIFY(SPYWAIT(spyGuiFontSize14));
+	QVERIFY(SPYWAIT(spyFontChangedSize14));
 	QCOMPARE(w->shell()->fontDesc(), expectedFontSize14);
 
 	// Normalization removes the :b attribute
-	const QString cmdFontBoldRemoved{ QStringLiteral("GuiFont! DejaVu Sans Mono:h16:b:l") };
+	const QString cmdFontBoldRemoved{
+		QStringLiteral("GuiFont! DejaVu Sans Mono:h16:b:l")
+	};
+
 	const QString expectedFontBoldRemoved{ QStringLiteral("DejaVu Sans Mono:h16:l") };
-	QSignalSpy spy_fontchange2(w->shell(), &ShellWidget::shellFontChanged);
-	QSignalSpy cmd_gf2{ c->neovimObject()->vim_command_output(c->encode(cmdFontBoldRemoved)),
-						&MsgpackRequest::finished };
-	QVERIFY(cmd_gf2.isValid());
-	QVERIFY(SPYWAIT(cmd_gf2, 5000));
 
-	// Test Performance: timeout occurs often, set value carefully.
-	SPYWAIT(spy_fontchange2, 5000 /*msec*/);
+	QSignalSpy spyFontConflictingArgs{ c->neovimObject()->vim_command_output(
+										   c->encode(cmdFontBoldRemoved)),
+		&MsgpackRequest::finished };
+	QSignalSpy spyFontChangedBoldRemoved(w->shell(), &ShellWidget::shellFontChanged);
 
+	QVERIFY(spyFontConflictingArgs.isValid());
+	QVERIFY(SPYWAIT(spyFontConflictingArgs));
+	QVERIFY(SPYWAIT(spyFontChangedBoldRemoved));
 	QCOMPARE(w->shell()->fontDesc(), expectedFontBoldRemoved);
 }
 
