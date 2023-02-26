@@ -67,7 +67,7 @@ add_executable(nvim-qt WIN32 MACOSX_BUNDLE main.cpp
 	${RES_FILE}
 	${ICON_PATH})
 
-target_link_libraries(nvim-qt ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt-gui)
+target_link_libraries(nvim-qt ${QTLIBS} neovim-qt-gui)
 
 if(APPLE)
 	add_custom_command(TARGET nvim-qt COMMAND ${CMAKE_COMMAND} -E copy_directory
