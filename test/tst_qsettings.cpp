@@ -32,6 +32,16 @@ static void SendNeovimCommand(NeovimConnector& connector, const QString& command
 
 	QVERIFY(spyCommand.isValid());
 	QVERIFY(SPYWAIT(spyCommand));
+
+
+	// Hypothesis: sometimes we do not wait long enough for the effects of
+	// a command to manifest because it requires
+	// 1. msg from gui to nvim
+	// 2. msg from nvim to gui
+	// The later are usually asynchronous notifications
+	//
+	// Attempt to ensure the previous command had the inteded effect
+	QTest::qSleep(1000);
 }
 
 void TestQSettings::initTestCase() noexcept
