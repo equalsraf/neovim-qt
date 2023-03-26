@@ -39,12 +39,16 @@ test_script:
 - set PATH=%QTPATH%;%QTPATH%/bin;%PATH%
 - echo %PATH%
 - cd "%APPVEYOR_BUILD_FOLDER%"/build
-- ctest -VV -C Release
+- ctest -VV -C Release --timeout 120 --output-junit JUnit.xml
 - ps: (Get-Item "$($env:APPVEYOR_BUILD_FOLDER)\INSTALL\bin\nvim-qt.exe").VersionInfo
 artifacts:
 - path: INSTALL
   name: neovim-qt
 - path: build\_CPack_Packages\win64\WIX\neovim-qt-installer.msi
+on_finish:
+- ps: |
+      $wc = New-Object 'System.Net.WebClient'
+      $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$env:APPVEYOR_JOB_ID", (Resolve-Path .\JUnit.xml))
 deploy:
   - provider: GitHub
     description: Automated builds (Appveyor)
