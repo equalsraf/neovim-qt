@@ -148,7 +148,7 @@ jobs:
         uses: GabrielBB/xvfb-action@v1 # Required by Linux, no X11 $DISPLAY
         with:
           working-directory: ${{ github.workspace }}/build
-          run: ctest --timeout 120 --output-on-failure -C ${{ matrix.flavor }}
+          run: ctest -VV --timeout 120 --output-on-failure -C ${{ matrix.flavor }}
 
       #
       # Deploy Release Binaries
