@@ -19,7 +19,7 @@ configuration:
 matrix:
   fast_finish: false
 install:
-- ps: appveyor DownloadFile -FileName Neovim.zip "https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip"
+- ps: appveyor DownloadFile -FileName Neovim.zip "https://github.com/neovim/neovim/releases/download/stable/nvim-win64.zip"
 - 7z x Neovim.zip
 - set PATH=%PATH%;%CD%\nvim-win64\bin;
 - nvim --version
