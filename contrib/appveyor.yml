@@ -55,7 +55,7 @@ deploy:
     release: $(appveyor_repo_tag_name)
     auth_token:
       secure: zhYnPJHaw6Dkl59gfvcx4EaAw7xhmU//01kwlRCvqdbkrz2IVSZKdwEs77Lw4Iod
-    artifact: neovim-qt.zip
+    artifact: neovim-qt.zip, build\_CPack_Packages\win64\WIX\neovim-qt-installer.msi
     prerelease: false
     on:
       appveyor_repo_tag: true
