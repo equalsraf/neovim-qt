@@ -14,10 +14,19 @@ environment:
     QTPATH: C:\Qt\5.15\msvc2019_64
     GENERATOR: Visual Studio 16
     CMAKE_PATH_PREFIX: C:\Qt\5.15\msvc2019_64\lib\cmake
+  - PlatformToolset: MinGW-Win64-Qt6
+    QTPATH: C:\Qt\6.2.4\mingw_64
+    GENERATOR: MinGW Makefiles
+    RELEASE_ARTIFACT: false
+    CMAKE_PATH_PREFIX: C:\Qt\6.2.4\mingw_64\lib\cmake
+    EXTRA_CMAKE_ARGS: -DWITH_QT=Qt6
 configuration:
 - RelWithDebInfo
 matrix:
   fast_finish: false
+  allow_failures:
+  - PlatformToolset: MinGW-Win64-Qt6
+
 install:
 - ps: appveyor DownloadFile -FileName Neovim.zip "https://github.com/neovim/neovim/releases/download/stable/nvim-win64.zip"
 - 7z x Neovim.zip
@@ -25,6 +34,7 @@ install:
 - nvim --version
 # sh.exe must not be in the PATH
 - if "%PlatformToolset%"=="MinGW-Win64" set PATH=C:\Qt\Tools\mingw810_64\bin;%PATH%;C:\Qt\5.15.1\mingw81_64\bin;C:\Program Files\Git\usr\bin
+- if "%PlatformToolset%"=="MinGW-Win64-Qt6" set PATH=C:\msys64\mingw64\bin;%PATH%;%QTPATH%\bin;C:\Program Files\Git\usr\bin
 - if "%PlatformToolset%"=="VisualStudio2019" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 build_script:
 - cd "%APPVEYOR_BUILD_FOLDER%"
