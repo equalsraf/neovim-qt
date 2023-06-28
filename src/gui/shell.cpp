@@ -928,7 +928,11 @@ void Shell::handleExtGuiOption(const QString& name, const QVariant& value)
 		handleGuiPopupmenu(value);
 	} else if (name == "RenderLigatures"){
 		setLigatureMode(value.toBool());
-	} else {
+	}
+	else if (name == "RenderFontAttr") {
+		setRenderFontAttr(value.toBool());
+	}
+	else {
 		// Uncomment for writing new event handling code.
 		// qDebug() << "Unknown GUI Option" << name << value;
 	}

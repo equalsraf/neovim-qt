@@ -146,6 +146,32 @@ void TestShell::guiShimCommands() noexcept
 	SPYWAIT(spy_fontchange2, 5000 /*msec*/);
 
 	QCOMPARE(w->shell()->fontDesc(), expectedFontBoldRemoved);
+
+	// GuiRenderFontAttr
+	QCOMPARE(w->shell()->renderFontAttr(), true);
+
+	QSignalSpy spy_fontattr_change(w->shell(), &ShellWidget::renderFontAttrChanged);
+	QVERIFY(spy_fontattr_change.isValid());
+	QSignalSpy cmd_fontattr(
+		c->neovimObject()->vim_command_output(c->encode("GuiRenderFontAttr 0")),
+		&MsgpackRequest::finished);
+	QVERIFY(cmd_fontattr.isValid());
+
+	QVERIFY2(SPYWAIT(cmd_fontattr), "Waiting for GuiRenderFontAttr cmd");
+	QVERIFY2(SPYWAIT(spy_fontattr_change), "Waiting for renderFontAttrChanged");
+	QCOMPARE(w->shell()->renderFontAttr(), false);
+
+	QSignalSpy spy_fontattr_change2(w->shell(), &ShellWidget::renderFontAttrChanged);
+	QVERIFY(spy_fontattr_change2.isValid());
+	QSignalSpy cmd_fontattr2(
+		c->neovimObject()->vim_command_output(c->encode("GuiRenderFontAttr 1")),
+		&MsgpackRequest::finished);
+	QVERIFY(cmd_fontattr2.isValid());
+
+	QVERIFY2(SPYWAIT(cmd_fontattr2), "Waiting for GuiRenderFontAttr cmd");
+	QVERIFY2(SPYWAIT(spy_fontattr_change2), "Waiting for renderFontAttrChanged");
+	QCOMPARE(w->shell()->renderFontAttr(), true);
+
 }
 
 void TestShell::CloseEvent_data() noexcept
