@@ -14,6 +14,7 @@ class ShellWidget: public QWidget
 	Q_PROPERTY(int columns READ columns NOTIFY columnsChanged)
 	Q_PROPERTY(QSize cellSize READ cellSize NOTIFY cellSizeChanged)
 	Q_PROPERTY(bool ligatureMode MEMBER m_isLigatureModeEnabled READ isLigatureModeEnabled WRITE setLigatureMode NOTIFY ligatureModeChanged)
+	Q_PROPERTY(bool renderFontAttr READ renderFontAttr WRITE setRenderFontAttr NOTIFY renderFontAttrChanged)
 
 public:
 	ShellWidget(QWidget *parent=0);
@@ -80,6 +81,8 @@ public:
 	{
 		return m_isLigatureModeEnabled;
 	}
+	bool renderFontAttr() const;
+	void setRenderFontAttr(bool);
 
 signals:
 	void shellFontChanged();
@@ -90,6 +93,7 @@ signals:
 	void columnsChanged(int cols);
 	void cellSizeChanged(QSize size);
 	void ligatureModeChanged(bool isEnabled);
+	void renderFontAttrChanged(bool isEnabled);
 
 public slots:
 	void resizeShell(int rows, int columns);
@@ -198,6 +202,7 @@ private:
 	QColor m_spColor;
 	int m_lineSpace{ 0 };
 	bool m_isLigatureModeEnabled{ false };
+	bool m_renderFontAttr{ true };
 
 	Background m_background{ Background::Dark };
 };

@@ -118,6 +118,20 @@ QSize ShellWidget::cellSize() const
 	return m_cellSize;
 }
 
+bool ShellWidget::renderFontAttr() const
+{
+	return m_renderFontAttr;
+}
+
+void ShellWidget::setRenderFontAttr(bool value)
+{
+	if (value != m_renderFontAttr) {
+		m_renderFontAttr = value;
+		update();
+		emit renderFontAttrChanged(m_renderFontAttr);
+	}
+}
+
 QRect ShellWidget::getNeovimCursorRect(QRect cellRect) noexcept
 {
 	QRect cursorRect{ cellRect };
@@ -342,11 +356,11 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 		}
 	}
 
-	if (cell.IsBold()) {
+	if (cell.IsBold() && renderFontAttr()) {
 		cellFont.setBold(cell.IsBold());
 	}
 
-	if (cell.IsItalic()) {
+	if (cell.IsItalic() && renderFontAttr()) {
 		cellFont.setItalic(cell.IsItalic());
 	}
 

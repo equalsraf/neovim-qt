@@ -278,6 +278,12 @@ function! s:GuiRenderLigatures(enable) abort
 endfunction
 command! -nargs=1 GuiRenderLigatures call s:GuiRenderLigatures(<args>)
 
+" Enable/Disable the rendering of bold/italics
+function! s:GuiRenderFontAttr(enable) abort
+	call rpcnotify(0, 'Gui', 'Option', 'RenderFontAttr', a:enable)
+endfunction
+command! -nargs=1 GuiRenderFontAttr call s:GuiRenderFontAttr(<args>)
+
 " Set window transparency, forwards to Qt setWindowOpacity
 function! s:GuiWindowOpacityCommand(value) abort
   call rpcnotify(0, 'Gui', 'WindowOpacity', a:value)
