@@ -20,9 +20,9 @@ jobs:
       displayName: CMake Build
 
 
-  - job: UbuntuBionic
+  - job: UbuntuFocal
     pool:
-      vmImage: 'ubuntu-18.04'
+      vmImage: 'ubuntu-20.04'
     steps:
     - script: |
         sudo add-apt-repository -y ppa:neovim-ppa/stable
