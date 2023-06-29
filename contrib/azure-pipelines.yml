@@ -89,7 +89,7 @@ jobs:
         architecture: 'x64'
       displayName: Setup Python
     - script: |
-        cinst --no-progress -y 7zip neovim
+        choco install --no-progress -y 7zip neovim
         pip install aqtinstall
         cd $(Build.BinariesDirectory)
         python -m aqt install 5.15.0 windows desktop win64_msvc2019_64
@@ -118,7 +118,7 @@ jobs:
         architecture: 'x64'
       displayName: Setup Python
     - script: |
-        cinst --no-progress -y 7zip neovim
+        choco install --no-progress -y 7zip neovim
         pip install aqtinstall
         cd $(Build.BinariesDirectory)
         python -m aqt install 6.0.0 windows desktop win64_msvc2019_64
