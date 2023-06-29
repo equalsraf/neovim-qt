@@ -78,6 +78,8 @@ jobs:
 
 
   - job: Windows_qt5
+    variables:
+      VCINSTALLDIR: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC
     pool:
       vmImage: 'windows-2019'
     steps:
@@ -98,7 +100,7 @@ jobs:
     - task: CMake@1
       inputs:
         workingDirectory: $(Build.BinariesDirectory)
-        cmakeArgs: -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=$(Build.BinariesDirectory)\5.15.0\msvc2019_64\lib\cmake;$(Build.BinariesDirectory)\5.15.0\msvc2019_64\bin $(Build.SourcesDirectory)
+        cmakeArgs: -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_PREFIX_PATH=$(Build.BinariesDirectory)\5.15.0\msvc2019_64\lib\cmake;$(Build.BinariesDirectory)\5.15.0\msvc2019_64\bin $(Build.SourcesDirectory)
       displayName: CMake Configure
     - task: CMake@1
       inputs:
