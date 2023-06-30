@@ -30,12 +30,8 @@ void EnableByDefault() noexcept
 
 void ClearAllContents() noexcept
 {
-	s_mockSettingsMap = {};
-}
-
-void OverwriteContents(QSettings::SettingsMap newValue) noexcept
-{
-	s_mockSettingsMap = std::move(newValue);
+	QSettings settings;
+	settings.clear();
 }
 
 }} // namespace NeovimQt::MockQSettings

@@ -1,12 +1,30 @@
 #include "common_gui.h"
 
 #include <gui/mainwindow.h>
+#include <QFontDatabase>
 
 #include "common.h"
 
 namespace NeovimQt {
 
-static const QStringList cs_argsNone{ "-u", "NONE" }; // clazy:exclude=non-pod-global-static
+static QStringList GetNoneArguments() noexcept
+{
+	static const QStringList cs_argsNone{ "-u", "NONE" };
+	return cs_argsNone;
+}
+
+static QStringList GetNoneArgumentsWithRuntime() noexcept
+{
+	static const QStringList cs_argsNoneRuntime{
+		"-u", "NONE", "--cmd", "set rtp+=" + GetRuntimeAbsolutePath()
+	};
+	return cs_argsNoneRuntime;
+}
+
+static void BypassLocalAndLoadTestGviminit() noexcept
+{
+	qputenv("GVIMINIT", "let g:loaded_test_gviminit = 1");
+}
 
 static void DisableLocalGInitVim() noexcept
 {
@@ -37,8 +55,9 @@ template<class T> static void ValidateNeovimConnection(T* obj) noexcept
 
 std::pair<NeovimConnector*, Shell*> CreateShellWidget() noexcept
 {
-	DisableLocalGInitVim();
-	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
+	BypassLocalAndLoadTestGviminit();
+
+	NeovimConnector* c{ NeovimConnector::spawn(GetNoneArguments()) };
 	Shell* s{ new Shell{ c } };
 
 	s->show();
@@ -50,7 +69,9 @@ std::pair<NeovimConnector*, Shell*> CreateShellWidget() noexcept
 
 std::pair<NeovimConnector*, MainWindow*> CreateMainWindow() noexcept
 {
-	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
+	BypassLocalAndLoadTestGviminit();
+
+	NeovimConnector* c{ NeovimConnector::spawn(GetNoneArguments()) };
 	MainWindow* w{ new MainWindow{ c } };
 
 	w->show();
@@ -62,12 +83,10 @@ std::pair<NeovimConnector*, MainWindow*> CreateMainWindow() noexcept
 
 std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept
 {
-	static const QStringList cs_argsNoneRuntime{
-		"-u", "NONE", "--cmd", "set rtp+=" + GetRuntimeAbsolutePath()
-	};
+	BypassLocalAndLoadTestGviminit();
 
 	DisableLocalGInitVim();
-	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNoneRuntime) };
+	NeovimConnector* c{ NeovimConnector::spawn(GetNoneArgumentsWithRuntime()) };
 	MainWindow* w{ new MainWindow{ c } };
 
 	w->show();
@@ -75,6 +94,19 @@ std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept
 	ValidateNeovimConnection(w);
 
 	return { c, w };
+}
+
+void LoadLocalDejaVuTestFonts() noexcept
+{
+	const QStringList fonts{ QStringLiteral("third-party/DejaVuSansMono.ttf"),
+		QStringLiteral("third-party/DejaVuSansMono-Bold.ttf"),
+		QStringLiteral("third-party/DejaVuSansMono-BoldOblique.ttf") };
+
+	for (const auto& path : fonts) {
+		QString abs_path_to_font(CMAKE_SOURCE_DIR);
+		abs_path_to_font.append("/").append(path);
+		QFontDatabase::addApplicationFont(abs_path_to_font);
+	}
 }
 
 } // namespace NeovimQt
