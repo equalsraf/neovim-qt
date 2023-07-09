@@ -11,15 +11,18 @@ environment:
     RELEASE_ARTIFACT: true
     CMAKE_PATH_PREFIX: C:\Qt\5.15\mingw81_64\lib\cmake
     CMAKE_BUILD_TYPE: Release
+    CMAKE_BUILD_PARALLEL_LEVEL: 2
   - PlatformToolset: VisualStudio2019
     QTPATH: C:\Qt\5.15\msvc2019_64
     GENERATOR: Visual Studio 16
     CMAKE_PATH_PREFIX: C:\Qt\5.15\msvc2019_64\lib\cmake
     CMAKE_BUILD_TYPE: Debug
+    CMAKE_BUILD_PARALLEL_LEVEL: 2
   - PlatformToolset: MinGW-Win64-Qt6
     QTPATH: C:\Qt\6.2.4\mingw_64
     GENERATOR: MinGW Makefiles
     CMAKE_PATH_PREFIX: C:\Qt\6.2.4\mingw_64\lib\cmake
+    CMAKE_BUILD_PARALLEL_LEVEL: 2
     EXTRA_CMAKE_ARGS: -DWITH_QT=Qt6
     CMAKE_BUILD_TYPE: Release
 configuration:
