@@ -85,6 +85,8 @@ void TestQSettings::OptionPopupMenu() noexcept
 
 	SendNeovimCommand(connector, "GuiPopupmenu 0");
 	QCOMPARE(settings.value("ext_popupmenu").toBool(), false);
+
+	cw.second->deleteLater();
 }
 
 void TestQSettings::OptionTabline() noexcept
@@ -99,6 +101,8 @@ void TestQSettings::OptionTabline() noexcept
 
 	SendNeovimCommand(connector, "GuiTabline 0");
 	QCOMPARE(settings.value("ext_tabline").toBool(), false);
+
+	cw.second->deleteLater();
 }
 
 void TestQSettings::GuiFont() noexcept
@@ -115,6 +119,8 @@ void TestQSettings::GuiFont() noexcept
 	SendNeovimCommand(connector, fontCommand);
 	QCOMPARE(window.shell()->fontDesc(), fontDesc);
 	QCOMPARE(settings.value("Gui/Font").toString(), fontDesc);
+
+	cw.second->deleteLater();
 }
 
 void TestQSettings::GuiScrollBar() noexcept
@@ -129,6 +135,8 @@ void TestQSettings::GuiScrollBar() noexcept
 
 	SendNeovimCommand(connector, "GuiScrollBar 0");
 	QCOMPARE(settings.value("Gui/ScrollBar").toBool(), false);
+
+	cw.second->deleteLater();
 }
 void TestQSettings::GuiTreeView() noexcept
 {
@@ -142,6 +150,8 @@ void TestQSettings::GuiTreeView() noexcept
 
 	SendNeovimCommand(connector, "GuiTreeviewHide");
 	QCOMPARE(settings.value("Gui/TreeView").toBool(), false);
+
+	cw.second->deleteLater();
 }
 
 } // Namespace NeovimQt
