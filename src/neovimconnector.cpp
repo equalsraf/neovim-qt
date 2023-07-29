@@ -37,6 +37,7 @@ NeovimConnector::NeovimConnector(MsgpackIODevice *dev)
 
 	connect(m_dev, &MsgpackIODevice::error,
 			this, &NeovimConnector::msgpackError);
+	connect(m_dev, &MsgpackIODevice::aboutToClose, this, &NeovimConnector::aboutToClose);
 
 	m_dev->setParent(this);
 

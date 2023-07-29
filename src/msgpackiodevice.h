@@ -71,6 +71,7 @@ signals:
 	/** A notification with the given name and arguments was received */
 	void notification(const QByteArray &name, const QVariantList& args);
 	void encodingChanged(const QByteArray& encoding);
+	void aboutToClose();
 
 protected:
 	void sendError(const msgpack_object& req, const QString& msg);

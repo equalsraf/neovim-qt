@@ -106,6 +106,7 @@ signals:
 	void ready();
 	void error(NeovimQt::NeovimConnector::NeovimError);
 	void processExited(int exitCode);
+	void aboutToClose();
 
 public slots:
 	void fatalTimeout();
