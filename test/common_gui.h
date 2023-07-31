@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QSharedPointer>
 #include <gui/mainwindow.h>
 #include <gui/shell.h>
 #include <neovimconnector.h>
@@ -7,10 +8,10 @@
 
 namespace NeovimQt {
 
-Shell* CreateShellWidget() noexcept;
+QSharedPointer<Shell> CreateShellWidget() noexcept;
 
-MainWindow* CreateMainWindow() noexcept;
+QSharedPointer<MainWindow> CreateMainWindow() noexcept;
 
-MainWindow* CreateMainWindowWithRuntime() noexcept;
+QSharedPointer<MainWindow> CreateMainWindowWithRuntime() noexcept;
 
 } // namespace NeovimQt

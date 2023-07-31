@@ -64,9 +64,9 @@ void TestShell::benchStart() noexcept
 {
 	QBENCHMARK
 	{
-		Shell* s = CreateShellWidget();
+		auto s = CreateShellWidget();
 
-		QSignalSpy onResize(s, &Shell::neovimResized);
+		QSignalSpy onResize(s.get(), &Shell::neovimResized);
 		QVERIFY(onResize.isValid());
 		QVERIFY(SPYWAIT(onResize));
 	}
@@ -77,8 +77,6 @@ void TestShell::startVarsShellWidget() noexcept
 	auto s = CreateShellWidget();
 
 	checkStartVars(s->nvim());
-
-	s->deleteLater();
 }
 
 void TestShell::startVarsMainWindow() noexcept
@@ -98,8 +96,6 @@ void TestShell::gviminit() noexcept
 	QVERIFY(cmd.isValid());
 	QVERIFY(SPYWAIT(cmd));
 	QCOMPARE(cmd.at(0).at(2).toByteArray(), QByteArray("1"));
-
-	s->deleteLater();
 }
 
 void TestShell::guiShimCommands() noexcept
@@ -150,8 +146,6 @@ void TestShell::guiShimCommands() noexcept
 	SPYWAIT(spy_fontchange2, 5000 /*msec*/);
 
 	QCOMPARE(w->shell()->fontDesc(), expectedFontBoldRemoved);
-
-	w->deleteLater();
 }
 
 void TestShell::CloseEvent_data() noexcept
@@ -186,7 +180,7 @@ void TestShell::CloseEvent() noexcept
 	QSignalSpy onClose(w->shell(), &Shell::neovimGuiCloseRequest);
 	QVERIFY(onClose.isValid());
 
-	QSignalSpy onWindowClosing(w, &MainWindow::closing);
+	QSignalSpy onWindowClosing(w.get(), &MainWindow::closing);
 	QVERIFY(onWindowClosing.isValid());
 
 	c->api0()->vim_command(c->encode(command));
@@ -210,8 +204,6 @@ void TestShell::CloseEvent() noexcept
 	int actual_exit_status{ p.exitCode() };
 
 	QCOMPARE(actual_exit_status, exit_status);
-
-	w->deleteLater();
 }
 
 void TestShell::GetClipboard_data() noexcept
@@ -250,8 +242,6 @@ void TestShell::GetClipboard() noexcept
 	QVERIFY(cmd_clip.isValid());
 	QVERIFY(SPYWAIT(cmd_clip));
 	QCOMPARE(cmd_clip.takeFirst().at(2), QVariant(register_data));
-
-	w->deleteLater();
 }
 
 void TestShell::SetClipboard_data() noexcept
@@ -292,8 +282,6 @@ void TestShell::SetClipboard() noexcept
 	QVERIFY(SPYWAIT(spy_sync));
 
 	QGuiApplication::clipboard()->setText(register_data, GetClipboardMode(reg));
-
-	w->deleteLater();
 }
 
 void TestShell::checkStartVars(NeovimQt::NeovimConnector* conn) noexcept
