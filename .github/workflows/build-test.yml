@@ -49,30 +49,6 @@ jobs:
             cc: clang
             cxx: clang++
             publish: true
-
-          # Qt 5.15 only supports MinGW 8.11. The `windows-latest` and `windows-2022`
-          # images bundle only 11.2. For now, we must use the older image `windows-2019`.
-          - name: Windows_MingGW
-            flavor: Debug
-            runner: windows-2022
-            generator: MinGW Makefiles
-            qtver: 5.15.2
-            qtdir: mingw81_64
-            qtstr: windows desktop win64_mingw81
-            cc: gcc
-            cxx: g++
-            ctest_exe_args: -tap
-
-          - name: Windows_Release
-            flavor: Release
-            runner: windows-2022
-            generator: Visual Studio 17 2022
-            qtver: 5.15.2
-            qtdir: msvc2019_64
-            qtstr: windows desktop win64_msvc2019_64
-            ctest_exe_args: -tap
-            publish: true
-
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v2
@@ -95,33 +71,6 @@ jobs:
           brew ls --formula | grep -wq qt5 || brew install qt5
           brew ls --formula | grep -wq msgpack || brew install msgpack
           brew link qt5 --force
-
-      - name: Windows - Setup
-        if: ${{ startsWith(matrix.runner, 'windows') }}
-        env:
-          QT_DIR: ${{ github.workspace }}\${{ matrix.qtver }}\${{ matrix.qtdir }}
-        run: |
-          New-Item -Path .\build -Name "build" -ItemType "directory"
-          Invoke-WebRequest https://github.com/neovim/neovim/releases/download/stable/nvim-win64.zip -OutFile nvim-win64.zip
-          Expand-Archive -Path nvim-win64.zip -DestinationPath .\build\
-          Add-Content -Path $env:GITHUB_PATH -Value ${{ github.workspace }}\build\nvim-win64\bin\
-          Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_PREFIX_PATH=$env:QT_DIR;$env:QT_DIR\lib\cmake"
-          Add-Content -Path $env:GITHUB_PATH -Value "${{ env.qt_dir }}"
-          Add-Content -Path $env:GITHUB_PATH -Value "${{ env.qt_dir }}\bin"
-
-      - name: Qt Cache Restore
-        if: ${{ matrix.qtver }}
-        id: cache-qt
-        uses: actions/cache@v2
-        with:
-          path: ${{ matrix.qtver }}\${{ matrix.qtdir }}
-          key: qt-${{ runner.os }}-${{ matrix.qtver }}-${{ matrix.qtdir }}
-
-      - name: Qt Cache Install
-        if: ${{ matrix.qtver && steps.cache-qt.outputs.cache-hit != 'true' }}
-        run: |
-          pip install aqtinstall
-          python -m aqt install ${{ matrix.qtver }} ${{ matrix.qtstr }}
 
       #
       # Build and Test
@@ -168,16 +117,6 @@ jobs:
         run: |
           macdeployqt ./build/bin/nvim-qt.app -dmg
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
-
-      - name: Windows - Publish
-        if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
-        run: |
-          cmake --build ./build --target install
-          Push-Location ${{ github.workspace }}/build
-          cpack --verbose -G WIX
-          Pop-Location
-          Compress-Archive -Path ./install -DestinationPath neovim-qt.zip
-          Move-Item -Path ./build/neovim-qt-installer.msi -Destination neovim-qt-installer.msi
 
       - name: Upload Artifacts
         if: ${{ matrix.publish }}
