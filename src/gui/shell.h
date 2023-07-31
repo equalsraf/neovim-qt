@@ -70,6 +70,7 @@ public:
 	static void DispatchRedrawNotifications(
 		T* pThis, const QVariantList& args) noexcept;
 
+	NeovimConnector* nvim() { return m_nvim; }
 signals:
 	void neovimTitleChanged(const QString &title);
 	void neovimBusyChanged(bool);
