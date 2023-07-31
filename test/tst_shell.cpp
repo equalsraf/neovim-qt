@@ -79,6 +79,8 @@ void TestShell::startVarsShellWidget() noexcept
 	NeovimConnector* c{ cs.first };
 
 	checkStartVars(c);
+
+	cs.second->deleteLater();
 }
 
 void TestShell::startVarsMainWindow() noexcept
@@ -92,13 +94,16 @@ void TestShell::startVarsMainWindow() noexcept
 void TestShell::gviminit() noexcept
 {
 	qputenv("GVIMINIT", "let g:test_gviminit = 1");
-	NeovimConnector* c{ CreateShellWidget().first };
+	auto cs{ CreateShellWidget() };
+	NeovimConnector* c = cs.first;
 
 	MsgpackRequest* req{ c->api0()->vim_command_output(c->encode("echo g:test_gviminit")) };
 	QSignalSpy cmd{ req, &MsgpackRequest::finished };
 	QVERIFY(cmd.isValid());
 	QVERIFY(SPYWAIT(cmd));
 	QCOMPARE(cmd.at(0).at(2).toByteArray(), QByteArray("1"));
+
+	cs.second->deleteLater();
 }
 
 void TestShell::guiShimCommands() noexcept
@@ -150,6 +155,8 @@ void TestShell::guiShimCommands() noexcept
 	SPYWAIT(spy_fontchange2, 5000 /*msec*/);
 
 	QCOMPARE(w->shell()->fontDesc(), expectedFontBoldRemoved);
+
+	w->deleteLater();
 }
 
 void TestShell::CloseEvent_data() noexcept
@@ -209,6 +216,8 @@ void TestShell::CloseEvent() noexcept
 	int actual_exit_status{ p.exitCode() };
 
 	QCOMPARE(actual_exit_status, exit_status);
+
+	w->deleteLater();
 }
 
 void TestShell::GetClipboard_data() noexcept
@@ -247,6 +256,8 @@ void TestShell::GetClipboard() noexcept
 	QVERIFY(cmd_clip.isValid());
 	QVERIFY(SPYWAIT(cmd_clip));
 	QCOMPARE(cmd_clip.takeFirst().at(2), QVariant(register_data));
+
+	cw.second->deleteLater();
 }
 
 void TestShell::SetClipboard_data() noexcept
@@ -287,6 +298,8 @@ void TestShell::SetClipboard() noexcept
 	QVERIFY(SPYWAIT(spy_sync));
 
 	QGuiApplication::clipboard()->setText(register_data, GetClipboardMode(reg));
+
+	cw.second->deleteLater();
 }
 
 void TestShell::checkStartVars(NeovimQt::NeovimConnector* conn) noexcept
