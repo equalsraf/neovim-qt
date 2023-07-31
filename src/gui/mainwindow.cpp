@@ -43,11 +43,11 @@ void MainWindow::init(NeovimConnector *c)
 	}
 
 	m_shell = new Shell(c);
+	m_shell->setParent(this);
 
 	addToolBar(&m_tabline);
 
 	m_nvim = c;
-	m_nvim->setParent(this);
 
 	// GuiShowContextMenu - right click context menu and actions.
 	m_contextMenu = new ContextMenu(c, this);
