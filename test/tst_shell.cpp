@@ -64,8 +64,7 @@ void TestShell::benchStart() noexcept
 {
 	QBENCHMARK
 	{
-		auto cs{ CreateShellWidget() };
-		Shell* s{ cs.second };
+		Shell* s = CreateShellWidget();
 
 		QSignalSpy onResize(s, &Shell::neovimResized);
 		QVERIFY(onResize.isValid());
@@ -75,12 +74,11 @@ void TestShell::benchStart() noexcept
 
 void TestShell::startVarsShellWidget() noexcept
 {
-	auto cs{ CreateShellWidget() };
-	NeovimConnector* c{ cs.first };
+	auto s = CreateShellWidget();
 
-	checkStartVars(c);
+	checkStartVars(s->nvim());
 
-	cs.second->deleteLater();
+	s->deleteLater();
 }
 
 void TestShell::startVarsMainWindow() noexcept
@@ -94,8 +92,8 @@ void TestShell::startVarsMainWindow() noexcept
 void TestShell::gviminit() noexcept
 {
 	qputenv("GVIMINIT", "let g:test_gviminit = 1");
-	auto cs{ CreateShellWidget() };
-	NeovimConnector* c = cs.first;
+	auto s = CreateShellWidget();
+	NeovimConnector* c = s->nvim();
 
 	MsgpackRequest* req{ c->api0()->vim_command_output(c->encode("echo g:test_gviminit")) };
 	QSignalSpy cmd{ req, &MsgpackRequest::finished };
@@ -103,7 +101,7 @@ void TestShell::gviminit() noexcept
 	QVERIFY(SPYWAIT(cmd));
 	QCOMPARE(cmd.at(0).at(2).toByteArray(), QByteArray("1"));
 
-	cs.second->deleteLater();
+	s->deleteLater();
 }
 
 void TestShell::guiShimCommands() noexcept

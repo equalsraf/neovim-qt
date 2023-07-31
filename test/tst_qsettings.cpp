@@ -59,15 +59,13 @@ void TestQSettings::OptionLineGrid() noexcept
 	QSettings settings;
 
 	settings.setValue("ext_linegrid", true);
-	auto csWithLineGrid{ CreateShellWidget() };
-	Shell* sWithLineGrid{ csWithLineGrid.second };
+	auto sWithLineGrid = CreateShellWidget();
 	ShellOptions shellOptionsWithLineGrid{ sWithLineGrid->GetShellOptions() };
 
 	QCOMPARE(shellOptionsWithLineGrid.IsLineGridEnabled(), true);
 
 	settings.setValue("ext_linegrid", false);
-	auto csLegacy{ CreateShellWidget() };
-	Shell* sLegacy{ csLegacy.second };
+	auto sLegacy = CreateShellWidget();
 	ShellOptions shellOptionsLegacy{ sLegacy->GetShellOptions() };
 
 	QCOMPARE(shellOptionsLegacy.IsLineGridEnabled(), false);

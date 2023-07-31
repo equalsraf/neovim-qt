@@ -35,7 +35,7 @@ template<class T> static void ValidateNeovimConnection(T* obj) noexcept
 	Q_ASSERT(obj->isNeovimAttached());
 }
 
-std::pair<NeovimConnector*, Shell*> CreateShellWidget() noexcept
+Shell* CreateShellWidget() noexcept
 {
 	DisableLocalGInitVim();
 	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
@@ -45,7 +45,7 @@ std::pair<NeovimConnector*, Shell*> CreateShellWidget() noexcept
 
 	ValidateNeovimConnection(s);
 
-	return { c, s };
+	return s;
 }
 
 std::pair<NeovimConnector*, MainWindow*> CreateMainWindow() noexcept
