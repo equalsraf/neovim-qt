@@ -11,6 +11,6 @@ Shell* CreateShellWidget() noexcept;
 
 MainWindow* CreateMainWindow() noexcept;
 
-std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept;
+MainWindow* CreateMainWindowWithRuntime() noexcept;
 
 } // namespace NeovimQt

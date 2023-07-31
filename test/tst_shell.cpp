@@ -104,9 +104,8 @@ void TestShell::gviminit() noexcept
 
 void TestShell::guiShimCommands() noexcept
 {
-	auto cw{ CreateMainWindowWithRuntime() };
-	NeovimConnector* c{ cw.first };
-	MainWindow* w{ cw.second };
+	auto w = CreateMainWindowWithRuntime();
+	auto c = w->shell()->nvim();
 
 	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
 
@@ -176,9 +175,8 @@ void TestShell::CloseEvent_data() noexcept
 
 void TestShell::CloseEvent() noexcept
 {
-	auto cw{ CreateMainWindowWithRuntime() };
-	NeovimConnector* c{ cw.first };
-	MainWindow* w{ cw.second };
+	auto w = CreateMainWindowWithRuntime();
+	auto c = w->shell()->nvim();
 
 	QFETCH(int, msgpack_status);
 	QFETCH(int, exit_status);
@@ -234,8 +232,8 @@ void TestShell::GetClipboard_data() noexcept
 
 void TestShell::GetClipboard() noexcept
 {
-	auto cw{ CreateMainWindowWithRuntime() };
-	NeovimConnector* c{ cw.first };
+	auto w = CreateMainWindowWithRuntime();
+	NeovimConnector* c = w->shell()->nvim();
 
 	QFETCH(char, reg);
 	QFETCH(QByteArray, register_data);
@@ -253,7 +251,7 @@ void TestShell::GetClipboard() noexcept
 	QVERIFY(SPYWAIT(cmd_clip));
 	QCOMPARE(cmd_clip.takeFirst().at(2), QVariant(register_data));
 
-	cw.second->deleteLater();
+	w->deleteLater();
 }
 
 void TestShell::SetClipboard_data() noexcept
@@ -274,8 +272,8 @@ void TestShell::SetClipboard_data() noexcept
 
 void TestShell::SetClipboard() noexcept
 {
-	auto cw{ CreateMainWindowWithRuntime() };
-	NeovimConnector* c{ cw.first };
+	auto w = CreateMainWindowWithRuntime();
+	NeovimConnector* c = w->shell()->nvim();
 
 	QFETCH(char, reg);
 	QFETCH(QByteArray, register_data);
@@ -295,7 +293,7 @@ void TestShell::SetClipboard() noexcept
 
 	QGuiApplication::clipboard()->setText(register_data, GetClipboardMode(reg));
 
-	cw.second->deleteLater();
+	w->deleteLater();
 }
 
 void TestShell::checkStartVars(NeovimQt::NeovimConnector* conn) noexcept

@@ -25,9 +25,9 @@ private slots:
 	void GuiTreeView() noexcept;
 };
 
-static void SendNeovimCommand(NeovimConnector& connector, const QString& command) noexcept
+static void SendNeovimCommand(NeovimConnector* connector, const QString& command) noexcept
 {
-	QSignalSpy spyCommand{ connector.api0()->vim_command_output(connector.encode(command)),
+	QSignalSpy spyCommand{ connector->api0()->vim_command_output(connector->encode(command)),
 		&MsgpackRequest::finished };
 
 	QVERIFY(spyCommand.isValid());
@@ -73,11 +73,11 @@ void TestQSettings::OptionLineGrid() noexcept
 
 void TestQSettings::OptionPopupMenu() noexcept
 {
-	auto cw{ CreateMainWindowWithRuntime() };
-	NeovimConnector& connector{ *cw.first };
+	auto w = CreateMainWindowWithRuntime();
+	NeovimConnector *connector = w->shell()->nvim();
 
 	QSettings settings;
-	QSignalSpy spy_fontchange(cw.second->shell(), &ShellWidget::shellFontChanged);
+	QSignalSpy spy_fontchange(w->shell(), &ShellWidget::shellFontChanged);
 
 	SendNeovimCommand(connector, "GuiPopupmenu 1");
 	SPYWAIT(spy_fontchange, 2500 /*msec*/);
@@ -87,13 +87,13 @@ void TestQSettings::OptionPopupMenu() noexcept
 	SPYWAIT(spy_fontchange, 2500 /*msec*/);
 	QCOMPARE(settings.value("ext_popupmenu").toBool(), false);
 
-	cw.second->deleteLater();
+	w->deleteLater();
 }
 
 void TestQSettings::OptionTabline() noexcept
 {
-	auto cw{ CreateMainWindowWithRuntime() };
-	NeovimConnector& connector{ *cw.first };
+	auto w = CreateMainWindowWithRuntime();
+	NeovimConnector* connector = w->shell()->nvim();
 
 	QSettings settings;
 
@@ -103,14 +103,13 @@ void TestQSettings::OptionTabline() noexcept
 	SendNeovimCommand(connector, "GuiTabline 0");
 	QCOMPARE(settings.value("ext_tabline").toBool(), false);
 
-	cw.second->deleteLater();
+	w->deleteLater();
 }
 
 void TestQSettings::GuiFont() noexcept
 {
-	auto cw{ CreateMainWindowWithRuntime() };
-	NeovimConnector& connector{ *cw.first };
-	MainWindow& window{ *cw.second };
+	auto w = CreateMainWindowWithRuntime();
+	NeovimConnector* connector = w->shell()->nvim();
 
 	QSettings settings;
 
@@ -118,16 +117,16 @@ void TestQSettings::GuiFont() noexcept
 	const QString fontCommand{ QStringLiteral("GuiFont! %1").arg(fontDesc) };
 
 	SendNeovimCommand(connector, fontCommand);
-	QCOMPARE(window.shell()->fontDesc(), fontDesc);
+	QCOMPARE(w->shell()->fontDesc(), fontDesc);
 	QCOMPARE(settings.value("Gui/Font").toString(), fontDesc);
 
-	cw.second->deleteLater();
+	w->deleteLater();
 }
 
 void TestQSettings::GuiScrollBar() noexcept
 {
-	auto cw{ CreateMainWindowWithRuntime() };
-	NeovimConnector& connector{ *cw.first };
+	auto w = CreateMainWindowWithRuntime();
+	NeovimConnector* connector = w->shell()->nvim();
 
 	QSettings settings;
 
@@ -137,12 +136,12 @@ void TestQSettings::GuiScrollBar() noexcept
 	SendNeovimCommand(connector, "GuiScrollBar 0");
 	QCOMPARE(settings.value("Gui/ScrollBar").toBool(), false);
 
-	cw.second->deleteLater();
+	w->deleteLater();
 }
 void TestQSettings::GuiTreeView() noexcept
 {
-	auto cw{ CreateMainWindowWithRuntime() };
-	NeovimConnector& connector{ *cw.first };
+	auto w = CreateMainWindowWithRuntime();
+	NeovimConnector* connector = w->shell()->nvim();
 
 	QSettings settings;
 
@@ -152,7 +151,7 @@ void TestQSettings::GuiTreeView() noexcept
 	SendNeovimCommand(connector, "GuiTreeviewHide");
 	QCOMPARE(settings.value("Gui/TreeView").toBool(), false);
 
-	cw.second->deleteLater();
+	w->deleteLater();
 }
 
 } // Namespace NeovimQt

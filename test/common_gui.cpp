@@ -60,7 +60,7 @@ MainWindow* CreateMainWindow() noexcept
 	return w;
 }
 
-std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept
+MainWindow* CreateMainWindowWithRuntime() noexcept
 {
 	static const QStringList cs_argsNoneRuntime{
 		"-u", "NONE", "--cmd", "set rtp+=" + GetRuntimeAbsolutePath()
@@ -74,7 +74,7 @@ std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept
 
 	ValidateNeovimConnection(w);
 
-	return { c, w };
+	return w;
 }
 
 } // namespace NeovimQt
