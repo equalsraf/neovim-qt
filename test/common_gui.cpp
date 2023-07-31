@@ -48,7 +48,7 @@ Shell* CreateShellWidget() noexcept
 	return s;
 }
 
-std::pair<NeovimConnector*, MainWindow*> CreateMainWindow() noexcept
+MainWindow* CreateMainWindow() noexcept
 {
 	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
 	MainWindow* w{ new MainWindow{ c } };
@@ -57,7 +57,7 @@ std::pair<NeovimConnector*, MainWindow*> CreateMainWindow() noexcept
 
 	ValidateNeovimConnection(w);
 
-	return { c, w };
+	return w;
 }
 
 std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept

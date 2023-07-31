@@ -83,10 +83,8 @@ void TestShell::startVarsShellWidget() noexcept
 
 void TestShell::startVarsMainWindow() noexcept
 {
-	auto cw{ CreateMainWindow() };
-	NeovimConnector* c{ cw.first };
-
-	checkStartVars(c);
+	auto w = CreateMainWindow();
+	checkStartVars(w->shell()->nvim());
 }
 
 void TestShell::gviminit() noexcept
