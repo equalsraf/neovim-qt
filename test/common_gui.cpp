@@ -35,7 +35,7 @@ template<class T> static void ValidateNeovimConnection(T* obj) noexcept
 	Q_ASSERT(obj->isNeovimAttached());
 }
 
-std::pair<NeovimConnector*, Shell*> CreateShellWidget() noexcept
+QSharedPointer<Shell> CreateShellWidget() noexcept
 {
 	DisableLocalGInitVim();
 	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
@@ -45,10 +45,10 @@ std::pair<NeovimConnector*, Shell*> CreateShellWidget() noexcept
 
 	ValidateNeovimConnection(s);
 
-	return { c, s };
+	return QSharedPointer<Shell>(s);
 }
 
-std::pair<NeovimConnector*, MainWindow*> CreateMainWindow() noexcept
+QSharedPointer<MainWindow> CreateMainWindow() noexcept
 {
 	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
 	MainWindow* w{ new MainWindow{ c } };
@@ -57,10 +57,10 @@ std::pair<NeovimConnector*, MainWindow*> CreateMainWindow() noexcept
 
 	ValidateNeovimConnection(w);
 
-	return { c, w };
+	return QSharedPointer<MainWindow>(w);
 }
 
-std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept
+QSharedPointer<MainWindow> CreateMainWindowWithRuntime() noexcept
 {
 	static const QStringList cs_argsNoneRuntime{
 		"-u", "NONE", "--cmd", "set rtp+=" + GetRuntimeAbsolutePath()
@@ -74,7 +74,7 @@ std::pair<NeovimConnector*, MainWindow*> CreateMainWindowWithRuntime() noexcept
 
 	ValidateNeovimConnection(w);
 
-	return { c, w };
+	return QSharedPointer<MainWindow>(w);
 }
 
 } // namespace NeovimQt

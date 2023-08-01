@@ -10,16 +10,19 @@ environment:
     GENERATOR: MinGW Makefiles
     RELEASE_ARTIFACT: true
     CMAKE_PATH_PREFIX: C:\Qt\5.15\mingw81_64\lib\cmake
+    CMAKE_BUILD_TYPE: Release
   - PlatformToolset: VisualStudio2019
     QTPATH: C:\Qt\5.15\msvc2019_64
     GENERATOR: Visual Studio 16
     CMAKE_PATH_PREFIX: C:\Qt\5.15\msvc2019_64\lib\cmake
+    CMAKE_BUILD_TYPE: Debug
   - PlatformToolset: MinGW-Win64-Qt6
     QTPATH: C:\Qt\6.2.4\mingw_64
     GENERATOR: MinGW Makefiles
     RELEASE_ARTIFACT: false
     CMAKE_PATH_PREFIX: C:\Qt\6.2.4\mingw_64\lib\cmake
     EXTRA_CMAKE_ARGS: -DWITH_QT=Qt6
+    CMAKE_BUILD_TYPE: Release
 configuration:
 - RelWithDebInfo
 matrix:
@@ -42,7 +45,7 @@ build_script:
 - echo %PATH%
 - mkdir build
 - cd build
-- cmake -G "%GENERATOR%" -DCMAKE_PREFIX_PATH="%CMAKE_PATH_PREFIX%" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../INSTALL -DENABLE_TESTS=ON %EXTRA_CMAKE_ARGS% ..
+- cmake -G "%GENERATOR%" -DCMAKE_PREFIX_PATH="%CMAKE_PATH_PREFIX%" -DCMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE% -DCMAKE_INSTALL_PREFIX=../INSTALL -DENABLE_TESTS=ON %EXTRA_CMAKE_ARGS% ..
 - cmake --build . --config Release --target install
 - cpack --verbose -G WIX
 test_script:

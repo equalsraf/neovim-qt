@@ -20,6 +20,7 @@ private slots:
 		QCOMPARE(c.canReconnect(), false);
 
 		NeovimConnector *spawned = NeovimConnector::spawn({"-u", "NONE"});
+		spawned->setParent(this);
 		QCOMPARE(spawned->connectionType(), NeovimConnector::SpawnedConnection);
 		QCOMPARE(spawned->canReconnect(), true);
 
@@ -29,6 +30,7 @@ private slots:
 	void isReady() {
 
 		NeovimConnector *c = NeovimConnector::spawn({"-u", "NONE"});
+		c->setParent(this);
 		QSignalSpy onReady(c, SIGNAL(ready()));
 		QVERIFY(onReady.isValid());
 
@@ -38,7 +40,7 @@ private slots:
 
 	void encodeDecode() {
 		NeovimConnector *c = NeovimConnector::spawn({"-u", "NONE"});
-
+		c->setParent(this);
 		// This will print a warning, but should succeed
 		QString s = "ç日本語";
 		QByteArray bytes = c->encode(s);
@@ -55,6 +57,7 @@ private slots:
 
 	void connectToNeovimTCP() {
 		NeovimConnector *c = NeovimConnector::connectToNeovim("127.0.0.1:64999");
+		c->setParent(this);
 		QCOMPARE(c->connectionType(), NeovimConnector::HostConnection);
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
 		QVERIFY(onError.isValid());
@@ -68,6 +71,7 @@ private slots:
 
 	void connectToNeovimSocket() {
 		NeovimConnector *c = NeovimConnector::connectToNeovim("NoSuchFile");
+		c->setParent(this);
 		QCOMPARE(c->connectionType(), NeovimConnector::SocketConnection);
 		QSignalSpy onError(c, SIGNAL(error(NeovimError)));
 		QVERIFY(onError.isValid());
@@ -82,6 +86,7 @@ private slots:
 	void connectToNeovimEnvEmpty() {
 		// This is the same as ::spawn()
 		NeovimConnector *c = NeovimConnector::connectToNeovim("");
+		c->setParent(this);
 		QSignalSpy onReady(c, SIGNAL(ready()));
 		QVERIFY(onReady.isValid());
 		QVERIFY(SPYWAIT(onReady));

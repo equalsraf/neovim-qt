@@ -92,6 +92,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 		return;
 	}
 
+	m_nvim->setParent(this);
+
 	connect(m_nvim, &NeovimConnector::error,
 			this, &Shell::neovimError);
 	connect(m_nvim, &NeovimConnector::processExited,

@@ -60,6 +60,7 @@ MsgpackIODevice::MsgpackIODevice(QIODevice* dev, QObject* parent)
 		m_dev->setParent(this);
 		connect(m_dev, &QAbstractSocket::readyRead,
 				this, &MsgpackIODevice::dataAvailable);
+		connect(m_dev, &QIODevice::aboutToClose, this, &MsgpackIODevice::aboutToClose);
 
 		if ( !m_dev->isSequential() ) {
 			setError(InvalidDevice, tr("IO device needs to be sequential"));

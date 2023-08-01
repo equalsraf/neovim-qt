@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 
 #include <QCloseEvent>
+#include <QEventLoop>
 #include <QLayout>
 #include <QSettings>
 #include <QStyleFactory>
@@ -42,11 +43,11 @@ void MainWindow::init(NeovimConnector *c)
 	}
 
 	m_shell = new Shell(c);
+	m_shell->setParent(this);
 
 	addToolBar(&m_tabline);
 
 	m_nvim = c;
-	m_nvim->setParent(this);
 
 	// GuiShowContextMenu - right click context menu and actions.
 	m_contextMenu = new ContextMenu(c, this);
@@ -235,6 +236,18 @@ void MainWindow::neovimGuiCloseRequest(int status)
 {
 	m_neovim_requested_close = true;
 	m_exitStatus = status;
+
+	// Try to wait for neovim to quit
+	QTimer timer;
+	timer.setSingleShot(true);
+	QEventLoop loop;
+	connect(m_nvim, &NeovimConnector::processExited, &loop, &QEventLoop::quit);
+	connect(m_nvim, &NeovimConnector::aboutToClose, &loop, &QEventLoop::quit);
+	timer.start(500);
+	loop.exec();
+	bool timed_out = !timer.isActive();
+	qDebug() << "Waited for neovim close, timed out:" << timed_out;
+
 	QMainWindow::close();
 	m_neovim_requested_close = false;
 }
