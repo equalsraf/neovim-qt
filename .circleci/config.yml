@@ -30,7 +30,7 @@ jobs:
           name: test
           command: |
             cd build
-            xvfb-run -a -e /dev/stdout ctest -VV
+            ctest -VV
       - run:
           name: Generate coverage report with lcov
           command: lcov --directory . --capture --output-file coverage.info
