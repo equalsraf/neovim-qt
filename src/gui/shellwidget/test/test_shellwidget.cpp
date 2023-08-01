@@ -194,7 +194,10 @@ void Test::diffWidgetOutput(QString name)
 	QImage diff(output.size(), QImage::Format_RGB32);
 	diff.fill(Qt::white);
 
-	bool failed = false;
+	bool failed = (output.width() != expected.width()) || (output.height() != expected.height());
+	if (failed) {
+		qWarning() << "Output dimensions do not match";
+	}
 
 	for (int y=0; y < output.height(); y++) {
 		for (int x=0; x < output.width(); x++) {
@@ -214,9 +217,10 @@ void Test::diffWidgetOutput(QString name)
 	qDebug() << "Saving diff" << outpath;
 
 
-	if (QGuiApplication::platformName() != "xcb") {
+	auto platform = QGuiApplication::platformName();
+	if (platform != "xcb") {
 		auto msg = QString("Skipping render test in non X11: %1")
-			.arg(QGuiApplication::platformName());
+			.arg(platform);
 		QSKIP(qPrintable(msg));
 	}
 
@@ -226,7 +230,7 @@ void Test::diffWidgetOutput(QString name)
 	QCOMPARE(output.height(), expected.height());
 
 	if (failed) {
-		qWarning() << "Failing diff, check the output diff image" << outpath;
+		qWarning() << platform << " - Failing diff, check the output diff image" << outpath;
 		QCOMPARE(failed, false);
 	}
 }
