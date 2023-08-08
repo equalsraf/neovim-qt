@@ -69,6 +69,10 @@ GuiLinespace	When called with no arguments this command displays the
 		linespace, the number of extra pixels each line will have.
                 A single argument is accepted as the new linespace height.
 
+								*GuiRenderFontAttr*
+GuiRenderFontAttr	Enable or disable Rendering of GUI font attributes. Turning
+			this off disables rendering of italic or bold text.
+
 								*GuiScrollBar*
 GuiScrollBar	Enable or disable the external GUI scrollbar
 
