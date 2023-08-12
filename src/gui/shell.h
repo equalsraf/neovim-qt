@@ -98,7 +98,7 @@ public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
 	void resizeNeovim(int n_cols, int n_rows);
-	bool setGuiFont(const QString& fdesc, bool force) noexcept;
+	bool setGuiFont(const QString& fdesc, bool force, bool reset=false) noexcept;
 	bool setGuiFontWide(const QString& fdesc) noexcept;
 	void updateGuiWindowState(Qt::WindowStates state);
 	void openFiles(const QList<QUrl> url);
@@ -116,6 +116,7 @@ protected slots:
 	void handleGinitError(quint32 msgid, quint64 fun, const QVariant& err);
 	void handleShimError(quint32 msgid, quint64 fun, const QVariant& err);
 	void handleGetBackgroundOption(quint32 msgid, quint64 fun, const QVariant& val);
+	void screenChanged();
 
 protected:
 	void tooltip(const QString& text);
