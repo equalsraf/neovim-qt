@@ -101,6 +101,7 @@ public slots:
 	void setBackground(const QColor& color);
 	void setForeground(const QColor& color);
 	void setDefaultFont();
+	void screenChanged();
 
 	/// Returns the platform-specific default font
 	static QString getDefaultFontFamily() noexcept;
