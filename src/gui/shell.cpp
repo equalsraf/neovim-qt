@@ -114,11 +114,12 @@ void Shell::handleFontError(const QString& msg)
 ///
 /// @param fdesc Neovim font description string, "Fira Code:h11".
 /// @param force used to indicate :GuiFont!, overrides mono space checks.
+/// @param reset we reseting the font, ignore optimizations
 /// @returns `true` if the font was successfully set.
-bool Shell::setGuiFont(const QString& fdesc, bool force) noexcept
+bool Shell::setGuiFont(const QString& fdesc, bool force, bool reset) noexcept
 {
 	// Exit early if the font description has not changed
-	if (fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
+	if (!reset && fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
 		return false;
 	}
 
@@ -167,6 +168,14 @@ bool Shell::setGuiFont(const QString& fdesc, bool force) noexcept
 
 	return true;
 }
+
+void Shell::screenChanged()
+{
+	// When the screen changes due to dpi scaling we have to
+	// re-set the current font
+	setGuiFont(fontDesc(), true, true);
+}
+
 
 bool Shell::setGuiFontWide(const QString& fdesc) noexcept
 {
@@ -1320,6 +1329,13 @@ void Shell::showEvent(QShowEvent* ev)
 	connect(m_nvim, &NeovimConnector::ready, this, &Shell::init);
 	if (m_nvim->isReady()) {
 		init();
+	}
+
+	screenChanged();
+
+	auto win = this->window();
+	if (win) {
+		connect(win->windowHandle(), &QWindow::screenChanged, this, &Shell::screenChanged);
 	}
 }
 
