@@ -124,9 +124,12 @@ void Shell::handleFontError(const QString& msg)
 ///
 /// @param fdesc Neovim font description string, "Fira Code:h11".
 /// @param force used to indicate :GuiFont!, overrides mono space checks.
+/// @param reset we reseting the font, ignore optimizations
 /// @returns `true` if the font was successfully set.
 bool Shell::setGuiFont(const QString& fdesc, bool force, bool reset) noexcept
 {
+	qWarning() << TryGetQFontFromDescription(fdesc) << font();
+
 	// Exit early if the font description has not changed
 	if (!reset && fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
 		return false;
