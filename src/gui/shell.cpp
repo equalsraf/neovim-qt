@@ -187,7 +187,6 @@ void Shell::screenChanged()
 	// re-set the current font
 	auto r = setGuiFont(fontDesc(), true, true);
 	qWarning() << __func__ << r;
-	resizeNeovim(size());
 }
 
 
