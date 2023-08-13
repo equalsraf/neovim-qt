@@ -54,7 +54,7 @@ void ShellWidget::setDefaultFont()
 
 void ShellWidget::screenChanged()
 {
-	qDebug() << __func__;
+	qWarning() << __func__;
 	setCellSize();
 }
 
