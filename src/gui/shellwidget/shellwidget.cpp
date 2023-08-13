@@ -54,8 +54,9 @@ void ShellWidget::setDefaultFont()
 
 void ShellWidget::screenChanged()
 {
-	qWarning() << __func__;
-	setCellSize();
+	// When the screen changes due to dpi scaling we have to re-set the current font
+	auto r = setShellFont(font(), true);
+	qWarning() << __func__ << r;
 }
 
 /*static*/ QString ShellWidget::getDefaultFontFamily() noexcept
