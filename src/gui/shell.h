@@ -98,7 +98,7 @@ public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
 	void resizeNeovim(int n_cols, int n_rows);
-	bool setGuiFont(const QString& fdesc, bool force) noexcept;
+	bool setGuiFont(const QString& fdesc, bool force, bool reset=false) noexcept;
 	bool setGuiFontWide(const QString& fdesc) noexcept;
 	void updateGuiWindowState(Qt::WindowStates state);
 	void openFiles(const QList<QUrl> url);
