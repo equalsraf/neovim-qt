@@ -32,6 +32,8 @@ ShellWidget::ShellWidget(QWidget* parent)
 	if (screen) {
 		connect(screen, &QScreen::logicalDotsPerInchChanged,
 				this, &ShellWidget::screenChanged);
+		connect(screen, &QScreen::physicalDotsPerInchChanged,
+				this, &ShellWidget::screenChanged);
 	}
 #endif
 }
