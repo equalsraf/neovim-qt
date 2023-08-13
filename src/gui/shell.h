@@ -116,6 +116,7 @@ protected slots:
 	void handleGinitError(quint32 msgid, quint64 fun, const QVariant& err);
 	void handleShimError(quint32 msgid, quint64 fun, const QVariant& err);
 	void handleGetBackgroundOption(quint32 msgid, quint64 fun, const QVariant& val);
+	void screenChanged();
 
 protected:
 	void tooltip(const QString& text);

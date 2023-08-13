@@ -4,7 +4,6 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPaintEvent>
-#include <QScreen>
 #include <QTextLayout>
 #include <QtMath>
 
@@ -26,16 +25,6 @@ ShellWidget::ShellWidget(QWidget* parent)
 
 	// Blinking Cursor Timer
 	connect(&m_cursor, &Cursor::CursorChanged, this, &ShellWidget::handleCursorChanged);
-
-#if (QT_VERSION > QT_VERSION_CHECK(5, 13, 0))
-	auto screen = this->screen();
-	if (screen) {
-		connect(screen, &QScreen::logicalDotsPerInchChanged,
-				this, &ShellWidget::screenChanged);
-		connect(screen, &QScreen::physicalDotsPerInchChanged,
-				this, &ShellWidget::screenChanged);
-	}
-#endif
 }
 
 ShellWidget* ShellWidget::fromFile(const QString& path)
@@ -50,13 +39,6 @@ void ShellWidget::setDefaultFont()
 	static const QFont font{ getDefaultFontFamily(), 11 /*pointSize*/, -1 /*weight*/, false /*italic*/ };
 	setFont(font);
 	setCellSize();
-}
-
-void ShellWidget::screenChanged()
-{
-	// When the screen changes due to dpi scaling we have to re-set the current font
-	auto r = setShellFont(font(), true);
-	qWarning() << __func__ << r;
 }
 
 /*static*/ QString ShellWidget::getDefaultFontFamily() noexcept

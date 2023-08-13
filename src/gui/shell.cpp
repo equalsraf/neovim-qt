@@ -87,6 +87,16 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 		setGuiFont(fontDescription, true /*force*/);
 	}
 
+#if (QT_VERSION > QT_VERSION_CHECK(5, 13, 0))
+	auto screen = this->screen();
+	if (screen) {
+		connect(screen, &QScreen::logicalDotsPerInchChanged,
+				this, &Shell::screenChanged);
+		connect(screen, &QScreen::physicalDotsPerInchChanged,
+				this, &Shell::screenChanged);
+	}
+#endif
+
 	if (!m_nvim) {
 		qWarning() << "Received NULL as Neovim Connector";
 		return;
@@ -167,6 +177,15 @@ bool Shell::setGuiFont(const QString& fdesc, bool force) noexcept
 
 	return true;
 }
+
+void Shell::screenChanged()
+{
+	// When the screen changes due to dpi scaling we have to re-set the current font
+	auto r = setShellFont(font(), true);
+	qWarning() << __func__ << r;
+	resizeNeovim(size());
+}
+
 
 bool Shell::setGuiFontWide(const QString& fdesc) noexcept
 {
