@@ -181,6 +181,12 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool reset) noexcept
 	return true;
 }
 
+void Shell::connectScreenChanged()
+{
+	screenChanged();
+	connect(window()->windowHandle(), &QWindow::screenChanged, this, &Shell::screenChanged);
+}
+
 void Shell::screenChanged()
 {
 	// When the screen changes due to dpi scaling we have to

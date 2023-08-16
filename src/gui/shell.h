@@ -71,6 +71,9 @@ public:
 		T* pThis, const QVariantList& args) noexcept;
 
 	NeovimConnector* nvim() { return m_nvim; }
+
+	void connectScreenChanged();
+
 signals:
 	void neovimTitleChanged(const QString &title);
 	void neovimBusyChanged(bool);
