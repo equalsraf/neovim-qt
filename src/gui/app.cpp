@@ -12,7 +12,6 @@
 #include "mainwindow.h"
 #include "printinfo.h"
 #include "version.h"
-#include "shell.h"
 
 namespace NeovimQt {
 
@@ -291,8 +290,6 @@ void App::showUi() noexcept
 		win->show();
 	}
 #endif
-
-	win->shell()->connectScreenChanged();
 }
 
 /// Initialize CLI parser with all the nvim-qt options, process the

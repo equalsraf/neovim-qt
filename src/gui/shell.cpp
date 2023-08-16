@@ -181,12 +181,6 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool reset) noexcept
 	return true;
 }
 
-void Shell::connectScreenChanged()
-{
-	screenChanged();
-	connect(window()->windowHandle(), &QWindow::screenChanged, this, &Shell::screenChanged);
-}
-
 void Shell::screenChanged()
 {
 	// When the screen changes due to dpi scaling we have to
@@ -1349,6 +1343,9 @@ void Shell::showEvent(QShowEvent* ev)
 	if (m_nvim->isReady()) {
 		init();
 	}
+
+	screenChanged();
+	connect(window()->windowHandle(), &QWindow::screenChanged, this, &Shell::screenChanged);
 }
 
 void Shell::paintEvent(QPaintEvent *ev)
