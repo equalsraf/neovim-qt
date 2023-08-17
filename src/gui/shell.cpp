@@ -87,16 +87,6 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 		setGuiFont(fontDescription, true /*force*/);
 	}
 
-#if (QT_VERSION > QT_VERSION_CHECK(5, 13, 0))
-	auto screen = this->screen();
-	if (screen) {
-		connect(screen, &QScreen::logicalDotsPerInchChanged,
-				this, &Shell::screenChanged);
-		connect(screen, &QScreen::physicalDotsPerInchChanged,
-				this, &Shell::screenChanged);
-	}
-#endif
-
 	if (!m_nvim) {
 		qWarning() << "Received NULL as Neovim Connector";
 		return;
