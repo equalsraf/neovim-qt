@@ -1333,9 +1333,15 @@ void Shell::showEvent(QShowEvent* ev)
 
 	screenChanged();
 
+	if (m_window_handle) {
+		disconnect(m_window_handle, &QWindow::screenChanged, this, &Shell::screenChanged);
+		m_window_handle = nullptr;
+	}
+
 	auto win = this->window();
 	if (win) {
-		connect(win->windowHandle(), &QWindow::screenChanged, this, &Shell::screenChanged);
+		m_window_handle = win->windowHandle();
+		connect(m_window_handle, &QWindow::screenChanged, this, &Shell::screenChanged);
 	}
 }
 

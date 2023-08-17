@@ -237,6 +237,8 @@ private:
 	ShellOptions m_options;
 	PopupMenu m_pum{ this };
 	bool m_mouseEnabled{ true };
+
+	QWindow *m_window_handle{ nullptr };
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler
