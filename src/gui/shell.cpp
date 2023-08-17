@@ -1345,7 +1345,11 @@ void Shell::showEvent(QShowEvent* ev)
 	}
 
 	screenChanged();
-	connect(window()->windowHandle(), &QWindow::screenChanged, this, &Shell::screenChanged);
+
+	auto win = this->window();
+	if (win) {
+		connect(win->windowHandle(), &QWindow::screenChanged, this, &Shell::screenChanged);
+	}
 }
 
 void Shell::paintEvent(QPaintEvent *ev)
