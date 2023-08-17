@@ -185,8 +185,7 @@ void Shell::screenChanged()
 {
 	// When the screen changes due to dpi scaling we have to
 	// re-set the current font
-	auto r = setGuiFont(fontDesc(), true, true);
-	qWarning() << __func__ << r;
+	setGuiFont(fontDesc(), true, true);
 }
 
 
