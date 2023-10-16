@@ -304,7 +304,7 @@ void App::processCommandlineOptions(QCommandLineParser& parser, QStringList argu
 				QCoreApplication::translate("main", "nvim_path"),
 				"nvim"));
 	parser.addOption(QCommandLineOption("timeout",
-				QCoreApplication::translate("main", "Error if nvim does not responde after count milliseconds"),
+				QCoreApplication::translate("main", "Error if nvim does not respond after count milliseconds"),
 				QCoreApplication::translate("main", "ms"),
 				"20000"));
 
