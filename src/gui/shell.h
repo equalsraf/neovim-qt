@@ -221,7 +221,7 @@ private:
 	/// Neovim mode descriptions from "mode_change", used by guicursor
 	QVariantList m_modeInfo;
 
-	bool m_resizing{ false };
+	QSize m_resizing;
 	QSize m_resize_neovim_pending;
 	QLabel* m_tooltip{ nullptr };
 	QPoint m_mouse_pos;

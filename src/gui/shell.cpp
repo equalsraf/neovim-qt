@@ -1608,11 +1608,22 @@ void Shell::resizeNeovim(int n_cols, int n_rows)
 	if (!m_nvim || (n_cols == columns() && n_rows == rows())) {
 		return;
 	}
-	if (m_resizing) {
-		m_resize_neovim_pending = QSize(n_cols, n_rows);
-	} else {
+
+	auto newsize = QSize(n_cols, n_rows);
+
+	if (m_resizing.isValid() && m_resizing == newsize) {
+		// Do not trigger two consecutive resizes for the same size.
+		// Neovim may fail to resize and issue a resize event that
+		// would result in a loop
+		return;
+	}
+
+	if (m_resizing.isValid()) {
+		m_resize_neovim_pending = newsize;
+	}
+	else {
 		m_nvim->api0()->ui_try_resize(n_cols, n_rows);
-		m_resizing = true;
+		m_resizing = newsize;
 	}
 }
 
@@ -1632,7 +1643,8 @@ void Shell::resizeEvent(QResizeEvent *ev)
  */
 void Shell::neovimResizeFinished()
 {
-	m_resizing = false;
+	m_resizing = QSize();
+
 	if (m_resize_neovim_pending.isValid()) {
 		resizeNeovim(m_resize_neovim_pending.width(),
 				m_resize_neovim_pending.height());
