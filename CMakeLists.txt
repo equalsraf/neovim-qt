@@ -1,11 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
-if (POLICY CMP0048)
-  cmake_policy(SET CMP0048 NEW)
-endif (POLICY CMP0048)
-if (POLICY CMP0069)
-  cmake_policy(SET CMP0069 NEW)
-endif (POLICY CMP0069)
-
+cmake_minimum_required(VERSION 3.9.0)
 # Neovim-Qt Version, used by --version update before release
 # 9999 = Development Pre-Release
 project(neovim-qt VERSION 0.2.18.0)
