@@ -311,7 +311,7 @@ Shell* MainWindow::shell()
 
 void MainWindow::saveWindowGeometry()
 {
-	QSettings settings{ "window-geometry" };
+	QSettings settings("nvim-qt", "window-geometry");
 	settings.setValue("window_geometry", saveGeometry());
 	settings.setValue("window_state", saveState());
 }
@@ -324,7 +324,7 @@ void MainWindow::restoreWindowGeometry()
 	qRegisterMetaTypeStreamOperators<QList<int>>("QList<int>");
 #endif
 
-	QSettings settings{ "window-geometry" };
+	QSettings settings("nvim-qt", "window-geometry");
 	restoreGeometry(settings.value("window_geometry").toByteArray());
 	restoreState(settings.value("window_state").toByteArray());
 }
