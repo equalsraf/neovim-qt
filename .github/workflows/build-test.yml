@@ -37,10 +37,10 @@ jobs:
 
           - name: MacOS_GCC
             flavor: Debug
-            runner: macos-11
+            runner: macos-12
             generator: Ninja
-            cc: gcc-10
-            cxx: g++-10
+            cc: gcc-11
+            cxx: g++-11
 
           - name: MacOS_Release
             flavor: Release
