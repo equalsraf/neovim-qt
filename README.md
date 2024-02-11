@@ -240,4 +240,4 @@ $ cmake --build .
 $ NVIM_QT_RUNTIME_PATH=../src/gui/runtime bin/nvim-qt
 ```
 
-NOTE: `NVIM_QT_RUNTIME` must be set for commands such as `:GuiFont` to work.
+NOTE: `NVIM_QT_RUNTIME_PATH` must be set for commands such as `:GuiFont` to work.
