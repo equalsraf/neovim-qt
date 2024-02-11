@@ -1498,9 +1498,7 @@ void Shell::wheelEvent(QWheelEvent *ev)
 	QSize cellSize,
 	int deltasPerStep) noexcept
 {
-	int invertConstant{ (ev.inverted()) ? -1 : 1 };
-
-	QPoint scrollRemainderAndEvent { (ev.angleDelta() * invertConstant) + scrollRemainderOut };
+	QPoint scrollRemainderAndEvent{ ev.angleDelta() + scrollRemainderOut };
 
 	scrollRemainderOut.rx() = scrollRemainderAndEvent.x() % deltasPerStep;
 	scrollRemainderOut.ry() = scrollRemainderAndEvent.y() % deltasPerStep;
