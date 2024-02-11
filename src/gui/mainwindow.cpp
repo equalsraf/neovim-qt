@@ -312,6 +312,11 @@ Shell* MainWindow::shell()
 void MainWindow::saveWindowGeometry()
 {
 	QSettings settings("nvim-qt", "window-geometry");
+	bool restore_window_geometry = settings.value("restore_window_geometry", true).toBool();
+	if (!restore_window_geometry) {
+		return;
+	}
+	settings.setValue("restore_window_geometry", restore_window_geometry);
 	settings.setValue("window_geometry", saveGeometry());
 	settings.setValue("window_state", saveState());
 }
@@ -325,6 +330,9 @@ void MainWindow::restoreWindowGeometry()
 #endif
 
 	QSettings settings("nvim-qt", "window-geometry");
+	if (!settings.value("restore_window_geometry", true).toBool()) {
+		return;
+	}
 	restoreGeometry(settings.value("window_geometry").toByteArray());
 	restoreState(settings.value("window_state").toByteArray());
 }
