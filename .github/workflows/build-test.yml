@@ -68,9 +68,8 @@ jobs:
         run: |
           brew install neovim
           brew ls --formula | grep -wq ninja || brew install ninja
-          brew ls --formula | grep -wq qt5 || brew install qt5
+          brew ls --formula | grep -wq qt5 || brew install qt@5
           brew ls --formula | grep -wq msgpack || brew install msgpack
-          brew link qt5 --force
 
       #
       # Build and Test
@@ -83,6 +82,7 @@ jobs:
           CMAKE_BUILD_TYPE: ${{ matrix.flavor }}
           CMAKE_GENERATOR: ${{ matrix.generator }}
         run: >
+          env PATH=${{ startsWith(matrix.runner, 'macos') && '/usr/local/opt/qt@5/bin:' || '' }}/usr/local/bin:/usr/bin/:/bin
           cmake -B ./build
           -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
@@ -115,7 +115,7 @@ jobs:
       - name: MacOS - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
         run: |
-          macdeployqt ./build/bin/nvim-qt.app -dmg
+          /usr/local/opt/qt@5/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
 
       - name: Upload Artifacts
