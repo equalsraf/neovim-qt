@@ -106,17 +106,17 @@ endif()
 install(TARGETS nvim-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
 if(NOT APPLE)
 	install(DIRECTORY runtime
-		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt/
+		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt
 		PATTERN "README.md" EXCLUDE)
 	install(FILES ${PROJECT_SOURCE_DIR}/LICENSE
-		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt/)
+		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt)
 	install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
     install(FILES ${PROJECT_SOURCE_DIR}/third-party/neovim.png
 			RENAME nvim-qt.png
-			DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/192x192/apps/)
+			DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/192x192/apps)
     install(FILES ${PROJECT_SOURCE_DIR}/third-party/neovim.svg
 			RENAME nvim-qt.svg
-			DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps/)
+			DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
 endif()
 
 if(WIN32 AND NOT CMAKE_CROSSCOMPILING AND NOT DEFINED USE_STATIC_QT)
