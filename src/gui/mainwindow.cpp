@@ -312,7 +312,7 @@ Shell* MainWindow::shell()
 void MainWindow::saveWindowGeometry()
 {
 	QSettings settings("nvim-qt", "window-geometry");
-	bool restore_window_geometry = settings.value("restore_window_geometry", true).toBool();
+	const bool restore_window_geometry{ settings.value("restore_window_geometry", true).toBool() };
 	if (!restore_window_geometry) {
 		return;
 	}
