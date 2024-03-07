@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 
+#include <QApplication>
 #include <QCloseEvent>
 #include <QEventLoop>
 #include <QLayout>
+#include <QScreen>
 #include <QSettings>
 #include <QStyleFactory>
 #include <QToolBar>
@@ -12,6 +14,23 @@ namespace NeovimQt {
 static QString DefaultWindowTitle() noexcept
 {
 	return "Neovim";
+}
+
+static void SetDefaultWindowSize(QWidget& widget) noexcept
+{
+	const QPoint local_position{ widget.width() / 2, 0 };
+	const QPoint global_position{ widget.mapToGlobal(local_position) };
+	const QScreen* screen{ qApp->screenAt(global_position) };
+	if (!screen) {
+		return;
+	}
+	const QRect geometry{ screen->availableGeometry() };
+	if (screen->orientation() == Qt::LandscapeOrientation) {
+		widget.resize(geometry.width() / 2, geometry.height());
+	}
+	else {
+		widget.resize(geometry.width(), geometry.height() / 2);
+	}
 }
 
 MainWindow::MainWindow(NeovimConnector* c, QWidget* parent) noexcept
@@ -333,8 +352,17 @@ void MainWindow::restoreWindowGeometry()
 	if (!settings.value("restore_window_geometry", true).toBool()) {
 		return;
 	}
-	restoreGeometry(settings.value("window_geometry").toByteArray());
-	restoreState(settings.value("window_state").toByteArray());
+	const QVariant geometry{ settings.value("window_geometry") };
+	if (geometry.isValid()) {
+		restoreGeometry(geometry.toByteArray());
+	}
+	else {
+		SetDefaultWindowSize(*this);
+	}
+	const QVariant state{ settings.value("window_state") };
+	if (state.isValid()) {
+		restoreState(state.toByteArray());
+	}
 }
 
 void MainWindow::setGuiAdaptiveColorEnabled(bool isEnabled)
