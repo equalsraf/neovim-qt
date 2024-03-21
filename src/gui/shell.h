@@ -190,10 +190,12 @@ protected:
 
 private slots:
 	void setAttached(bool attached);
+	void ensureVisible() noexcept;
 
 private:
 	bool m_init_called{ false };
 	bool m_attached{ false };
+	bool m_shown{ false };
 	NeovimConnector* m_nvim{ nullptr };
 
 	QList<QUrl> m_deferredOpen;
@@ -231,6 +233,8 @@ private:
 	Qt::MouseButton m_mouseclick_pending;
 	// Accumulates remainder of steppy scroll
 	QPoint m_scrollDeltaRemainder;
+	// Ensures that the Shell widget is made visible
+	QTimer m_visibility_timer;
 
 	// Properties
 	bool m_neovimBusy{ false };
