@@ -103,6 +103,15 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	m_nvim->setRequestHandler(new ShellRequestHandler(this));
 }
 
+void Shell::ensureVisible() noexcept
+{
+	if (!m_shown) {
+		m_shown = true;
+		setVisible(true);
+		setFocus();
+	}
+}
+
 void Shell::handleFontError(const QString& msg)
 {
 	if (m_attached) {
@@ -326,6 +335,10 @@ void Shell::init()
 		return;
 	}
 
+	// Pull Request#1101: Defer displaying the shell until colors have been set
+	if (!m_shown) {
+		setVisible(false);
+	}
 	connect(m_nvim->api0(), &NeovimApi0::neovimNotification,
 			this, &Shell::handleNeovimNotification);
 	connect(m_nvim->api0(), &NeovimApi0::on_ui_try_resize,
@@ -365,6 +378,16 @@ void Shell::init()
 
 	// Set initial value
 	m_nvim->api0()->vim_set_var("GuiWindowFrameless", (windowFlags() & Qt::FramelessWindowHint) ? 1: 0);
+
+	// Make the shell visible even when default_colors_set is not received,
+	// e.g. when using the older cell-based grid protocol.
+	if (!m_shown) {
+		constexpr int visibility_timeout{ 850 };
+		m_visibility_timer.setInterval(visibility_timeout);
+		m_visibility_timer.setSingleShot(true);
+		connect(&m_visibility_timer, &QTimer::timeout, this, &Shell::ensureVisible);
+		m_visibility_timer.start();
+	}
 }
 
 void Shell::neovimError(NeovimConnector::NeovimError err)
@@ -1127,6 +1150,8 @@ void Shell::handleDefaultColorsSet(const QVariantList& opargs)
 	setBackground(backgroundColor);
 	setSpecial(specialColor);
 
+	// Display the shell now that the default colors have been set.
+	ensureVisible();
 	// Cells drawn with the default colors require a re-paint
 	update();
 	emit colorsChanged();
