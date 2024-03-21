@@ -45,12 +45,15 @@ jobs:
     pool:
       vmImage: 'macOS-latest'
     steps:
-    - script: brew install msgpack neovim ninja qt5
+    - script: brew install msgpack neovim ninja qt@5
       displayName: Install Dependencies
     - task: CMake@1
       inputs:
         workingDirectory: $(Build.BinariesDirectory)
-        cmakeArgs: -GNinja -DUSE_SYSTEM_MSGPACK=OFF -DCMAKE_BUILD_TYPE=Debug $(Build.SourcesDirectory)
+        cmakeArgs: -GNinja -DUSE_SYSTEM_MSGPACK=OFF -DCMAKE_BUILD_TYPE=Debug \
+          -DQT_DIR=/usr/local/opt/qt@5/lib/cmake/Qt5 \
+          -DQt5_DIR=/usr/local/opt/qt@5/lib/cmake/Qt5 \
+          $(Build.SourcesDirectory)
       displayName: CMake Configure
     - task: CMake@1
       inputs:
