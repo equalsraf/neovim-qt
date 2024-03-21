@@ -19,7 +19,7 @@ jobs:
             nvim: 0.1.7
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Download Neovim Source
         run: |
@@ -108,7 +108,7 @@ jobs:
             nvim: 0.4.4
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install Neovim
         env:
