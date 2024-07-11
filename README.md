@@ -20,7 +20,23 @@ Instructions for common platforms are listed below.
 
 ### Windows
 
-Neovim Qt is bundled with all releases of Neovim on Windows.
+Nightly versions of Neovim Qt require manual download + installation.
+
+Pre-built Windows binaries are provided for all recent commits:  
+[AppVeyor Commit Build Wiki Instructions](https://github.com/equalsraf/neovim-qt/wiki/Windows-AppVeyor-Builds)
+
+#### Neovim version 0.10.0 and later
+
+Starting with Neovim version `0.10.0`, Neovim Qt is no longer bundled with Neovim on Windows; each package must be installed separately.
+
+```
+> winget install neovim.neovim
+> winget install equalsraf.neovim-qt
+```
+
+#### Neovim versions before 0.10.0
+
+Neovim Qt is bundled with all releases of Neovim on Windows prior to Neovim version `0.10.0`.
 
 See the Neovim release page:
 
@@ -38,11 +54,6 @@ Pre-Release Neovim + Stable Neovim Qt:
 ```
 > choco install neovim --pre
 ```
-
-Nightly versions of Neovim Qt require manual download + installation.
-
-Pre-built Windows binaries are provided for all recent commits:  
-[AppVeyor Commit Build Wiki Instructions](https://github.com/equalsraf/neovim-qt/wiki/Windows-AppVeyor-Builds)
 
 ### MacOS
 
