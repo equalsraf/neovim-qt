@@ -79,6 +79,12 @@ static QVariant GetButtonName(
 		case Qt::NoButton:
 			return QLatin1String{""};
 
+    case Qt::XButton1:
+			return QStringLiteral("X1");
+
+    case Qt::XButton2:
+			return QStringLiteral("X2");
+
 		default:
 			return {}; // Invalid
 	}
