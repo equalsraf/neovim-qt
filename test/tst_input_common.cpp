@@ -21,6 +21,8 @@ private slots:
 	void MouseLeftClick() noexcept;
 	void MouseRightClick() noexcept;
 	void MouseMiddleClick() noexcept;
+	void MouseX1Click() noexcept;
+	void MouseX2Click() noexcept;
 };
 
 void TestInputCommon::LessThanKey() noexcept
@@ -253,6 +255,44 @@ void TestInputCommon::MouseMiddleClick() noexcept
 
 	QCOMPARE(middleClickPress, QString{ "<MiddleMouse><1,2>" });
 	QCOMPARE(middleClickRelease, QString{ "<MiddleRelease><1,2>" });
+}
+
+void TestInputCommon::MouseX1Click() noexcept
+{
+	QString x1Press{ NeovimQt::Input::convertMouse(
+		Qt::XButton1,
+		QEvent::MouseButtonPress,
+		Qt::NoModifier,
+		{ 1, 2 },
+		1 /*clickCount*/) };
+	QString x1Release{ NeovimQt::Input::convertMouse(
+		Qt::XButton1,
+		QEvent::MouseButtonRelease,
+		Qt::NoModifier,
+		{ 1, 2 },
+		1 /*clickCount*/) };
+
+	QCOMPARE(x1Press, QString{ "<X1Mouse><1,2>" });
+	QCOMPARE(x1Release, QString{ "<X1Release><1,2>" });
+}
+
+void TestInputCommon::MouseX2Click() noexcept
+{
+	QString x2Press{ NeovimQt::Input::convertMouse(
+		Qt::XButton2,
+		QEvent::MouseButtonPress,
+		Qt::NoModifier,
+		{ 1, 2 },
+		1 /*clickCount*/) };
+	QString x2Release{ NeovimQt::Input::convertMouse(
+		Qt::XButton2,
+		QEvent::MouseButtonRelease,
+		Qt::NoModifier,
+		{ 1, 2 },
+		1 /*clickCount*/) };
+
+	QCOMPARE(x2Press, QString{ "<X2Mouse><1,2>" });
+	QCOMPARE(x2Release, QString{ "<X2Release><1,2>" });
 }
 
 #include "tst_input_common.moc"
