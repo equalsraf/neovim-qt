@@ -446,7 +446,9 @@ void App::showVersionInfo(QCommandLineParser& parser) noexcept
 
 	out << "NVIM-QT v" << PROJECT_VERSION << QT_ENDL;
 	out << "Build type: " << CMAKE_BUILD_TYPE << QT_ENDL;
+#if !defined(REPRODUCIBLE_BUILD)
 	out << "Compilation:" << CMAKE_CXX_FLAGS << QT_ENDL;
+#endif
 	out << "Qt Version: " << QT_VERSION_STR << QT_ENDL;
 	out << "Environment: " << QT_ENDL;
 	out << "  nvim: " << nvimExecutable << QT_ENDL;
