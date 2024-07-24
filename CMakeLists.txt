@@ -10,7 +10,7 @@ endif()
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(REPRODUCIBLE_BUILD "Make this build reproducible" OFF)
+option(REPRODUCIBLE_BUILD "Make this build reproducible" ON)
 option(USE_GCOV "Enable gcov support" OFF)
 option(ENABLE_CLAZY "Build with KDE Clang Clazy Linter" OFF)
 option(ENABLE_TIDY "Build with Clang Tidy Linter" OFF)
