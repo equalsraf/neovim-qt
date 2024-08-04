@@ -16,14 +16,20 @@ function! s:get_last_ui_chan()
 	return uis[-1].chan
 endfunction
 
+function! s:notify_all_uis(...)
+	for ui in nvim_list_uis()
+		call call("rpcnotify", [ui.chan] + a:000)
+	endfor
+endfunction
+
 " Close the GUI
 function! GuiClose() abort
-  call rpcnotify(0, 'Gui', 'Close', v:exiting)
+  call s:notify_all_uis('Gui', 'Close', v:exiting)
 endfunction
 
 " Open new window
 function! GuiNewWindow(args) abort
-  call rpcnotify(0, 'Gui', 'NewWindow', a:args)
+  call s:notify_all_uis('Gui', 'NewWindow', a:args)
 endfunction
 
 " Notify the GUI when exiting Neovim
@@ -34,38 +40,38 @@ augroup END
 
 " A replacement for foreground()
 function! GuiForeground() abort
-  call rpcnotify(0, 'Gui', 'Foreground')
+  call s:notify_all_uis('Gui', 'Foreground')
 endfunction
 
 " Set maximized state for GUI window (1 is enabled, 0 disabled)
 function! GuiWindowMaximized(enabled) abort
-  call rpcnotify(0, 'Gui', 'WindowMaximized', a:enabled)
+  call s:notify_all_uis('Gui', 'WindowMaximized', a:enabled)
 endfunction
 
 " Set fullscreen state for GUI window (1 is enabled, 0 disabled)
 function! GuiWindowFullScreen(enabled) abort
-  call rpcnotify(0, 'Gui', 'WindowFullScreen', a:enabled)
+  call s:notify_all_uis('Gui', 'WindowFullScreen', a:enabled)
 endfunction
 
 " Set frameless state for GUI window (1 is enabled, 0 disabled)
 function! GuiWindowFrameless(enabled) abort
-  call rpcnotify(0, 'Gui', 'WindowFrameless', a:enabled)
+  call s:notify_all_uis('Gui', 'WindowFrameless', a:enabled)
 endfunction
 
 " Set GUI font
 function! GuiFont(fname, ...) abort
   let force = get(a:000, 0, 0)
-  call rpcnotify(0, 'Gui', 'Font', a:fname, force)
+  call s:notify_all_uis('Gui', 'Font', a:fname, force)
 endfunction
 
 " Set additional linespace
 function! GuiLinespace(height) abort
-  call rpcnotify(0, 'Gui', 'Linespace', a:height)
+  call s:notify_all_uis('Gui', 'Linespace', a:height)
 endfunction
 
 " Configure mouse hide behaviour (1 is enabled, 0 disabled)
 function! GuiMousehide(enabled) abort
-  call rpcnotify(0, 'Gui', 'Mousehide', a:enabled)
+  call s:notify_all_uis('Gui', 'Mousehide', a:enabled)
 endfunction
 
 " The GuiFont command. For compatibility there is also Guifont
@@ -97,17 +103,17 @@ endfunction
 command! -nargs=? GuiLinespace call s:GuiLinespaceCommand("<args>")
 
 function! s:GuiTabline(enable) abort
-	call rpcnotify(0, 'Gui', 'Option', 'Tabline', a:enable)
+	call s:notify_all_uis('Gui', 'Option', 'Tabline', a:enable)
 endfunction
 command! -nargs=1 GuiTabline call s:GuiTabline(<args>)
 
 function! s:GuiTablineBuffers(enable) abort
-	call rpcnotify(0, 'Gui', 'Option', 'TablineBuffers', a:enable)
+	call s:notify_all_uis('Gui', 'Option', 'TablineBuffers', a:enable)
 endfunction
 command! -nargs=1 GuiTablineBuffers call s:GuiTablineBuffers(<args>)
 
 function! s:GuiPopupmenu(enable) abort
-	call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', a:enable)
+	call s:notify_all_uis('Gui', 'Option', 'Popupmenu', a:enable)
 endfunction
 command! -nargs=1 GuiPopupmenu call s:GuiPopupmenu(<args>)
 
@@ -200,14 +206,14 @@ endfunction
 " Directory autocommands for Treeview
 augroup guiDirEvents
     autocmd!
-    autocmd DirChanged * call rpcnotify(0, 'Dir', getcwd())
-    autocmd WinEnter * call rpcnotify(0, 'Dir', getcwd())
-    autocmd VimEnter * call rpcnotify(0, 'Dir', getcwd())
+    autocmd DirChanged * call s:notify_all_uis('Dir', getcwd())
+    autocmd WinEnter * call s:notify_all_uis('Dir', getcwd())
+    autocmd VimEnter * call s:notify_all_uis('Dir', getcwd())
 augroup END
 
 " Notifies the TreeView widget of a Show or Hide event
 function! s:TreeViewShowHide(show)
-    call rpcnotify(0, 'Gui', 'TreeView', 'ShowHide', a:show)
+    call s:notify_all_uis('Gui', 'TreeView', 'ShowHide', a:show)
 endfunction
 
 command! GuiTreeviewShow call <SID>TreeViewShowHide(1)
@@ -219,7 +225,7 @@ anoremenu <script> Gui.Treeview.Hide :call <SID>TreeViewShowHide(0)
 
 " Notifies the TreeView widget of a Toggle event
 function! s:TreeViewToggle()
-    call rpcnotify(0, 'Gui', 'TreeView', 'Toggle')
+    call s:notify_all_uis('Gui', 'TreeView', 'Toggle')
 endfunction
 
 command! GuiTreeviewToggle call <SID>TreeViewToggle()
@@ -228,7 +234,7 @@ anoremenu <script> Gui.Treeview.Toggle :call <SID>TreeViewShowToggle()
 
 " Show Right-Click ContextMenu
 function GuiShowContextMenu() range
-	call rpcnotify(0, 'Gui', 'ShowContextMenu')
+	call s:notify_all_uis('Gui', 'ShowContextMenu')
 endfunction
 
 " Notify Gui of any cursor movement, used by GuiScrollBar
@@ -236,57 +242,57 @@ function s:GuiCursorMoved()
 	let l:minLineVisible = line('w0')
 	let l:bufferSize = line('$')
 	let l:windowHeight = winheight(winnr())
-	call rpcnotify(0, 'Gui', 'CursorMoved', l:minLineVisible, l:bufferSize, l:windowHeight)
+	call s:notify_all_uis('Gui', 'CursorMoved', l:minLineVisible, l:bufferSize, l:windowHeight)
 endfunction
 
 autocmd CursorMoved,CursorMovedI,VimResized * call <SID>GuiCursorMoved()
 
 " Show/Hide the Gui ScrollBar
 function! s:GuiScrollBar(enable) abort
-	call rpcnotify(0, 'Gui', 'SetScrollBarVisible', a:enable)
+	call s:notify_all_uis('Gui', 'SetScrollBarVisible', a:enable)
 endfunction
 
 command! -nargs=1 GuiScrollBar call s:GuiScrollBar(<args>)
 
 " Use Neovim theming for Qt Widgets
 function! s:GuiAdaptiveColor(enable) abort
-	call rpcnotify(0, 'Gui', 'AdaptiveColor', a:enable)
+	call s:notify_all_uis('Gui', 'AdaptiveColor', a:enable)
 endfunction
 command! -nargs=1 GuiAdaptiveColor call s:GuiAdaptiveColor(<args>)
 
 " Use Neovim font for Qt Widgets
 function! s:GuiAdaptiveFont(enable) abort
-	call rpcnotify(0, 'Gui', 'AdaptiveFont', a:enable)
+	call s:notify_all_uis('Gui', 'AdaptiveFont', a:enable)
 endfunction
 command! -nargs=1 GuiAdaptiveFont call s:GuiAdaptiveFont(<args>)
 
 " Override default Qt Style using QStyleFactory
 function! s:GuiAdaptiveStyle(styleName, ...) abort
-	call rpcnotify(0, 'Gui', 'AdaptiveStyle', a:styleName)
+	call s:notify_all_uis('Gui', 'AdaptiveStyle', a:styleName)
 endfunction
 command! -nargs=? GuiAdaptiveStyle call s:GuiAdaptiveStyle("<args>")
 
 " Print a list of available Qt Styles
 function! s:GuiAdaptiveStyleList() abort
-	call rpcnotify(0, 'Gui', 'AdaptiveStyleList')
+	call s:notify_all_uis('Gui', 'AdaptiveStyleList')
 endfunction
 command! -nargs=0 GuiAdaptiveStyleList call s:GuiAdaptiveStyleList()
 
 " Change rendering logic to use ligature-compatible rendering scheme
 function! s:GuiRenderLigatures(enable) abort
-	call rpcnotify(0, 'Gui', 'Option', 'RenderLigatures', a:enable)
+	call s:notify_all_uis('Gui', 'Option', 'RenderLigatures', a:enable)
 endfunction
 command! -nargs=1 GuiRenderLigatures call s:GuiRenderLigatures(<args>)
 
 " Enable/Disable the rendering of bold/italics
 function! s:GuiRenderFontAttr(enable) abort
-	call rpcnotify(0, 'Gui', 'Option', 'RenderFontAttr', a:enable)
+	call s:notify_all_uis('Gui', 'Option', 'RenderFontAttr', a:enable)
 endfunction
 command! -nargs=1 GuiRenderFontAttr call s:GuiRenderFontAttr(<args>)
 
 " Set window transparency, forwards to Qt setWindowOpacity
 function! s:GuiWindowOpacityCommand(value) abort
-  call rpcnotify(0, 'Gui', 'WindowOpacity', a:value)
+  call s:notify_all_uis('Gui', 'WindowOpacity', a:value)
 endfunction
 command! -nargs=1 GuiWindowOpacity call s:GuiWindowOpacityCommand("<args>")
 
