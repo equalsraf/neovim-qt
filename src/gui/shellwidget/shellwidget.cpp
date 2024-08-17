@@ -11,6 +11,14 @@
 #include "compat_shellwidget.h"
 #include "helpers.h"
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+constexpr int c_qtWeightMin{ 0 };
+constexpr int c_qtWeightMax{ 99 };
+#else
+constexpr int c_qtWeightMin{ 1 };
+constexpr int c_qtWeightMax{ 1000 };
+#endif
+
 ShellWidget::ShellWidget(QWidget* parent)
 	: QWidget(parent)
 {
@@ -1042,7 +1050,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 			weight = QFont::DemiBold;
 		} else if (attr.length() > 0 && attr.at(0) == 'w') {
 			weight = rightString(attr, attr.length() - 1).toInt();
-			if (weight < 0 || weight > 99) {
+			if (weight < c_qtWeightMin || weight > c_qtWeightMax) {
 				return QStringLiteral("Invalid font weight");
 			}
 		} else if (attr == "i") {
