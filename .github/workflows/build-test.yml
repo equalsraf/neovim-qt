@@ -39,8 +39,8 @@ jobs:
             flavor: Debug
             runner: macos-12
             generator: Ninja
-            cc: gcc-11
-            cxx: g++-11
+            cc: gcc-12
+            cxx: g++-12
 
           - name: MacOS_Release
             flavor: Release
