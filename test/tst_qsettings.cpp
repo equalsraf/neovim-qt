@@ -47,6 +47,7 @@ static void SendNeovimCommand(NeovimConnector* connector, const QString& command
 void TestQSettings::initTestCase() noexcept
 {
 	NeovimQt::MockQSettings::EnableByDefault();
+	LoadDejaVuSansMonoTestFonts();
 }
 
 void TestQSettings::cleanup() noexcept
@@ -109,7 +110,8 @@ void TestQSettings::GuiFont() noexcept
 
 	QSettings settings;
 
-	const QString fontDesc{ QStringLiteral("%1:h20").arg(GetPlatformTestFont()) };
+	const QString cmdFontSize14{ QStringLiteral("GuiFont! :h14") };
+	const QString fontDesc{ QStringLiteral("DejaVu Sans Mono:h20") };
 	const QString fontCommand{ QStringLiteral("GuiFont! %1").arg(fontDesc) };
 
 	SendNeovimCommand(connector, fontCommand);
