@@ -70,7 +70,7 @@ jobs:
           python ${{ env.GEN_CMD }} ${{ env.NVIM_EXE }} ${{ env.OUTPUT }}
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Neovim API ${{ matrix.version}} Bindings
           path: |
@@ -119,7 +119,7 @@ jobs:
           Expand-Archive -Path nvim-win64.zip -DestinationPath ${{ github.workspace }}\build\
 
       - name: Install Dependencies
-        run:
+        run: |
           pip install jinja2 msgpack
           choco install dos2unix
 
@@ -135,7 +135,7 @@ jobs:
           dos2unix src/auto/neovimapi${{ matrix.version }}.h
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Neovim API ${{ matrix.version}} Bindings
           path: |
