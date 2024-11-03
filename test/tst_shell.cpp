@@ -263,7 +263,7 @@ void TestShell::GetClipboard() noexcept
 
 	QGuiApplication::clipboard()->setText(register_data, GetClipboardMode(reg));
 
-	QString getreg_cmd = QString("getreg('%1')").arg(reg);
+	QString getreg_cmd = QStringLiteral("getreg('%1')").arg(reg);
 	QSignalSpy cmd_clip(c->api1()->nvim_eval(c->encode(getreg_cmd)), &MsgpackRequest::finished);
 	QVERIFY(cmd_clip.isValid());
 	QVERIFY(SPYWAIT(cmd_clip));
@@ -300,7 +300,7 @@ void TestShell::SetClipboard() noexcept
 	c->api0()->vim_command(c->encode("call GuiClipboard()"));
 
 	QString setreg_cmd =
-		QString("setreg('%1', '%2')\n").arg(reg).arg(QString::fromUtf8(register_data));
+		QStringLiteral("setreg('%1', '%2')\n").arg(reg).arg(QString::fromUtf8(register_data));
 	c->neovimObject()->vim_command(c->encode(setreg_cmd));
 	QSignalSpy spy_sync(c->neovimObject()->vim_feedkeys("", "", false), &MsgpackRequest::finished);
 	SPYWAIT(spy_sync);

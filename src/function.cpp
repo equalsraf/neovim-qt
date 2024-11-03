@@ -173,14 +173,14 @@ QString Function::signature() const
 {
 	QStringList sigparams;
 	foreach(const StringPair p, parameters) {
-		sigparams.append(QString("%1 %2").arg(p.first, p.second));
+		sigparams.append(QStringLiteral("%1 %2").arg(p.first, p.second));
 	}
 
 	QString notes;
 	if (can_fail) {
 		notes += " !fail";
 	}
-	return  QString("%1 %2(%3)%4").arg(return_type, name, sigparams.join(", "), notes);
+	return  QStringLiteral("%1 %2(%3)%4").arg(return_type, name, sigparams.join(", "), notes);
 }
 
 } // Namespace

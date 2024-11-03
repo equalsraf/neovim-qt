@@ -1571,7 +1571,7 @@ void Shell::updateWindowId()
 		m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
 		WId window_id = effectiveWinId();
 		m_nvim->api0()->vim_set_var("GuiWindowId", QVariant(window_id));
-		m_nvim->api0()->vim_command(QString("let v:windowid = %1").arg(window_id).toLatin1());
+		m_nvim->api0()->vim_command(QStringLiteral("let v:windowid = %1").arg(window_id).toLatin1());
 		updateClientInfo();
 	}
 }
@@ -1872,7 +1872,7 @@ void ShellRequestHandler::handleRequest(MsgpackIODevice* dev, quint32 msgid, con
 			QString reg_name = reg.toString();
 
 			if (reg_name != "*" && reg_name != "+") {
-				dev->sendResponse(msgid, QString("Unknown register"), QVariant());
+				dev->sendResponse(msgid, QStringLiteral("Unknown register"), QVariant());
 				return;
 			}
 
@@ -1915,7 +1915,7 @@ void ShellRequestHandler::handleRequest(MsgpackIODevice* dev, quint32 msgid, con
 		}
 	}
 	// be sure to return early or this message will be sent
-	dev->sendResponse(msgid, QString("Unknown method"), QVariant());
+	dev->sendResponse(msgid, QStringLiteral("Unknown method"), QVariant());
 }
 
 /**
