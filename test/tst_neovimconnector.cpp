@@ -147,10 +147,10 @@ private slots:
 		server->listen(QHostAddress::LocalHost);
 		QVERIFY(server->isListening());
 
-		NeovimConnector *c = NeovimConnector::connectToNeovim(
-			QStringLiteral("%1:%2")
-				.arg(server->serverAddress().toString())
-				.arg(server->serverPort()));
+		NeovimConnector* c =
+			NeovimConnector::connectToNeovim(QStringLiteral("%1:%2")
+												 .arg(server->serverAddress().toString())
+												 .arg(server->serverPort()));
 
 		// Test Performance: timeout expected, set value carefully.
 		c->setRequestTimeout(1000 /*msec*/);

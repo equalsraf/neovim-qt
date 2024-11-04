@@ -180,7 +180,7 @@ QString Function::signature() const
 	if (can_fail) {
 		notes += " !fail";
 	}
-	return  QStringLiteral("%1 %2(%3)%4").arg(return_type, name, sigparams.join(", "), notes);
+	return QStringLiteral("%1 %2(%3)%4").arg(return_type, name, sigparams.join(", "), notes);
 }
 
 } // Namespace
