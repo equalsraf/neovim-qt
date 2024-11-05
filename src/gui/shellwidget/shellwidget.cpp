@@ -83,7 +83,8 @@ bool ShellWidget::setShellFont(const QFont& font, bool force) noexcept
 		}
 
 		if (isBadMonospace(font)) {
-			emit fontError(QString("Warning: Font \"%1\" reports bad fixed pitch metrics").arg(font.family()));
+			emit fontError(QStringLiteral("Warning: Font \"%1\" reports bad fixed pitch metrics")
+							   .arg(font.family()));
 		}
 	}
 

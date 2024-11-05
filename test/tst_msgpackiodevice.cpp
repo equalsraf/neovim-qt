@@ -163,7 +163,7 @@ private slots:
 		QVERIFY(one->checkVariant(true));
 		QVERIFY(one->checkVariant(42));
 		QVERIFY(one->checkVariant(4.4));
-		QVERIFY(one->checkVariant(QString("test")));
+		QVERIFY(one->checkVariant(QStringLiteral("test")));
 		QVERIFY(one->checkVariant(QByteArray()));
 		QVERIFY(one->checkVariant(QVariantList() << "test"));
 		QVERIFY(one->checkVariant(QVariantMap()));

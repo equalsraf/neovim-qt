@@ -151,7 +151,7 @@ void MainWindow::neovimExited(int status)
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
 		m_stack.setCurrentIndex(0);
 	} else if (status != 0) {
-		m_errorWidget->setText(QString("Neovim exited with status code (%1)").arg(status));
+		m_errorWidget->setText(QStringLiteral("Neovim exited with status code (%1)").arg(status));
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
 		m_stack.setCurrentIndex(0);
 	} else {
@@ -174,7 +174,8 @@ void MainWindow::neovimError(NeovimConnector::NeovimError err)
 }
 void MainWindow::neovimIsUnsupported()
 {
-	m_errorWidget->setText(QString("Cannot connect to this Neovim, required API version 1, found [%1-%2]")
+	m_errorWidget->setText(
+		QStringLiteral("Cannot connect to this Neovim, required API version 1, found [%1-%2]")
 			.arg(m_nvim->apiCompatibility())
 			.arg(m_nvim->apiLevel()));
 	m_errorWidget->showReconnect(m_nvim->canReconnect());

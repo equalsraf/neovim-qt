@@ -65,7 +65,7 @@ static QVariant GetButtonName(
 		case Qt::LeftButton:
 		{
 			if (clickCount > 1 && clickCount <= 4) {
-				return QString("%1-Left").arg(clickCount);
+				return QStringLiteral("%1-Left").arg(clickCount);
 			}
 			return QStringLiteral("Left");
 		}

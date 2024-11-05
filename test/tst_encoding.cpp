@@ -22,7 +22,7 @@ protected:
 void TestEncoding::encodeString()
 {
 	QMetaObject::Connection conn;
-	m_c->api1()->vim_set_var("testing-neovim-qt", QString("value"));
+	m_c->api1()->vim_set_var("testing-neovim-qt", QStringLiteral("value"));
 	m_c->api1()->vim_get_var("testing-neovim-qt");
 	QSignalSpy onVimGetVar{ m_c->api1(), &NeovimQt::NeovimApi1::on_vim_get_var };
 	conn = connect(m_c->api1(), &NeovimQt::NeovimApi1::on_vim_get_var,

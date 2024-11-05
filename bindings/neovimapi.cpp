@@ -86,7 +86,7 @@ void NeovimApi{{api_level}}::handleResponseError(quint32 msgid, quint64 fun, con
 		break;
 {% endfor %}
 	default:
-		m_c->setError(NeovimConnector::RuntimeMsgpackError, QString("Received error for function that should not fail: %s").arg(fun));
+		m_c->setError(NeovimConnector::RuntimeMsgpackError, QStringLiteral("Received error for function that should not fail: %s").arg(fun));
 	}
 }
 
@@ -133,7 +133,7 @@ bool NeovimApi{{api_level}}::checkFunctions(const QVariantList& ftable)
 	<< Function("{{f.return_type.neovim_type}}", "{{f.name}}",
 			QList<QString>()
 			{% for param in f.parameters %}
-			<< QString("{{param.neovim_type}}")
+			<< QStringLiteral("{{param.neovim_type}}")
 			{% endfor %}
 			, false)
 	{% endfor %}
