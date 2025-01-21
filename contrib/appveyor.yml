@@ -67,7 +67,7 @@ deploy:
     description: Automated builds (Appveyor)
     release: $(appveyor_repo_tag_name)
     auth_token:
-      secure: zhYnPJHaw6Dkl59gfvcx4EaAw7xhmU//01kwlRCvqdbkrz2IVSZKdwEs77Lw4Iod
+      secure: EC3hRzfCyV2DwNDMFWvk1V41y6axx/Mn0bYkFI5tD5uZdg+kAhuoEAmde59TWJDx2VEfJpQxjSdSs+ibZHKU65DRbs5lzenXPie/l5usZWE82rX6W92zPMl2DbeuaLSY
     artifact: neovim-qt.zip, build\_CPack_Packages\win64\WIX\neovim-qt-installer.msi
     prerelease: false
     on:
