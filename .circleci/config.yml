@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     machine:
-      image: ubuntu-2004:202008-01
+      image: ubuntu-2204:2024.11.1
     working_directory: ~/project
     steps:
       - checkout
@@ -15,8 +15,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo apt-get install -y cmake libqt5svg5 libqt5svg5-dev neovim python3-dev python3-jinja2 python3-msgpack python3-pip qt5-default
-            sudo apt-get install -y lcov
+            sudo NEEDRESTART_MODE=l apt-get install -y cmake libqt5svg5 libqt5svg5-dev neovim python3-dev python3-jinja2 python3-msgpack python3-pip qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
+
+            sudo NEEDRESTART_MODE=l apt-get install -y lcov
       - run:
           name: build
           command: |
