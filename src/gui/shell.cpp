@@ -399,9 +399,6 @@ void Shell::neovimError(NeovimConnector::NeovimError err)
 void Shell::neovimExited(int status)
 {
 	setAttached(false);
-	if (status == 0 && m_nvim->errorCause() == NeovimConnector::NoError) {
-		close();
-	}
 }
 
 /// Neovim requested a resize
@@ -1709,12 +1706,21 @@ void Shell::closeEvent(QCloseEvent *ev)
 		m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
 		// If attached to a spawned Neovim process, ignore the event
 		// and try to close Neovim as :qa
-		ev->ignore();
 		bailoutIfinputBlocking();
+
+		// Try to wait for neovim to quit
+		QEventLoop loop;
+		connect(m_nvim, &NeovimConnector::processExited, &loop, &QEventLoop::quit);
+		connect(m_nvim, &NeovimConnector::aboutToClose,  &loop, &QEventLoop::quit);
+		connect(m_nvim->api0(), &NeovimApi0::on_vim_command, &loop, [&loop, ev](){
+			//This will fire if we cancel the closing
+			ev->ignore();
+			loop.quit();
+		});
 		m_nvim->api0()->vim_command("confirm qa");
-	} else {
-		QWidget::closeEvent(ev);
+		loop.exec();
 	}
+	if (ev->isAccepted())  QWidget::closeEvent(ev);
 }
 
 void Shell::focusInEvent(QFocusEvent *ev)

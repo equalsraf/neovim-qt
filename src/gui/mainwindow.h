@@ -53,6 +53,7 @@ private slots:
 	void handleNeovimAttachment(bool);
 	void neovimIsUnsupported();
 	void saveWindowGeometry();
+	void handleClosing();
 
 	// GuiAdaptive Color/Font/Style Slots
 	void setGuiAdaptiveColorEnabled(bool isEnabled);
@@ -70,7 +71,7 @@ private:
 	Shell* m_shell{ nullptr };
 	QStackedWidget m_stack;
 
-	bool m_neovim_requested_close{ false };
+	bool m_inCloseEvent{ false };
 	ContextMenu* m_contextMenu{ nullptr };
 	ScrollBar* m_scrollbar{ nullptr };
 	Tabline m_tabline;
