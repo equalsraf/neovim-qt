@@ -20,14 +20,14 @@ jobs:
       displayName: CMake Build
 
 
-  - job: UbuntuFocal
+  - job: UbuntuJammy
     pool:
-      vmImage: 'ubuntu-20.04'
+      vmImage: 'ubuntu-22.04'
     steps:
     - script: |
         sudo add-apt-repository -y ppa:neovim-ppa/stable
         sudo apt update -y
-        sudo apt install -y libqt5svg5-dev neovim ninja-build qt5-default
+        sudo apt install -y libqt5svg5-dev neovim ninja-build qtbase5-dev qt5-qmake
       displayName: Install Dependencies
     - task: CMake@1
       inputs:
