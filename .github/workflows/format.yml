@@ -29,10 +29,7 @@ jobs:
 
       - name: Install LLVM 15
         run: |
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh 15 all
-          rm llvm.sh
+          sudo apt-get install -y clang-format-15 clang-15
 
       - name: Run ClangFormatDiff Script
         run: contrib/clang-format-diff.sh
