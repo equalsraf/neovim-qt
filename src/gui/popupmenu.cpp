@@ -61,7 +61,8 @@ void PopupMenu::setGeometry(int64_t row, int64_t col)
 		const int height = sizeHintContent.height();
 
 		qDebug() << "Fallback: PUM anchored to 0,0 without parent shell_widget!";
-		return QListView::setGeometry(0, 0, width, height);
+		QListView::setGeometry(0, 0, width, height);
+		return;
 	}
 
 	const int cell_width = m_parentShellWidget->cellSize().width();
@@ -124,7 +125,7 @@ void PopupMenu::setGeometry(int64_t row, int64_t col)
 		anchor_y = (row + 1) * cell_height;
 	}
 
-	return QListView::setGeometry(anchor_x, anchor_y, width, height);
+	QListView::setGeometry(anchor_x, anchor_y, width, height);
 }
 
 } // Namespace

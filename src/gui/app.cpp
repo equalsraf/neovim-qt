@@ -24,7 +24,7 @@ int s_exitStatus{ 0 };
 
 struct ConnectorInitArgs
 {
-	enum class Type
+	enum class Type : std::int8_t
 	{
 		Embed,
 		Server,
@@ -43,6 +43,10 @@ struct ConnectorInitArgs
 
 	ConnectorInitArgs(
 		Type _type, int _timeout, QString _server, QString _nvim, QStringList nvimArgs) noexcept;
+
+	// non copyable - we don't need it and it triggers lint warnings on const members
+	ConnectorInitArgs(const ConnectorInitArgs&) = delete;
+	ConnectorInitArgs& operator=(const ConnectorInitArgs&) = delete;
 };
 
 ConnectorInitArgs::Type getConnectorType(const QCommandLineParser& parser) noexcept
