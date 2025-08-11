@@ -29,7 +29,7 @@ jobs:
 
           - name: Linux_Release
             flavor: Release
-            runner: ubuntu-20.04
+            runner: ubuntu-22.04
             generator: Ninja
             cc: gcc
             cxx: g++
