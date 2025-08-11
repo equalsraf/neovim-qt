@@ -37,14 +37,14 @@ jobs:
 
           - name: MacOS_GCC
             flavor: Debug
-            runner: macos-12
+            runner: macos-13
             generator: Ninja
             cc: gcc-12
             cxx: g++-12
 
           - name: MacOS_Release
             flavor: Release
-            runner: macos-12
+            runner: macos-13
             generator: Ninja
             cc: clang
             cxx: clang++
