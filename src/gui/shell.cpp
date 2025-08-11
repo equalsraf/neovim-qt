@@ -1711,13 +1711,12 @@ void Shell::closeEvent(QCloseEvent *ev)
 		// Try to wait for neovim to quit
 		QEventLoop loop;
 		connect(m_nvim, &NeovimConnector::processExited, &loop, &QEventLoop::quit);
-		connect(m_nvim, &NeovimConnector::aboutToClose,  &loop, &QEventLoop::quit);
-		connect(m_nvim->api0(), &NeovimApi0::on_vim_command, &loop, [&loop, ev](){
+		MsgpackRequest * request = m_nvim->api0()->vim_command("confirm qa");
+		connect(request, &MsgpackRequest::finished, &loop, [&loop, ev](){
 			//This will fire if we cancel the closing
 			ev->ignore();
 			loop.quit();
 		});
-		m_nvim->api0()->vim_command("confirm qa");
 		loop.exec();
 	}
 	if (ev->isAccepted())  QWidget::closeEvent(ev);
