@@ -112,8 +112,12 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::neovimFullScreen);
 	connect(m_shell, &Shell::neovimFrameless,
 			this, &MainWindow::neovimFrameless);
+
+	// neovimGuiCloseRequest can't be a DirectConnection, since
+	// it's not invoked when it is still running. We need it to
+	// start executing right away.
 	connect(m_shell, &Shell::neovimGuiCloseRequest,
-			this, &MainWindow::neovimGuiCloseRequest);
+			this, &MainWindow::neovimGuiCloseRequest,Qt::ConnectionType::QueuedConnection);
 	connect(m_shell, &Shell::neovimOpacity,
 			this, &MainWindow::setWindowOpacity);
 	connect(m_nvim, &NeovimConnector::processExited,
@@ -155,8 +159,6 @@ void MainWindow::neovimExited(int status)
 		m_errorWidget->setText(QStringLiteral("Neovim exited with status code (%1)").arg(status));
 		m_errorWidget->showReconnect(m_nvim->canReconnect());
 		m_stack.setCurrentIndex(0);
-	} if (!m_inCloseEvent) {
-		close();
 	}
 }
 void MainWindow::neovimError(NeovimConnector::NeovimError err)
@@ -256,6 +258,9 @@ void MainWindow::neovimFullScreen(bool set)
 void MainWindow::neovimGuiCloseRequest(int status)
 {
 	m_exitStatus = status;
+	if (!m_inCloseEvent) {
+		close();
+	}
 }
 
 void MainWindow::reconnectNeovim()
@@ -285,8 +290,8 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 		handleClosing();
 	} else {
 		ev->ignore();
+		m_inCloseEvent = false;
 	}
-	m_inCloseEvent = false;
 }
 void MainWindow::changeEvent(QEvent* ev)
 {
@@ -306,6 +311,7 @@ void MainWindow::handleNeovimAttachment(bool attached)
 	if (!attached) {
 		return;
 	}
+	m_exitStatus = 0;
 
 	if (m_shell && isWindow()) {
 		m_shell->updateGuiWindowState(windowState());
