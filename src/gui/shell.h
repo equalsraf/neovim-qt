@@ -94,6 +94,8 @@ signals:
 	void setGuiAdaptiveStyle(const QString& styleName);
 	void showGuiAdaptiveStyleList();
 
+	void forceQuit();
+
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);

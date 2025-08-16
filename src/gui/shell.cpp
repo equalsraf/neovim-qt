@@ -1711,6 +1711,10 @@ void Shell::closeEvent(QCloseEvent *ev)
 		// Try to wait for neovim to quit
 		QEventLoop loop;
 		connect(m_nvim, &NeovimConnector::processExited, &loop, &QEventLoop::quit);
+		connect(this,   &Shell::forceQuit,               &loop, [this] {
+			bailoutIfinputBlocking();
+			m_nvim->api0()->vim_command("q!");
+		});
 		MsgpackRequest * request = m_nvim->api0()->vim_command("confirm qa");
 		connect(request, &MsgpackRequest::finished, &loop, [&loop, ev](){
 			//This will fire if we cancel the closing
