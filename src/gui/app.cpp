@@ -241,7 +241,9 @@ bool App::event(QEvent* event) noexcept
 	}
 	else if (event->type() == QEvent::Quit) {
 		for (auto window : s_windows) {
-			if (!window->close()) {
+			if (window->isClosing()) {
+				window->emitForceClose();
+			} else if (!window->close()) {
 				event->setAccepted(false);
 			}
 		}
@@ -271,7 +273,7 @@ void App::showUi() noexcept
 
 	// delete the main window when closed to emit `destroyed()` signal to
 	// support `:cq` return codes (Pull#644).
-	setQuitOnLastWindowClosed(false);
+	setQuitOnLastWindowClosed(true);
 
 	// Window geometry should be restored only when the user does not specify
 	// one of the following command line arguments. Argument "maximized" can

@@ -29,6 +29,8 @@ public:
 	void restoreWindowGeometry();
 
 	bool active() const noexcept { return m_isActive; }
+	bool isClosing() const noexcept { return m_inCloseEvent; }
+	void emitForceClose() const noexcept;
 
 signals:
 	void neovimAttachmentChanged(bool);

@@ -280,6 +280,9 @@ void MainWindow::handleClosing()
 	}
 	emit closing(m_exitStatus);
 }
+void MainWindow::emitForceClose() const noexcept {
+	emit m_shell->forceQuit();
+}
 
 void MainWindow::closeEvent(QCloseEvent *ev)
 {
