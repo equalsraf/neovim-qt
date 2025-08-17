@@ -8,8 +8,6 @@ namespace NeovimQt {
 
 QClipboard::Mode GetClipboardMode(char reg) noexcept;
 
-QString GetPlatformTestFont() noexcept;
-
 QStringList BinaryAndArgumentsNoForkWithCommand(const QString& command) noexcept;
 
 void AddPlatformSpecificExitCodeCases() noexcept;
