@@ -30,7 +30,7 @@ if(WIN32)
 endif()
 
 add_library(neovim-qt STATIC ${NEOVIM_QT_SOURCES})
-target_link_libraries(neovim-qt Qt${QT_VERSION_MAJOR}::Network ${MSGPACK_LIBRARIES})
+target_link_libraries(neovim-qt Qt${QT_VERSION_MAJOR}::Network msgpack-c)
 target_link_libraries(neovim-qt compat)
 
 add_subdirectory(gui)

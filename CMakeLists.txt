@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9.0)
+cmake_minimum_required(VERSION 3.11.0)
 # Neovim-Qt Version, used by --version update before release
 # 9999 = Development Pre-Release
 project(neovim-qt VERSION 0.2.19.0)
@@ -163,11 +163,10 @@ endif()
 # msgpack
 option(USE_SYSTEM_MSGPACK "Use system msgpack libraries " OFF)
 if(USE_SYSTEM_MSGPACK)
-	find_package(Msgpack REQUIRED)
+	find_package(msgpack-c 6.0.0 REQUIRED)
 else()
 	add_subdirectory(third-party)
 endif()
-include_directories(${MSGPACK_INCLUDE_DIRS})
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DQT_NO_DEBUG_OUTPUT)
