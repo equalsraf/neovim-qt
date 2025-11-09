@@ -105,11 +105,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 			"-bugprone-unhandled-exception-at-new,"
 			"-readability-suspicious-call-argument,"
 			)
-		if(${CMAKE_VERSION} VERSION_LESS "3.6.0")
-			message("ENABLE_TIDY requires CMake >= 3.6.0")
-		else()
-			set(CMAKE_CXX_CLANG_TIDY clang-tidy "-checks=${TIDY_CHECKS};-warnings-as-errors=*")
-		endif()
+		set(CMAKE_CXX_CLANG_TIDY clang-tidy "-checks=${TIDY_CHECKS};-warnings-as-errors=*")
 	endif()
 
 	# Code Coverage Report
