@@ -9,11 +9,6 @@ QClipboard::Mode GetClipboardMode(char /*reg*/) noexcept
 	return QClipboard::Clipboard;
 }
 
-QString GetPlatformTestFont() noexcept
-{
-	return QStringLiteral("Monaco");
-}
-
 QStringList BinaryAndArgumentsNoForkWithCommand(const QString& command) noexcept
 {
 	return { NVIM_QT_BINARY, "--nofork", "--",  "-c", command };
