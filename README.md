@@ -79,7 +79,7 @@ If your distribution is not listed here, please create an Issue with instruction
 
 #### Arch Linux
 
-Neovim Qt is available from the Arch [Community Repository](https://archlinux.org/packages/community/x86_64/neovim-qt/).
+Neovim Qt is available from the Arch [Extra Repository](https://archlinux.org/packages/extra/x86_64/neovim-qt/).
 
 ```
 $ sudo pacman -S neovim-qt
@@ -87,18 +87,11 @@ $ sudo pacman -S neovim-qt
 
 #### Gentoo
 
-Neovim Qt is available from this [Portage Ebuild](https://github.com/jgehrig/gentoo/blob/master/app-editors/neovim-qt/neovim-qt-9999.ebuild).
-
-Alternatively, you can add the entire overlay:
-```
-$ eselect repository add jgehrig git https://github.com/jgehrig/gentoo.git
-$ emerge --sync
-$ emerge -av neovim-qt
-```
+Neovim Qt is available from [GURU](https://gpo.zugaina.org/Overlays/guru/app-editors/neovim-qt).
 
 #### OpenSUSE
 
-Neovim Qt is available from this [Community Package](https://build.opensuse.org/package/show/home%3AAptrug/neovim-qt).
+Neovim Qt is available from this [Community Package](https://build.opensuse.org/package/show/home:cfr34k/neovim-qt).
 
 #### Debian, Ubuntu
 
