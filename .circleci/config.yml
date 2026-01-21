@@ -24,7 +24,7 @@ jobs:
             pyenv global system
             mkdir build
             cd build
-            cmake -DCMAKE_BUILD_TYPE=Debug -DUSE_GCOV=ON -DPYTHON_EXECUTABLE=/usr/bin/python3 ..
+            cmake -DCMAKE_BUILD_TYPE=Debug -DUSE_GCOV=ON -DPYTHON_EXECUTABLE=/usr/bin/python3 -DENABLE_TESTS=ON ..
             cmake --build . --target bindings -- VERBOSE=1
             cmake --build . -- VERBOSE=1
       - run:
@@ -38,3 +38,5 @@ jobs:
       - run:
           name: Upload coverage report to codecov
           command: bash <(curl -s https://codecov.io/bash) -f coverage.info 
+      - store_test_results:
+          path: build/test_shellwidget_output/

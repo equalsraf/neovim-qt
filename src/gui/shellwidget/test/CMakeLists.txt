@@ -4,6 +4,8 @@ if (WIN32 AND USE_STATIC_QT)
 	add_definitions(-DUSE_STATIC_QT)
 endif ()
 
+add_definitions(-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
+
 # Define shell2.txt location for bench_paint
 file(TO_CMAKE_PATH ${CMAKE_CURRENT_SOURCE_DIR} TEST_SOURCE_DIR)
 add_definitions(-DTEST_SOURCE_DIR="${TEST_SOURCE_DIR}")
@@ -13,6 +15,9 @@ function(add_xtest SOURCE_NAME)
 	target_link_libraries(${SOURCE_NAME} Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Test qshellwidget)
 	add_test(NAME ${SOURCE_NAME} COMMAND ${SOURCE_NAME} ${CTEST_EXE_ARGS})
 endfunction()
+
+file(TO_CMAKE_PATH ${CMAKE_CURRENT_SOURCE_DIR} TEST_SOURCE_DIR)
+add_definitions(-DTEST_SOURCE_DIR="${TEST_SOURCE_DIR}")
 
 add_xtest(test_cell)
 add_xtest(test_shellcontents)

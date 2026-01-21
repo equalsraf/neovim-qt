@@ -118,6 +118,13 @@ jobs:
           /usr/local/opt/qt@5/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
 
+      - name: Upload Test Artifacts
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: ${{ matrix.name }}_testoutput
+          path: |
+            build/test_shellwidget_output/
       - name: Upload Artifacts
         if: ${{ matrix.publish }}
         uses: actions/upload-artifact@v4
@@ -129,3 +136,4 @@ jobs:
             neovim-qt.dmg
             neovim-qt-installer.msi
             neovim-qt.zip
+
