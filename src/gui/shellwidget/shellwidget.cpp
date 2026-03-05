@@ -6,6 +6,7 @@
 #include <QPaintEvent>
 #include <QTextLayout>
 #include <QtMath>
+#include <tuple>
 
 #include "compat.h"
 #include "compat_shellwidget.h"
@@ -432,7 +433,7 @@ void ShellWidget::paintForegroundCellText(
 	// Draw chars at the baseline
 	const int cellTextOffset{ m_ascent + (m_lineSpace / 2) };
 	const QPoint pos{ cellRect.left(), cellRect.top() + cellTextOffset};
-	const uint character{ cell.GetCharacter() };
+	const char32_t character{ cell.GetCharacter() };
 	const QString text{ QString::fromUcs4(&character, 1) };
 
 	p.drawText(pos, text);
@@ -712,7 +713,7 @@ void ShellWidget::paintRectLigatures(QPainter& p, const QRect rect) noexcept
 					blockCursorPos = blockText.size();
 				}
 
-				const uint cellCharacter{ checkCell.GetCharacter() };
+				const char32_t cellCharacter{ checkCell.GetCharacter() };
 				blockText += QString::fromUcs4(&cellCharacter, 1);
 
 				if (checkCell.IsDoubleWidth()) {
@@ -1035,8 +1036,11 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	qreal pointSizeF = curFont.pointSizeF();
 	int weight = -1;
 	bool italic = false;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	QList<std::pair<QFont::Tag, float>> variants;
+#endif
 	for (const auto& attr : qAsConst(attrs)) {
-		if (attr.size() >= 2 && attr[0] == 'h') {
+		if (attr.size() >= 2 && attr[0] == 'h' && attr[1] >= '0' && attr[1] <= '9') {
 			bool ok{ false };
 			qreal height = midString(attr, 1).toFloat(&ok);
 			if (!ok || height < 0) {
@@ -1056,6 +1060,17 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 			}
 		} else if (attr == "i") {
 			italic = true;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+		} else if (attr.length() >= 5 && attr[4] >= '0' && attr[4] <= '9') {
+			auto tag = QFont::Tag::fromString(attr.first(4));
+			if (tag) {
+				bool ok{ false };
+				qreal axisVal = midString(attr, 4).toFloat(&ok);
+				if (ok) {
+					variants.append(std::make_pair(*tag, axisVal));
+				}
+			}
+#endif
 		}
 	}
 
@@ -1065,6 +1080,31 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	font.setStyleHint(QFont::TypeWriter, fontStyleStrategy());
 	font.setFixedPitch(true);
 	font.setKerning(false);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+	QFontInfo info(font);
+	QList<QFont::Tag> validTags;
+	QStringList messageTags;
+	for (const auto& axis : info.variableAxes()) {
+		validTags.append(axis.tag());
+		messageTags.append(axis.tag().toString());
+	}
+	for (const auto& variant : variants) {
+		if (validTags.contains(variant.first)) {
+			font.setVariableAxis(variant.first, variant.second);
+		} else {
+			return QStringLiteral("Unknown font variant axis: %1    known tags: %2")
+				.arg(variant.first.toString())
+				.arg(messageTags.join(", "));
+		}
+	}
+#elif (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	// From 6.7.0 until 6.9.0, there was no way to get a list of the valid axes
+	// Just blindly apply them
+	for (const auto& variant : variants) {
+		font.setVariableAxis(variant.first, variant.second);
+	}
+#endif
 
 	return font;
 }
