@@ -433,7 +433,7 @@ void ShellWidget::paintForegroundCellText(
 	// Draw chars at the baseline
 	const int cellTextOffset{ m_ascent + (m_lineSpace / 2) };
 	const QPoint pos{ cellRect.left(), cellRect.top() + cellTextOffset};
-	const uint character{ cell.GetCharacter() };
+	const char32_t character{ cell.GetCharacter() };
 	const QString text{ QString::fromUcs4(&character, 1) };
 
 	p.drawText(pos, text);
@@ -713,7 +713,7 @@ void ShellWidget::paintRectLigatures(QPainter& p, const QRect rect) noexcept
 					blockCursorPos = blockText.size();
 				}
 
-				const uint cellCharacter{ checkCell.GetCharacter() };
+				const char32_t cellCharacter{ checkCell.GetCharacter() };
 				blockText += QString::fromUcs4(&cellCharacter, 1);
 
 				if (checkCell.IsDoubleWidth()) {
