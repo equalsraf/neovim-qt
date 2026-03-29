@@ -17,8 +17,13 @@ template <class T>
 bool decode(const QVariant& in, QList<T>& out)
 {
 	out.clear();
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	if ((QMetaType::Type)in.type() != QMetaType::QVariantList) {
 		qWarning() << "Attempting to decode as QList<...> when type is" << in.type() << in;
+#else
+	if (in.metaType().id() != QMetaType::QVariantList) {
+		qWarning() << "Attempting to decode as QList<...> when type is" << in.metaType().id() << in;
+#endif
 		return true;
 	}
 	foreach(const QVariant val, in.toList()) {

@@ -54,7 +54,11 @@ bool saveShellContents(const ShellContents& s, const QString& filename)
 			if (cell.GetBackgroundColor().isValid()) {
 				p.fillRect(r, cell.GetBackgroundColor());
 			}
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 			const uint character{ cell.GetCharacter() };
+#else
+			const char32_t character{ static_cast<char32_t>(cell.GetCharacter()) };
+#endif
 			p.drawText(r, QString::fromUcs4(&character, 1));
 		}
 	}

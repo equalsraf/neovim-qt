@@ -401,8 +401,13 @@ void MsgpackIODevice::dispatchNotification(msgpack_object& nt)
 	}
 
 	QVariant val; 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	if (decodeMsgpack(nt.via.array.ptr[2], val) ||
 			(QMetaType::Type)val.type() != QMetaType::QVariantList  ) {
+#else
+	if (decodeMsgpack(nt.via.array.ptr[2], val) ||
+			val.metaType().id() != QMetaType::QVariantList  ) {
+#endif
 		qDebug() << "Unable to unpack notification parameters" << nt;
 		return;
 	}
@@ -731,11 +736,19 @@ void MsgpackIODevice::send(const QVariant& var)
 {
 	if (!checkVariant(var)) {
 		msgpack_pack_nil(&m_pk);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 		qWarning() << "Trying to pack unsupported variant type" << var.type() << "packing Nil instead";
+#else
+		qWarning() << "Trying to pack unsupported variant type" << var.metaType().id() << "packing Nil instead";
+#endif
 		return;
 	}
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	switch((QMetaType::Type)var.type()) {
+#else
+	switch(var.metaType().id()) {
+#endif
 	case QMetaType::Void:
 	case QMetaType::UnknownType:
 		msgpack_pack_nil(&m_pk);
@@ -805,7 +818,11 @@ void MsgpackIODevice::send(const QVariant& var)
 		break;
 	default:
 		msgpack_pack_nil(&m_pk);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 		qWarning() << "There is a BUG in the QVariant serializer" << var.type();
+#else
+		qWarning() << "There is a BUG in the QVariant serializer" << var.metaType().id();
+#endif
 	}
 }
 
@@ -843,7 +860,11 @@ fail:
  */
 bool MsgpackIODevice::checkVariant(const QVariant& var)
 {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	switch((QMetaType::Type)var.type()) {
+#else
+	switch(var.metaType().id()) {
+#endif
 	case QMetaType::UnknownType:
 		break;
 	case QMetaType::Bool:

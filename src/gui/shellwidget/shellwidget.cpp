@@ -432,7 +432,11 @@ void ShellWidget::paintForegroundCellText(
 	// Draw chars at the baseline
 	const int cellTextOffset{ m_ascent + (m_lineSpace / 2) };
 	const QPoint pos{ cellRect.left(), cellRect.top() + cellTextOffset};
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	const uint character{ cell.GetCharacter() };
+#else
+	const char32_t character{ static_cast<char32_t>(cell.GetCharacter()) };
+#endif
 	const QString text{ QString::fromUcs4(&character, 1) };
 
 	p.drawText(pos, text);
@@ -712,7 +716,11 @@ void ShellWidget::paintRectLigatures(QPainter& p, const QRect rect) noexcept
 					blockCursorPos = blockText.size();
 				}
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 				const uint cellCharacter{ checkCell.GetCharacter() };
+#else
+				const char32_t cellCharacter{ static_cast<char32_t>(checkCell.GetCharacter()) };
+#endif
 				blockText += QString::fromUcs4(&cellCharacter, 1);
 
 				if (checkCell.IsDoubleWidth()) {
@@ -1035,7 +1043,11 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	qreal pointSizeF = curFont.pointSizeF();
 	int weight = -1;
 	bool italic = false;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	for (const auto& attr : qAsConst(attrs)) {
+#else
+	for (const auto& attr : std::as_const(attrs)) {
+#endif
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok{ false };
 			qreal height = midString(attr, 1).toFloat(&ok);
@@ -1071,7 +1083,11 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 
 /*static*/ bool ShellWidget::IsValidFont(const QVariant& variant) noexcept
 {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	return static_cast<QMetaType::Type>(variant.type()) == QMetaType::QFont;
+#else
+	return variant.metaType().id() == QMetaType::QFont;
+#endif
 }
 
 /*static*/ bool ShellWidget::isBadMonospace(const QFont& f) noexcept

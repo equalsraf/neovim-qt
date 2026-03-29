@@ -473,7 +473,11 @@ void App::openNewWindow(const QVariantList& args) noexcept
 	QString server;
 	QString nvim{ "nvim" };
 	ConnectorInitArgs::Type type{ ConnectorInitArgs::Type::Default };
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	if (args.size() > 1 && args.at(1).type() == QVariant::Type::Map) {
+#else
+	if (args.size() > 1 && args.at(1).metaType().id() == QMetaType::QVariantMap) {
+#endif
 		const QVariantMap initMap{ args.at(1).toMap() };
 
 		if (initMap.contains("nvim")) {

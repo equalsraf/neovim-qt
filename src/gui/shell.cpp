@@ -454,7 +454,11 @@ void Shell::handleHighlightSet(const QVariantMap& attrs)
 /// Paint a character and advance the cursor
 void Shell::handlePut(const QVariantList& args)
 {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	if (args.size() != 1 || (QMetaType::Type)args.at(0).type() != QMetaType::QByteArray) {
+#else
+	if (args.size() != 1 || args.at(0).metaType().id() != QMetaType::QByteArray) {
+#endif
 		qWarning() << "Unexpected arguments for redraw:put" << args;
 		return;
 	}
@@ -582,7 +586,11 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		// setNeovimCursor will cause typing lags
 		qApp->inputMethod()->update(Qt::ImCursorRectangle);
 	} else if (name == "highlight_set") {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 		if (opargs.size() < 1 && (QMetaType::Type)opargs.at(0).type() != QMetaType::QVariantMap) {
+#else
+		if (opargs.size() < 1 && opargs.at(0).metaType().id() != QMetaType::QVariantMap) {
+#endif
 			qWarning() << "Unexpected argument for redraw:" << name << opargs;
 			return;
 		}
@@ -652,7 +660,11 @@ void Shell::handlePopupMenuShow(const QVariantList& opargs)
 	// The 'popupmenu_show' API is not consistent across NeoVim versions!
 	// A 5th argument was introduced in neovim/neovim@16c3337
 	if (opargs.size() < 4
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 		|| static_cast<QMetaType::Type>(opargs.at(0).type()) != QMetaType::QVariantList
+#else
+		|| opargs.at(0).metaType().id() != QMetaType::QVariantList
+#endif
 		|| !opargs.at(1).canConvert<int64_t>()
 		|| !opargs.at(2).canConvert<int64_t>()
 		|| !opargs.at(3).canConvert<int64_t>()) {
@@ -810,7 +822,12 @@ void Shell::handleModeInfoSet(const QVariantList& opargs)
 {
 	if (opargs.size() < 2
 		|| !opargs.at(0).canConvert<bool>()
-		|| static_cast<QMetaType::Type>(opargs.at(1).type()) != QMetaType::QVariantList) {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+		|| static_cast<QMetaType::Type>(opargs.at(1).type()) != QMetaType::QVariantList
+#else
+		|| opargs.at(1).metaType().id() != QMetaType::QVariantList
+#endif
+			) {
 		qWarning() << "Unexpected arguments for mode_info_set:" << opargs;
 		return;
 	}
@@ -1158,8 +1175,14 @@ void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
 {
 	if (opargs.size() < 4
 		|| !opargs.at(0).canConvert<qint64>()
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 		|| static_cast<QMetaType::Type>(opargs.at(1).type()) != QMetaType::QVariantMap
-		|| static_cast<QMetaType::Type>(opargs.at(2).type()) != QMetaType::QVariantMap) {
+		|| static_cast<QMetaType::Type>(opargs.at(2).type()) != QMetaType::QVariantMap
+#else
+		|| opargs.at(1).metaType().id() != QMetaType::QVariantMap
+		|| opargs.at(2).metaType().id() != QMetaType::QVariantMap
+#endif
+			) {
 		qWarning() << "Unexpected arguments for hl_attr_define:" << opargs;
 		return;
 	}
@@ -1177,7 +1200,11 @@ void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
 void Shell::handleHighlightGroupSet(const QVariantList& opargs) noexcept
 {
 	if (opargs.size() < 2
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 		|| opargs.at(0).type() != QVariant::Type::ByteArray
+#else
+		|| opargs.at(0).metaType().id() != QMetaType::QByteArray
+#endif
 		|| !opargs.at(1).canConvert<uint64_t>()) {
 		qWarning() << "Unexpected arguments for hl_group_set:" << opargs;
 		return;
@@ -1195,7 +1222,12 @@ void Shell::handleGridLine(const QVariantList& opargs)
 		|| !opargs.at(0).canConvert<qint64>()
 		|| !opargs.at(1).canConvert<qint64>()
 		|| !opargs.at(2).canConvert<qint64>()
-		|| static_cast<QMetaType::Type>(opargs.at(3).type()) != QMetaType::QVariantList) {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+		|| static_cast<QMetaType::Type>(opargs.at(3).type()) != QMetaType::QVariantList
+#else
+		|| opargs.at(3).metaType().id() != QMetaType::QVariantList
+#endif
+			) {
 		qWarning() << "Unexpected arguments for grid_line:" << opargs;
 		return;
 	}
@@ -1411,8 +1443,14 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 		return;
 	}
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	QPoint pos(ev->x()/cellSize().width(),
 			ev->y()/cellSize().height());
+#else
+	QPointF eventPos = ev->position();
+	QPoint pos(eventPos.x()/cellSize().width(),
+			eventPos.y()/cellSize().height());
+#endif
 	QString inp;
 	if (ev->type() == QEvent::MouseMove) {
 		Qt::MouseButton bt;
@@ -1476,8 +1514,14 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 {
 	setCursorFromBusyState();
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	QPoint pos(ev->x()/cellSize().width(),
 			ev->y()/cellSize().height());
+#else
+	QPointF eventPos = ev->position();
+	QPoint pos(eventPos.x()/cellSize().width(),
+			eventPos.y()/cellSize().height());
+#endif
 	if (pos != m_mouse_pos) {
 		m_mouse_pos = pos;
 		mouseClickReset();
