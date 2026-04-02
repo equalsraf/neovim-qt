@@ -17,7 +17,7 @@ namespace NeovimQt {
 
 /**
  * \class NeovimQt::MsgpackIODevice
- * 
+ *
  * \brief A msgpack-rpc channel build on top of QIODevice
  *
  */
@@ -400,9 +400,9 @@ void MsgpackIODevice::dispatchNotification(msgpack_object& nt)
 		return;
 	}
 
-	QVariant val; 
+	QVariant val;
 	if (decodeMsgpack(nt.via.array.ptr[2], val) ||
-			(QMetaType::Type)val.type() != QMetaType::QVariantList  ) {
+			val.metaType().id() != QMetaType::QVariantList) {
 		qDebug() << "Unable to unpack notification parameters" << nt;
 		return;
 	}
@@ -731,11 +731,11 @@ void MsgpackIODevice::send(const QVariant& var)
 {
 	if (!checkVariant(var)) {
 		msgpack_pack_nil(&m_pk);
-		qWarning() << "Trying to pack unsupported variant type" << var.type() << "packing Nil instead";
+		qWarning() << "Trying to pack unsupported variant type" << var.metaType().id() << "packing Nil instead";
 		return;
 	}
 
-	switch((QMetaType::Type)var.type()) {
+	switch(var.metaType().id()) {
 	case QMetaType::Void:
 	case QMetaType::UnknownType:
 		msgpack_pack_nil(&m_pk);
@@ -805,7 +805,7 @@ void MsgpackIODevice::send(const QVariant& var)
 		break;
 	default:
 		msgpack_pack_nil(&m_pk);
-		qWarning() << "There is a BUG in the QVariant serializer" << var.type();
+		qWarning() << "There is a BUG in the QVariant serializer" << var.metaType().id();
 	}
 }
 
@@ -843,7 +843,7 @@ fail:
  */
 bool MsgpackIODevice::checkVariant(const QVariant& var)
 {
-	switch((QMetaType::Type)var.type()) {
+	switch(var.metaType().id()) {
 	case QMetaType::UnknownType:
 		break;
 	case QMetaType::Bool:

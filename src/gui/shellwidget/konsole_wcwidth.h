@@ -9,7 +9,7 @@
 // Qt
 #include <QtCore/QString>
 
-int konsole_wcwidth(uint ucs);
+int konsole_wcwidth(char32_t ucs);
 
 int string_width(const QString& text);
 

@@ -340,12 +340,6 @@ void MainWindow::saveWindowGeometry()
 
 void MainWindow::restoreWindowGeometry()
 {
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-	// Workaround for error `QVariant::save: unable to save type 'QList<int>'`.
-	// This error can occur when calling the two `settings.value(...)` below.
-	qRegisterMetaTypeStreamOperators<QList<int>>("QList<int>");
-#endif
-
 	QSettings settings("nvim-qt", "window-geometry");
 	if (!settings.value("restore_window_geometry", true).toBool()) {
 		return;

@@ -454,14 +454,14 @@ void Shell::handleHighlightSet(const QVariantMap& attrs)
 /// Paint a character and advance the cursor
 void Shell::handlePut(const QVariantList& args)
 {
-	if (args.size() != 1 || (QMetaType::Type)args.at(0).type() != QMetaType::QByteArray) {
+	if (args.size() != 1 || args.at(0).metaType().id() != QMetaType::QByteArray) {
 		qWarning() << "Unexpected arguments for redraw:put" << args;
 		return;
 	}
 
 	QString text = m_nvim->decode(args.at(0).toByteArray());
 	if (text.isEmpty() && m_cursor_pos.x() > 0 &&
-	    contents().constValue(m_cursor_pos.y(), m_cursor_pos.x() - 1).IsDoubleWidth()) {
+		contents().constValue(m_cursor_pos.y(), m_cursor_pos.x() - 1).IsDoubleWidth()) {
 		// nvim will seek to the second cell of a wide char and put "",
 		// expecting the cursor position and cell style to be updated properly.
 		// Handle this case.
@@ -582,7 +582,7 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		// setNeovimCursor will cause typing lags
 		qApp->inputMethod()->update(Qt::ImCursorRectangle);
 	} else if (name == "highlight_set") {
-		if (opargs.size() < 1 && (QMetaType::Type)opargs.at(0).type() != QMetaType::QVariantMap) {
+		if (opargs.size() < 1 && opargs.at(0).metaType().id() != QMetaType::QVariantMap) {
 			qWarning() << "Unexpected argument for redraw:" << name << opargs;
 			return;
 		}
@@ -652,7 +652,7 @@ void Shell::handlePopupMenuShow(const QVariantList& opargs)
 	// The 'popupmenu_show' API is not consistent across NeoVim versions!
 	// A 5th argument was introduced in neovim/neovim@16c3337
 	if (opargs.size() < 4
-		|| static_cast<QMetaType::Type>(opargs.at(0).type()) != QMetaType::QVariantList
+		|| opargs.at(0).metaType().id() != QMetaType::QVariantList
 		|| !opargs.at(1).canConvert<int64_t>()
 		|| !opargs.at(2).canConvert<int64_t>()
 		|| !opargs.at(3).canConvert<int64_t>()) {
@@ -810,7 +810,7 @@ void Shell::handleModeInfoSet(const QVariantList& opargs)
 {
 	if (opargs.size() < 2
 		|| !opargs.at(0).canConvert<bool>()
-		|| static_cast<QMetaType::Type>(opargs.at(1).type()) != QMetaType::QVariantList) {
+		|| opargs.at(1).metaType().id() != QMetaType::QVariantList) {
 		qWarning() << "Unexpected arguments for mode_info_set:" << opargs;
 		return;
 	}
@@ -1158,8 +1158,8 @@ void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
 {
 	if (opargs.size() < 4
 		|| !opargs.at(0).canConvert<qint64>()
-		|| static_cast<QMetaType::Type>(opargs.at(1).type()) != QMetaType::QVariantMap
-		|| static_cast<QMetaType::Type>(opargs.at(2).type()) != QMetaType::QVariantMap) {
+		|| opargs.at(1).metaType().id() != QMetaType::QVariantMap
+		|| opargs.at(2).metaType().id() != QMetaType::QVariantMap) {
 		qWarning() << "Unexpected arguments for hl_attr_define:" << opargs;
 		return;
 	}
@@ -1177,7 +1177,7 @@ void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
 void Shell::handleHighlightGroupSet(const QVariantList& opargs) noexcept
 {
 	if (opargs.size() < 2
-		|| opargs.at(0).type() != QVariant::Type::ByteArray
+		|| opargs.at(0).metaType().id() != QMetaType::QByteArray
 		|| !opargs.at(1).canConvert<uint64_t>()) {
 		qWarning() << "Unexpected arguments for hl_group_set:" << opargs;
 		return;
@@ -1195,7 +1195,7 @@ void Shell::handleGridLine(const QVariantList& opargs)
 		|| !opargs.at(0).canConvert<qint64>()
 		|| !opargs.at(1).canConvert<qint64>()
 		|| !opargs.at(2).canConvert<qint64>()
-		|| static_cast<QMetaType::Type>(opargs.at(3).type()) != QMetaType::QVariantList) {
+		|| opargs.at(3).metaType().id() != QMetaType::QVariantList) {
 		qWarning() << "Unexpected arguments for grid_line:" << opargs;
 		return;
 	}
@@ -1411,8 +1411,9 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 		return;
 	}
 
-	QPoint pos(ev->x()/cellSize().width(),
-			ev->y()/cellSize().height());
+	QPointF eventPos = ev->position();
+	QPoint pos(eventPos.x()/cellSize().width(),
+			eventPos.y()/cellSize().height());
 	QString inp;
 	if (ev->type() == QEvent::MouseMove) {
 		Qt::MouseButton bt;
@@ -1476,8 +1477,9 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 {
 	setCursorFromBusyState();
 
-	QPoint pos(ev->x()/cellSize().width(),
-			ev->y()/cellSize().height());
+	QPointF eventPos = ev->position();
+	QPoint pos(eventPos.x()/cellSize().width(),
+			eventPos.y()/cellSize().height());
 	if (pos != m_mouse_pos) {
 		m_mouse_pos = pos;
 		mouseClickReset();
@@ -1535,12 +1537,7 @@ void Shell::wheelEvent(QWheelEvent *ev)
 		return {};
 	}
 
-// TODO Issue#751:  Remove Deprecated code, keep #else below
-#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
-	const QPoint evPos{ ev.x(), ev.y() };
-#else
 	const QPoint evPos{ ev.position().toPoint() };
-#endif
 
 	QPoint evCellPos{ evPos.x() / cellSize.width(), evPos.y() / cellSize.height() };
 
@@ -1766,8 +1763,10 @@ void Shell::tooltip(const QString& text)
 		m_tooltip->show();
 	}
 
-	m_tooltip->setMinimumWidth(GetHorizontalAdvance(QFontMetrics{ m_tooltip->font() }, text));
-	m_tooltip->setMaximumWidth(GetHorizontalAdvance(QFontMetrics{ m_tooltip->font() }, text));
+	QFontMetrics fm(m_tooltip->font());
+	int width = fm.horizontalAdvance(text);
+	m_tooltip->setMinimumWidth(width);
+	m_tooltip->setMaximumWidth(width);
 	m_tooltip->update();
 }
 

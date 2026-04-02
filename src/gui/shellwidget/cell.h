@@ -8,14 +8,14 @@
 class Cell {
 public:
 	/// Create a cell having a specified HighlightAttribute
-	Cell(uint character, const HighlightAttribute& attribute) noexcept :
+	Cell(char32_t character, const HighlightAttribute& attribute) noexcept :
 		m_highlight(attribute)
 	{
 		SetCharacter(character);
 	}
 
 	Cell(
-		uint character,
+		char32_t character,
 		QColor fgColor,
 		QColor bgColor,
 		QColor spColor,
@@ -45,9 +45,9 @@ public:
 	/// Create a cell marked as invalid
 	static Cell MakeInvalidCell();
 
-	void SetCharacter(uint character);
+	void SetCharacter(char32_t character);
 
-	uint GetCharacter() const { return m_character; };
+	char32_t GetCharacter() const { return m_character; };
 
 	bool IsDoubleWidth() const { return m_isDoubleWidth; };
 
@@ -76,7 +76,7 @@ public:
 	bool operator==(const Cell& other) const;
 
 private:
-	uint m_character{ ' ' };
+	char32_t m_character{ ' ' };
 	bool m_isValid{ true };
 	bool m_isDoubleWidth{ false };
 

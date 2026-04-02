@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9.0)
+cmake_minimum_required(VERSION 3.11.0)
 project(qshellwidget)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -15,14 +15,14 @@ if (WIN32 AND USE_STATIC_QT)
 endif ()
 
 set(SOURCES
-  cell.cpp
-  cursor.cpp
-  highlight.cpp
-  helpers.cpp
-  konsole_wcwidth.cpp
-  shellcontents.cpp
-  shellwidget.cpp
-  compat_shellwidget_qt${QT_VERSION_MAJOR}.cpp)
+	cell.cpp
+	cursor.cpp
+	highlight.cpp
+	helpers.cpp
+	konsole_wcwidth.cpp
+	shellcontents.cpp
+	shellwidget.cpp
+	compat_shellwidget_qt${QT_VERSION_MAJOR}.cpp)
 
 add_library(qshellwidget STATIC ${SOURCES})
 target_link_libraries(qshellwidget Qt${QT_VERSION_MAJOR}::Widgets compat)

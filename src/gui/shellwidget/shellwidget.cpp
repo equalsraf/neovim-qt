@@ -9,15 +9,9 @@
 
 #include "compat.h"
 #include "compat_shellwidget.h"
-#include "helpers.h"
 
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-constexpr int c_qtWeightMin{ 0 };
-constexpr int c_qtWeightMax{ 99 };
-#else
 constexpr int c_qtWeightMin{ 1 };
 constexpr int c_qtWeightMax{ 1000 };
-#endif
 
 ShellWidget::ShellWidget(QWidget* parent)
 	: QWidget(parent)
@@ -84,7 +78,7 @@ bool ShellWidget::setShellFont(const QFont& font, bool force) noexcept
 
 		if (isBadMonospace(font)) {
 			emit fontError(QStringLiteral("Warning: Font \"%1\" reports bad fixed pitch metrics")
-							   .arg(font.family()));
+					.arg(font.family()));
 		}
 	}
 
@@ -118,7 +112,7 @@ void ShellWidget::setCellSize()
 {
 	QFontMetrics fm(font());
 	m_ascent = fm.ascent();
-	m_cellSize = QSize(GetHorizontalAdvance(fm, 'W'),
+	m_cellSize = QSize(fm.horizontalAdvance('W'),
 			qMax(fm.lineSpacing(), fm.height()) + m_lineSpace);
 	setSizeIncrement(m_cellSize);
 }
@@ -432,7 +426,7 @@ void ShellWidget::paintForegroundCellText(
 	// Draw chars at the baseline
 	const int cellTextOffset{ m_ascent + (m_lineSpace / 2) };
 	const QPoint pos{ cellRect.left(), cellRect.top() + cellTextOffset};
-	const uint character{ cell.GetCharacter() };
+	const char32_t character{ cell.GetCharacter() };
 	const QString text{ QString::fromUcs4(&character, 1) };
 
 	p.drawText(pos, text);
@@ -712,7 +706,7 @@ void ShellWidget::paintRectLigatures(QPainter& p, const QRect rect) noexcept
 					blockCursorPos = blockText.size();
 				}
 
-				const uint cellCharacter{ checkCell.GetCharacter() };
+				const char32_t cellCharacter{ checkCell.GetCharacter() };
 				blockText += QString::fromUcs4(&cellCharacter, 1);
 
 				if (checkCell.IsDoubleWidth()) {
@@ -1035,7 +1029,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	qreal pointSizeF = curFont.pointSizeF();
 	int weight = -1;
 	bool italic = false;
-	for (const auto& attr : qAsConst(attrs)) {
+	for (const auto& attr : std::as_const(attrs)) {
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok{ false };
 			qreal height = midString(attr, 1).toFloat(&ok);
@@ -1071,7 +1065,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 
 /*static*/ bool ShellWidget::IsValidFont(const QVariant& variant) noexcept
 {
-	return static_cast<QMetaType::Type>(variant.type()) == QMetaType::QFont;
+	return variant.metaType().id() == QMetaType::QFont;
 }
 
 /*static*/ bool ShellWidget::isBadMonospace(const QFont& f) noexcept
@@ -1099,7 +1093,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 
 	// Italic
 	if ( fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
-			fm_italic.maxWidth()*2 != GetHorizontalAdvance(fm_italic, "MM") ) {
+			fm_italic.maxWidth()*2 != fm_italic.horizontalAdvance("MM") ) {
 		QFontInfo info(fi);
 		qDebug() << fi.family() << "Average and Maximum font width mismatch for Italic font; QFont::exactMatch() is" << fi.exactMatch()
 			<< "Real font is " << info.family() << info.pointSize();
@@ -1108,7 +1102,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 
 	// Bold
 	if ( fm_bold.averageCharWidth() != fm_bold.maxWidth() ||
-			fm_bold.maxWidth()*2 != GetHorizontalAdvance(fm_bold, "MM") ) {
+			fm_bold.maxWidth()*2 != fm_bold.horizontalAdvance("MM") ) {
 		QFontInfo info(fb);
 		qDebug() << fb.family() << "Average and Maximum font width mismatch for Bold font; QFont::exactMatch() is" << fb.exactMatch()
 			<< "Real font is " << info.family() << info.pointSize();
@@ -1117,7 +1111,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 
 	// Bold+Italic
 	if ( fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
-			fm_boldit.maxWidth()*2 != GetHorizontalAdvance(fm_boldit, "MM") ) {
+			fm_boldit.maxWidth()*2 != fm_boldit.horizontalAdvance("MM") ) {
 		QFontInfo info(fbi);
 		qDebug() << fbi.family() << "Average and Maximum font width mismatch for Bold+Italic font; QFont::exactMatch() is" << fbi.exactMatch()
 			<< "Real font is " << info.family() << info.pointSize();
