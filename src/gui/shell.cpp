@@ -460,8 +460,8 @@ void Shell::handlePut(const QVariantList& args)
 	}
 
 	QString text = m_nvim->decode(args.at(0).toByteArray());
-	if (text.isEmpty() && m_cursor_pos.x() > 0 &&
-		contents().constValue(m_cursor_pos.y(), m_cursor_pos.x() - 1).IsDoubleWidth()) {
+	if (text.isEmpty() && m_cursor_pos.x() > 0
+		&& contents().constValue(m_cursor_pos.y(), m_cursor_pos.x() - 1).IsDoubleWidth()) {
 		// nvim will seek to the second cell of a wide char and put "",
 		// expecting the cursor position and cell style to be updated properly.
 		// Handle this case.
@@ -651,10 +651,8 @@ void Shell::handlePopupMenuShow(const QVariantList& opargs)
 {
 	// The 'popupmenu_show' API is not consistent across NeoVim versions!
 	// A 5th argument was introduced in neovim/neovim@16c3337
-	if (opargs.size() < 4
-		|| opargs.at(0).metaType().id() != QMetaType::QVariantList
-		|| !opargs.at(1).canConvert<int64_t>()
-		|| !opargs.at(2).canConvert<int64_t>()
+	if (opargs.size() < 4 || opargs.at(0).metaType().id() != QMetaType::QVariantList
+		|| !opargs.at(1).canConvert<int64_t>() || !opargs.at(2).canConvert<int64_t>()
 		|| !opargs.at(3).canConvert<int64_t>()) {
 		qWarning() << "Unexpected arguments for popupmenu_show:" << opargs;
 		return;
@@ -808,8 +806,7 @@ void Shell::handleModeChange(const QVariantList& opargs)
 
 void Shell::handleModeInfoSet(const QVariantList& opargs)
 {
-	if (opargs.size() < 2
-		|| !opargs.at(0).canConvert<bool>()
+	if (opargs.size() < 2 || !opargs.at(0).canConvert<bool>()
 		|| opargs.at(1).metaType().id() != QMetaType::QVariantList) {
 		qWarning() << "Unexpected arguments for mode_info_set:" << opargs;
 		return;
@@ -1156,8 +1153,7 @@ void Shell::handleDefaultColorsSet(const QVariantList& opargs)
 
 void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
 {
-	if (opargs.size() < 4
-		|| !opargs.at(0).canConvert<qint64>()
+	if (opargs.size() < 4 || !opargs.at(0).canConvert<qint64>()
 		|| opargs.at(1).metaType().id() != QMetaType::QVariantMap
 		|| opargs.at(2).metaType().id() != QMetaType::QVariantMap) {
 		qWarning() << "Unexpected arguments for hl_attr_define:" << opargs;
@@ -1176,8 +1172,7 @@ void Shell::handleHighlightAttributeDefine(const QVariantList& opargs)
 
 void Shell::handleHighlightGroupSet(const QVariantList& opargs) noexcept
 {
-	if (opargs.size() < 2
-		|| opargs.at(0).metaType().id() != QMetaType::QByteArray
+	if (opargs.size() < 2 || opargs.at(0).metaType().id() != QMetaType::QByteArray
 		|| !opargs.at(1).canConvert<uint64_t>()) {
 		qWarning() << "Unexpected arguments for hl_group_set:" << opargs;
 		return;
@@ -1191,10 +1186,8 @@ void Shell::handleHighlightGroupSet(const QVariantList& opargs) noexcept
 
 void Shell::handleGridLine(const QVariantList& opargs)
 {
-	if (opargs.size() < 4
-		|| !opargs.at(0).canConvert<qint64>()
-		|| !opargs.at(1).canConvert<qint64>()
-		|| !opargs.at(2).canConvert<qint64>()
+	if (opargs.size() < 4 || !opargs.at(0).canConvert<qint64>()
+		|| !opargs.at(1).canConvert<qint64>() || !opargs.at(2).canConvert<qint64>()
 		|| opargs.at(3).metaType().id() != QMetaType::QVariantList) {
 		qWarning() << "Unexpected arguments for grid_line:" << opargs;
 		return;
@@ -1412,8 +1405,7 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 	}
 
 	QPointF eventPos = ev->position();
-	QPoint pos(eventPos.x()/cellSize().width(),
-			eventPos.y()/cellSize().height());
+	QPoint pos(eventPos.x()/cellSize().width(), eventPos.y()/cellSize().height());
 	QString inp;
 	if (ev->type() == QEvent::MouseMove) {
 		Qt::MouseButton bt;
@@ -1478,8 +1470,7 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 	setCursorFromBusyState();
 
 	QPointF eventPos = ev->position();
-	QPoint pos(eventPos.x()/cellSize().width(),
-			eventPos.y()/cellSize().height());
+	QPoint pos(eventPos.x()/cellSize().width(), eventPos.y()/cellSize().height());
 	if (pos != m_mouse_pos) {
 		m_mouse_pos = pos;
 		mouseClickReset();

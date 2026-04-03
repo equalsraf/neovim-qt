@@ -8,14 +8,13 @@
 class Cell {
 public:
 	/// Create a cell having a specified HighlightAttribute
-	Cell(char32_t character, const HighlightAttribute& attribute) noexcept :
-		m_highlight(attribute)
+	Cell(char32_t character, const HighlightAttribute& attribute) noexcept
+		: m_highlight(attribute)
 	{
 		SetCharacter(character);
 	}
 
-	Cell(
-		char32_t character,
+	Cell(char32_t character,
 		QColor fgColor,
 		QColor bgColor,
 		QColor spColor,
@@ -24,10 +23,17 @@ public:
 		bool underline,
 		bool undercurl,
 		bool strikethrough,
-		bool reverse) noexcept :
-		Cell{
-			character,
-			{ fgColor, bgColor, spColor, reverse, italic, bold, underline, undercurl, strikethrough } }
+		bool reverse) noexcept
+		: Cell{ character,
+			{ fgColor,
+				bgColor,
+				spColor,
+				reverse,
+				italic,
+				bold,
+				underline,
+				undercurl,
+				strikethrough } }
 	{
 	}
 

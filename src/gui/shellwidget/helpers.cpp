@@ -40,4 +40,3 @@ bool saveShellContents(const ShellContents& s, const QString& filename)
 
 	return img.save(filename);
 }
-

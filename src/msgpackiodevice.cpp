@@ -401,8 +401,7 @@ void MsgpackIODevice::dispatchNotification(msgpack_object& nt)
 	}
 
 	QVariant val;
-	if (decodeMsgpack(nt.via.array.ptr[2], val) ||
-			val.metaType().id() != QMetaType::QVariantList) {
+	if (decodeMsgpack(nt.via.array.ptr[2], val) || val.metaType().id() != QMetaType::QVariantList) {
 		qDebug() << "Unable to unpack notification parameters" << nt;
 		return;
 	}
@@ -731,81 +730,82 @@ void MsgpackIODevice::send(const QVariant& var)
 {
 	if (!checkVariant(var)) {
 		msgpack_pack_nil(&m_pk);
-		qWarning() << "Trying to pack unsupported variant type" << var.metaType().id() << "packing Nil instead";
+		qWarning() << "Trying to pack unsupported variant type" << var.metaType().id()
+			       << "packing Nil instead";
 		return;
 	}
 
 	switch(var.metaType().id()) {
-	case QMetaType::Void:
-	case QMetaType::UnknownType:
-		msgpack_pack_nil(&m_pk);
-		break;
-	case QMetaType::Bool:
-		send(var.toBool());
-		break;
-	case QMetaType::Int:
-		msgpack_pack_int(&m_pk, var.toInt());
-		break;
-	case QMetaType::UInt:
-		msgpack_pack_unsigned_int(&m_pk, var.toUInt());
-		break;
-	case QMetaType::Long:
-		msgpack_pack_long_long(&m_pk, var.toLongLong());
-		break;
-	case QMetaType::LongLong:
-		msgpack_pack_long_long(&m_pk, var.toLongLong());
-		break;
-	case QMetaType::ULong:
-		msgpack_pack_unsigned_long_long(&m_pk, var.toULongLong());
-		break;
-	case QMetaType::ULongLong:
-		msgpack_pack_unsigned_long_long(&m_pk, var.toULongLong());
-		break;
-	case QMetaType::Float:
-		msgpack_pack_float(&m_pk, var.toFloat());
-		break;
-	case QMetaType::Double:
-		msgpack_pack_double(&m_pk, var.toDouble());
-		break;
-	case QMetaType::QByteArray:
-		send(var.toByteArray());
-		break;
-	case QMetaType::QStringList:
-		msgpack_pack_array(&m_pk, var.toList().size());
-		foreach(const QVariant& elem, var.toList()) {
-			send(elem);
-		}
-		break;
-	case QMetaType::QVariantList:
-		msgpack_pack_array(&m_pk, var.toList().size());
-		foreach(const QVariant& elem, var.toList()) {
-			send(elem);
-		}
-		break;
-	case QMetaType::QVariantMap:
-		{
-		const QVariantMap& m = var.toMap();
-		msgpack_pack_map(&m_pk, m.size());
-		QMapIterator<QString,QVariant> it(m);
-		while(it.hasNext()) {
-			it.next();
-			send(it.key());
-			send(it.value());
-		}
-		}
-		break;
-	case QMetaType::QPoint:
-		// As an array [row, col]
-		msgpack_pack_array(&m_pk, 2);
-		msgpack_pack_int64(&m_pk, var.toPoint().y());
-		msgpack_pack_int64(&m_pk, var.toPoint().x());
-		break;
-	case QMetaType::QString:
-		send(encode(var.toString()));
-		break;
-	default:
-		msgpack_pack_nil(&m_pk);
-		qWarning() << "There is a BUG in the QVariant serializer" << var.metaType().id();
+		case QMetaType::Void:
+		case QMetaType::UnknownType:
+			msgpack_pack_nil(&m_pk);
+			break;
+		case QMetaType::Bool:
+			send(var.toBool());
+			break;
+		case QMetaType::Int:
+			msgpack_pack_int(&m_pk, var.toInt());
+			break;
+		case QMetaType::UInt:
+			msgpack_pack_unsigned_int(&m_pk, var.toUInt());
+			break;
+		case QMetaType::Long:
+			msgpack_pack_long_long(&m_pk, var.toLongLong());
+			break;
+		case QMetaType::LongLong:
+			msgpack_pack_long_long(&m_pk, var.toLongLong());
+			break;
+		case QMetaType::ULong:
+			msgpack_pack_unsigned_long_long(&m_pk, var.toULongLong());
+			break;
+		case QMetaType::ULongLong:
+			msgpack_pack_unsigned_long_long(&m_pk, var.toULongLong());
+			break;
+		case QMetaType::Float:
+			msgpack_pack_float(&m_pk, var.toFloat());
+			break;
+		case QMetaType::Double:
+			msgpack_pack_double(&m_pk, var.toDouble());
+			break;
+		case QMetaType::QByteArray:
+			send(var.toByteArray());
+			break;
+		case QMetaType::QStringList:
+			msgpack_pack_array(&m_pk, var.toList().size());
+			foreach(const QVariant& elem, var.toList()) {
+				send(elem);
+			}
+			break;
+		case QMetaType::QVariantList:
+			msgpack_pack_array(&m_pk, var.toList().size());
+			foreach(const QVariant& elem, var.toList()) {
+				send(elem);
+			}
+			break;
+		case QMetaType::QVariantMap:
+			{
+			const QVariantMap& m = var.toMap();
+			msgpack_pack_map(&m_pk, m.size());
+			QMapIterator<QString,QVariant> it(m);
+			while(it.hasNext()) {
+				it.next();
+				send(it.key());
+				send(it.value());
+			}
+			}
+			break;
+		case QMetaType::QPoint:
+			// As an array [row, col]
+			msgpack_pack_array(&m_pk, 2);
+			msgpack_pack_int64(&m_pk, var.toPoint().y());
+			msgpack_pack_int64(&m_pk, var.toPoint().x());
+			break;
+		case QMetaType::QString:
+			send(encode(var.toString()));
+			break;
+		default:
+			msgpack_pack_nil(&m_pk);
+			qWarning() << "There is a BUG in the QVariant serializer" << var.metaType().id();
 	}
 }
 
@@ -844,58 +844,58 @@ fail:
 bool MsgpackIODevice::checkVariant(const QVariant& var)
 {
 	switch(var.metaType().id()) {
-	case QMetaType::UnknownType:
-		break;
-	case QMetaType::Bool:
-		break;
-	case QMetaType::Int:
-		break;
-	case QMetaType::UInt:
-		break;
-	case QMetaType::Long:
-		break;
-	case QMetaType::LongLong:
-		break;
-	case QMetaType::ULong:
-		break;
-	case QMetaType::ULongLong:
-		break;
-	case QMetaType::Float:
-		break;
-	case QMetaType::QString:
-		break;
-	case QMetaType::Double:
-		break;
-	case QMetaType::QByteArray:
-		break;
-	case QMetaType::QStringList:
-		break;
-	case QMetaType::QVariantList:
-		foreach(const QVariant& elem, var.toList()) {
-			if (!checkVariant(elem)) {
-				return false;
+		case QMetaType::UnknownType:
+			break;
+		case QMetaType::Bool:
+			break;
+		case QMetaType::Int:
+			break;
+		case QMetaType::UInt:
+			break;
+		case QMetaType::Long:
+			break;
+		case QMetaType::LongLong:
+			break;
+		case QMetaType::ULong:
+			break;
+		case QMetaType::ULongLong:
+			break;
+		case QMetaType::Float:
+			break;
+		case QMetaType::QString:
+			break;
+		case QMetaType::Double:
+			break;
+		case QMetaType::QByteArray:
+			break;
+		case QMetaType::QStringList:
+			break;
+		case QMetaType::QVariantList:
+			foreach(const QVariant& elem, var.toList()) {
+				if (!checkVariant(elem)) {
+					return false;
+				}
 			}
-		}
-		break;
-	case QMetaType::QVariantMap:
-		{
-		const QVariantMap& m = var.toMap();
-		QMapIterator<QString,QVariant> it(m);
-		while(it.hasNext()) {
-			it.next();
-			if (!checkVariant(it.key())) {
-				return false;
+			break;
+		case QMetaType::QVariantMap:
+			{
+				const QVariantMap& m = var.toMap();
+				QMapIterator<QString,QVariant> it(m);
+				while(it.hasNext()) {
+					it.next();
+					if (!checkVariant(it.key())) {
+						return false;
+					}
+					if (!checkVariant(it.value())) {
+						return false;
+					}
+				}
 			}
-			if (!checkVariant(it.value())) {
-				return false;
-			}
-		}
-		}
-		break;
-	case QMetaType::QPoint:
-		break;
-	default:
-		return false;
+			break;
+		case QMetaType::QPoint:
+			break;
+		default:
+			return false;
 	}
 	return true;
 }
