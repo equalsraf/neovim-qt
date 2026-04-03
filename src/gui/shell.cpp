@@ -1405,7 +1405,7 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 	}
 
 	QPointF eventPos = ev->position();
-	QPoint pos(eventPos.x()/cellSize().width(), eventPos.y()/cellSize().height());
+	QPoint pos(eventPos.x() / cellSize().width(), eventPos.y() / cellSize().height());
 	QString inp;
 	if (ev->type() == QEvent::MouseMove) {
 		Qt::MouseButton bt;
@@ -1470,7 +1470,7 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 	setCursorFromBusyState();
 
 	QPointF eventPos = ev->position();
-	QPoint pos(eventPos.x()/cellSize().width(), eventPos.y()/cellSize().height());
+	QPoint pos(eventPos.x() / cellSize().width(), eventPos.y() / cellSize().height());
 	if (pos != m_mouse_pos) {
 		m_mouse_pos = pos;
 		mouseClickReset();

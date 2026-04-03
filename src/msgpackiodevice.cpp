@@ -731,11 +731,11 @@ void MsgpackIODevice::send(const QVariant& var)
 	if (!checkVariant(var)) {
 		msgpack_pack_nil(&m_pk);
 		qWarning() << "Trying to pack unsupported variant type" << var.metaType().id()
-			       << "packing Nil instead";
+				   << "packing Nil instead";
 		return;
 	}
 
-	switch(var.metaType().id()) {
+	switch (var.metaType().id()) {
 		case QMetaType::Void:
 		case QMetaType::UnknownType:
 			msgpack_pack_nil(&m_pk);
@@ -772,28 +772,27 @@ void MsgpackIODevice::send(const QVariant& var)
 			break;
 		case QMetaType::QStringList:
 			msgpack_pack_array(&m_pk, var.toList().size());
-			foreach(const QVariant& elem, var.toList()) {
+			foreach (const QVariant& elem, var.toList()) {
 				send(elem);
 			}
 			break;
 		case QMetaType::QVariantList:
 			msgpack_pack_array(&m_pk, var.toList().size());
-			foreach(const QVariant& elem, var.toList()) {
+			foreach (const QVariant& elem, var.toList()) {
 				send(elem);
 			}
 			break;
 		case QMetaType::QVariantMap:
-			{
+		{
 			const QVariantMap& m = var.toMap();
 			msgpack_pack_map(&m_pk, m.size());
-			QMapIterator<QString,QVariant> it(m);
-			while(it.hasNext()) {
+			QMapIterator<QString, QVariant> it(m);
+			while (it.hasNext()) {
 				it.next();
 				send(it.key());
 				send(it.value());
 			}
-			}
-			break;
+		} break;
 		case QMetaType::QPoint:
 			// As an array [row, col]
 			msgpack_pack_array(&m_pk, 2);
@@ -843,7 +842,7 @@ fail:
  */
 bool MsgpackIODevice::checkVariant(const QVariant& var)
 {
-	switch(var.metaType().id()) {
+	switch (var.metaType().id()) {
 		case QMetaType::UnknownType:
 			break;
 		case QMetaType::Bool:
@@ -871,27 +870,26 @@ bool MsgpackIODevice::checkVariant(const QVariant& var)
 		case QMetaType::QStringList:
 			break;
 		case QMetaType::QVariantList:
-			foreach(const QVariant& elem, var.toList()) {
+			foreach (const QVariant& elem, var.toList()) {
 				if (!checkVariant(elem)) {
 					return false;
 				}
 			}
 			break;
 		case QMetaType::QVariantMap:
-			{
-				const QVariantMap& m = var.toMap();
-				QMapIterator<QString,QVariant> it(m);
-				while(it.hasNext()) {
-					it.next();
-					if (!checkVariant(it.key())) {
-						return false;
-					}
-					if (!checkVariant(it.value())) {
-						return false;
-					}
+		{
+			const QVariantMap& m = var.toMap();
+			QMapIterator<QString, QVariant> it(m);
+			while (it.hasNext()) {
+				it.next();
+				if (!checkVariant(it.key())) {
+					return false;
+				}
+				if (!checkVariant(it.value())) {
+					return false;
 				}
 			}
-			break;
+		} break;
 		case QMetaType::QPoint:
 			break;
 		default:
