@@ -3,7 +3,7 @@
 #include <QMap>
 #include <QVariant>
 
-namespace NeovimQt { namespace Input {
+namespace NeovimQt::Input {
 
 const QMap<int, QString>& GetSpecialKeysMap() noexcept
 {
@@ -273,4 +273,4 @@ QString convertKey(const QKeyEvent& ev) noexcept
 	return evNormalized.text();
 }
 
-} } // namespace NeovimQt::Input
+} // namespace NeovimQt::Input

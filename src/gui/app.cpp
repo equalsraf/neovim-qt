@@ -413,8 +413,6 @@ void App::checkArgumentsMayTerminate(QCommandLineParser& parser) noexcept
 
 /*static*/ QStringList App::getNeovimArgs() noexcept
 {
-	QStringList neovimArgs{ "--cmd","set termguicolors" };
-
 	QString runtimePath{ getRuntimePath() };
 	if (runtimePath.isEmpty()) {
 		return { "--cmd","set termguicolors" };
