@@ -14,7 +14,6 @@
 #include <QShowEvent>
 
 #include "app.h"
-#include "compat_gui.h"
 #include "helpers.h"
 #include "input.h"
 #include "konsole_wcwidth.h"
@@ -344,7 +343,7 @@ void Shell::init()
 	connect(m_nvim->api0(), &NeovimApi0::on_ui_try_resize,
 			this, &Shell::neovimResizeFinished);
 
-	QRect screenRect = screenAvailableGeometry(this);
+	QRect screenRect = this->screen()->availableGeometry();
 	const int64_t shellWidth = screenRect.width() / cellSize().width();
 	const int64_t shellHeight = screenRect.height() / cellSize().height();
 	QVariantMap options;

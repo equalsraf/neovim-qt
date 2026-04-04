@@ -5,26 +5,24 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-  workflow_dispatch:
 
 jobs:
   BuildTest:
     name: ${{ matrix.name }}
-    if: false  # TODO: failsafe to prevent this job from running until refactored for Qt6
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: Linux_GCC
             flavor: Debug
-            runner: ubuntu-22.04
+            runner: ubuntu-latest
             generator: Ninja
             cc: gcc
             cxx: g++
 
           - name: Linux_LLVM
             flavor: Debug
-            runner: ubuntu-22.04
+            runner: ubuntu-latest
             generator: Ninja
             cc: clang
             cxx: clang++
@@ -37,20 +35,22 @@ jobs:
             cxx: g++
             publish: true
 
-          - name: MacOS_GCC
-            flavor: Debug
-            runner: macos-13
-            generator: Ninja
-            cc: gcc-12
-            cxx: g++-12
+          # TODO: Disabled to test individually
 
-          - name: MacOS_Release
-            flavor: Release
-            runner: macos-13
-            generator: Ninja
-            cc: clang
-            cxx: clang++
-            publish: true
+          #- name: MacOS_GCC
+          #  flavor: Debug
+          #  runner: macos-13
+          #  generator: Ninja
+          #  cc: gcc-12
+          #  cxx: g++-12
+
+          #- name: MacOS_Release
+          #  flavor: Release
+          #  runner: macos-13
+          #  generator: Ninja
+          #  cc: clang
+          #  cxx: clang++
+          #  publish: true
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -62,7 +62,7 @@ jobs:
         if: ${{ startsWith(matrix.runner, 'ubuntu') }}
         run: |
           sudo add-apt-repository -y ppa:neovim-ppa/stable
-          sudo apt-get install -y neovim ninja-build libqt5svg5 libqt5svg5-dev qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools libfuse2
+          sudo apt-get install -y neovim ninja-build libqt6svg6 qt6-svg-dev libqt6svgwidgets6 qt6-base-dev qtchooser qmake6 qt6-base-dev-tools
           sudo apt-get update -y
 
       - name: MacOS - Setup
@@ -84,7 +84,7 @@ jobs:
           CMAKE_BUILD_TYPE: ${{ matrix.flavor }}
           CMAKE_GENERATOR: ${{ matrix.generator }}
         run: >
-          env PATH=${{ startsWith(matrix.runner, 'macos') && '/usr/local/opt/qt@5/bin:' || '' }}/usr/local/bin:/usr/bin/:/bin
+          env PATH=${{ startsWith(matrix.runner, 'macos') && '/usr/local/opt/qt@6/bin:' || '' }}/usr/local/bin:/usr/bin/:/bin
           cmake -B ./build
           -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
@@ -112,7 +112,7 @@ jobs:
           cmake --build ./build --target install
           wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
           chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-          ./linuxdeployqt-continuous-x86_64.AppImage ./install/share/applications/nvim-qt.desktop -appimage -qmake=/usr/lib/qt5/bin/qmake
+          ./linuxdeployqt-continuous-x86_64.AppImage ./install/share/applications/nvim-qt.desktop -appimage -qmake=/usr/lib/qt6/bin/qmake
 
       - name: MacOS - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
@@ -121,7 +121,7 @@ jobs:
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
 
       - name: Upload Artifacts
-        if: ${{ matrix.publish }}
+        if: ${{ false && matrix.publish }}   # TODO: Wait until all builds are tested
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}

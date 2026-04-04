@@ -49,17 +49,17 @@ void TestNeovimObject::delayedSetup()
 void TestNeovimObject::test_event(const QByteArray& name, const QVariantList& params)
 {
 	QVariant arg0 = params.at(0);
-	if ( (QMetaType::Type)arg0.type() == QMetaType::QByteArray ) {
+	if (arg0.metaType().id() == QMetaType::QByteArray) {
 		QVERIFY(arg0.toString() == "WAT");
 		m_test_event_string = true;
 	}
 
-	if ( (QMetaType::Type)arg0.type() == QMetaType::ULongLong ) {
+	if (arg0.metaType().id() == QMetaType::ULongLong) {
 		QVERIFY(arg0.toInt() == 42);
 		m_test_event_uint = true;
 	}
 
-	if (arg0.canConvert(QMetaType::QStringList)) {
+	if (arg0.canConvert(QMetaType(QMetaType::QStringList))) {
 		QStringList l = arg0.toStringList();
 		m_test_event_stringlist = true;
 	}
