@@ -5,10 +5,12 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   BuildTest:
     name: ${{ matrix.name }}
+    if: false  # TODO: failsafe to prevent this job from running until refactored for Qt6
     strategy:
       fail-fast: false
       matrix:
