@@ -526,6 +526,18 @@ void Shell::handleSetScrollRegion(const QVariantList& opargs)
 
 void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 {
+	if (name == "flush") {
+		for (const auto& cmd : m_pendingRedrawEvents) {
+			handleRedrawEvent(cmd.first, cmd.second);
+		}
+		m_pendingRedrawEvents.clear();
+	} else {
+		m_pendingRedrawEvents.append({name, opargs});
+	}
+}
+
+void Shell::handleRedrawEvent(const QByteArray& name, const QVariantList& opargs)
+{
 	if (name == "update_fg") {
 		if (opargs.size() < 1 || !opargs.at(0).canConvert<quint64>()) {
 			qWarning() << "Unexpected arguments for redraw:" << name << opargs;
@@ -621,8 +633,6 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 		m_pum.hide();
 	} else if (name == "mode_info_set") {
 		handleModeInfoSet(opargs);
-	} else if (name == "flush") {
-		// Do Nothing, a notification that nvim is done redrawing.
 	} else if (name == "grid_resize") {
 		handleGridResize(opargs);
 	} else if (name == "default_colors_set") {
