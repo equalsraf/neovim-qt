@@ -10,46 +10,49 @@ jobs:
   BuildTest:
     name: ${{ matrix.name }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
-          - name: Linux_GCC
+          - name: MacOS_Debug
             flavor: Debug
-            runner: ubuntu-latest
-            generator: Ninja
-            cc: gcc
-            cxx: g++
-
-          - name: Linux_LLVM
-            flavor: Debug
-            runner: ubuntu-latest
+            runner: macos-latest
             generator: Ninja
             cc: clang
             cxx: clang++
 
-          - name: Linux_Release
+          - name: MacOS_Release
             flavor: Release
-            runner: ubuntu-22.04
+            runner: macos-latest
             generator: Ninja
-            cc: gcc
-            cxx: g++
+            cc: clang
+            cxx: clang++
             publish: true
 
           # TODO: Disabled to test individually
+          # BEGIN - TESTED AND VERIFIED
 
-          #- name: MacOS_GCC
+          #- name: Linux_GCC
           #  flavor: Debug
-          #  runner: macos-13
+          #  runner: ubuntu-latest
           #  generator: Ninja
-          #  cc: gcc-12
-          #  cxx: g++-12
+          #  cc: gcc
+          #  cxx: g++
 
-          #- name: MacOS_Release
-          #  flavor: Release
-          #  runner: macos-13
+          #- name: Linux_LLVM
+          #  flavor: Debug
+          #  runner: ubuntu-latest
           #  generator: Ninja
           #  cc: clang
           #  cxx: clang++
+
+          # END   - TESTED AND VERIFIED
+
+          #- name: Linux_Release
+          #  flavor: Release
+          #  runner: ubuntu-22.04
+          #  generator: Ninja
+          #  cc: gcc
+          #  cxx: g++
           #  publish: true
     runs-on: ${{ matrix.runner }}
     steps:
@@ -68,10 +71,10 @@ jobs:
       - name: MacOS - Setup
         if: ${{ startsWith(matrix.runner, 'macos') }}
         run: |
-          brew install neovim
+          brew install neovim qt
           brew ls --formula | grep -wq ninja || brew install ninja
-          brew ls --formula | grep -wq qt5 || brew install qt@5
-          brew ls --formula | grep -wq msgpack || brew install msgpack
+          echo "$(brew --prefix qt)/bin" >> "$GITHUB_PATH"
+          echo "Qt6_DIR=$(brew --prefix qt)/lib/cmake/Qt6" >> "$GITHUB_ENV"
 
       #
       # Build and Test
@@ -84,7 +87,6 @@ jobs:
           CMAKE_BUILD_TYPE: ${{ matrix.flavor }}
           CMAKE_GENERATOR: ${{ matrix.generator }}
         run: >
-          env PATH=${{ startsWith(matrix.runner, 'macos') && '/usr/local/opt/qt@6/bin:' || '' }}/usr/local/bin:/usr/bin/:/bin
           cmake -B ./build
           -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
@@ -104,20 +106,10 @@ jobs:
       #
       # Deploy Release Binaries
       #
-      - name: Linux - Publish
-        if: ${{ matrix.publish && startsWith(matrix.runner, 'ubuntu') }}
-        env:
-          ARCH: x86_64
-        run: |
-          cmake --build ./build --target install
-          wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-          chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-          ./linuxdeployqt-continuous-x86_64.AppImage ./install/share/applications/nvim-qt.desktop -appimage -qmake=/usr/lib/qt6/bin/qmake
-
       - name: MacOS - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
         run: |
-          /usr/local/opt/qt@5/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
+          $(brew --prefix qt)/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
 
       - name: Upload Artifacts
@@ -127,7 +119,6 @@ jobs:
           name: ${{ matrix.name }}
           if-no-files-found: ignore
           path: |
-            Neovim-Qt-*-x86_64.AppImage
             neovim-qt.dmg
             neovim-qt-installer.msi
             neovim-qt.zip
