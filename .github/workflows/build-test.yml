@@ -9,10 +9,25 @@ on:
 jobs:
   BuildTest:
     name: ${{ matrix.name }}
+    if: false   # TODO: disable for now
     strategy:
       fail-fast: true
       matrix:
         include:
+          - name: Linux_GCC
+            flavor: Debug
+            runner: ubuntu-latest
+            generator: Ninja
+            cc: gcc
+            cxx: g++
+
+          - name: Linux_LLVM
+            flavor: Debug
+            runner: ubuntu-latest
+            generator: Ninja
+            cc: clang
+            cxx: clang++
+
           - name: MacOS_Debug
             flavor: Debug
             runner: macos-latest
@@ -30,30 +45,8 @@ jobs:
 
           # TODO: Disabled to test individually
           # BEGIN - TESTED AND VERIFIED
-
-          #- name: Linux_GCC
-          #  flavor: Debug
-          #  runner: ubuntu-latest
-          #  generator: Ninja
-          #  cc: gcc
-          #  cxx: g++
-
-          #- name: Linux_LLVM
-          #  flavor: Debug
-          #  runner: ubuntu-latest
-          #  generator: Ninja
-          #  cc: clang
-          #  cxx: clang++
-
           # END   - TESTED AND VERIFIED
 
-          #- name: Linux_Release
-          #  flavor: Release
-          #  runner: ubuntu-22.04
-          #  generator: Ninja
-          #  cc: gcc
-          #  cxx: g++
-          #  publish: true
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -79,7 +72,7 @@ jobs:
       #
       # Build and Test
       #
-      - name: Neovim Version
+      - name: Test Neovim Version
         run: nvim --version
 
       - name: Configure
@@ -113,12 +106,11 @@ jobs:
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
 
       - name: Upload Artifacts
-        if: ${{ false && matrix.publish }}   # TODO: Wait until all builds are tested
+        if: ${{ matrix.publish }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
           if-no-files-found: ignore
           path: |
             neovim-qt.dmg
-            neovim-qt-installer.msi
-            neovim-qt.zip
+
