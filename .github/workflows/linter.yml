@@ -10,7 +10,6 @@ on:
 jobs:
   Clazy:
     name: Clazy
-    if: false # TODO: temporarily turned off to test build-test.yml
     strategy:
       fail-fast: false
     runs-on: ubuntu-latest
@@ -35,7 +34,6 @@ jobs:
 
   ClangTidy:
     name: ClangTidy
-    if: false # TODO: temporarily turned off to test build-test.yml
     strategy:
       fail-fast: false
     runs-on: ubuntu-latest
@@ -56,3 +54,4 @@ jobs:
 
       - name: Build
         run: cmake --build ${{ github.workspace }}/build
+

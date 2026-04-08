@@ -1,4 +1,4 @@
-name: Windows Build And Test
+name: Build And Deploy
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   BuildTest:
-    name: WinBuildDeploy
+    name: Windows
     strategy:
       fail-fast: true
     runs-on: windows-latest
