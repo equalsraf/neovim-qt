@@ -343,7 +343,11 @@ void Shell::init()
 	connect(m_nvim->api0(), &NeovimApi0::on_ui_try_resize,
 			this, &Shell::neovimResizeFinished);
 
-	QRect screenRect = this->screen()->availableGeometry();
+	QRect screenRect {};
+	if (this->screen())
+	{
+		screenRect = this->screen()->availableGeometry();
+	}
 	const int64_t shellWidth = screenRect.width() / cellSize().width();
 	const int64_t shellHeight = screenRect.height() / cellSize().height();
 	QVariantMap options;
@@ -1403,8 +1407,8 @@ void Shell::neovimMouseEvent(QMouseEvent *ev)
 		return;
 	}
 
-	QPointF eventPos = ev->position();
-	QPoint pos(eventPos.x() / cellSize().width(), eventPos.y() / cellSize().height());
+	QPointF eventPos{ ev->position() };
+	QPoint pos{ eventPos.x() / cellSize().width(), eventPos.y() / cellSize().height() };
 	QString inp;
 	if (ev->type() == QEvent::MouseMove) {
 		Qt::MouseButton bt;
@@ -1468,8 +1472,8 @@ void Shell::mouseMoveEvent(QMouseEvent *ev)
 {
 	setCursorFromBusyState();
 
-	QPointF eventPos = ev->position();
-	QPoint pos(eventPos.x() / cellSize().width(), eventPos.y() / cellSize().height());
+	QPointF eventPos{ ev->position() };
+	QPoint pos{ eventPos.x() / cellSize().width(), eventPos.y() / cellSize().height() };
 	if (pos != m_mouse_pos) {
 		m_mouse_pos = pos;
 		mouseClickReset();
@@ -1754,7 +1758,7 @@ void Shell::tooltip(const QString& text)
 	}
 
 	QFontMetrics fm(m_tooltip->font());
-	int width = fm.horizontalAdvance(text);
+	int width{ fm.horizontalAdvance(text) };
 	m_tooltip->setMinimumWidth(width);
 	m_tooltip->setMaximumWidth(width);
 	m_tooltip->update();
