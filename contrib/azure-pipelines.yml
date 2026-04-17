@@ -103,17 +103,21 @@ jobs:
     - task: CMake@1
       inputs:
         workingDirectory: $(Build.BinariesDirectory)
-        cmakeArgs: -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_PREFIX_PATH=$(Build.BinariesDirectory)\5.15.0\msvc2019_64\lib\cmake;$(Build.BinariesDirectory)\5.15.0\msvc2019_64\bin $(Build.SourcesDirectory)
+        cmakeArgs: -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_PREFIX_PATH=$(Build.BinariesDirectory)\5.15.0\msvc2019_64\lib\cmake;$(Build.BinariesDirectory)\5.15.0\msvc2019_64\bin $(Build.SourcesDirectory)
       displayName: CMake Configure
     - task: CMake@1
       inputs:
         workingDirectory: $(Build.BinariesDirectory)
-        cmakeArgs: --build . --config Release --target install
+        cmakeArgs: --build . --config RelWithDebInfo --target install
       displayName: CMake Build
     - script: |
-        cpack --verbose -G WIX
+        cpack --verbose -G WIX -C RelWithDebInfo
       displayName: 'CPack release'
       workingDirectory: $(Build.BinariesDirectory)
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: $(Build.BinariesDirectory)\_CPack_Packages\win64\WIX\neovim-qt-installer.msi
+        publishLocation: 'pipeline'
 
   - job: Windows_qt5
     variables:
