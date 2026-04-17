@@ -103,21 +103,35 @@ jobs:
     - task: CMake@1
       inputs:
         workingDirectory: $(Build.BinariesDirectory)
-        cmakeArgs: -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_PREFIX_PATH=$(Build.BinariesDirectory)\5.15.0\msvc2019_64\lib\cmake;$(Build.BinariesDirectory)\5.15.0\msvc2019_64\bin $(Build.SourcesDirectory)
+        cmakeArgs: -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_PREFIX_PATH=$(Build.BinariesDirectory)\5.15.0\msvc2019_64\lib\cmake;$(Build.BinariesDirectory)\5.15.0\msvc2019_64\bin -DCMAKE_INSTALL_PREFIX=$(Build.BinariesDirectory)\INSTALL $(Build.SourcesDirectory)
       displayName: CMake Configure
     - task: CMake@1
       inputs:
         workingDirectory: $(Build.BinariesDirectory)
         cmakeArgs: --build . --config RelWithDebInfo --target install
-      displayName: CMake Build
+      displayName: CMake Install
     - script: |
         cpack --verbose -G WIX -C RelWithDebInfo
       displayName: 'CPack release'
       workingDirectory: $(Build.BinariesDirectory)
     - task: PublishPipelineArtifact@1
+      displayName: 'Publish MSI'
       inputs:
         targetPath: $(Build.BinariesDirectory)\_CPack_Packages\win64\WIX\neovim-qt-installer.msi
         publishLocation: 'pipeline'
+        artifactName: neovim-qt-installer.msi
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: $(Build.BinariesDirectory)\INSTALL
+        archiveType: 'zip'
+        archiveFile: $(Build.BinariesDirectory)\neovim-qt.zip
+      displayName: 'Generate zip artifact'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish zip'
+      inputs:
+        targetPath: $(Build.BinariesDirectory)\neovim-qt.zip
+        publishLocation: 'pipeline'
+        artifactName: neovim-qt.zip
 
   - job: Windows_qt5
     variables:
