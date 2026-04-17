@@ -6,7 +6,6 @@
 #include <QTcpSocket>
 #include <QtGlobal>
 
-#include "compat.h"
 #include "msgpackiodevice.h"
 #include "msgpackrequest.h"
 #include "neovimconnectorhelper.h"
@@ -15,7 +14,7 @@ namespace NeovimQt {
 
 /**
  * \class NeovimQt::NeovimConnector
- * 
+ *
  * \brief A Connection to a Neovim instance
  *
  */
@@ -78,7 +77,7 @@ void NeovimConnector::clearError()
 
 /**
  * Called when an error takes place
- */ 
+ */
 NeovimConnector::NeovimError NeovimConnector::errorCause()
 {
 	return m_error;
@@ -280,12 +279,7 @@ NeovimConnector* NeovimConnector::spawn(const QStringList& params, const QString
 	c->m_spawnArgs = params;
 	c->m_spawnExe = exe;
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
-	connect(p, SIGNAL(error(QProcess::ProcessError)),
-			c, SLOT(processError(QProcess::ProcessError)));
-#else
 	connect(p, &QProcess::errorOccurred, c, &NeovimConnector::processError);
-#endif
 	connect(p, SIGNAL(finished(int,QProcess::ExitStatus)),
 			c, SIGNAL(processExited(int)));
 	connect(p, &QProcess::started,
@@ -314,12 +308,7 @@ NeovimConnector* NeovimConnector::connectToSocket(const QString& path)
 	c->m_connSocket = path;
 #endif
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
-	connect(s, SIGNAL(error(QLocalSocket::LocalSocketError)),
-			c, SLOT(socketError()));
-#else
 	connect(s, &QLocalSocket::errorOccurred, c, &NeovimConnector::socketError);
-#endif
 	connect(s, &QLocalSocket::connected,
 			c, &NeovimConnector::discoverMetadata);
 	s->connectToServer(c->m_connSocket);
@@ -341,12 +330,7 @@ NeovimConnector* NeovimConnector::connectToHost(const QString& host, int port)
 	c->m_connHost = host;
 	c->m_connPort = port;
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
-	connect(s, SIGNAL(error(QAbstractSocket::SocketError)),
-			c, SLOT(socketError()));
-#else
 	connect(s, &QAbstractSocket::errorOccurred, c, &NeovimConnector::socketError);
-#endif
 	connect(s, &QAbstractSocket::connected,
 			c, &NeovimConnector::discoverMetadata);
 	s->connectToHost(host, port);
@@ -365,22 +349,23 @@ NeovimConnector* NeovimConnector::connectToNeovim(const QString& server)
 {
 	QString addr = server;
 	if (addr.isEmpty()) {
-		 addr = QString::fromLocal8Bit(qgetenv("NVIM_LISTEN_ADDRESS"));
+		addr = QString::fromLocal8Bit(qgetenv("NVIM_LISTEN_ADDRESS"));
 	}
 	if (addr.isEmpty()) {
 		return spawn();
 	}
 
-	int colon_pos = addr.lastIndexOf(':');
-	if (colon_pos != -1 && colon_pos != 0 && addr[colon_pos-1] != ':') {
+	const QStringView parsed{ server };
+	int colon_pos = parsed.lastIndexOf(':');
+	if (colon_pos != -1 && colon_pos != 0 && parsed[colon_pos - 1] != ':') {
 		bool ok;
-		int port = midString(addr, colon_pos + 1).toInt(&ok);
+		int port = parsed.mid(colon_pos + 1).toInt(&ok);
 		if (ok) {
-			QString host = addr.mid(0, colon_pos);
+			QString host{ parsed.mid(0, colon_pos).toString() };
 			return connectToHost(host, port);
 		}
 	}
-	return connectToSocket(addr);
+	return connectToSocket(parsed.toString());
 }
 
 NeovimConnector* NeovimConnector::fromStdinOut()

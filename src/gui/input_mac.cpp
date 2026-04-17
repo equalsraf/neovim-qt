@@ -1,6 +1,6 @@
 #include "input.h"
 
-namespace NeovimQt { namespace Input {
+namespace NeovimQt::Input {
 
 Qt::KeyboardModifiers ControlModifier() noexcept
 {
@@ -94,4 +94,4 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	return { type, key, mod, text };
 }
 
-} } // namespace NeovimQt::Input
+} // namespace NeovimQt::Input

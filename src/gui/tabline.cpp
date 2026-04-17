@@ -163,7 +163,7 @@ static std::vector<Tab> ParseTablineVariant(const QVariantList tabs) noexcept
 	std::vector<Tab> tabList;
 
 	for (const auto& varTab : tabs) {
-		if (static_cast<QMetaType::Type>(varTab.type()) != QMetaType::QVariantMap) {
+		if (varTab.metaType().id() != QMetaType::QVariantMap) {
 			qWarning() << "Unexpected varTab value in tabline_update:" << varTab;
 			continue;
 		}
@@ -187,7 +187,7 @@ static std::vector<Tab> ParseTablineVariant(const QVariantList tabs) noexcept
 void Tabline::handleTablineUpdate(const QVariantList& args) noexcept
 {
 	if (args.size() < 2 || !args.at(0).canConvert<uint64_t>()
-		|| static_cast<QMetaType::Type>(args.at(1).type()) != QMetaType::QVariantList) {
+		|| args.at(1).metaType().id() != QMetaType::QVariantList) {
 		qWarning() << "Unexpected argument for tabline_update:" << args;
 		return;
 	}
@@ -203,7 +203,7 @@ void Tabline::handleTablineUpdate(const QVariantList& args) noexcept
 	}
 
 	if (!args.at(2).canConvert<uint64_t>()
-		|| static_cast<QMetaType::Type>(args.at(3).type()) != QMetaType::QVariantList) {
+		|| args.at(3).metaType().id() != QMetaType::QVariantList) {
 		qWarning() << "Unexpected argument for tabline_update:" << args;
 		return;
 	}
@@ -468,7 +468,7 @@ static QString GetSanitizedErrorString(const QVariant& err) noexcept
 		"No write since last change!\nPlease save and try again."
 	};
 
-	if (err.type() != QVariant::Type::List) {
+	if (err.metaType().id() != QMetaType::QVariantList) {
 		return s_errorUnknown;
 	}
 

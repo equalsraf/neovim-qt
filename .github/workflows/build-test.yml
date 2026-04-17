@@ -10,45 +10,38 @@ jobs:
   BuildTest:
     name: ${{ matrix.name }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - name: Linux_GCC
             flavor: Debug
-            runner: ubuntu-22.04
+            runner: ubuntu-latest
             generator: Ninja
             cc: gcc
             cxx: g++
 
           - name: Linux_LLVM
             flavor: Debug
-            runner: ubuntu-22.04
+            runner: ubuntu-latest
             generator: Ninja
             cc: clang
             cxx: clang++
 
-          - name: Linux_Release
-            flavor: Release
-            runner: ubuntu-22.04
-            generator: Ninja
-            cc: gcc
-            cxx: g++
-            publish: true
-
-          - name: MacOS_GCC
+          - name: MacOS_Debug
             flavor: Debug
-            runner: macos-13
+            runner: macos-latest
             generator: Ninja
-            cc: gcc-12
-            cxx: g++-12
+            cc: clang
+            cxx: clang++
 
           - name: MacOS_Release
             flavor: Release
-            runner: macos-13
+            runner: macos-latest
             generator: Ninja
             cc: clang
             cxx: clang++
             publish: true
+
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -60,21 +53,21 @@ jobs:
         if: ${{ startsWith(matrix.runner, 'ubuntu') }}
         run: |
           sudo add-apt-repository -y ppa:neovim-ppa/stable
-          sudo apt-get install -y neovim ninja-build libqt5svg5 libqt5svg5-dev qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools libfuse2
+          sudo apt-get install -y neovim ninja-build libqt6svg6 qt6-svg-dev libqt6svgwidgets6 qt6-base-dev qtchooser qmake6 qt6-base-dev-tools
           sudo apt-get update -y
 
       - name: MacOS - Setup
         if: ${{ startsWith(matrix.runner, 'macos') }}
         run: |
-          brew install neovim
+          brew install neovim qt
           brew ls --formula | grep -wq ninja || brew install ninja
-          brew ls --formula | grep -wq qt5 || brew install qt@5
-          brew ls --formula | grep -wq msgpack || brew install msgpack
+          echo "$(brew --prefix qt)/bin" >> "$GITHUB_PATH"
+          echo "Qt6_DIR=$(brew --prefix qt)/lib/cmake/Qt6" >> "$GITHUB_ENV"
 
       #
       # Build and Test
       #
-      - name: Neovim Version
+      - name: Test Neovim Version
         run: nvim --version
 
       - name: Configure
@@ -82,7 +75,6 @@ jobs:
           CMAKE_BUILD_TYPE: ${{ matrix.flavor }}
           CMAKE_GENERATOR: ${{ matrix.generator }}
         run: >
-          env PATH=${{ startsWith(matrix.runner, 'macos') && '/usr/local/opt/qt@5/bin:' || '' }}/usr/local/bin:/usr/bin/:/bin
           cmake -B ./build
           -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
           -DCMAKE_C_COMPILER=${{ matrix.cc }}
@@ -102,30 +94,18 @@ jobs:
       #
       # Deploy Release Binaries
       #
-      - name: Linux - Publish
-        if: ${{ matrix.publish && startsWith(matrix.runner, 'ubuntu') }}
-        env:
-          ARCH: x86_64
-        run: |
-          cmake --build ./build --target install
-          wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-          chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-          ./linuxdeployqt-continuous-x86_64.AppImage ./install/share/applications/nvim-qt.desktop -appimage -qmake=/usr/lib/qt5/bin/qmake
-
       - name: MacOS - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
         run: |
-          /usr/local/opt/qt@5/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
+          $(brew --prefix qt)/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
 
       - name: Upload Artifacts
-        if: ${{ matrix.publish }}
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
-          if-no-files-found: ignore
+          if-no-files-found: error
           path: |
-            Neovim-Qt-*-x86_64.AppImage
             neovim-qt.dmg
-            neovim-qt-installer.msi
-            neovim-qt.zip
+

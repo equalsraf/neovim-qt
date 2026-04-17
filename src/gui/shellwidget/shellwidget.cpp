@@ -7,17 +7,8 @@
 #include <QTextLayout>
 #include <QtMath>
 
-#include "compat.h"
-#include "compat_shellwidget.h"
-#include "helpers.h"
-
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-constexpr int c_qtWeightMin{ 0 };
-constexpr int c_qtWeightMax{ 99 };
-#else
 constexpr int c_qtWeightMin{ 1 };
 constexpr int c_qtWeightMax{ 1000 };
-#endif
 
 ShellWidget::ShellWidget(QWidget* parent)
 	: QWidget(parent)
@@ -118,8 +109,8 @@ void ShellWidget::setCellSize()
 {
 	QFontMetrics fm(font());
 	m_ascent = fm.ascent();
-	m_cellSize = QSize(GetHorizontalAdvance(fm, 'W'),
-			qMax(fm.lineSpacing(), fm.height()) + m_lineSpace);
+	m_cellSize =
+		QSize(fm.horizontalAdvance('W'), qMax(fm.lineSpacing(), fm.height()) + m_lineSpace);
 	setSizeIncrement(m_cellSize);
 }
 QSize ShellWidget::cellSize() const
@@ -377,7 +368,8 @@ QFont ShellWidget::GetCellFont(const Cell& cell) const noexcept
 	// but we want to match the family name with the bold/italic attributes.
 	cellFont.setStyleName({});
 
-	cellFont.setStyleHint(QFont::TypeWriter, fontStyleStrategy());
+	cellFont.setStyleHint(
+		QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::PreferMatch));
 	cellFont.setFixedPitch(true);
 	cellFont.setKerning(false);
 
@@ -432,7 +424,7 @@ void ShellWidget::paintForegroundCellText(
 	// Draw chars at the baseline
 	const int cellTextOffset{ m_ascent + (m_lineSpace / 2) };
 	const QPoint pos{ cellRect.left(), cellRect.top() + cellTextOffset};
-	const uint character{ cell.GetCharacter() };
+	const char32_t character{ cell.GetCharacter() };
 	const QString text{ QString::fromUcs4(&character, 1) };
 
 	p.drawText(pos, text);
@@ -574,7 +566,7 @@ void ShellWidget::paintForegroundTextBlock(
 
 		// When the cursor IS within the glyph run, decompose individual characters under the cursor.
 		const int cursorGlyphRunPos { cursorPos - glyphsRendered };
-		auto textGlyphRun = midString(text, glyphsRendered, sizeGlyphRun);
+		auto textGlyphRun = text.mid(glyphsRendered, sizeGlyphRun);
 
 		// Compares a glyph run with and without ligatures. Ligature glyphs are detected as differences
 		// in these two lists. A non-empty newCursorGlyphList indicates glyph substitution is required.
@@ -712,7 +704,7 @@ void ShellWidget::paintRectLigatures(QPainter& p, const QRect rect) noexcept
 					blockCursorPos = blockText.size();
 				}
 
-				const uint cellCharacter{ checkCell.GetCharacter() };
+				const char32_t cellCharacter{ checkCell.GetCharacter() };
 				blockText += QString::fromUcs4(&cellCharacter, 1);
 
 				if (checkCell.IsDoubleWidth()) {
@@ -1035,10 +1027,11 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	qreal pointSizeF = curFont.pointSizeF();
 	int weight = -1;
 	bool italic = false;
-	for (const auto& attr : qAsConst(attrs)) {
+	for (const auto& attr : std::as_const(attrs)) {
+		const QStringView attrView{ attr };
 		if (attr.size() >= 2 && attr[0] == 'h') {
 			bool ok{ false };
-			qreal height = midString(attr, 1).toFloat(&ok);
+			qreal height = attrView.mid(1).toFloat(&ok);
 			if (!ok || height < 0) {
 				return QStringLiteral("Invalid font height");
 			}
@@ -1050,7 +1043,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 		} else if (attr == "sb") {
 			weight = QFont::DemiBold;
 		} else if (attr.length() > 0 && attr.at(0) == 'w') {
-			weight = rightString(attr, attr.length() - 1).toInt();
+			weight = attrView.right(attr.length() - 1).toInt();
 			if (weight < c_qtWeightMin || weight > c_qtWeightMax) {
 				return QStringLiteral("Invalid font weight");
 			}
@@ -1062,7 +1055,8 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	QFont font{ attrs.at(0), -1 /*pointSize*/, weight, italic };
 
 	font.setPointSizeF(pointSizeF);
-	font.setStyleHint(QFont::TypeWriter, fontStyleStrategy());
+	font.setStyleHint(
+		QFont::TypeWriter, QFont::StyleStrategy(QFont::PreferDefault | QFont::PreferMatch));
 	font.setFixedPitch(true);
 	font.setKerning(false);
 
@@ -1071,7 +1065,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 
 /*static*/ bool ShellWidget::IsValidFont(const QVariant& variant) noexcept
 {
-	return static_cast<QMetaType::Type>(variant.type()) == QMetaType::QFont;
+	return variant.metaType().id() == QMetaType::QFont;
 }
 
 /*static*/ bool ShellWidget::isBadMonospace(const QFont& f) noexcept
@@ -1098,8 +1092,8 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	}
 
 	// Italic
-	if ( fm_italic.averageCharWidth() != fm_italic.maxWidth() ||
-			fm_italic.maxWidth()*2 != GetHorizontalAdvance(fm_italic, "MM") ) {
+	if (fm_italic.averageCharWidth() != fm_italic.maxWidth()
+		|| fm_italic.maxWidth() * 2 != fm_italic.horizontalAdvance("MM")) {
 		QFontInfo info(fi);
 		qDebug() << fi.family() << "Average and Maximum font width mismatch for Italic font; QFont::exactMatch() is" << fi.exactMatch()
 			<< "Real font is " << info.family() << info.pointSize();
@@ -1107,8 +1101,8 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	}
 
 	// Bold
-	if ( fm_bold.averageCharWidth() != fm_bold.maxWidth() ||
-			fm_bold.maxWidth()*2 != GetHorizontalAdvance(fm_bold, "MM") ) {
+	if (fm_bold.averageCharWidth() != fm_bold.maxWidth()
+		|| fm_bold.maxWidth() * 2 != fm_bold.horizontalAdvance("MM")) {
 		QFontInfo info(fb);
 		qDebug() << fb.family() << "Average and Maximum font width mismatch for Bold font; QFont::exactMatch() is" << fb.exactMatch()
 			<< "Real font is " << info.family() << info.pointSize();
@@ -1116,8 +1110,8 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	}
 
 	// Bold+Italic
-	if ( fm_boldit.averageCharWidth() != fm_boldit.maxWidth() ||
-			fm_boldit.maxWidth()*2 != GetHorizontalAdvance(fm_boldit, "MM") ) {
+	if (fm_boldit.averageCharWidth() != fm_boldit.maxWidth()
+		|| fm_boldit.maxWidth() * 2 != fm_boldit.horizontalAdvance("MM")) {
 		QFontInfo info(fbi);
 		qDebug() << fbi.family() << "Average and Maximum font width mismatch for Bold+Italic font; QFont::exactMatch() is" << fbi.exactMatch()
 			<< "Real font is " << info.family() << info.pointSize();

@@ -7,7 +7,7 @@ if(NOT EXISTS ${NEOVIM_EXEC})
 	set(NEOVIM_EXEC nvim)
 endif()
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(REPRODUCIBLE_BUILD "Make this build reproducible" ON)
@@ -24,7 +24,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
 		string(CONCAT CLAZY_CHECKS
 			"level0,"
 			"level1,"
-			"no-inefficient-qlist-soft,"
 			)
 
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xclang -plugin-arg-clazy -Xclang ${CLAZY_CHECKS} -Wno-deprecated-declarations -Werror")
@@ -133,27 +132,20 @@ include(MacOSXPaths)
 # Qt
 set(CMAKE_AUTOMOC ON)
 
-# Build against Qt5 or Qt6
+# Build against Qt6
 if(NOT DEFINED WITH_QT)
-	set(WITH_QT Qt5)
-elseif(NOT WITH_QT STREQUAL "Qt5" AND NOT WITH_QT STREQUAL "Qt6")
-	message(WARNING "Unknown qt version, expecting (Qt5, Qt6), using ${WITH_QT}")
+	set(WITH_QT Qt6)
+elseif(NOT WITH_QT STREQUAL "Qt6")
+	message(WARNING "Unknown qt version, expecting Qt6, using ${WITH_QT}")
 endif()
 
-set(REQ_QT_MODULES Core Network Test Widgets)
+set(REQ_QT_MODULES Core Network Test Widgets SvgWidgets)
 find_package(QT NAMES ${WITH_QT} COMPONENTS ${REQ_QT_MODULES} REQUIRED)
-if(${QT_VERSION_MAJOR} VERSION_GREATER_EQUAL 6.0)
-	# Qt6 uses SvgWidgets instead of Svg
-	set(REQ_QT_MODULES ${REQ_QT_MODULES} SvgWidgets)
-	set(CMAKE_CXX_STANDARD 17)
-else()
-	set(REQ_QT_MODULES ${REQ_QT_MODULES} Svg)
-endif()
 message(STATUS "Building against Qt${QT_VERSION_MAJOR}.${QT_VERSION_MINOR} ${REQ_QT_MODULES}")
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${REQ_QT_MODULES} REQUIRED)
 
-if(Qt${QT_VERSION_MAJOR}Core_VERSION VERSION_LESS 5.8)
-	message(FATAL_ERROR "Minimum supported Qt5 version is 5.8!")
+if(Qt${QT_VERSION_MAJOR}Core_VERSION VERSION_LESS 6.0)
+	message(FATAL_ERROR "Minimum supported Qt6 version is 6.0!")
 endif()
 
 # msgpack
@@ -165,7 +157,7 @@ else()
 endif()
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions(-DQT_NO_DEBUG_OUTPUT)
+	add_definitions(-DQT_NO_DEBUG_OUTPUT)
 endif()
 
 # Place targets in bin/ or lib/ for all build configurations
@@ -173,15 +165,15 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 foreach(CFGNAME ${CMAKE_CONFIGURATION_TYPES})
-  string(TOUPPER ${CFGNAME} CFGNAME)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFGNAME} ${CMAKE_BINARY_DIR}/bin)
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFGNAME} ${CMAKE_BINARY_DIR}/lib)
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFGNAME} ${CMAKE_BINARY_DIR}/lib)
+	string(TOUPPER ${CFGNAME} CFGNAME)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFGNAME} ${CMAKE_BINARY_DIR}/bin)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFGNAME} ${CMAKE_BINARY_DIR}/lib)
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFGNAME} ${CMAKE_BINARY_DIR}/lib)
 endforeach()
 
 if(MSVC)
-  # Allow use of deprecated function names in MSVC (read/write)
-  add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+	# Allow use of deprecated function names in MSVC (read/write)
+	add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
 endif()
 
 add_subdirectory(src)
@@ -196,17 +188,17 @@ if(ENABLE_TESTS)
 endif()
 
 # Bindings
-find_package(PythonInterp)
-if (PYTHONINTERP_FOUND)
+find_package(Python)
+if (Python_Interpreter_FOUND)
 	set(NVIM "nvim" CACHE STRING "Path to nvim executable")
 	add_custom_target(bindings
-		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/generate_bindings.py ${NVIM} ${CMAKE_SOURCE_DIR}/src/auto
+		COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/generate_bindings.py ${NVIM} ${CMAKE_SOURCE_DIR}/src/auto
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 		COMMENT "Generating bindings"
 		)
 
 	add_custom_target(bindings-preview
-		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/generate_bindings.py ${NVIM}
+		COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/bindings/generate_bindings.py ${NVIM}
 		)
 endif()
 

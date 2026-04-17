@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
     env:
-      CLANG_FORMAT_DIFF: /usr/share/clang/clang-format-15/clang-format-diff.py
+      CLANG_FORMAT_DIFF: /usr/share/clang/clang-format-18/clang-format-diff.py
       BRANCH_POINT: ${{ github.base_ref }}
     runs-on: ubuntu-latest
     steps:
@@ -26,10 +26,6 @@ jobs:
 
       - name: Setup PR Branch
         run: git branch ${{ github.base_ref }} origin/${{ github.base_ref }}
-
-      - name: Install LLVM 15
-        run: |
-          sudo apt-get install -y clang-format-15 clang-15
 
       - name: Run ClangFormatDiff Script
         run: contrib/clang-format-diff.sh

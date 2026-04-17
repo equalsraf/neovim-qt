@@ -11,7 +11,7 @@
 	return invalidCell;
 }
 
-void Cell::SetCharacter(uint character)
+void Cell::SetCharacter(char32_t character)
 {
 	m_character = character;
 	m_isDoubleWidth = konsole_wcwidth(character) > 1;

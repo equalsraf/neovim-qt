@@ -2,13 +2,8 @@
 configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-if(${QT_VERSION_MAJOR} VERSION_GREATER_EQUAL 6.0)
-	include_directories(${Qt6SvgWidgets_INCLUDE_DIRS})
-	add_definitions(${Qt6SvgWidgets_DEFINITIONS})
-endif()
-
-add_subdirectory(compat)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/compat)
+include_directories(${Qt6SvgWidgets_INCLUDE_DIRS})
+add_definitions(${Qt6SvgWidgets_DEFINITIONS})
 
 set(NEOVIM_QT_SOURCES
   auto/neovimapi0.cpp
@@ -30,7 +25,6 @@ if(WIN32)
 endif()
 
 add_library(neovim-qt STATIC ${NEOVIM_QT_SOURCES})
-target_link_libraries(neovim-qt Qt${QT_VERSION_MAJOR}::Network msgpack-c)
-target_link_libraries(neovim-qt compat)
+target_link_libraries(neovim-qt Qt6::Network msgpack-c)
 
 add_subdirectory(gui)
