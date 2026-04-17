@@ -338,14 +338,12 @@ void Shell::init()
 	if (!m_shown) {
 		setVisible(false);
 	}
-	connect(m_nvim->api0(), &NeovimApi0::neovimNotification,
-			this, &Shell::handleNeovimNotification);
-	connect(m_nvim->api0(), &NeovimApi0::on_ui_try_resize,
-			this, &Shell::neovimResizeFinished);
+	connect(
+		m_nvim->api0(), &NeovimApi0::neovimNotification, this, &Shell::handleNeovimNotification);
+	connect(m_nvim->api0(), &NeovimApi0::on_ui_try_resize, this, &Shell::neovimResizeFinished);
 
-	QRect screenRect {};
-	if (this->screen())
-	{
+	QRect screenRect{};
+	if (this->screen()) {
 		screenRect = this->screen()->availableGeometry();
 	}
 	const int64_t shellWidth = screenRect.width() / cellSize().width();
@@ -380,7 +378,8 @@ void Shell::init()
 	m_nvim->api0()->vim_subscribe("Gui");
 
 	// Set initial value
-	m_nvim->api0()->vim_set_var("GuiWindowFrameless", (windowFlags() & Qt::FramelessWindowHint) ? 1: 0);
+	m_nvim->api0()->vim_set_var(
+		"GuiWindowFrameless", (windowFlags() & Qt::FramelessWindowHint) ? 1 : 0);
 
 	// Make the shell visible even when default_colors_set is not received,
 	// e.g. when using the older cell-based grid protocol.
@@ -1401,36 +1400,42 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 	// FIXME: bytes might not be written, and need to be buffered
 }
 
-void Shell::neovimMouseEvent(QMouseEvent *ev)
+void Shell::neovimMouseEvent(QMouseEvent* ev)
 {
 	if (!m_attached || !m_mouseEnabled) {
 		return;
 	}
 
 	QPointF eventPos{ ev->position() };
-	QPoint pos{ eventPos.x() / cellSize().width(), eventPos.y() / cellSize().height() };
+	QPoint pos{ static_cast<int>(eventPos.x() / cellSize().width()),
+		static_cast<int>(eventPos.y() / cellSize().height()) };
 	QString inp;
 	if (ev->type() == QEvent::MouseMove) {
 		Qt::MouseButton bt;
 		if (ev->buttons() & Qt::LeftButton) {
 			bt = Qt::LeftButton;
-		} else if (ev->buttons() & Qt::RightButton) {
+		}
+		else if (ev->buttons() & Qt::RightButton) {
 			bt = Qt::RightButton;
-		} else if (ev->buttons() & Qt::MiddleButton) {
+		}
+		else if (ev->buttons() & Qt::MiddleButton) {
 			bt = Qt::MiddleButton;
-		} else {
+		}
+		else {
 			return;
 		}
 		inp = Input::convertMouse(bt, ev->type(), ev->modifiers(), pos, 0);
-	} else {
-		inp = Input::convertMouse(ev->button(), ev->type(), ev->modifiers(), pos,
-						m_mouseclick_count);
+	}
+	else {
+		inp =
+			Input::convertMouse(ev->button(), ev->type(), ev->modifiers(), pos, m_mouseclick_count);
 	}
 	if (inp.isEmpty()) {
 		return;
 	}
 	m_nvim->api0()->vim_input(inp.toLatin1());
 }
+
 void Shell::mousePressEvent(QMouseEvent *ev)
 {
 	m_mouseclick_timer.start();
@@ -1468,12 +1473,13 @@ void Shell::mouseReleaseEvent(QMouseEvent *ev)
 	neovimMouseEvent(ev);
 }
 
-void Shell::mouseMoveEvent(QMouseEvent *ev)
+void Shell::mouseMoveEvent(QMouseEvent* ev)
 {
 	setCursorFromBusyState();
 
 	QPointF eventPos{ ev->position() };
-	QPoint pos{ eventPos.x() / cellSize().width(), eventPos.y() / cellSize().height() };
+	QPoint pos{ static_cast<int>(eventPos.x() / cellSize().width()),
+		static_cast<int>(eventPos.y() / cellSize().height()) };
 	if (pos != m_mouse_pos) {
 		m_mouse_pos = pos;
 		mouseClickReset();
@@ -1746,14 +1752,14 @@ void Shell::focusOutEvent(QFocusEvent *ev)
 void Shell::tooltip(const QString& text)
 {
 	m_tooltip->setText(text);
-	if ( text.isEmpty() ) {
+	if (text.isEmpty()) {
 		m_tooltip->hide();
 		return;
 	}
 
-	if ( !m_tooltip->isVisible() ) {
+	if (!m_tooltip->isVisible()) {
 		m_tooltip->setMinimumHeight(cellSize().height());
-		m_tooltip->move(neovimCursorTopLeft() );
+		m_tooltip->move(neovimCursorTopLeft());
 		m_tooltip->show();
 	}
 
