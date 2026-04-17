@@ -49,6 +49,12 @@ jobs:
             cc: clang
             cxx: clang++
             publish: true
+          - name: Windows Release
+            flavor: Release
+            runner: windows-2022
+            cc: unused
+            cxx: unused
+            generator: Visual Studio 17 2022
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -71,6 +77,15 @@ jobs:
           brew ls --formula | grep -wq qt5 || brew install qt@5
           brew ls --formula | grep -wq msgpack || brew install msgpack
 
+      - name: Windows - Setup
+        if: ${{ startsWith(matrix.runner, 'windows') }}
+        run: |
+          choco install --no-progress -y 7zip neovim
+          pip install aqtinstall
+          python -m aqt install-qt windows desktop 5.15.0 win64_msvc2019_64
+          Add-Content $env:GITHUB_PATH "C:\tools\neovim\nvim-win64\bin"
+          Add-Content $env:GITHUB_PATH "${{ github.workspace }}\5.15.0\msvc2019_64\bin"
+
       #
       # Build and Test
       #
@@ -78,6 +93,7 @@ jobs:
         run: nvim --version
 
       - name: Configure
+        if: ${{ ! startsWith(matrix.runner, 'windows') }}
         env:
           CMAKE_BUILD_TYPE: ${{ matrix.flavor }}
           CMAKE_GENERATOR: ${{ matrix.generator }}
@@ -89,6 +105,18 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
           -DENABLE_TESTS=ON
           -DCTEST_EXE_ARGS=${{ matrix.ctest_exe_args }}
+
+      - name: Configure - Windows
+        if: ${{ startsWith(matrix.runner, 'windows') }}
+        env:
+          CMAKE_BUILD_TYPE: ${{ matrix.flavor }}
+          CMAKE_GENERATOR: ${{ matrix.generator }}
+        run: >
+          cmake -B ./build
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\install
+          -DENABLE_TESTS=ON
+          -DCTEST_EXE_ARGS=${{ matrix.ctest_exe_args }}
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}\5.15.0\msvc2019_64\lib\cmake;${{ github.workspace }}\5.15.0\msvc2019_64\bin"
 
       - name: Build
         run: cmake --build ${{ github.workspace }}/build
