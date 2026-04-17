@@ -113,6 +113,7 @@ jobs:
     - script: |
         cpack --verbose -G WIX
       displayName: 'CPack release'
+      workingDirectory: $(Build.BinariesDirectory)
 
   - job: Windows_qt5
     variables:
