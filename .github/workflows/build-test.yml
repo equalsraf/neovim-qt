@@ -52,9 +52,10 @@ jobs:
           - name: Windows Release
             flavor: Release
             runner: windows-2022
+            generator: Visual Studio 17 2022
             cc: unused
             cxx: unused
-            generator: Visual Studio 17 2022
+            publish: true
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -119,10 +120,11 @@ jobs:
           -DCMAKE_PREFIX_PATH="${{ github.workspace }}\5.15.0\msvc2019_64\lib\cmake;${{ github.workspace }}\5.15.0\msvc2019_64\bin"
 
       - name: Build
-        run: cmake --build ${{ github.workspace }}/build
+        run: cmake --build ${{ github.workspace }}/build --target install
 
       - name: Test
         uses: GabrielBB/xvfb-action@v1 # Required by Linux, no X11 $DISPLAY
+        if: ${{ ! startswith(matrix.runner, 'windows') }}
         with:
           working-directory: ${{ github.workspace }}/build
           run: ctest -VV --debug --timeout 120 --output-on-failure -C ${{ matrix.flavor }}
@@ -145,6 +147,11 @@ jobs:
         run: |
           /usr/local/opt/qt@5/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
+
+      - name: Windows - Publish
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
+        run: |
+          cpack --verbose -G WIX -C RelWithDebInfo
 
       - name: Upload Artifacts
         if: ${{ matrix.publish }}
