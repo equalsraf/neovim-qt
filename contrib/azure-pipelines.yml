@@ -118,7 +118,7 @@ jobs:
     variables:
       VCINSTALLDIR: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'windows-2022'
     steps:
     - task: UsePythonVersion@0
       inputs:
@@ -147,7 +147,7 @@ jobs:
 
   - job: Windows_qt6
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'windows-2022'
     steps:
     - task: UsePythonVersion@0
       inputs:
