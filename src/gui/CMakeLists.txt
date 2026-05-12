@@ -58,10 +58,10 @@ add_library(neovim-qt-gui
 target_link_libraries(neovim-qt-gui ${QTLIBS} qshellwidget neovim-qt)
 
 if(APPLE)
-	set_property(SOURCE app.cpp PROPERTY COMPILE_DEFINITIONS
+	set_property(SOURCE app.cpp shell.cpp PROPERTY COMPILE_DEFINITIONS
 		NVIM_QT_RELATIVE_RUNTIME_PATH="../Resources/runtime")
 else()
-	set_property(SOURCE app.cpp PROPERTY COMPILE_DEFINITIONS
+	set_property(SOURCE app.cpp shell.cpp PROPERTY COMPILE_DEFINITIONS
 		NVIM_QT_RELATIVE_RUNTIME_PATH="../share/nvim-qt/runtime")
 endif()
 

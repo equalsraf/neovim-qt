@@ -180,6 +180,13 @@ QString convertKey(const QKeyEvent& ev) noexcept
 		return keypadKeys.value(key).arg(GetModifierPrefix(mod));
 	}
 
+	// Issue#1162: macOS Option key as Meta/Alt toggle.
+	// Platform-dispatched: returns overridden text on Mac when enabled,
+	// std::nullopt on all other platforms.
+	if (const auto optionMetaText{ GetOptionAsMetaText(ev) }) {
+		text = *optionMetaText;
+	}
+
 	// Issue#917: On Linux, Control + Space sends text as "\u0000"
 	if (key == Qt::Key_Space && text.size() > 0 && !text.at(0).isPrint()) {
 		text = " ";

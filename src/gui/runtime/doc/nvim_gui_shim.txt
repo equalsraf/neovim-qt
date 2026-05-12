@@ -87,8 +87,27 @@ GuiRenderLigatures	Enable or disable rendering ligatures
 
 								*GuiWindowOpacity*
 GuiWindowOpacity	Set window opacity. Takes a single argument,
-				a double in the range 0.0 to 1.0 (fully opaque).
-				This capability might not be supported in some platforms.
+			a double in the range 0.0 to 1.0 (fully opaque).
+			This capability might not be supported in some platforms.
+
+								*GuiMacOptionIsMeta*
+GuiMacOptionIsMeta	macOS only. Controls whether the Option key acts as
+			Meta/Alt for Neovim key mappings instead of producing
+			Unicode characters. Accepts one of the following values:
+
+			  none   - Default. Option key produces Unicode
+			           characters (e.g., Option+j → ∆).
+			  left   - Left Option acts as Meta/Alt, right
+			           Option produces Unicode characters.
+			  right  - Right Option acts as Meta/Alt, left
+			           Option produces Unicode characters.
+			  both   - Both Option keys act as Meta/Alt.
+
+			Example: >
+
+			    :GuiMacOptionIsMeta both
+<
+			This command has no effect on non-macOS platforms.
 
 ==============================================================================
 2. GUI variables
@@ -136,6 +155,10 @@ each line.
 
 							*g:GuiMousehide*
 g:GuiMousehide is 1 if mouse hiding is in effect, 0 otherwise.
+
+							*g:GuiMacOptionIsMeta*
+g:GuiMacOptionIsMeta holds the current macOS Option-as-Meta mode string.
+One of "none", "left", "right", or "both". See |GuiMacOptionIsMeta|.
 
 ==============================================================================
 3. Functions

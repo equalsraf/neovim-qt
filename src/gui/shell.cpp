@@ -3,7 +3,9 @@
 #include <cmath>
 #include <QApplication>
 #include <QClipboard>
+#include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
 #include <QFontDialog>
 #include <QKeyEvent>
 #include <QMimeData>
@@ -297,8 +299,21 @@ void Shell::setAttached(bool attached)
 
 		updateClientInfo();
 
+		// Re-add runtime to rtp: plugin managers (e.g. lazy.nvim) may have reset it.
+		const QDir runtimeDir{ QDir{ QCoreApplication::applicationDirPath() }.filePath(
+			QStringLiteral(NVIM_QT_RELATIVE_RUNTIME_PATH)) };
+		if (runtimeDir.exists()) {
+			const QString rtpCmd{ QString{ "let &rtp.=',%1'" }.arg(runtimeDir.path()) };
+			qDebug() << "setAttached: ensuring rtp includes:" << runtimeDir.path();
+			m_nvim->api0()->vim_command(rtpCmd.toUtf8());
+		}
+
+		qDebug() << "setAttached: loading shim plugin via 'runtime plugin/nvim_gui_shim.vim'";
 		MsgpackRequest* req_shim{ m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim") };
 		connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
+		connect(req_shim, &MsgpackRequest::finished, this, [](quint32, quint64, const QVariant&) {
+			qDebug() << "setAttached: shim plugin loaded successfully";
+		});
 
 		MsgpackRequest* req_ginit{ m_nvim->api0()->vim_command(GetGVimInitCommand()) };
 		connect(req_ginit, &MsgpackRequest::error, this, &Shell::handleGinitError);
@@ -941,6 +956,9 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			handleGuiAdaptiveStyle(args);
 		} else if (guiEvName == "AdaptiveStyleList") {
 			handleGuiAdaptiveStyleList();
+		} else if (guiEvName == "MacOptionIsMeta" && args.size() == 2) {
+			qDebug() << "GuiMacOptionIsMeta received:" << args.at(1);
+			handleMacOptionIsMeta(args.at(1));
 		}
 		return;
 	} else if (name != "redraw") {
@@ -1336,6 +1354,40 @@ void Shell::handleGuiAdaptiveStyleList() noexcept
 	emit showGuiAdaptiveStyleList();
 }
 
+void Shell::handleMacOptionIsMeta(const QVariant& value) noexcept
+{
+#ifdef Q_OS_MAC
+	if (!value.canConvert<QByteArray>()) {
+		qWarning() << "Unexpected value for MacOptionIsMeta:" << value;
+		return;
+	}
+
+	const QString mode{ m_nvim->decode(value.toByteArray()).toLower().trimmed() };
+
+	Input::MacOptionMetaMode metaMode{ Input::MacOptionMetaMode::None };
+	if (mode == "none") {
+		metaMode = Input::MacOptionMetaMode::None;
+	} else if (mode == "left") {
+		metaMode = Input::MacOptionMetaMode::Left;
+	} else if (mode == "right") {
+		metaMode = Input::MacOptionMetaMode::Right;
+	} else if (mode == "both") {
+		metaMode = Input::MacOptionMetaMode::Both;
+	} else {
+		m_nvim->api0()->vim_report_error(
+			m_nvim->encode(
+				QString{ "Unknown GuiMacOptionIsMeta value: '%1'. Expected: none, left, right, both" }
+					.arg(mode)));
+		return;
+	}
+
+	Input::SetMacOptionIsMeta(metaMode);
+	m_nvim->api0()->vim_set_var("GuiMacOptionIsMeta", mode);
+#else
+	Q_UNUSED(value);
+#endif
+}
+
 void Shell::showEvent(QShowEvent* ev)
 {
 	// Prevent init() from being called multiple times
@@ -1388,8 +1440,8 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 	const QString inp{ Input::convertKey(*ev) };
 
 	// Uncomment for key input debugging and unit test writing.
-	// qDebug() << "QKeyEvent ev:" << ev;
-	// qDebug() << "  " << inp;
+	qDebug() << "QKeyEvent ev:" << ev;
+	qDebug() << "  " << inp;
 
 	if (inp.isEmpty()) {
 		QWidget::keyPressEvent(ev);
@@ -1953,7 +2005,7 @@ void Shell::handleGinitError(quint32 msgid, quint64 fun, const QVariant& err)
 
 void Shell::handleShimError(quint32 msgid, quint64 fun, const QVariant& err)
 {
-	qDebug() << "GUI shim error " << err;
+	qWarning() << "GUI shim error " << err;
 }
 
 void Shell::handleGetBackgroundOption(quint32 msgid, quint64 fun, const QVariant& val)

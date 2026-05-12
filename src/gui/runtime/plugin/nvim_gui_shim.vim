@@ -278,6 +278,12 @@ function! s:GuiAdaptiveStyleList() abort
 endfunction
 command! -nargs=0 GuiAdaptiveStyleList call s:GuiAdaptiveStyleList()
 
+" Set macOS Option key behavior: none, left, right, both
+function! s:GuiMacOptionIsMeta(value) abort
+	call s:notify_all_uis('Gui', 'MacOptionIsMeta', a:value)
+endfunction
+command! -nargs=1 GuiMacOptionIsMeta call s:GuiMacOptionIsMeta("<args>")
+
 " Change rendering logic to use ligature-compatible rendering scheme
 function! s:GuiRenderLigatures(enable) abort
 	call s:notify_all_uis('Gui', 'Option', 'RenderLigatures', a:enable)

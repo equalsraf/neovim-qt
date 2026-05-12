@@ -48,4 +48,9 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	return { type, key, mod, text };
 }
 
+std::optional<QString> GetOptionAsMetaText(const QKeyEvent& /*ev*/) noexcept
+{
+	return std::nullopt;
+}
+
 } // namespace NeovimQt::Input

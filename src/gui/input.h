@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QEvent>
 #include <QKeyEvent>
 #include <QMap>
@@ -54,5 +56,26 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	int key,
 	Qt::KeyboardModifiers mod,
 	const QString& text) noexcept;
+
+/// Platform-dispatched: check if Option/Alt should be treated as Meta.
+/// Returns the overridden text for the key if Option-as-Meta is active
+/// for this event, or std::nullopt to preserve default behavior.
+/// Non-Mac platforms always return std::nullopt.
+std::optional<QString> GetOptionAsMetaText(const QKeyEvent& ev) noexcept;
+
+#ifdef Q_OS_MAC
+enum class MacOptionMetaMode {
+	None,   ///< Default: Option produces Unicode characters (current behavior)
+	Left,   ///< Left Option acts as Meta/Alt
+	Right,  ///< Right Option acts as Meta/Alt
+	Both,   ///< Both Option keys act as Meta/Alt
+};
+
+/// Set the macOS Option-as-Meta mode.
+void SetMacOptionIsMeta(MacOptionMetaMode mode) noexcept;
+
+/// Get the current macOS Option-as-Meta mode.
+MacOptionMetaMode GetMacOptionIsMeta() noexcept;
+#endif
 
 } } // namespace NeovimQt:Input
