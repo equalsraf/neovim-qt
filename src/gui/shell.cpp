@@ -367,12 +367,15 @@ void Shell::setAttached(bool attached)
 		updateClientInfo();
 
 		// Re-add runtime to rtp: plugin managers (e.g. lazy.nvim) may have reset it.
-		const QDir runtimeDir{ QDir{ QCoreApplication::applicationDirPath() }.filePath(
-			QStringLiteral(NVIM_QT_RELATIVE_RUNTIME_PATH)) };
-		if (runtimeDir.exists()) {
-			const QString rtpCmd{ QString{ "let &rtp.=',%1'" }.arg(runtimeDir.path()) };
-			qDebug() << "setAttached: ensuring rtp includes:" << runtimeDir.path();
-			m_nvim->api0()->vim_command(rtpCmd.toUtf8());
+		const QString appDir{ QCoreApplication::applicationDirPath() };
+		for (const auto& relPath : { "../Resources/runtime", "../share/nvim-qt/runtime" }) {
+			const QDir runtimeDir{ QDir{ appDir }.filePath(relPath) };
+			if (runtimeDir.exists()) {
+				const QString rtpCmd{ QString{ "let &rtp.=',%1'" }.arg(runtimeDir.path()) };
+				qDebug() << "setAttached: ensuring rtp includes:" << runtimeDir.path();
+				m_nvim->api0()->vim_command(rtpCmd.toUtf8());
+				break;
+			}
 		}
 
 		qDebug() << "setAttached: loading shim plugin via 'runtime plugin/nvim_gui_shim.vim'";
@@ -1436,7 +1439,6 @@ void Shell::handleGuiAdaptiveStyleList() noexcept
 
 void Shell::handleMacOptionIsMeta(const QVariant& value) noexcept
 {
-#ifdef Q_OS_MAC
 	if (!value.canConvert<QByteArray>()) {
 		qWarning() << "Unexpected value for MacOptionIsMeta:" << value;
 		return;
@@ -1463,9 +1465,6 @@ void Shell::handleMacOptionIsMeta(const QVariant& value) noexcept
 
 	Input::SetMacOptionIsMeta(metaMode);
 	m_nvim->api0()->vim_set_var("GuiMacOptionIsMeta", mode);
-#else
-	Q_UNUSED(value);
-#endif
 }
 
 void Shell::showEvent(QShowEvent* ev)

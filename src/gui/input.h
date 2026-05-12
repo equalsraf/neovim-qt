@@ -63,7 +63,6 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 /// Non-Mac platforms always return std::nullopt.
 std::optional<QString> GetOptionAsMetaText(const QKeyEvent& ev) noexcept;
 
-#ifdef Q_OS_MAC
 enum class MacOptionMetaMode {
 	None,   ///< Default: Option produces Unicode characters (current behavior)
 	Left,   ///< Left Option acts as Meta/Alt
@@ -71,11 +70,10 @@ enum class MacOptionMetaMode {
 	Both,   ///< Both Option keys act as Meta/Alt
 };
 
-/// Set the macOS Option-as-Meta mode.
+/// Set the macOS Option-as-Meta mode. No-op on non-Mac platforms.
 void SetMacOptionIsMeta(MacOptionMetaMode mode) noexcept;
 
-/// Get the current macOS Option-as-Meta mode.
+/// Get the current macOS Option-as-Meta mode. Always returns None on non-Mac.
 MacOptionMetaMode GetMacOptionIsMeta() noexcept;
-#endif
 
 } } // namespace NeovimQt:Input
