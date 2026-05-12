@@ -191,6 +191,9 @@ protected:
 	virtual void handleGuiAdaptiveStyle(const QVariantList& opargs) noexcept;
 	virtual void handleGuiAdaptiveStyleList() noexcept;
 
+	// macOS Option-as-Meta
+	virtual void handleMacOptionIsMeta(const QVariant& value) noexcept;
+
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;

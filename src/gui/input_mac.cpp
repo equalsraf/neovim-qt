@@ -94,4 +94,62 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	return { type, key, mod, text };
 }
 
+static MacOptionMetaMode s_macOptionIsMeta{ MacOptionMetaMode::None };
+
+void SetMacOptionIsMeta(MacOptionMetaMode mode) noexcept
+{
+	s_macOptionIsMeta = mode;
+}
+
+MacOptionMetaMode GetMacOptionIsMeta() noexcept
+{
+	return s_macOptionIsMeta;
+}
+
+std::optional<QString> GetOptionAsMetaText(const QKeyEvent& ev) noexcept
+{
+	if (s_macOptionIsMeta == MacOptionMetaMode::None) {
+		return std::nullopt;
+	}
+
+	const Qt::KeyboardModifiers mod{ ev.modifiers() };
+	if (!(mod & Qt::AltModifier)) {
+		return std::nullopt;
+	}
+
+	// macOS native modifier masks for left/right Option keys
+	constexpr quint32 NativeLeftOptionMask{ 0x00000020 };
+	constexpr quint32 NativeRightOptionMask{ 0x00000040 };
+
+	const quint32 nativeMod{ ev.nativeModifiers() };
+	const bool isLeftAlt{ (nativeMod & NativeLeftOptionMask) != 0 };
+	const bool isRightAlt{ (nativeMod & NativeRightOptionMask) != 0 };
+
+	const bool treatAsMeta{
+		(s_macOptionIsMeta == MacOptionMetaMode::Both)
+		|| (s_macOptionIsMeta == MacOptionMetaMode::Left && isLeftAlt)
+		|| (s_macOptionIsMeta == MacOptionMetaMode::Right && isRightAlt) };
+
+	if (!treatAsMeta) {
+		return std::nullopt;
+	}
+
+	// Use key() to derive the base key name, ignoring macOS
+	// Unicode transformation from text().
+	const int key{ ev.key() };
+
+	// Filter out modifier-only events and keys outside the BMP
+	// (e.g. Key_Alt = 0x01000023 cannot be represented as QChar).
+	if (key <= 0 || key > 0xFFFF) {
+		return std::nullopt;
+	}
+
+	QString text{ QChar{ static_cast<char16_t>(key) } };
+	if (!(mod & Qt::ShiftModifier)) {
+		text = text.toLower();
+	}
+
+	return text;
+}
+
 } // namespace NeovimQt::Input
