@@ -301,22 +301,17 @@ void Shell::setAttached(bool attached)
 
 		// Re-add runtime to rtp: plugin managers (e.g. lazy.nvim) may have reset it.
 		const QString appDir{ QCoreApplication::applicationDirPath() };
-		for (const auto& relPath : { "../Resources/runtime", "../share/nvim-qt/runtime" }) {
+		for (const char* relPath : { "../Resources/runtime", "../share/nvim-qt/runtime" }) {
 			const QDir runtimeDir{ QDir{ appDir }.filePath(relPath) };
 			if (runtimeDir.exists()) {
 				const QString rtpCmd{ QString{ "let &rtp.=',%1'" }.arg(runtimeDir.path()) };
-				qDebug() << "setAttached: ensuring rtp includes:" << runtimeDir.path();
 				m_nvim->api0()->vim_command(rtpCmd.toUtf8());
 				break;
 			}
 		}
 
-		qDebug() << "setAttached: loading shim plugin via 'runtime plugin/nvim_gui_shim.vim'";
 		MsgpackRequest* req_shim{ m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim") };
 		connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
-		connect(req_shim, &MsgpackRequest::finished, this, [](quint32, quint64, const QVariant&) {
-			qDebug() << "setAttached: shim plugin loaded successfully";
-		});
 
 		MsgpackRequest* req_ginit{ m_nvim->api0()->vim_command(GetGVimInitCommand()) };
 		connect(req_ginit, &MsgpackRequest::error, this, &Shell::handleGinitError);
@@ -960,7 +955,6 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 		} else if (guiEvName == "AdaptiveStyleList") {
 			handleGuiAdaptiveStyleList();
 		} else if (guiEvName == "MacOptionIsMeta" && args.size() == 2) {
-			qDebug() << "GuiMacOptionIsMeta received:" << args.at(1);
 			handleMacOptionIsMeta(args.at(1));
 		}
 		return;
@@ -1439,8 +1433,8 @@ void Shell::keyPressEvent(QKeyEvent *ev)
 	const QString inp{ Input::convertKey(*ev) };
 
 	// Uncomment for key input debugging and unit test writing.
-	qDebug() << "QKeyEvent ev:" << ev;
-	qDebug() << "  " << inp;
+	// qDebug() << "QKeyEvent ev:" << ev;
+	// qDebug() << "  " << inp;
 
 	if (inp.isEmpty()) {
 		QWidget::keyPressEvent(ev);
@@ -2004,7 +1998,7 @@ void Shell::handleGinitError(quint32 msgid, quint64 fun, const QVariant& err)
 
 void Shell::handleShimError(quint32 msgid, quint64 fun, const QVariant& err)
 {
-	qWarning() << "GUI shim error " << err;
+	qDebug() << "GUI shim error " << err;
 }
 
 void Shell::handleGetBackgroundOption(quint32 msgid, quint64 fun, const QVariant& val)

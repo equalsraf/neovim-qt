@@ -405,7 +405,7 @@ void App::checkArgumentsMayTerminate(QCommandLineParser& parser) noexcept
 	// Look for the runtime relative to the nvim-qt binary.
 	// Probe both known layouts: macOS bundle and standard install.
 	const QString appDir{ applicationDirPath() };
-	for (const auto& relPath : { "../Resources/runtime", "../share/nvim-qt/runtime" }) {
+	for (const char* relPath : { "../Resources/runtime", "../share/nvim-qt/runtime" }) {
 		const QDir d{ QDir{ appDir }.filePath(relPath) };
 		if (d.exists()) {
 			return d.path();
