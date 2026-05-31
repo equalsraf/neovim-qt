@@ -1,0 +1,132 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo add-apt-repository -y ppa:neovim-ppa/stable
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            neovim ninja-build cmake build-essential pkg-config \
+            libqt6svg6 qt6-svg-dev libqt6svgwidgets6 \
+            qt6-base-dev qt6-base-dev-tools qtchooser qmake6
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -GNinja
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Install
+        run: cmake --build build --target install --config Release
+
+      - name: Package Linux tar.gz
+        run: |
+          tar -C install -czf neovim-qt-linux-x86_64.tar.gz .
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          if-no-files-found: error
+          path: neovim-qt-linux-x86_64.tar.gz
+
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.5.*'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build and package
+        env:
+          CMAKE_BUILD_TYPE: Release
+          CMAKE_GENERATOR: Ninja
+        run: |
+          iwr "https://github.com/neovim/neovim/releases/download/stable/nvim-win64.zip" -OutFile Neovim.zip
+          7z x Neovim.zip
+          $env:Path += ";" + $PWD.Path + "\nvim-win64\bin"
+          nvim --version
+
+          cmake -B ./build `
+            -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install `
+            -DCMAKE_C_COMPILER=cl `
+            -DCMAKE_CXX_COMPILER=cl `
+            -DCMAKE_BUILD_TYPE=Release
+
+          cmake --build ./build --config Release --target install
+
+          cd build
+          cpack --verbose -G WIX
+        shell: pwsh
+
+      - name: Ensure zip package exists
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "neovim-qt.zip")) {
+            Compress-Archive -Path install\* -DestinationPath neovim-qt.zip
+          }
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          if-no-files-found: error
+          path: |
+            neovim-qt.zip
+            build/neovim-qt-installer.msi
+
+  publish-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - build-linux
+      - build-windows
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-assets/linux-release/neovim-qt-linux-x86_64.tar.gz
+            release-assets/windows-release/neovim-qt.zip
+            release-assets/windows-release/neovim-qt-installer.msi
+          draft: false
+          prerelease: false
+          generate_release_notes: true
