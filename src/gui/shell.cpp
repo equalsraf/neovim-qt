@@ -83,7 +83,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	if (guiFont.canConvert<QString>())
 	{
 		QString fontDescription{ guiFont.toString() };
-		setGuiFont(fontDescription, true /*force*/);
+		setGuiFont(fontDescription, true /*force*/, true /*reset*/, false /*quiet*/);
 	}
 
 	if (!m_nvim) {
@@ -124,7 +124,7 @@ void Shell::handleFontError(const QString& msg)
 /// @param force used to indicate :GuiFont!, overrides mono space checks.
 /// @param reset we reseting the font, ignore optimizations
 /// @returns `true` if the font was successfully set.
-bool Shell::setGuiFont(const QString& fdesc, bool force, bool reset) noexcept
+bool Shell::setGuiFont(const QString& fdesc, bool force, bool reset, bool quiet) noexcept
 {
 	// Exit early if the font description has not changed
 	if (!reset && fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
@@ -143,7 +143,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool reset) noexcept
 			return false;
 		}
 
-		if (!setShellFont(font, force)) {
+		if (!setShellFont(font, force, quiet)) {
 			return false;
 		}
 	}
@@ -156,7 +156,7 @@ bool Shell::setGuiFont(const QString& fdesc, bool force, bool reset) noexcept
 			return false;
 		}
 
-		if (!setShellFont(qvariant_cast<QFont>(varFont), force)) {
+		if (!setShellFont(qvariant_cast<QFont>(varFont), force, quiet)) {
 			return false;
 		}
 	}
@@ -181,7 +181,7 @@ void Shell::screenChanged()
 {
 	// When the screen changes due to dpi scaling we have to
 	// re-set the current font
-	setGuiFont(fontDesc(), true, true);
+	setGuiFont(fontDesc(), true, true, true);
 }
 
 
@@ -977,7 +977,8 @@ void Shell::handleSetOption(const QVariantList& opargs)
 	const QVariant& value{ opargs.at(1) };
 
 	if (name == "guifont") {
-		setGuiFont(value.toString(), false /*force*/);
+		// TODO value needs to be parsed properly according to 'guifont' option
+		setGuiFont(value.toString(), true /*force*/, false /*reset*/, false /*quiet*/);
 	} else if (name == "guifontwide") {
 		handleGuiFontWide(value);
 	} else if (name == "linespace") {
@@ -1010,7 +1011,7 @@ void Shell::handleGuiFontFunction(const QVariantList& args)
 		force = args.at(2).toBool();
 	}
 
-	setGuiFont(fdesc, force);
+	setGuiFont(fdesc, force, false /*reset*/, false /*quiet*/);
 }
 
 void Shell::handleGuiFontWide(const QVariant& value) noexcept
