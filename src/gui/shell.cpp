@@ -978,7 +978,9 @@ void Shell::handleSetOption(const QVariantList& opargs)
 
 	if (name == "guifont") {
 		// TODO value needs to be parsed properly according to 'guifont' option
-		setGuiFont(value.toString(), true /*force*/, false /*reset*/, false /*quiet*/);
+		// here just split non escaped commas to get the last entry.
+		auto values = value.toString().split(QRegularExpression(R"(,(?<!\\))"));
+		setGuiFont(values.last(), true /*force*/, false /*reset*/, false /*quiet*/);
 	} else if (name == "guifontwide") {
 		handleGuiFontWide(value);
 	} else if (name == "linespace") {
