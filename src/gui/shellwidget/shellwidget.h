@@ -27,7 +27,7 @@ public:
 		Light
 	};
 
-	bool setShellFont(const QFont& font, bool force = false) noexcept;
+	bool setShellFont(const QFont& font, bool force, bool quiet) noexcept;
 
 	QColor background() const;
 	QColor foreground() const;
