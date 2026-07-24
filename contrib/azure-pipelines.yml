@@ -22,7 +22,7 @@ jobs:
 
   - job: UbuntuResolute
     pool:
-      vmImage: 'ubuntu-26.04'
+      vmImage: 'ubuntu-24.04'
     steps:
     - script: |
         sudo add-apt-repository -y ppa:neovim-ppa/stable
