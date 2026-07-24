@@ -15,7 +15,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo NEEDRESTART_MODE=l apt-get install -y cmake neovim python3-dev python3-jinja2 python3-msgpack python3-pip qt6-base-dev qt6-tools-dev libqt6svg6-dev
+            sudo NEEDRESTART_MODE=l apt-get install -y cmake neovim python3-dev python3-jinja2 python3-msgpack python3-pip qt6-base-dev qt6-tools-dev libqt6svg6-dev libglx-dev libgl1-mesa-dev
 
             sudo NEEDRESTART_MODE=l apt-get install -y lcov
       - run:
