@@ -62,7 +62,7 @@ bool ShellWidget::setShellFont(const QFont& font, bool force, bool quiet) noexce
 
 	QFontInfo fi(font);
 	if (fi.family().compare(font.family(), Qt::CaseInsensitive) != 0
-			&& font.family().compare("Monospace", Qt::CaseInsensitive) != 0 && !quiet) {
+		&& font.family().compare("Monospace", Qt::CaseInsensitive) != 0 && !quiet) {
 		emit fontError(QStringLiteral("Unknown font: %1").arg(font.family()));
 		return false;
 	}
