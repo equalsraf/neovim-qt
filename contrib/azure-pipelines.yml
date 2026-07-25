@@ -78,8 +78,8 @@ jobs:
         python -m aqt install-qt windows desktop 6.10.1 win64_msvc2022_64
       displayName: Install Dependencies
     - powershell: |
-        Write-Host "##vso[task.setvariable variable=PATH;]${env:PATH};C:\tools\neovim\nvim-win64\bin";
-      displayName: Add Neovim to PATH
+        Write-Host "##vso[task.setvariable variable=PATH;]${env:PATH};$(Build.BinariesDirectory)\6.10.1\msvc2022_64\bin;C:\tools\neovim\nvim-win64\bin";
+      displayName: Set PATH
     - task: CMake@1
       inputs:
         workingDirectory: $(Build.BinariesDirectory)
