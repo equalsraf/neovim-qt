@@ -31,7 +31,7 @@ jobs:
           name: test
           command: |
             cd build
-            ctest -VV
+            ctest -VV --output-junit junit.xml
       - run:
           name: Generate coverage report with lcov
           command: |
@@ -42,3 +42,5 @@ jobs:
           command: |
             cd build
             bash <(curl -s https://codecov.io/bash) -f coverage.info
+      - store_test_results:
+          path: build/junit.xml
