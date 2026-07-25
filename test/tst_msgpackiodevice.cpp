@@ -122,9 +122,13 @@ private slots:
 		QCOMPARE(n.at(1).toList(), params);
 	}
 
+	void sendDouble() { one->send(static_cast<double>(1)); }
+
 	void request() {
+		QCOMPARE(one->pendingRequests().size(), 0);
 		auto req = one->startRequestUnchecked("testRequest", 0);
-		
+		QCOMPARE(one->pendingRequests().size(), 1);
+
 		QSignalSpy gotResp(req, SIGNAL(error(quint32, quint64, QVariant)));
 		QVERIFY(gotResp.isValid());
 
