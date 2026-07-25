@@ -20,7 +20,7 @@ jobs:
       displayName: CMake Build
 
 
-  - job: UbuntuResolute
+  - job: UbuntuNoble
     pool:
       vmImage: 'ubuntu-24.04'
     steps:
