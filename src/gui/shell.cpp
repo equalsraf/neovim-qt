@@ -181,7 +181,7 @@ void Shell::screenChanged()
 {
 	// When the screen changes due to dpi scaling we have to
 	// re-set the current font
-	setGuiFont(fontDesc(), FontOption::Force & FontOption::Quiet, true);
+	setShellFont(font(), FontOption::Force & FontOption::Quiet);
 }
 
 
