@@ -139,6 +139,8 @@ private slots:
 		QVERIFY(gotReq.isValid());
 
 		auto req2 = one->startRequestUnchecked("testRequest2", 1);
+		QSignalSpy gotResp2(req2, SIGNAL(finished(quint32, quint64, QVariant)));
+		QVERIFY(gotResp2.isValid());
 		one->send(QByteArray("hello"));
 		QVERIFY(SPYWAIT(gotReq));
 
@@ -148,8 +150,6 @@ private slots:
 		QCOMPARE(signal.at(1).toByteArray(), QByteArray("testRequest2"));
 		QCOMPARE(signal.at(2).toList().at(0).toByteArray(), QByteArray("hello"));
 
-		QSignalSpy gotResp2(req2, SIGNAL(finished(quint32, quint64, QVariant)));
-		QVERIFY(gotResp2.isValid());
 		QVERIFY2(SPYWAIT(gotResp2), "RequestHandler sends back a response");
 	}
 
