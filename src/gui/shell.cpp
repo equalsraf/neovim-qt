@@ -228,7 +228,7 @@ void Shell::updateGuiFontRegisters() noexcept
 
 	// Update `set guifont=`, but only if value changes
 	MsgpackRequest* getOption{ m_nvim->api0()->vim_get_option("guifont") };
-	connect(getOption, &MsgpackRequest::finished, this, &Shell::handleGuiFontOption);
+	//connect(getOption, &MsgpackRequest::finished, this, &Shell::handleGuiFontOption);
 
 	// Update `:GuiFont`, but only if value changes
 	MsgpackRequest* getVariable{ m_nvim->api0()->vim_get_var("GuiFont") };
