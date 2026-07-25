@@ -250,6 +250,7 @@ void Shell::handleGuiFontOption(quint32 msgid, quint64 fun, const QVariant& val)
 		return;
 	}
 
+	qWarning() << __func__ << newFont;
 	m_nvim->api0()->vim_set_option("guifont", newFont);
 }
 
@@ -977,6 +978,7 @@ void Shell::handleSetOption(const QVariantList& opargs)
 	const QVariant& value{ opargs.at(1) };
 
 	if (name == "guifont") {
+		qWarning() << __func__ << value.toString();
 		setGuiFont(value.toString(), false /*force*/);
 	} else if (name == "guifontwide") {
 		handleGuiFontWide(value);

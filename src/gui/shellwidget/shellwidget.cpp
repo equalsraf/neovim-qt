@@ -67,6 +67,8 @@ bool ShellWidget::setShellFont(const QFont& font, bool force) noexcept
 		return false;
 	}
 
+	qWarning() << __func__ << font;
+
 	if (!force) {
 		if (!fi.fixedPitch()) {
 			emit fontError(QStringLiteral("%1 is not a fixed pitch font").arg(font.family()));
