@@ -113,6 +113,10 @@ void TestQSettings::GuiFont() noexcept
 	const QString fontCommand{ QStringLiteral("GuiFont! %1").arg(fontDesc) };
 
 	SendNeovimCommand(connector, fontCommand);
+
+	QSignalSpy spy_fontchange(w->shell(), &ShellWidget::shellFontChanged);
+	SPYWAIT(spy_fontchange, 2500 /*msec*/);
+
 	QCOMPARE(w->shell()->fontDesc(), fontDesc);
 	QCOMPARE(settings.value("Gui/Font").toString(), fontDesc);
 }
