@@ -60,8 +60,8 @@ bool ShellWidget::setShellFont(const QFont& font, FontOptions opts) noexcept
 		return false;
 	}
 
-	auto quiet = opts & FontOption::Quiet;
-	auto force = opts & FontOption::Force;
+	auto quiet = opts.testFlag(FontOption::Quiet);
+	auto force = opts.testFlag(FontOption::Force);
 
 	QFontInfo fi(font);
 	if (fi.family().compare(font.family(), Qt::CaseInsensitive) != 0
