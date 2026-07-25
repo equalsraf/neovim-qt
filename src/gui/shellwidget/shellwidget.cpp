@@ -51,7 +51,7 @@ void ShellWidget::setDefaultFont()
 #endif
 }
 
-bool ShellWidget::setShellFont(const QFont& font, bool force, bool quiet) noexcept
+bool ShellWidget::setShellFont(const QFont& font, FontOptions opts) noexcept
 {
 	// Issue #585 Error message "Unknown font:" for Neovim 0.4.2+.
 	// This case has always been hit, but results in user visible error messages for recent
@@ -59,6 +59,9 @@ bool ShellWidget::setShellFont(const QFont& font, bool force, bool quiet) noexce
 	if (font.family().isEmpty()) {
 		return false;
 	}
+
+	auto quiet = opts & FontOption::Quiet;
+	auto force = opts & FontOption::Force;
 
 	QFontInfo fi(font);
 	if (fi.family().compare(font.family(), Qt::CaseInsensitive) != 0
