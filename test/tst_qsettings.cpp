@@ -112,9 +112,10 @@ void TestQSettings::GuiFont() noexcept
 	const QString fontDesc{ QStringLiteral("%1:h20").arg(GetPlatformTestFont()) };
 	const QString fontCommand{ QStringLiteral("GuiFont! %1").arg(fontDesc) };
 
+	QSignalSpy spy_fontchange(w->shell(), &ShellWidget::shellFontChanged);
+
 	SendNeovimCommand(connector, fontCommand);
 
-	QSignalSpy spy_fontchange(w->shell(), &ShellWidget::shellFontChanged);
 	SPYWAIT(spy_fontchange, 2500 /*msec*/);
 
 	QCOMPARE(w->shell()->fontDesc(), fontDesc);
