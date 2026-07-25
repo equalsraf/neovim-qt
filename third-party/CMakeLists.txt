@@ -15,6 +15,8 @@ set(MSGPACK_SHA256 674119f1a85b5f2ecc4c7d5c2859edf50c0b05e0c10aa0df85eefa2c8c14b
 
 set(BUILD_SHARED_LIBS OFF)
 set(MSGPACK_BUILD_EXAMPLES OFF)
+# Newer cmake ignores variables for option
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 FetchContent_Declare(
     msgpack-c
