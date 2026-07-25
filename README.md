@@ -1,6 +1,4 @@
 [![Build Status](https://circleci.com/gh/equalsraf/neovim-qt.svg?style=svg)](https://circleci.com/gh/equalsraf/neovim-qt)
-[![Build status](https://ci.appveyor.com/api/projects/status/c252f54mfjcuud8x/branch/master?svg=true)](https://ci.appveyor.com/project/equalsraf/neovim-qt/branch/master)
-[![Build Status](https://travis-ci.org/equalsraf/neovim-qt.svg?branch=master)](https://travis-ci.org/equalsraf/neovim-qt)
 [![codecov Status](https://codecov.io/gh/equalsraf/neovim-qt/branch/master/graph/badge.svg)](https://codecov.io/gh/equalsraf/neovim-qt)
 [![Build Status](https://dev.azure.com/equalsraf/neovim-qt/_apis/build/status/equalsraf.neovim-qt?branchName=master)](https://dev.azure.com/equalsraf/neovim-qt/_build/latest?definitionId=1&branchName=master)
 [![Downloads](https://img.shields.io/github/downloads/equalsraf/neovim-qt/total.svg?maxAge=2592000)](https://github.com/equalsraf/neovim-qt/releases)
