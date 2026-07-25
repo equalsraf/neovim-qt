@@ -27,7 +27,16 @@ public:
 		Light
 	};
 
-	bool setShellFont(const QFont& font, bool force, bool quiet) noexcept;
+	enum FontOption
+	{
+		/// Override monospace font check
+		Force,
+		/// Do not emit errors for errorss
+		Quiet,
+	};
+	Q_DECLARE_FLAGS(FontOptions, FontOption)
+
+	bool setShellFont(const QFont& font, FontOptions opts) noexcept;
 
 	QColor background() const;
 	QColor foreground() const;
@@ -206,3 +215,5 @@ private:
 
 	Background m_background{ Background::Dark };
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(ShellWidget::FontOptions)
