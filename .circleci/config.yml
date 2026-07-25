@@ -34,7 +34,11 @@ jobs:
             ctest -VV
       - run:
           name: Generate coverage report with lcov
-          command: lcov --directory . --capture --output-file coverage.info
+          command: |
+            cd build
+            lcov --directory . --capture --output-file coverage.info
       - run:
           name: Upload coverage report to codecov
-          command: bash <(curl -s https://codecov.io/bash) -f coverage.info 
+          command: |
+            cd build
+            bash <(curl -s https://codecov.io/bash) -f coverage.info
