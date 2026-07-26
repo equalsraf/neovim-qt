@@ -203,3 +203,6 @@ if (Python_Interpreter_FOUND)
 endif()
 
 include(CPackOptions)
+include(Format)
+
+ClangFormat()
