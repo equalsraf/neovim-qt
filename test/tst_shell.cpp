@@ -103,6 +103,9 @@ void TestShell::guiShimCommands() noexcept
 	auto w = CreateMainWindowWithRuntime();
 	auto c = w->shell()->nvim();
 
+	QSignalSpy spy_fontchange0(w->shell(), &ShellWidget::shellFontChanged);
+	SPYWAIT(spy_fontchange0, 2500 /*msec*/);
+
 	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
 
 	QSignalSpy cmd_font(
