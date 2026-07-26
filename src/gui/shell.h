@@ -27,6 +27,7 @@ class Shell: public ShellWidget
 	Q_PROPERTY(bool isNeovimBusy READ isNeovimBusy() NOTIFY neovimBusyChanged(bool))
 	Q_PROPERTY(bool isNeovimAttached READ isNeovimAttached() NOTIFY neovimAttachmentChanged(bool))
 
+public:
 	enum FontChangeSource
 	{
 		NvimOption,
@@ -34,8 +35,8 @@ class Shell: public ShellWidget
 		SettingsFile,
 		Internal
 	};
+	Q_ENUM(FontChangeSource);
 
-public:
 	Shell(NeovimConnector *nvim, QWidget *parent=0);
 	~Shell();
 	QSize sizeIncrement() const;

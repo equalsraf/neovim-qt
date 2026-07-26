@@ -34,6 +34,7 @@ public:
 		/// Do not emit errors for errorss
 		Quiet,
 	};
+	Q_ENUM(FontOption);
 	Q_DECLARE_FLAGS(FontOptions, FontOption)
 
 	bool setShellFont(const QFont& font, FontOptions opts) noexcept;
