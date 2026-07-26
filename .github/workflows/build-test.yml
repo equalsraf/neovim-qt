@@ -1,31 +1,62 @@
-name: Build And Test
+name: Build Test Publish
 
 on:
   push:
     branches: [ master ]
+    tags: [ '*' ]
   pull_request:
     branches: [ master ]
 
 jobs:
+  CreateRelease:
+    name: Draft Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # needed to get git tag/notes
+      - uses: actions/checkout@v4
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          PRERELEASE_FLAG="${{ startsWith(github.ref_name, 'v') && '' || '--prerelease' }}"
+          if ! gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release create $TAG_NAME --draft --title "$TAG_NAME" --verify-tag --notes-from-tag $PRERELEASE_FLAG
+          else
+            echo "Release already exists. Skipping."
+          fi
+
   BuildTest:
     name: ${{ matrix.name }}
+    needs: [CreateRelease]
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
-          - name: Linux_GCC
+          - name: Linux_Debug_GCC
             flavor: Debug
             runner: ubuntu-latest
             generator: Ninja
             cc: gcc
             cxx: g++
 
-          - name: Linux_LLVM
+          - name: Linux_Debug_LLVM
             flavor: Debug
             runner: ubuntu-latest
             generator: Ninja
             cc: clang
             cxx: clang++
+
+          - name: Windows_Release
+            flavor: Release
+            generator: Ninja
+            cc: cl
+            cxx: cl
+            runner: windows-latest
+            publish: true
 
           - name: MacOS_Debug
             flavor: Debug
@@ -64,10 +95,42 @@ jobs:
           echo "$(brew --prefix qt)/bin" >> "$GITHUB_PATH"
           echo "Qt6_DIR=$(brew --prefix qt)/lib/cmake/Qt6" >> "$GITHUB_ENV"
 
+      - name: Windows - Setup Qt
+        if: ${{ startsWith(matrix.runner, 'windows') }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.*'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+      - name: Windows - Setup MSVC
+        if: ${{ startsWith(matrix.runner, 'windows') }}
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Windows - Setup vulkan headers
+        if: ${{ startsWith(matrix.runner, 'windows') }}
+        run: |
+          choco install vulkan-sdk -y
+          $vulkanRoot = Get-ChildItem -Path "C:\VulkanSDK" | Select-Object -First 1 | Select-Object -ExpandProperty FullName
+          if (-not $vulkanRoot) {
+            Write-Error "Vulkan SDK was not found in C:\VulkanSDK after installation."
+            exit 1
+          }
+          Write-Host "Detected Vulkan SDK Path: $vulkanRoot"
+          "VULKAN_SDK=$vulkanRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "$vulkanRoot\Bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        shell: pwsh
+      - name: Windows - Setup Neovim
+        if: ${{ startsWith(matrix.runner, 'windows') }}
+        run: |
+          iwr "https://github.com/neovim/neovim/releases/download/stable/nvim-win64.zip" -OutFile Neovim.zip
+          7z x Neovim.zip
+          echo "$((Get-Item .).FullName)/nvim-win64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        shell: pwsh
+
       #
       # Build and Test
       #
-      - name: Test Neovim Version
+      - name: Check Neovim Version
         run: nvim --version
 
       - name: Configure
@@ -86,26 +149,64 @@ jobs:
         run: cmake --build ${{ github.workspace }}/build
 
       - name: Test
+        if: ${{ !startsWith(matrix.runner, 'windows') }}
         uses: GabrielBB/xvfb-action@v1 # Required by Linux, no X11 $DISPLAY
         with:
           working-directory: ${{ github.workspace }}/build
           run: ctest -VV --timeout 120 --output-on-failure -C ${{ matrix.flavor }}
 
+
       #
       # Deploy Release Binaries
       #
-      - name: MacOS - Publish
-        if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
+      - name: Windows - Publish
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
         run: |
-          $(brew --prefix qt)/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
-          mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
-
-      - name: Upload Artifacts
-        if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
+          cd build
+          cpack --verbose -G WIX
+        shell: pwsh
+      - name: Windows - Upload Artifacts
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.name }}
+          name: Windows_Release
           if-no-files-found: error
           path: |
-            neovim-qt.dmg
+            build/neovim-qt-installer.msi
+      #- name: MacOS - Publish
+      #  if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
+      #  run: |
+      #    $(brew --prefix qt)/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
+      #    mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
+      #- name: MacOS - Upload Artifacts
+      #  if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: ${{ matrix.name }}
+      #    if-no-files-found: error
+      #    path: |
+      #      neovim-qt.dmg
+
+  UploadReleaseAssets:
+    name: Upload Release Assets
+    needs: [CreateRelease, BuildTest]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # required for gh release step
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: '*_Release*'
+          merge-multiple: true
+
+      - name: Upload release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Add artifact file names here
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          gh release upload --clobber "$TAG_NAME" neovim-qt-installer.msi
 
