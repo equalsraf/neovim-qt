@@ -259,6 +259,7 @@ void MainWindow::neovimGuiCloseRequest(int status)
 {
 	m_exitStatus = status;
 	if (!m_inCloseEvent) {
+		qDebug() << __func__ << "Handling close event" << status;
 		close();
 	}
 }

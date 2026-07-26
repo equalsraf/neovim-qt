@@ -140,6 +140,7 @@ void onWindowDestroyed(QObject* obj) noexcept
 	s_windows.erase(std::remove(s_windows.begin(), s_windows.end(), (MainWindow*)obj));
 
 	if (s_windows.empty()) {
+		qDebug() << __func__ << s_exitStatus;
 		qApp->exit(s_exitStatus);
 	}
 }
