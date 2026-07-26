@@ -9,7 +9,98 @@
 #include <QStyleFactory>
 #include <QToolBar>
 
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#endif
+
 namespace NeovimQt {
+
+#ifdef Q_OS_WIN
+enum PreferredAppMode {
+	Default,
+	AllowDark,
+	ForceDark,
+	ForceLight,
+	Max
+};
+
+enum WINDOWCOMPOSITIONATTRIB {
+	WCA_UNDEFINED = 0,
+	WCA_NCRENDERING_ENABLED = 1,
+	WCA_NCRENDERING_POLICY = 2,
+	WCA_TRANSITIONS_FORCEDISABLED = 3,
+	WCA_ALLOW_NCPAINT = 4,
+	WCA_CAPTION_BUTTON_BOUNDS = 5,
+	WCA_NONCLIENT_RTL_LAYOUT = 6,
+	WCA_FORCE_ICONIC_REPRESENTATION = 7,
+	WCA_EXTENDED_FRAME_BOUNDS = 8,
+	WCA_HAS_ICONIC_BITMAP = 9,
+	WCA_THEME_ATTRIBUTES = 10,
+	WCA_NCRENDERING_EXILED = 11,
+	WCA_NCADORNMENTINFO = 12,
+	WCA_EXCLUDED_FROM_LIVEPREVIEW = 13,
+	WCA_VIDEO_OVERLAY_ACTIVE = 14,
+	WCA_FORCE_ACTIVEWINDOW_APPEARANCE = 15,
+	WCA_DISALLOW_PEEK = 16,
+	WCA_CLOAK = 17,
+	WCA_CLOAKED = 18,
+	WCA_ACCENT_POLICY = 19,
+	WCA_FREEZE_REPRESENTATION = 20,
+	WCA_EVER_UNCLOAKED = 21,
+	WCA_VISUAL_OWNER = 22,
+	WCA_HOLOGRAPHIC = 23,
+	WCA_EXCLUDED_FROM_DDA = 24,
+	WCA_PASSIVEUPDATEMODE = 25,
+	WCA_USEDARKMODECOLORS = 26,
+	WCA_LAST = 27
+};
+
+struct WINDOWCOMPOSITIONATTRIBDATA {
+	WINDOWCOMPOSITIONATTRIB Attrib;
+	PVOID pvData;
+	SIZE_T cbData;
+};
+
+using fnAllowDarkModeForWindow = BOOL(WINAPI*)(HWND hWnd, BOOL allow);
+using fnSetPreferredAppMode = PreferredAppMode(WINAPI*)(PreferredAppMode appMode);
+using fnSetWindowCompositionAttribute = BOOL(WINAPI*)(HWND hwnd, WINDOWCOMPOSITIONATTRIBDATA*);
+
+static void SetDarkTitleBar(HWND hwnd) noexcept
+{
+	HMODULE h_uxtheme{ LoadLibraryExW(L"uxtheme.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32) };
+	HMODULE h_user32{ GetModuleHandleW(L"user32.dll") };
+	if (!h_uxtheme || !h_user32) {
+		if (h_uxtheme) {
+			FreeLibrary(h_uxtheme);
+		}
+		return;
+	}
+
+	auto set_preferred_app_mode = reinterpret_cast<fnSetPreferredAppMode>(
+		GetProcAddress(h_uxtheme, MAKEINTRESOURCEA(135)));
+	auto allow_dark_mode_for_window = reinterpret_cast<fnAllowDarkModeForWindow>(
+		GetProcAddress(h_uxtheme, MAKEINTRESOURCEA(133)));
+	auto set_window_composition_attribute = reinterpret_cast<fnSetWindowCompositionAttribute>(
+		GetProcAddress(h_user32, "SetWindowCompositionAttribute"));
+
+	if (!set_preferred_app_mode || !allow_dark_mode_for_window || !set_window_composition_attribute) {
+		FreeLibrary(h_uxtheme);
+		return;
+	}
+
+	set_preferred_app_mode(AllowDark);
+	BOOL dark{ TRUE };
+	allow_dark_mode_for_window(hwnd, dark);
+	WINDOWCOMPOSITIONATTRIBDATA data{
+		WCA_USEDARKMODECOLORS,
+		&dark,
+		sizeof(dark)
+	};
+	set_window_composition_attribute(hwnd, &data);
+
+	FreeLibrary(h_uxtheme);
+}
+#endif
 
 static QString DefaultWindowTitle() noexcept
 {
@@ -48,6 +139,10 @@ MainWindow::MainWindow(NeovimConnector* c, QWidget* parent) noexcept
 	setWindowTitle(DefaultWindowTitle());
 
 	init(c);
+
+#ifdef Q_OS_WIN
+	SetDarkTitleBar(reinterpret_cast<HWND>(winId()));
+#endif
 }
 
 void MainWindow::init(NeovimConnector *c)
