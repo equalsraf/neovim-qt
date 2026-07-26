@@ -132,6 +132,7 @@ void onFileOpenEvent(const QList<QUrl>& files) noexcept
 
 void onWindowClosing(int status) noexcept
 {
+	qDebug() << __func__ << status;
 	s_exitStatus = status;
 }
 
