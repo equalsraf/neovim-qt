@@ -4,6 +4,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(${Qt6SvgWidgets_INCLUDE_DIRS})
 add_definitions(${Qt6SvgWidgets_DEFINITIONS})
+add_compile_definitions(QT_TYPESAFE_FLAGS)
 
 set(NEOVIM_QT_SOURCES
   auto/neovimapi0.cpp
