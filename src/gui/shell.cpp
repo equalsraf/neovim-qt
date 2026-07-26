@@ -133,6 +133,8 @@ bool Shell::setGuiFont(
 		return false;
 	}
 
+	qDebug() << __func__ << fdesc << src << reset;
+
 	const bool isGuiDialogRequest{ fdesc == "*" };
 
 	if (isGuiDialogRequest) {
@@ -228,6 +230,7 @@ void Shell::updateGuiFontRegisters() noexcept
 		return;
 	}
 
+	qDebug() << __func__ << fontDesc();
 	// Update `set guifont=`, but only if value changes
 	auto guiFontCmd =
 		QStringLiteral("if &guifont != '%1' | call nvim_set_option('guifont', '%1') | endif")
