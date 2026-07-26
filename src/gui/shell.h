@@ -26,6 +26,15 @@ class Shell: public ShellWidget
 	Q_OBJECT
 	Q_PROPERTY(bool isNeovimBusy READ isNeovimBusy() NOTIFY neovimBusyChanged(bool))
 	Q_PROPERTY(bool isNeovimAttached READ isNeovimAttached() NOTIFY neovimAttachmentChanged(bool))
+
+	enum FontChangeSource
+	{
+		NvimOption,
+		RuntimeCall,
+		SettingsFile,
+		Internal
+	};
+
 public:
 	Shell(NeovimConnector *nvim, QWidget *parent=0);
 	~Shell();
@@ -100,7 +109,10 @@ public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
 	void resizeNeovim(const QSize&);
 	void resizeNeovim(int n_cols, int n_rows);
-	bool setGuiFont(const QString& fdesc, ShellWidget::FontOptions opts, bool reset) noexcept;
+	bool setGuiFont(const QString& fdesc,
+		ShellWidget::FontOptions opts,
+		Shell::FontChangeSource src,
+		bool reset) noexcept;
 	bool setGuiFontWide(const QString& fdesc) noexcept;
 	void updateGuiWindowState(Qt::WindowStates state);
 	void openFiles(const QList<QUrl> url);

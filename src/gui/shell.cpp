@@ -83,7 +83,8 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	if (guiFont.canConvert<QString>())
 	{
 		QString fontDescription{ guiFont.toString() };
-		setGuiFont(fontDescription, FontOption::Force, true /*reset*/);
+		setGuiFont(
+			fontDescription, FontOption::Force, FontChangeSource::SettingsFile, true /*reset*/);
 	}
 
 	if (!m_nvim) {
@@ -124,7 +125,7 @@ void Shell::handleFontError(const QString& msg)
 /// @param opts used to pass options to ShellWidget
 /// @param reset we reseting the font, ignore optimizations
 /// @returns `true` if the font was successfully set.
-bool Shell::setGuiFont(const QString& fdesc, ShellWidget::FontOptions opts, bool reset) noexcept
+bool Shell::setGuiFont(const QString& fdesc, ShellWidget::FontOptions opts, FontChangeSource src, bool reset) noexcept
 {
 	// Exit early if the font description has not changed
 	if (!reset && fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
@@ -981,7 +982,7 @@ void Shell::handleSetOption(const QVariantList& opargs)
 		// here just split non escaped commas to get the last entry.
 		static const QRegularExpression s_fontSplit = QRegularExpression(R"(,(?<!\\))");
 		auto values = value.toString().split(s_fontSplit);
-		setGuiFont(values.last(), FontOption::Force, false /*reset*/);
+		setGuiFont(values.last(), FontOption::Force, FontChangeSource::NvimOption, false /*reset*/);
 	} else if (name == "guifontwide") {
 		handleGuiFontWide(value);
 	} else if (name == "linespace") {
@@ -1014,7 +1015,7 @@ void Shell::handleGuiFontFunction(const QVariantList& args)
 		opts.setFlag(FontOption::Force, args.at(2).toBool());
 	}
 
-	setGuiFont(fdesc, opts, false /*reset*/);
+	setGuiFont(fdesc, opts, FontChangeSource::RuntimeCall, false /*reset*/);
 }
 
 void Shell::handleGuiFontWide(const QVariant& value) noexcept
