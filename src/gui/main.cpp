@@ -32,6 +32,11 @@ int ui_main(int argc, char **argv)
 	qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "1");
 #endif
 
+	// Set high-DPI scale factor rounding policy to be compatible with the Qt5 drawing
+	// behavior i.e. round non integer scale factors since our rendering code cannot handle them.
+	// This MUST be called before creating the app instance.
+	QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
+
 	NeovimQt::App app(argc, argv);
 
 	app.checkArgumentsMayTerminate(app.commandLineParser());
