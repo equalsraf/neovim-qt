@@ -165,8 +165,12 @@ jobs:
       - name: Windows - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
         run: |
-          cd build
+          cmake --build ./build --target install
+          Push-Location ${{ github.workspace }}/build
           cpack --verbose -G WIX
+          Pop-Location
+          Compress-Archive -Path ./install -DestinationPath neovim-qt.zip
+          Move-Item -Path ./build/neovim-qt-installer.msi -Destination neovim-qt-installer.msi
         shell: pwsh
       - name: Windows - Upload Artifacts
         if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
@@ -213,5 +217,5 @@ jobs:
         # Add artifact file names here
         run: |
           TAG_NAME="${{ github.ref_name }}"
-          gh release upload --clobber "$TAG_NAME" neovim-qt-installer.msi
+          gh release upload --clobber "$TAG_NAME" neovim-qt-installer.msi neovim-qt.zip neovim-qt.dmg
 
