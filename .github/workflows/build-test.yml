@@ -57,6 +57,8 @@ jobs:
             cxx: cl
             runner: windows-latest
             publish: true
+            # windows images discard output when using default format
+            ctest_exe_args: -tap
 
           - name: MacOS_Debug
             flavor: Debug
@@ -103,6 +105,7 @@ jobs:
           host: 'windows'
           target: 'desktop'
           arch: 'win64_msvc2022_64'
+          cache: true
       - name: Windows - Setup MSVC
         if: ${{ startsWith(matrix.runner, 'windows') }}
         uses: ilammy/msvc-dev-cmd@v1
