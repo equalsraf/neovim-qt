@@ -175,20 +175,22 @@ jobs:
           name: Windows_Release
           if-no-files-found: error
           path: |
-            build/neovim-qt-installer.msi
-      #- name: MacOS - Publish
-      #  if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
-      #  run: |
-      #    $(brew --prefix qt)/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
-      #    mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
-      #- name: MacOS - Upload Artifacts
-      #  if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: ${{ matrix.name }}
-      #    if-no-files-found: error
-      #    path: |
-      #      neovim-qt.dmg
+            neovim-qt-installer.msi
+            neovim-qt.zip
+
+      - name: MacOS - Publish
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
+        run: |
+          $(brew --prefix qt)/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
+          mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
+      - name: MacOS - Upload Artifacts
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          if-no-files-found: error
+          path: |
+            neovim-qt.dmg
 
   UploadReleaseAssets:
     name: Upload Release Assets
