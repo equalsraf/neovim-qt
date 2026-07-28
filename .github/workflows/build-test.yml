@@ -198,7 +198,10 @@ jobs:
 
   UploadReleaseAssets:
     name: Upload Release Assets
+    # Depending on the create job is not enough - because the job always runs
+    # we must check for a tag here too
     needs: [CreateRelease, BuildTest]
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
