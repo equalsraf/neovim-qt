@@ -50,6 +50,14 @@ jobs:
             cc: clang
             cxx: clang++
 
+          - name: Windows_Debug
+            flavor: Debug
+            generator: Ninja
+            cc: cl
+            cxx: cl
+            runner: windows-latest
+            # windows images discard output when using default format
+            ctest_exe_args: -tap
           - name: Windows_Release
             flavor: Release
             generator: Ninja
