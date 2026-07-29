@@ -108,14 +108,15 @@ void TestQSettings::GuiFont() noexcept
 	NeovimConnector* connector = w->shell()->nvim();
 
 	// Await for inital font to settle - avoid racing with nvim &guifont
-	QSignalSpy spy_fontchange(w->shell(), &ShellWidget::shellFontChanged);
-	SPYWAIT(spy_fontchange, 2500 /*msec*/);
+	QSignalSpy spy_fontchange0(w->shell(), &ShellWidget::shellFontChanged);
+	SPYWAIT(spy_fontchange0, 2500 /*msec*/);
 
 	QSettings settings;
 
 	const QString fontDesc{ QStringLiteral("%1:h20").arg(GetPlatformTestFont()) };
 	const QString fontCommand{ QStringLiteral("GuiFont! %1").arg(fontDesc) };
 
+	QSignalSpy spy_fontchange(w->shell(), &ShellWidget::shellFontChanged);
 	SendNeovimCommand(connector, fontCommand);
 	SPYWAIT(spy_fontchange, 2500 /*msec*/);
 
