@@ -171,12 +171,14 @@ bool Shell::setGuiFont(
 	}
 
 	// The font has changed:
+	m_font_timestamp += 1;
 	//  1) Trigger resize to update the ShellWidget
 	//  2) Write QSettings for flicker-free start-up.
 	//  3) Update font variables (as necessary).
 	resizeNeovim(size());
 	writeGuiFontQSettings();
 	updateGuiFontRegisters();
+
 
 	return true;
 }
