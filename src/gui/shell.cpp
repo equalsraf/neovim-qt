@@ -125,7 +125,8 @@ void Shell::handleFontError(const QString& msg)
 /// @param opts used to pass options to ShellWidget
 /// @param reset we reseting the font, ignore optimizations
 /// @returns `true` if the font was successfully set.
-bool Shell::setGuiFont(const QString& fdesc, ShellWidget::FontOptions opts, FontChangeSource src, bool reset) noexcept
+bool Shell::setGuiFont(
+	const QString& fdesc, ShellWidget::FontOptions opts, FontChangeSource src, bool reset) noexcept
 {
 	// Exit early if the font description has not changed
 	if (!reset && fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
@@ -169,7 +170,7 @@ bool Shell::setGuiFont(const QString& fdesc, ShellWidget::FontOptions opts, Font
 		return false;
 	}
 
-	// The font has changed:
+	// The font has changed (track a logical timestamp):
 	m_font_timestamp += 1;
 	//  1) Trigger resize to update the ShellWidget
 	//  2) Write QSettings for flicker-free start-up.
@@ -234,7 +235,27 @@ void Shell::updateGuiFontRegisters() noexcept
 	qDebug() << __func__ << fontDesc();
 	// Update `set guifont=`, but only if value changes
 	MsgpackRequest* getOption{ m_nvim->api0()->vim_get_option("guifont") };
-	connect(getOption, &MsgpackRequest::finished, this, &Shell::handleGuiFontOption);
+
+	auto timestamp = this->m_font_timestamp;
+	connect(getOption,
+		&MsgpackRequest::finished,
+		this,
+		[this, timestamp](quint32 msg, quint64 _f, const QVariant& val) noexcept
+		{
+			if (timestamp != this->m_font_timestamp) {
+				// The font changed since the call
+				qDebug() << "Ignoring guifont option update - timestamp changed";
+				return;
+			}
+
+			const QString oldFont{ val.toString() };
+			const QString newFont{ fontDesc() };
+			if (newFont.compare(oldFont, Qt::CaseInsensitive) == 0) {
+				return;
+			}
+
+			m_nvim->api0()->vim_set_option("guifont", newFont);
+		});
 
 	// Update `:GuiFont`, but only if value changes
 	MsgpackRequest* getVariable{ m_nvim->api0()->vim_get_var("GuiFont") };
@@ -245,18 +266,6 @@ void Shell::writeGuiFontQSettings() noexcept
 {
 	QSettings settings;
 	settings.setValue("Gui/Font", fontDesc());
-}
-
-void Shell::handleGuiFontOption(quint32 msgid, quint64 fun, const QVariant& val) noexcept
-{
-	const QString oldFont{ val.toString() };
-	const QString newFont{ fontDesc() };
-
-	if (newFont.compare(oldFont, Qt::CaseInsensitive) == 0) {
-		return;
-	}
-
-	m_nvim->api0()->vim_set_option("guifont", newFont);
 }
 
 void Shell::handleGuiFontVariable(quint32 msgid, quint64 fun, const QVariant& val) noexcept
