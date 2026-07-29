@@ -2,11 +2,11 @@
 
 #include <QFileInfo>
 
-bool SPYWAIT(QSignalSpy& spy, int timeout) noexcept
+bool SPYWAIT(QSignalSpy& spy, int timeout, qsizetype minSignals) noexcept
 {
 	// For more details, see:
 	// http://stackoverflow.com/questions/22390208/google-test-mock-with-qt-signals
-	return spy.count() > 0 || spy.wait(timeout);
+	return spy.count() >= minSignals || spy.wait(timeout);
 }
 
 QString GetRuntimeAbsolutePath() noexcept
