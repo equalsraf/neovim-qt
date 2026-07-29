@@ -233,12 +233,8 @@ void Shell::updateGuiFontRegisters() noexcept
 
 	qDebug() << __func__ << fontDesc();
 	// Update `set guifont=`, but only if value changes
-	auto guiFontCmd = QStringLiteral("if &guifont != '%1' | call nvim_set_option('guifont', '%1') | endif")
-		.arg(fontDesc());
-	MsgpackRequest* setOption{ m_nvim->api0()->vim_command(m_nvim->encode(guiFontCmd)) };
-	connect(setOption, &MsgpackRequest::error, this, [](quint32 _msgid, quint64 _fun, const QVariant &error) {
-			qDebug() << "Failed to set guifont" << error;
-			});
+	MsgpackRequest* getOption{ m_nvim->api0()->vim_get_option("guifont") };
+	connect(getOption, &MsgpackRequest::finished, this, &Shell::handleGuiFontOption);
 
 	// Update `:GuiFont`, but only if value changes
 	MsgpackRequest* getVariable{ m_nvim->api0()->vim_get_var("GuiFont") };
@@ -249,6 +245,18 @@ void Shell::writeGuiFontQSettings() noexcept
 {
 	QSettings settings;
 	settings.setValue("Gui/Font", fontDesc());
+}
+
+void Shell::handleGuiFontOption(quint32 msgid, quint64 fun, const QVariant& val) noexcept
+{
+	const QString oldFont{ val.toString() };
+	const QString newFont{ fontDesc() };
+
+	if (newFont.compare(oldFont, Qt::CaseInsensitive) == 0) {
+		return;
+	}
+
+	m_nvim->api0()->vim_set_option("guifont", newFont);
 }
 
 void Shell::handleGuiFontVariable(quint32 msgid, quint64 fun, const QVariant& val) noexcept
