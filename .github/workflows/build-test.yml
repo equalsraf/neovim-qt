@@ -157,7 +157,7 @@ jobs:
           -DCTEST_EXE_ARGS=${{ matrix.ctest_exe_args }}
 
       - name: Build
-        run: cmake --build ${{ github.workspace }}/build
+        run: cmake --build ${{ github.workspace }}/build -- -v
 
       - name: Test
         uses: GabrielBB/xvfb-action@v1 # Required by Linux, no X11 $DISPLAY
