@@ -125,8 +125,7 @@ void Shell::handleFontError(const QString& msg)
 /// @param opts used to pass options to ShellWidget
 /// @param reset we reseting the font, ignore optimizations
 /// @returns `true` if the font was successfully set.
-bool Shell::setGuiFont(
-	const QString& fdesc, ShellWidget::FontOptions opts, FontChangeSource src, bool reset) noexcept
+bool Shell::setGuiFont(const QString& fdesc, ShellWidget::FontOptions opts, FontChangeSource src, bool reset) noexcept
 {
 	// Exit early if the font description has not changed
 	if (!reset && fdesc.compare(fontDesc(), Qt::CaseInsensitive) == 0) {
@@ -234,15 +233,12 @@ void Shell::updateGuiFontRegisters() noexcept
 
 	qDebug() << __func__ << fontDesc();
 	// Update `set guifont=`, but only if value changes
-	auto guiFontCmd =
-		QStringLiteral("if &guifont != '%1' | call nvim_set_option('guifont', '%1') | endif")
-			.arg(fontDesc());
+	auto guiFontCmd = QStringLiteral("if &guifont != '%1' | call nvim_set_option('guifont', '%1') | endif")
+		.arg(fontDesc());
 	MsgpackRequest* setOption{ m_nvim->api0()->vim_command(m_nvim->encode(guiFontCmd)) };
-	connect(setOption,
-		&MsgpackRequest::error,
-		this,
-		[](quint32 _msgid, quint64 _fun, const QVariant& error)
-		{ qDebug() << "Failed to set guifont" << error; });
+	connect(setOption, &MsgpackRequest::error, this, [](quint32 _msgid, quint64 _fun, const QVariant &error) {
+			qDebug() << "Failed to set guifont" << error;
+			});
 
 	// Update `:GuiFont`, but only if value changes
 	MsgpackRequest* getVariable{ m_nvim->api0()->vim_get_var("GuiFont") };
