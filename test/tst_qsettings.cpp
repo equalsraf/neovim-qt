@@ -108,8 +108,15 @@ void TestQSettings::GuiFont() noexcept
 	NeovimConnector* connector = w->shell()->nvim();
 
 	// Await for inital font to settle - avoid racing with nvim &guifont
+	// The assumption here is that there are 2 fonts being set
+	// 1. from qsettings
+	// 2. from nvim &guifont
+	//
+	// There is also a third call to set the font - a consequence of the
+	// previous calls. It should be ignored due to same font name, but it
+	// can race against a test call.
 	QSignalSpy spy_fontchange0(w->shell(), &ShellWidget::shellFontChanged);
-	SPYWAIT(spy_fontchange0, 2500 /*msec*/);
+	SPYWAIT(spy_fontchange0, 2500 /*msec*/, 2 /*signals*/);
 
 	QSettings settings;
 
@@ -119,6 +126,13 @@ void TestQSettings::GuiFont() noexcept
 	QSignalSpy spy_fontchange(w->shell(), &ShellWidget::shellFontChanged);
 	SendNeovimCommand(connector, fontCommand);
 	SPYWAIT(spy_fontchange, 2500 /*msec*/);
+
+	if (fontDesc.compare(w->shell()->fontDesc()) != 0) {
+		// retry once, if needed, to win race
+		QSignalSpy spy_fontchange(w->shell(), &ShellWidget::shellFontChanged);
+		SendNeovimCommand(connector, fontCommand);
+		SPYWAIT(spy_fontchange, 2500 /*msec*/);
+	}
 
 	QCOMPARE(w->shell()->fontDesc(), fontDesc);
 	QCOMPARE(settings.value("Gui/Font").toString(), fontDesc);
