@@ -221,6 +221,7 @@ private:
 	bool m_font_undercurl{ false };
 	bool m_font_strikethrough{ false };
 	bool m_mouseHide{ true };
+	quint64 m_font_timestamp{ 0 };
 
 	// highlight fg/bg - from redraw:highlightset - by default we
 	// use the values from above
