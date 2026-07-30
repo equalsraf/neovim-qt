@@ -176,32 +176,39 @@ jobs:
           Push-Location ${{ github.workspace }}/build
           cpack --verbose -G WIX
           Pop-Location
-          Compress-Archive -Path ./install -DestinationPath neovim-qt.zip
+          Compress-Archive -Path ./install/* -DestinationPath neovim-qt.zip
           Move-Item -Path ./build/neovim-qt-installer.msi -Destination neovim-qt-installer.msi
         shell: pwsh
-      - name: Windows - Upload Artifacts
+      - name: Artifact neovim-qt-installer.msi
         if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: Windows_Release
+          name: neovim-qt-installer.msi
+          path: neovim-qt-installer.msi
           if-no-files-found: error
-          path: |
-            neovim-qt-installer.msi
-            neovim-qt.zip
+          archive: false
+      - name: Artifact neovim-qt.zip
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: neovim-qt.zip
+          path: neovim-qt.zip
+          if-no-files-found: error
+          archive: false
 
       - name: MacOS - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
         run: |
           $(brew --prefix qt)/bin/macdeployqt ./build/bin/nvim-qt.app -dmg
           mv ./build/bin/nvim-qt.dmg neovim-qt.dmg
-      - name: MacOS - Upload Artifacts
+      - name: Artifact neovim-qt.dmg
         if: ${{ matrix.publish && startsWith(matrix.runner, 'macos') }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.name }}
           if-no-files-found: error
-          path: |
-            neovim-qt.dmg
+          archive: false
+          name: neovim-qt.dmg
+          path: neovim-qt.dmg
 
   UploadReleaseAssets:
     name: Upload Release Assets
@@ -216,9 +223,9 @@ jobs:
     steps:
       # required for gh release step
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
-          pattern: '*_Release*'
+          pattern: 'neovim-qt*'
           merge-multiple: true
 
       - name: Upload release assets
