@@ -119,6 +119,52 @@ void Shell::handleFontError(const QString& msg)
 	}
 }
 
+QStringList Shell::splitFontList(const QString& value) noexcept
+{
+	QStringList fonts;
+	QString font;
+	bool escaped{ false };
+	bool skipSpaces{ false };
+
+	for (const QChar character : value) {
+		if (skipSpaces && character == ' ') {
+			continue;
+		}
+		skipSpaces = false;
+
+		if (escaped) {
+			if (character != ',' && character != '\\') {
+				font.append('\\');
+			}
+			font.append(character);
+			escaped = false;
+		}
+		else if (character == '\\') {
+			escaped = true;
+		}
+		else if (character == ',') {
+			fonts.append(font);
+			font.clear();
+			skipSpaces = true;
+		}
+		else {
+			font.append(character);
+		}
+	}
+
+	if (escaped) {
+		font.append('\\');
+	}
+	fonts.append(font);
+
+	return fonts;
+}
+
+QString Shell::escapeFontListEntry(QString value) noexcept
+{
+	return value.replace('\\', QStringLiteral("\\\\")).replace(',', QStringLiteral("\\,"));
+}
+
 /// Set the GUI font, or display the current font
 ///
 /// @param fdesc Neovim font description string, "Fira Code:h11".
@@ -155,8 +201,9 @@ bool Shell::setGuiFont(
 		QVariant varFont{ TryGetQFontFromDescription(fdesc) };
 
 		if (!ShellWidget::IsValidFont(varFont)) {
-			m_nvim->api0()->vim_report_error(
-				m_nvim->encode(varFont.toString()));
+			if (!opts.testFlag(FontOption::Quiet)) {
+				emit fontError(varFont.toString());
+			}
 			return false;
 		}
 
@@ -167,7 +214,7 @@ bool Shell::setGuiFont(
 
 	// Only update the ShellWidget when font changes.
 	if (!m_attached) {
-		return false;
+		return true;
 	}
 
 	// The font has changed (track a logical timestamp):
@@ -177,7 +224,7 @@ bool Shell::setGuiFont(
 	//  3) Update font variables (as necessary).
 	resizeNeovim(size());
 	writeGuiFontQSettings();
-	updateGuiFontRegisters();
+	updateGuiFontRegisters(isGuiDialogRequest ? FontChangeSource::Internal : src);
 
 
 	return true;
@@ -201,24 +248,29 @@ bool Shell::setGuiFontWide(const QString& fdesc) noexcept
 		return true;
 	}
 
-	const QStringList fdescList{ fdesc.split(",") };
+	const QStringList fdescList{ splitFontList(fdesc) };
 	if (fdescList.size() < 1) {
 		return false;
 	}
 
 	std::vector<QFont> fontList;
 	fontList.reserve(fdescList.size());
+	QString lastError;
 
 	for (const auto& strFont : fdescList) {
 		QVariant varFont{ TryGetQFontFromDescription(strFont) };
 
 		if (!ShellWidget::IsValidFont(varFont)) {
-			m_nvim->api0()->vim_report_error(
-				m_nvim->encode(varFont.toString()));
-			return false;
+			lastError = varFont.toString();
+			continue;
 		}
 
 		fontList.push_back(qvariant_cast<QFont>(varFont));
+	}
+
+	if (fontList.empty()) {
+		emit fontError(lastError);
+		return false;
 	}
 
 	m_guifontwidelist = std::move(fontList);
@@ -226,7 +278,7 @@ bool Shell::setGuiFontWide(const QString& fdesc) noexcept
 	return true;
 }
 
-void Shell::updateGuiFontRegisters() noexcept
+void Shell::updateGuiFontRegisters(FontChangeSource src) noexcept
 {
 	if (!m_attached || !m_nvim || !m_nvim->api0()) {
 		return;
@@ -240,8 +292,12 @@ void Shell::updateGuiFontRegisters() noexcept
 	connect(getOption,
 		&MsgpackRequest::finished,
 		this,
-		[this, timestamp](quint32 msg, quint64 _f, const QVariant& val) noexcept
+		[this, timestamp, src](quint32 msg, quint64 _f, const QVariant& val) noexcept
 		{
+			if (src == FontChangeSource::NvimOption) {
+				return;
+			}
+
 			if (timestamp != this->m_font_timestamp) {
 				// The font changed since the call
 				qDebug() << "Ignoring guifont option update - timestamp changed";
@@ -249,7 +305,7 @@ void Shell::updateGuiFontRegisters() noexcept
 			}
 
 			const QString oldFont{ val.toString() };
-			const QString newFont{ fontDesc() };
+			const QString newFont{ escapeFontListEntry(fontDesc()) };
 			if (newFont.compare(oldFont, Qt::CaseInsensitive) == 0) {
 				return;
 			}
@@ -992,11 +1048,16 @@ void Shell::handleSetOption(const QVariantList& opargs)
 	const QVariant& value{ opargs.at(1) };
 
 	if (name == "guifont") {
-		// TODO value needs to be parsed properly according to 'guifont' option
-		// here just split non escaped commas to get the last entry.
-		static const QRegularExpression s_fontSplit = QRegularExpression(R"(,(?<!\\))");
-		auto values = value.toString().split(s_fontSplit);
-		setGuiFont(values.last(), FontOption::Force, FontChangeSource::NvimOption, false /*reset*/);
+		const QStringList values{ splitFontList(value.toString()) };
+		for (qsizetype i = 0; i < values.size(); i++) {
+			auto opts = FontOptions{ FontOption::Force };
+			opts.setFlag(FontOption::Quiet, i + 1 < values.size());
+
+			if (values.at(i).compare(fontDesc(), Qt::CaseInsensitive) == 0
+				|| setGuiFont(values.at(i), opts, FontChangeSource::NvimOption, false)) {
+				break;
+			}
+		}
 	} else if (name == "guifontwide") {
 		handleGuiFontWide(value);
 	} else if (name == "linespace") {

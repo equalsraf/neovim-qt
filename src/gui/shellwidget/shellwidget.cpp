@@ -65,14 +65,18 @@ bool ShellWidget::setShellFont(const QFont& font, FontOptions opts) noexcept
 
 	QFontInfo fi(font);
 	if (fi.family().compare(font.family(), Qt::CaseInsensitive) != 0
-		&& font.family().compare("Monospace", Qt::CaseInsensitive) != 0 && !quiet) {
-		emit fontError(QStringLiteral("Unknown font: %1").arg(font.family()));
+		&& font.family().compare("Monospace", Qt::CaseInsensitive) != 0) {
+		if (!quiet) {
+			emit fontError(QStringLiteral("Unknown font: %1").arg(font.family()));
+		}
 		return false;
 	}
 
 	if (!force) {
-		if (!fi.fixedPitch() && !quiet) {
-			emit fontError(QStringLiteral("%1 is not a fixed pitch font").arg(font.family()));
+		if (!fi.fixedPitch()) {
+			if (!quiet) {
+				emit fontError(QStringLiteral("%1 is not a fixed pitch font").arg(font.family()));
+			}
 			return false;
 		}
 
@@ -1056,6 +1060,7 @@ QVariant ShellWidget::TryGetQFontFromDescription(const QString& fdesc) const noe
 	}
 
 	QFont font{ attrs.at(0), -1 /*pointSize*/, weight, italic };
+	font.setFamilies({ attrs.at(0) });
 
 	font.setPointSizeF(pointSizeF);
 	font.setStyleHint(

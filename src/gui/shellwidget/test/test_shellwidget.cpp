@@ -14,6 +14,7 @@ private slots:
 	void clearRegion();
 	void fontDescriptionFromQFont();
 	void fontDescriptionToQFont();
+	void quietFontErrors();
 };
 
 
@@ -79,6 +80,13 @@ void Test::fontDescriptionToQFont()
 	QVERIFY(ValidateQFont(
 		ShellWidget::TryGetQFontFromDescription(QString{ "%1:h11" }.arg(fontFamily), defaultFont),
 		fontFamily, 11, QFont::Weight::Normal, false /*italic*/));
+	QVERIFY(ValidateQFont(
+		ShellWidget::TryGetQFontFromDescription(QString{ "Font, Name:h12" }, defaultFont),
+		"Font, Name",
+		12,
+		QFont::Weight::Normal,
+		false));
+
 
 	QVERIFY(ValidateQFont(
 		ShellWidget::TryGetQFontFromDescription(QString{ "%1:h12:l" }.arg(fontFamily), defaultFont),
@@ -124,6 +132,19 @@ void Test::fontDescriptionToQFont()
 
 	QVERIFY(!ShellWidget::IsValidFont(varInvalidNegativeHeight));
 	QCOMPARE(varInvalidHeight, QVariant{ QString{ "Invalid font height" } });
+}
+
+void Test::quietFontErrors()
+{
+	ShellWidget widget;
+	QSignalSpy fontError{ &widget, &ShellWidget::fontError };
+	QSignalSpy fontChanged{ &widget, &ShellWidget::shellFontChanged };
+	QFont missingFont{ QStringLiteral("Neovim Qt Missing Font") };
+
+	QVERIFY(!widget.setShellFont(
+		missingFont, ShellWidget::FontOption::Force | ShellWidget::FontOption::Quiet));
+	QCOMPARE(fontError.count(), 0);
+	QCOMPARE(fontChanged.count(), 0);
 }
 
 QTEST_MAIN(Test)

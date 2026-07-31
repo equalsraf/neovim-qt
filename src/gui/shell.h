@@ -5,6 +5,7 @@
 #include <QList>
 #include <QMap>
 #include <QMenu>
+#include <QStringList>
 #include <QTimer>
 #include <QUrl>
 #include <QVariantList>
@@ -172,6 +173,8 @@ protected:
 	virtual void handleWindowFrameless(const QVariant& value) noexcept;
 	virtual void handleCloseEvent(const QVariantList &args) noexcept;
 	virtual void handleGuiPopupmenu(const QVariant& value) noexcept;
+	static QStringList splitFontList(const QString& value) noexcept;
+	static QString escapeFontListEntry(QString value) noexcept;
 
 	// Modern 'ext_linegrid' Grid UI Events
 	virtual void handleGridResize(const QVariantList& opargs);
@@ -196,7 +199,7 @@ protected:
 	void setCursorFromBusyState() noexcept;
 
 	// GuiFont
-	void updateGuiFontRegisters() noexcept;
+	void updateGuiFontRegisters(FontChangeSource src = FontChangeSource::Internal) noexcept;
 	void writeGuiFontQSettings() noexcept;
 	void handleGuiFontOption(quint32 msgid, quint64 fun, const QVariant& val) noexcept;
 	void handleGuiFontVariable(quint32 msgid, quint64 fun, const QVariant& val) noexcept;

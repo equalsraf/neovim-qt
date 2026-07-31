@@ -30,9 +30,9 @@ public:
 	enum FontOption
 	{
 		/// Override monospace font check
-		Force,
+		Force = 0x1,
 		/// Do not emit errors for errorss
-		Quiet,
+		Quiet = 0x2,
 	};
 	Q_ENUM(FontOption);
 	Q_DECLARE_FLAGS(FontOptions, FontOption)
