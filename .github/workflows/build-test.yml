@@ -15,7 +15,7 @@ jobs:
       contents: write
     steps:
       # needed to get git tag/notes
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         env:
@@ -85,7 +85,7 @@ jobs:
 
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       #
       # Setup and Configuration
@@ -222,7 +222,7 @@ jobs:
 
     steps:
       # required for gh release step
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
           pattern: 'neovim-qt*'
