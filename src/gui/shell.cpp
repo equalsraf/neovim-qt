@@ -214,7 +214,7 @@ bool Shell::setGuiFont(
 
 	// Only update the ShellWidget when font changes.
 	if (!m_attached) {
-		return true;
+		return false;
 	}
 
 	// The font has changed (track a logical timestamp):
@@ -224,7 +224,7 @@ bool Shell::setGuiFont(
 	//  3) Update font variables (as necessary).
 	resizeNeovim(size());
 	writeGuiFontQSettings();
-	updateGuiFontRegisters(isGuiDialogRequest ? FontChangeSource::Internal : src);
+	updateGuiFontRegisters();
 
 
 	return true;
@@ -278,7 +278,7 @@ bool Shell::setGuiFontWide(const QString& fdesc) noexcept
 	return true;
 }
 
-void Shell::updateGuiFontRegisters(FontChangeSource src) noexcept
+void Shell::updateGuiFontRegisters() noexcept
 {
 	if (!m_attached || !m_nvim || !m_nvim->api0()) {
 		return;
@@ -292,12 +292,8 @@ void Shell::updateGuiFontRegisters(FontChangeSource src) noexcept
 	connect(getOption,
 		&MsgpackRequest::finished,
 		this,
-		[this, timestamp, src](quint32 msg, quint64 _f, const QVariant& val) noexcept
+		[this, timestamp](quint32 msg, quint64 _f, const QVariant& val) noexcept
 		{
-			if (src == FontChangeSource::NvimOption) {
-				return;
-			}
-
 			if (timestamp != this->m_font_timestamp) {
 				// The font changed since the call
 				qDebug() << "Ignoring guifont option update - timestamp changed";
@@ -1053,8 +1049,12 @@ void Shell::handleSetOption(const QVariantList& opargs)
 			auto opts = FontOptions{ FontOption::Force };
 			opts.setFlag(FontOption::Quiet, i + 1 < values.size());
 
-			if (values.at(i).compare(fontDesc(), Qt::CaseInsensitive) == 0
-				|| setGuiFont(values.at(i), opts, FontChangeSource::NvimOption, false)) {
+			if (values.at(i).compare(fontDesc(), Qt::CaseInsensitive) == 0) {
+				break;
+			}
+
+			if (setGuiFont(values.at(i), opts, FontChangeSource::NvimOption, false)
+				|| values.at(i).compare(fontDesc(), Qt::CaseInsensitive) == 0) {
 				break;
 			}
 		}
