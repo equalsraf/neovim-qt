@@ -14,4 +14,6 @@ QSharedPointer<MainWindow> CreateMainWindow() noexcept;
 
 QSharedPointer<MainWindow> CreateMainWindowWithRuntime() noexcept;
 
+void LoadDejaVuSansMonoTestFonts() noexcept;
+
 } // namespace NeovimQt
