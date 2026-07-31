@@ -18,6 +18,24 @@ Q_IMPORT_PLUGIN (QWindowsIntegrationPlugin);
 
 namespace NeovimQt {
 
+class FontListTestShell : public Shell
+{
+public:
+	QStringList wideFontFamilies() const
+	{
+		QStringList families;
+		for (const auto& font : m_guifontwidelist) {
+			families.append(font.family());
+		}
+		return families;
+	}
+
+	using Shell::escapeFontListEntry;
+	using Shell::handleSetOption;
+	using Shell::Shell;
+	using Shell::splitFontList;
+};
+
 class TestShell : public QObject
 {
 	Q_OBJECT
@@ -29,6 +47,7 @@ private slots:
 	void startVarsMainWindow() noexcept;
 	void gviminit() noexcept;
 	void guiShimCommands() noexcept;
+	void fontDescriptionList() noexcept;
 	void CloseEvent_data() noexcept;
 	void CloseEvent() noexcept;
 	void GetClipboard_data() noexcept;
@@ -175,6 +194,50 @@ void TestShell::guiShimCommands() noexcept
 	QVERIFY2(SPYWAIT(spy_fontattr_change2), "Waiting for renderFontAttrChanged");
 	QCOMPARE(w->shell()->renderFontAttr(), true);
 
+}
+
+void TestShell::fontDescriptionList() noexcept
+{
+	const QString defaultFonts{ QStringLiteral(
+		"Source Code Pro,DejaVu Sans Mono,Courier New,monospace") };
+	QCOMPARE(FontListTestShell::splitFontList(defaultFonts),
+		QStringList({ "Source Code Pro", "DejaVu Sans Mono", "Courier New", "monospace" }));
+	QCOMPARE(FontListTestShell::splitFontList(QStringLiteral("Font One,  Font Two")),
+		QStringList({ "Font One", "Font Two" }));
+	QCOMPARE(FontListTestShell::splitFontList(QStringLiteral(R"(Font\, Name,monospace)")),
+		QStringList({ "Font, Name", "monospace" }));
+	QCOMPARE(FontListTestShell::splitFontList(QStringLiteral(R"(Font\\,monospace)")),
+		QStringList({ R"(Font\)", "monospace" }));
+	QCOMPARE(FontListTestShell::splitFontList(QStringLiteral(R"(Font\ Name,monospace)")),
+		QStringList({ R"(Font\ Name)", "monospace" }));
+	const QString escapedFamily{ QStringLiteral(R"(Font\ Name, Alternate)") };
+	QCOMPARE(
+		FontListTestShell::splitFontList(FontListTestShell::escapeFontListEntry(escapedFamily)),
+		QStringList{ escapedFamily });
+
+	auto socket = new QLocalSocket;
+	auto connector = new NeovimConnector{ socket };
+	socket->setParent(connector);
+	FontListTestShell shell{ connector };
+	QSignalSpy fontError{ &shell, &ShellWidget::fontError };
+
+	QVERIFY(shell.setGuiFontWide(QStringLiteral(R"(Font\, Name, monospace)")));
+	QCOMPARE(shell.wideFontFamilies(), QStringList({ "Font, Name", "monospace" }));
+	QVERIFY(shell.setGuiFontWide(QStringLiteral(R"(Missing:ha, Font\, Name)")));
+	QCOMPARE(shell.wideFontFamilies(), QStringList({ "Font, Name" }));
+	QCOMPARE(fontError.count(), 0);
+	QVERIFY(!shell.setGuiFontWide(QStringLiteral("Missing:ha, Also Missing:hb")));
+	QCOMPARE(fontError.count(), 1);
+
+	fontError.clear();
+	shell.handleSetOption({ QStringLiteral("guifont"),
+		QStringLiteral("Neovim Qt Missing Font,DejaVu Sans Mono:h13,monospace:h14") });
+	QCOMPARE(shell.fontDesc(), QStringLiteral("DejaVu Sans Mono:h13"));
+	QCOMPARE(fontError.count(), 0);
+
+	shell.handleSetOption({ QStringLiteral("guifont"),
+		QStringLiteral("Neovim Qt Missing One,Neovim Qt Missing Two") });
+	QCOMPARE(fontError.count(), 1);
 }
 
 void TestShell::CloseEvent_data() noexcept
