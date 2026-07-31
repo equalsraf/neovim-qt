@@ -226,7 +226,6 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           pattern: 'neovim-qt*'
-          merge-multiple: true
 
       - name: Upload release assets
         env:
