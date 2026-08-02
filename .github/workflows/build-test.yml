@@ -233,5 +233,6 @@ jobs:
         # Add artifact file names here
         run: |
           TAG_NAME="${{ github.ref_name }}"
+          ls -lh
           gh release upload --clobber "$TAG_NAME" neovim-qt-installer.msi neovim-qt.zip neovim-qt.dmg
 
