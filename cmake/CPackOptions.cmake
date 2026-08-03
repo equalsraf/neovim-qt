@@ -13,4 +13,11 @@ set(CPACK_WIX_UPGRADE_GUID "b3357595-f87b-4706-85b0-e2630d989979")
 set(CPACK_WIX_PATCH_FILE "${PROJECT_SOURCE_DIR}/contrib/wix_patch.xml")
 set(CPACK_WIX_PRODUCT_ICON "${PROJECT_SOURCE_DIR}/third-party/neovim.ico")
 
+if(WIN32)
+  # Create start menu and desktop shortcuts
+  set(CPACK_WIX_PROGRAM_MENU_FOLDER "${CPACK_PACKAGE_NAME}")
+  set(CPACK_PACKAGE_EXECUTABLES "nvim-qt" "Neovim-Qt")
+  set(CPACK_WIX_INSTALL_SCOPE "perMachine")
+endif()
+
 include(CPack)
