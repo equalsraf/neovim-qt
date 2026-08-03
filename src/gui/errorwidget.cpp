@@ -1,43 +1,84 @@
 #include "errorwidget.h"
 
-#include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QSvgWidget>
+#include <QVBoxLayout>
+#include <QDebug>
+
+static constexpr std::array<uint32_t, 5> cs_retryTimeoutSeconds{ 5, 10, 30 };
 
 namespace NeovimQt {
 
-ErrorWidget::ErrorWidget(QWidget *parent)
-:QWidget(parent), m_errorLabel(0), m_closeButton(0)
+static QHBoxLayout* getHorizCenterLayout(QWidget* widget) noexcept
 {
-	m_errorLabel = new QLabel();
-	m_closeButton = new QPushButton(tr("Retry"));
-
-	m_image = new QSvgWidget(":/neovim.svg");
-	m_image->setFixedSize(64, 64);
-
-	connect(m_closeButton, &QPushButton::clicked,
-			this, &ErrorWidget::reconnectNeovim);
-
-	QHBoxLayout *inner_layout = new QHBoxLayout();
+	QHBoxLayout* inner_layout = new QHBoxLayout();
 	inner_layout->addStretch();
-	inner_layout->addWidget(m_image);
-	inner_layout->addWidget(m_errorLabel);
-	inner_layout->addWidget(m_closeButton);
+	inner_layout->addWidget(widget);
 	inner_layout->addStretch();
-	QVBoxLayout *outer_layout = new QVBoxLayout();
+	return inner_layout;
+}
+
+ErrorWidget::ErrorWidget(QWidget* parent) noexcept
+	: QWidget(parent)
+{
+	m_reconnectTimer = new QTimer(this);
+	connect(m_reconnectTimer, &QTimer::timeout, this, &ErrorWidget::reconnectTimeout);
+	m_reconnectTimer->start(1000);
+
+	m_errorMessage = new QLabel();
+
+	m_retryMessage = new QLabel();
+	m_retryMessage->setText(getRetryMessageText());
+
+	m_retryButton = new QPushButton(tr("Retry Now"));
+	connect(m_retryButton, &QPushButton::clicked, this, &ErrorWidget::reconnectNeovim);
+
+	QSvgWidget* neovimIcon = new QSvgWidget(":/neovim.svg");
+	neovimIcon->setFixedSize(64, 64);
+
+	QVBoxLayout* outer_layout = new QVBoxLayout();
 	outer_layout->addStretch();
-	outer_layout->addLayout(inner_layout);
+	outer_layout->addLayout(getHorizCenterLayout(neovimIcon));
+	outer_layout->addLayout(getHorizCenterLayout(m_errorMessage));
+	outer_layout->addLayout(getHorizCenterLayout(m_retryMessage));
+	outer_layout->addLayout(getHorizCenterLayout(m_retryButton));
 	outer_layout->addStretch();
 	setLayout(outer_layout);
 }
 
-void ErrorWidget::setText(const QString& text)
+void ErrorWidget::setText(const QString& text) noexcept
 {
-	m_errorLabel->setText(text);
+	m_errorMessage->setText(text);
+	qDebug() << "Error:" << text;
 }
 
-void ErrorWidget::showReconnect(bool on)
+void ErrorWidget::showReconnect(bool isVisible) noexcept
 {
-	m_closeButton->setVisible(on);
+	m_retryButton->setVisible(isVisible);
 }
 
-} //Namespace
+QString ErrorWidget::getRetryMessageText() noexcept
+{
+	const uint32_t secondsLeft{ cs_retryTimeoutSeconds[m_retryIndex] - m_timerCount };
+	return  tr("Reconnecting in ") + QString::number(secondsLeft) + tr(" seconds...");
+}
+
+void ErrorWidget::reconnectTimeout() noexcept
+{
+	++m_timerCount;
+	m_retryMessage->setText(getRetryMessageText());
+
+	if (m_timerCount >= cs_retryTimeoutSeconds[m_retryIndex])
+	{
+
+		if (m_retryIndex < cs_retryTimeoutSeconds.size()) {
+			++m_retryIndex;
+		}
+
+		reconnectNeovim();
+
+		m_timerCount = 0;
+	}
+}
+
+} // Namespace NeovimQt
