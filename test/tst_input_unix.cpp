@@ -14,6 +14,7 @@ private slots:
 	void ShiftModifierLetter() noexcept;
 	void GermanKeyboardLayout() noexcept;
 	void ControlSpace() noexcept;
+	void OptionAsMetaIsNoOp() noexcept;
 };
 
 void TestInputUnix::LessThanModifierKeys() noexcept
@@ -103,6 +104,20 @@ void TestInputUnix::ControlSpace() noexcept
 	// Intentionally written with QStringLiteral, other alternatives do not create the same QKeyEvent
 	QKeyEvent evControlSpace{ QEvent::KeyPress, Qt::Key_Space, Qt::ControlModifier, QStringLiteral( "\u0000" ) };
 	QCOMPARE(NeovimQt::Input::convertKey(evControlSpace), QString{ "<C-Space>" });
+}
+
+void TestInputUnix::OptionAsMetaIsNoOp() noexcept
+{
+	// Issue#1162: On non-Mac platforms, GetOptionAsMetaText is always a no-op.
+	QKeyEvent evAltJ{ QEvent::KeyPress, Qt::Key_J, Qt::AltModifier, "j" };
+	QCOMPARE(NeovimQt::Input::GetOptionAsMetaText(evAltJ), std::nullopt);
+
+	QKeyEvent evAltShiftJ{ QEvent::KeyPress, Qt::Key_J,
+		Qt::AltModifier | Qt::ShiftModifier, "J" };
+	QCOMPARE(NeovimQt::Input::GetOptionAsMetaText(evAltShiftJ), std::nullopt);
+
+	// Alt+J should produce <A-j> via normal convertKey path (no Unicode override)
+	QCOMPARE(NeovimQt::Input::convertKey(evAltJ), QString{ "<A-j>" });
 }
 
 #include "tst_input_unix.moc"

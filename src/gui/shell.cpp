@@ -3,7 +3,9 @@
 #include <cmath>
 #include <QApplication>
 #include <QClipboard>
+#include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
 #include <QFontDialog>
 #include <QKeyEvent>
 #include <QMimeData>
@@ -363,6 +365,17 @@ void Shell::setAttached(bool attached)
 		}
 
 		updateClientInfo();
+
+		// Re-add runtime to rtp: plugin managers (e.g. lazy.nvim) may have reset it.
+		const QString appDir{ QCoreApplication::applicationDirPath() };
+		for (const char* relPath : { "../Resources/runtime", "../share/nvim-qt/runtime" }) {
+			const QDir runtimeDir{ QDir{ appDir }.filePath(relPath) };
+			if (runtimeDir.exists()) {
+				const QString rtpCmd{ QString{ "let &rtp.=',%1'" }.arg(runtimeDir.path()) };
+				m_nvim->api0()->vim_command(rtpCmd.toUtf8());
+				break;
+			}
+		}
 
 		MsgpackRequest* req_shim{ m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim") };
 		connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
@@ -1008,6 +1021,8 @@ void Shell::handleNeovimNotification(const QByteArray &name, const QVariantList&
 			handleGuiAdaptiveStyle(args);
 		} else if (guiEvName == "AdaptiveStyleList") {
 			handleGuiAdaptiveStyleList();
+		} else if (guiEvName == "MacOptionIsMeta" && args.size() == 2) {
+			handleMacOptionIsMeta(args.at(1));
 		}
 		return;
 	} else if (name != "redraw") {
@@ -1414,6 +1429,36 @@ void Shell::handleGuiAdaptiveStyle(const QVariantList& opargs) noexcept
 void Shell::handleGuiAdaptiveStyleList() noexcept
 {
 	emit showGuiAdaptiveStyleList();
+}
+
+void Shell::handleMacOptionIsMeta(const QVariant& value) noexcept
+{
+	if (!value.canConvert<QByteArray>()) {
+		qWarning() << "Unexpected value for MacOptionIsMeta:" << value;
+		return;
+	}
+
+	const QString mode{ m_nvim->decode(value.toByteArray()).toLower().trimmed() };
+
+	Input::MacOptionMetaMode metaMode{ Input::MacOptionMetaMode::None };
+	if (mode == "none") {
+		metaMode = Input::MacOptionMetaMode::None;
+	} else if (mode == "left") {
+		metaMode = Input::MacOptionMetaMode::Left;
+	} else if (mode == "right") {
+		metaMode = Input::MacOptionMetaMode::Right;
+	} else if (mode == "both") {
+		metaMode = Input::MacOptionMetaMode::Both;
+	} else {
+		m_nvim->api0()->vim_report_error(
+			m_nvim->encode(
+				QString{ "Unknown GuiMacOptionIsMeta value: '%1'. Expected: none, left, right, both" }
+					.arg(mode)));
+		return;
+	}
+
+	Input::SetMacOptionIsMeta(metaMode);
+	m_nvim->api0()->vim_set_var("GuiMacOptionIsMeta", mode);
 }
 
 void Shell::showEvent(QShowEvent* ev)
