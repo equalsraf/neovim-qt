@@ -156,6 +156,7 @@ protected:
 	virtual void handlePut(const QVariantList& args);
 	virtual void handleHighlightSet(const QVariantMap& args);
 	virtual void handleRedraw(const QByteArray& name, const QVariantList& args);
+	void handleRedrawEvent(const QByteArray& name, const QVariantList& args);
 	virtual void handleScroll(const QVariantList& args);
 	virtual void handleModeChange(const QVariantList& opargs);
 	virtual void handleModeInfoSet(const QVariantList& opargs);
@@ -262,6 +263,8 @@ private:
 	bool m_mouseEnabled{ true };
 
 	QWindow *m_window_handle{ nullptr };
+
+	QList<QPair<QByteArray, QVariantList>> m_pendingRedrawEvents;
 };
 
 class ShellRequestHandler: public QObject, public MsgpackRequestHandler
