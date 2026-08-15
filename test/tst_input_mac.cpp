@@ -182,8 +182,9 @@ void TestInputMac::MacOptionIsMetaBoth() noexcept
 	QCOMPARE(NeovimQt::Input::convertKey(evCtrlAltJ), QString{ "<C-A-j>" });
 
 	// Ctrl+Shift+Option+J should produce <C-S-A-J>
-	QKeyEvent evCtrlShiftAltJ{ QEvent::KeyPress, Qt::Key_J,
-		Qt::MetaModifier | Qt::ShiftModifier | Qt::AltModifier, "Ô" };
+	QKeyEvent evCtrlShiftAltJ{
+		QEvent::KeyPress, Qt::Key_J, Qt::MetaModifier | Qt::ShiftModifier | Qt::AltModifier, "Ô"
+	};
 	QCOMPARE(NeovimQt::Input::convertKey(evCtrlShiftAltJ), QString{ "<C-S-A-J>" });
 
 	// Restore default
@@ -246,8 +247,9 @@ void TestInputMac::MacOptionIsMetaBothLessThanBackslash() noexcept
 
 	// Option+< should produce <A-lt>. The text override replaces the Unicode
 	// char, and the "<" special handling in convertKey formats it as lt.
-	QKeyEvent evAltLessThan{ QEvent::KeyPress, Qt::Key_Less,
-		Qt::AltModifier | Qt::ShiftModifier, "¯" };
+	QKeyEvent evAltLessThan{
+		QEvent::KeyPress, Qt::Key_Less, Qt::AltModifier | Qt::ShiftModifier, "¯"
+	};
 	QCOMPARE(NeovimQt::Input::convertKey(evAltLessThan), QString{ "<A-lt>" });
 
 	// Option+\ should produce <A-Bslash>
@@ -264,13 +266,13 @@ void TestInputMac::MacOptionIsMetaBothCmdCombo() noexcept
 
 	// Cmd(D-)+Option+J should produce <D-A-j>
 	// On Mac, ControlModifier maps to Cmd/D-
-	QKeyEvent evCmdAltJ{ QEvent::KeyPress, Qt::Key_J,
-		Qt::ControlModifier | Qt::AltModifier, "∆" };
+	QKeyEvent evCmdAltJ{ QEvent::KeyPress, Qt::Key_J, Qt::ControlModifier | Qt::AltModifier, "∆" };
 	QCOMPARE(NeovimQt::Input::convertKey(evCmdAltJ), QString{ "<D-A-j>" });
 
 	// Cmd+Ctrl+Option+J should produce <D-C-A-j>
-	QKeyEvent evCmdCtrlAltJ{ QEvent::KeyPress, Qt::Key_J,
-		Qt::ControlModifier | Qt::MetaModifier | Qt::AltModifier, "∆" };
+	QKeyEvent evCmdCtrlAltJ{
+		QEvent::KeyPress, Qt::Key_J, Qt::ControlModifier | Qt::MetaModifier | Qt::AltModifier, "∆"
+	};
 	QCOMPARE(NeovimQt::Input::convertKey(evCmdCtrlAltJ), QString{ "<D-C-A-j>" });
 
 	// Restore default
@@ -308,37 +310,53 @@ void TestInputMac::MacOptionIsMetaLeftRight() noexcept
 	// Mode: Left — only left Option acts as Meta
 	NeovimQt::Input::SetMacOptionIsMeta(NeovimQt::Input::MacOptionMetaMode::Left);
 
-	QKeyEvent evLeftAltJ{ QEvent::KeyPress, Qt::Key_J, Qt::AltModifier,
-		0 /*nativeScanCode*/, 0 /*nativeVirtualKey*/, NativeLeftOptionMask, "∆" };
+	QKeyEvent evLeftAltJ{ QEvent::KeyPress,
+		Qt::Key_J,
+		Qt::AltModifier,
+		0 /*nativeScanCode*/,
+		0 /*nativeVirtualKey*/,
+		NativeLeftOptionMask,
+		"∆" };
 	QCOMPARE(NeovimQt::Input::convertKey(evLeftAltJ), QString{ "<A-j>" });
 
 	// Right Option should pass through Unicode character
-	QKeyEvent evRightAltJ{ QEvent::KeyPress, Qt::Key_J, Qt::AltModifier,
-		0, 0, NativeRightOptionMask, "∆" };
+	QKeyEvent evRightAltJ{
+		QEvent::KeyPress, Qt::Key_J, Qt::AltModifier, 0, 0, NativeRightOptionMask, "∆"
+	};
 	QCOMPARE(NeovimQt::Input::convertKey(evRightAltJ), QString{ "∆" });
 
 	// Left Option + Shift
-	QKeyEvent evLeftAltShiftJ{ QEvent::KeyPress, Qt::Key_J,
+	QKeyEvent evLeftAltShiftJ{ QEvent::KeyPress,
+		Qt::Key_J,
 		Qt::AltModifier | Qt::ShiftModifier,
-		0, 0, NativeLeftOptionMask, "Ô" };
+		0,
+		0,
+		NativeLeftOptionMask,
+		"Ô" };
 	QCOMPARE(NeovimQt::Input::convertKey(evLeftAltShiftJ), QString{ "<A-J>" });
 
 	// Mode: Right — only right Option acts as Meta
 	NeovimQt::Input::SetMacOptionIsMeta(NeovimQt::Input::MacOptionMetaMode::Right);
 
-	QKeyEvent evRightAltB{ QEvent::KeyPress, Qt::Key_B, Qt::AltModifier,
-		0, 0, NativeRightOptionMask, "∫" };
+	QKeyEvent evRightAltB{
+		QEvent::KeyPress, Qt::Key_B, Qt::AltModifier, 0, 0, NativeRightOptionMask, "∫"
+	};
 	QCOMPARE(NeovimQt::Input::convertKey(evRightAltB), QString{ "<A-b>" });
 
 	// Left Option should pass through Unicode character
-	QKeyEvent evLeftAltB{ QEvent::KeyPress, Qt::Key_B, Qt::AltModifier,
-		0, 0, NativeLeftOptionMask, "∫" };
+	QKeyEvent evLeftAltB{
+		QEvent::KeyPress, Qt::Key_B, Qt::AltModifier, 0, 0, NativeLeftOptionMask, "∫"
+	};
 	QCOMPARE(NeovimQt::Input::convertKey(evLeftAltB), QString{ "∫" });
 
 	// Right Option + Ctrl
-	QKeyEvent evRightCtrlAltB{ QEvent::KeyPress, Qt::Key_B,
+	QKeyEvent evRightCtrlAltB{ QEvent::KeyPress,
+		Qt::Key_B,
 		Qt::MetaModifier | Qt::AltModifier,
-		0, 0, NativeRightOptionMask, "∫" };
+		0,
+		0,
+		NativeRightOptionMask,
+		"∫" };
 	QCOMPARE(NeovimQt::Input::convertKey(evRightCtrlAltB), QString{ "<C-A-b>" });
 
 	// Restore default
@@ -355,22 +373,25 @@ void TestInputMac::MacOptionIsMetaLeftRightBothPressed() noexcept
 	// Mode: Left — should still trigger because left bit is set
 	NeovimQt::Input::SetMacOptionIsMeta(NeovimQt::Input::MacOptionMetaMode::Left);
 
-	QKeyEvent evBothAltJ{ QEvent::KeyPress, Qt::Key_J, Qt::AltModifier,
-		0, 0, NativeBothOptionMask, "∆" };
+	QKeyEvent evBothAltJ{
+		QEvent::KeyPress, Qt::Key_J, Qt::AltModifier, 0, 0, NativeBothOptionMask, "∆"
+	};
 	QCOMPARE(NeovimQt::Input::convertKey(evBothAltJ), QString{ "<A-j>" });
 
 	// Mode: Right — should also trigger because right bit is set
 	NeovimQt::Input::SetMacOptionIsMeta(NeovimQt::Input::MacOptionMetaMode::Right);
 
-	QKeyEvent evBothAltK{ QEvent::KeyPress, Qt::Key_K, Qt::AltModifier,
-		0, 0, NativeBothOptionMask, "˚" };
+	QKeyEvent evBothAltK{
+		QEvent::KeyPress, Qt::Key_K, Qt::AltModifier, 0, 0, NativeBothOptionMask, "˚"
+	};
 	QCOMPARE(NeovimQt::Input::convertKey(evBothAltK), QString{ "<A-k>" });
 
 	// Mode: Both — should always trigger
 	NeovimQt::Input::SetMacOptionIsMeta(NeovimQt::Input::MacOptionMetaMode::Both);
 
-	QKeyEvent evBothAltL{ QEvent::KeyPress, Qt::Key_L, Qt::AltModifier,
-		0, 0, NativeBothOptionMask, "¬" };
+	QKeyEvent evBothAltL{
+		QEvent::KeyPress, Qt::Key_L, Qt::AltModifier, 0, 0, NativeBothOptionMask, "¬"
+	};
 	QCOMPARE(NeovimQt::Input::convertKey(evBothAltL), QString{ "<A-l>" });
 
 	// Restore default
@@ -420,8 +441,7 @@ void TestInputMac::GetOptionAsMetaTextDirect() noexcept
 	QCOMPARE(NeovimQt::Input::GetOptionAsMetaText(evAltJ), std::optional<QString>{ "j" });
 
 	// Shift+Alt — returns uppercase
-	QKeyEvent evAltShiftJ{ QEvent::KeyPress, Qt::Key_J,
-		Qt::AltModifier | Qt::ShiftModifier, "Ô" };
+	QKeyEvent evAltShiftJ{ QEvent::KeyPress, Qt::Key_J, Qt::AltModifier | Qt::ShiftModifier, "Ô" };
 	QCOMPARE(NeovimQt::Input::GetOptionAsMetaText(evAltShiftJ), std::optional<QString>{ "J" });
 
 	// No AltModifier — returns std::nullopt even when mode is Both
@@ -431,14 +451,16 @@ void TestInputMac::GetOptionAsMetaTextDirect() noexcept
 	// Left mode with right native modifier — returns std::nullopt
 	constexpr quint32 NativeRightOptionMask{ 0x00000040 };
 	NeovimQt::Input::SetMacOptionIsMeta(NeovimQt::Input::MacOptionMetaMode::Left);
-	QKeyEvent evRightAltJ{ QEvent::KeyPress, Qt::Key_J, Qt::AltModifier,
-		0, 0, NativeRightOptionMask, "∆" };
+	QKeyEvent evRightAltJ{
+		QEvent::KeyPress, Qt::Key_J, Qt::AltModifier, 0, 0, NativeRightOptionMask, "∆"
+	};
 	QCOMPARE(NeovimQt::Input::GetOptionAsMetaText(evRightAltJ), std::nullopt);
 
 	// Left mode with left native modifier — returns text
 	constexpr quint32 NativeLeftOptionMask{ 0x00000020 };
-	QKeyEvent evLeftAltJ{ QEvent::KeyPress, Qt::Key_J, Qt::AltModifier,
-		0, 0, NativeLeftOptionMask, "∆" };
+	QKeyEvent evLeftAltJ{
+		QEvent::KeyPress, Qt::Key_J, Qt::AltModifier, 0, 0, NativeLeftOptionMask, "∆"
+	};
 	QCOMPARE(NeovimQt::Input::GetOptionAsMetaText(evLeftAltJ), std::optional<QString>{ "j" });
 
 	// Restore default

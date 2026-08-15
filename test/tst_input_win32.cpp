@@ -119,8 +119,7 @@ void TestInputWin32::OptionAsMetaIsNoOp() noexcept
 	QKeyEvent evAltJ{ QEvent::KeyPress, Qt::Key_J, Qt::AltModifier, "j" };
 	QCOMPARE(NeovimQt::Input::GetOptionAsMetaText(evAltJ), std::nullopt);
 
-	QKeyEvent evAltShiftJ{ QEvent::KeyPress, Qt::Key_J,
-		Qt::AltModifier | Qt::ShiftModifier, "J" };
+	QKeyEvent evAltShiftJ{ QEvent::KeyPress, Qt::Key_J, Qt::AltModifier | Qt::ShiftModifier, "J" };
 	QCOMPARE(NeovimQt::Input::GetOptionAsMetaText(evAltShiftJ), std::nullopt);
 
 	// Alt+J should produce <A-j> via normal convertKey path (no Unicode override)

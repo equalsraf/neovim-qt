@@ -53,9 +53,7 @@ std::optional<QString> GetOptionAsMetaText(const QKeyEvent& /*ev*/) noexcept
 	return std::nullopt;
 }
 
-void SetMacOptionIsMeta(MacOptionMetaMode /*mode*/) noexcept
-{
-}
+void SetMacOptionIsMeta(MacOptionMetaMode /*mode*/) noexcept {}
 
 MacOptionMetaMode GetMacOptionIsMeta() noexcept
 {

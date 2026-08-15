@@ -125,8 +125,7 @@ std::optional<QString> GetOptionAsMetaText(const QKeyEvent& ev) noexcept
 	const bool isLeftAlt{ (nativeMod & NativeLeftOptionMask) != 0 };
 	const bool isRightAlt{ (nativeMod & NativeRightOptionMask) != 0 };
 
-	const bool treatAsMeta{
-		(s_macOptionIsMeta == MacOptionMetaMode::Both)
+	const bool treatAsMeta{ (s_macOptionIsMeta == MacOptionMetaMode::Both)
 		|| (s_macOptionIsMeta == MacOptionMetaMode::Left && isLeftAlt)
 		|| (s_macOptionIsMeta == MacOptionMetaMode::Right && isRightAlt) };
 

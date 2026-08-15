@@ -1,7 +1,6 @@
 #pragma once
 
 #include <optional>
-
 #include <QEvent>
 #include <QKeyEvent>
 #include <QMap>
@@ -63,11 +62,12 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 /// Non-Mac platforms always return std::nullopt.
 std::optional<QString> GetOptionAsMetaText(const QKeyEvent& ev) noexcept;
 
-enum class MacOptionMetaMode {
-	None,   ///< Default: Option produces Unicode characters (current behavior)
-	Left,   ///< Left Option acts as Meta/Alt
-	Right,  ///< Right Option acts as Meta/Alt
-	Both,   ///< Both Option keys act as Meta/Alt
+enum class MacOptionMetaMode
+{
+	None,  ///< Default: Option produces Unicode characters (current behavior)
+	Left,  ///< Left Option acts as Meta/Alt
+	Right, ///< Right Option acts as Meta/Alt
+	Both,  ///< Both Option keys act as Meta/Alt
 };
 
 /// Set the macOS Option-as-Meta mode. No-op on non-Mac platforms.
