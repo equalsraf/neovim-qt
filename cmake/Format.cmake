@@ -1,5 +1,5 @@
 
-function(ClangFormat)
+function(ClangFormat BASEREF)
 	find_program(GIT_PROGRAM git)
 	find_program(CLANGFORMAT_PROGRAM clang-format)
 
@@ -11,10 +11,10 @@ function(ClangFormat)
 			OUTPUT_QUIET)
 	endif()
 
-	set(COMMON_ARGS --style file:${PROJECT_SOURCE_DIR}/contrib/clang-format.txt origin/master)
+	set(COMMON_ARGS --style file:${PROJECT_SOURCE_DIR}/contrib/clang-format.txt ${BASEREF})
 
 	if(GITHELPER_STATUS EQUAL 0)
-		message(STATUS "Enabling format target")
+		message(STATUS "Enabling format target against ${BASEREF}")
 
 		add_custom_target(format
 			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}

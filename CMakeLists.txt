@@ -205,4 +205,7 @@ endif()
 include(CPackOptions)
 include(Format)
 
-ClangFormat()
+if(NOT DEFINED CLANGFORMAT_BASEREF)
+	set(CLANGFORMAT_BASEREF "origin/master")
+endif()
+ClangFormat(${CLANGFORMAT_BASEREF})
