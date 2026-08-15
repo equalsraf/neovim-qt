@@ -51,4 +51,16 @@ QKeyEvent CreatePlatformNormalizedKeyEvent(
 	return { type, key, mod, text };
 }
 
+std::optional<QString> GetOptionAsMetaText(const QKeyEvent& /*ev*/) noexcept
+{
+	return std::nullopt;
+}
+
+void SetMacOptionIsMeta(MacOptionMetaMode /*mode*/) noexcept {}
+
+MacOptionMetaMode GetMacOptionIsMeta() noexcept
+{
+	return MacOptionMetaMode::None;
+}
+
 } // namespace NeovimQt::Input
