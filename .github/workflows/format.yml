@@ -28,6 +28,11 @@ jobs:
       - name: Setup PR Branch
         run: git branch ${{ github.base_ref }} origin/${{ github.base_ref }}
 
+      # This system hosts multiple clang-format versions that get different
+      # git command names (per version)
+      - name: Git alias clang-format
+        run: git config alias.clang-format clang-format-18
+
       - name: Run clang-format
         run: |
           cmake -DCLANGFORMAT_BASEREF="${{ github.base_ref }}" -P cmake/RunFormat.cmake
