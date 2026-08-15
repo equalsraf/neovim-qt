@@ -366,14 +366,13 @@ void Shell::setAttached(bool attached)
 
 		updateClientInfo();
 
-		// Re-add runtime to rtp: plugin managers (e.g. lazy.nvim) may have reset it.
-		const QString appDir{ QCoreApplication::applicationDirPath() };
-		for (const char* relPath : { "../Resources/runtime", "../share/nvim-qt/runtime" }) {
-			const QDir runtimeDir{ QDir{ appDir }.filePath(relPath) };
-			if (runtimeDir.exists()) {
-				const QString rtpCmd{ QString{ "let &rtp.=',%1'" }.arg(runtimeDir.path()) };
+		if (m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
+			// Re-add runtime to rtp: plugin managers (e.g. lazy.nvim) may have reset it.
+			// but only if nvim is spawned
+			auto runtimeDir = App::getRuntimePath();
+			if (!runtimeDir.isEmpty()) {
+				const QString rtpCmd{ QString{ "let &rtp.=',%1'" }.arg(runtimeDir) };
 				m_nvim->api0()->vim_command(rtpCmd.toUtf8());
-				break;
 			}
 		}
 

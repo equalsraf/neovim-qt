@@ -24,9 +24,9 @@ public:
 	static void checkArgumentsMayTerminate(QCommandLineParser&) noexcept;
 	static void processCommandlineOptions(QCommandLineParser&, QStringList) noexcept;
 	static void openNewWindow(const QVariantList& args) noexcept;
+	static QString getRuntimePath() noexcept;
 
 private:
-	static QString getRuntimePath() noexcept;
 	static QStringList getNeovimArgs() noexcept;
 	static void showVersionInfo(QCommandLineParser&) noexcept;
 
