@@ -44,6 +44,40 @@ jobs:
           else
             echo "changes_detected=false" >> $GITHUB_ENV
           fi
+      - name: Upload Artifacts
+        if: fromJSON(env.changes_detected)
+        uses: actions/upload-artifact@v7
+        with:
+          name: ClangFormat Patch
+          path: clang_format.patch
+
+      - name: Patch File
+        run: |
+          if [ -s clang_format.patch ]; then
+            cat clang_format.patch
+          fi
+
+      - name: Check Validity
+        run: |
+          if [ -s clang_format.patch ]; then
+            echo "---------------------------------------------------------------------------"
+            echo "|                          CLANG FORMAT FAILURE                           |"
+            echo "---------------------------------------------------------------------------"
+            echo "|                                                                         |"
+            echo "| Your changes are not clang-format compliant!                            |"
+            echo "|                                                                         |"
+            echo "| An Artifact 'ClangFormat Patch' was uploaded.                           |"
+            echo "|                                                                         |"
+            echo "| Consider inspecting and applying 'clang_format.patch':                  |"
+            echo "|   git apply clang_format.patch                                          |"
+            echo "|                                                                         |"
+            echo "| The contents of 'clang_format.patch' is printed below.                  |"
+            echo "|                                                                         |"
+            echo "---------------------------------------------------------------------------"
+            cat clang_format.patch
+            echo "---------------------------------------------------------------------------"
+            exit 1
+          fi
 
 
 
