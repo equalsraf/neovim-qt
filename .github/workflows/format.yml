@@ -7,6 +7,41 @@ on:
     branches: [ master ]
 
 jobs:
+  # TODO replace existing script call with this cmake target
+  # but still missing output file, etc
+  ClangFormatDiff2:
+    name: ClangFormat2
+    if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    env:
+      CMAKE_GENERATOR: ninja
+    steps:
+      # https://github.com/actions/checkout/issues/416
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup PR Branch
+        run: git branch ${{ github.base_ref }} origin/${{ github.base_ref }}
+
+      - name: Run clang-format
+        run: |
+          cmake -DCLANGFORMAT_BASEREF="${{ github.base_ref }}" -P cmake/RunFormat.cmake
+
+      - name: Detect ClangFormat Changes
+        run: |
+          if [ -s clang_format.patch ]; then
+            echo "changes_detected=true" >> $GITHUB_ENV
+          else
+            echo "changes_detected=false" >> $GITHUB_ENV
+          fi
+
+
+
   ClangFormatDiff:
     name: ClangFormat
     if: github.event_name == 'pull_request'
