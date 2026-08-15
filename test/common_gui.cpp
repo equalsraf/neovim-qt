@@ -40,24 +40,34 @@ QSharedPointer<Shell> CreateShellWidget() noexcept
 	DisableLocalGInitVim();
 	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
 	Shell* s{ new Shell{ c } };
+	s->setAttribute(Qt::WA_DeleteOnClose, true);
 
 	s->show();
 
 	ValidateNeovimConnection(s);
 
-	return QSharedPointer<Shell>(s);
+	return QSharedPointer<Shell>(s, [](Shell *s) {
+			if (s) {
+				s->close();
+			}
+			});
 }
 
 QSharedPointer<MainWindow> CreateMainWindow() noexcept
 {
 	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
 	MainWindow* w{ new MainWindow{ c } };
+	w->setAttribute(Qt::WA_DeleteOnClose, true);
 
 	w->show();
 
 	ValidateNeovimConnection(w);
 
-	return QSharedPointer<MainWindow>(w);
+	return QSharedPointer<MainWindow>(w, [](MainWindow *w) {
+			if (w) {
+				w->close();
+			}
+			});
 }
 
 QSharedPointer<MainWindow> CreateMainWindowWithRuntime() noexcept
@@ -69,12 +79,17 @@ QSharedPointer<MainWindow> CreateMainWindowWithRuntime() noexcept
 	DisableLocalGInitVim();
 	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNoneRuntime) };
 	MainWindow* w{ new MainWindow{ c } };
+	w->setAttribute(Qt::WA_DeleteOnClose, true);
 
 	w->show();
 
 	ValidateNeovimConnection(w);
 
-	return QSharedPointer<MainWindow>(w);
+	return QSharedPointer<MainWindow>(w, [](MainWindow *w) {
+			if (w) {
+				w->close();
+			}
+			});
 }
 
 } // namespace NeovimQt
