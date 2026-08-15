@@ -3,4 +3,5 @@ build/
 src/gui/runtime/doc/tags
 third-party/msgpack*
 compile_commands.json
+clang_format.patch
 !.github
