@@ -19,39 +19,11 @@ Instructions for common platforms are listed below.
 
 ### Windows
 
-Nightly versions of Neovim Qt require manual download + installation.
-
-Pre-built Windows binaries are provided for all recent commits:  
-[AppVeyor Commit Build Wiki Instructions](https://github.com/equalsraf/neovim-qt/wiki/Windows-AppVeyor-Builds)
-
-#### Neovim version 0.10.0 and later
-
-Starting with Neovim version `0.10.0`, Neovim Qt is no longer bundled with Neovim on Windows; each package must be installed separately.
+Each package must be installed separately.
 
 ```
 > winget install neovim.neovim
 > winget install equalsraf.neovim-qt
-```
-
-#### Neovim versions before 0.10.0
-
-Neovim Qt is bundled with all releases of Neovim on Windows prior to Neovim version `0.10.0`.
-
-See the Neovim release page:
-
- - [Nightly Release](https://github.com/neovim/neovim/releases/nightly)
- - [Stable Release](https://github.com/neovim/neovim/releases/latest)
-
-Neovim is available as a [Chocolatey Package](https://chocolatey.org/packages/neovim/).
-
-Stable Neovim + Neovim Qt:
-```
-> choco install neovim
-```
-
-Pre-Release Neovim + Stable Neovim Qt:
-```
-> choco install neovim --pre
 ```
 
 ### MacOS
@@ -98,6 +70,14 @@ Neovim Qt is in both the Debian and Ubuntu package repositories, and can be inst
 
 ```
 $ apt install neovim-qt
+```
+
+#### Guix
+
+Guix has separate packages for neovim and neovim-qt
+
+```
+guix install neovim-qt neovim
 ```
 
 #### Homebrew
