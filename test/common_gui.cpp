@@ -46,11 +46,13 @@ QSharedPointer<Shell> CreateShellWidget() noexcept
 
 	ValidateNeovimConnection(s);
 
-	return QSharedPointer<Shell>(s, [](Shell *s) {
+	return QSharedPointer<Shell>(s,
+		[](Shell* s)
+		{
 			if (s) {
 				s->close();
 			}
-			});
+		});
 }
 
 QSharedPointer<MainWindow> CreateMainWindow() noexcept
@@ -63,11 +65,13 @@ QSharedPointer<MainWindow> CreateMainWindow() noexcept
 
 	ValidateNeovimConnection(w);
 
-	return QSharedPointer<MainWindow>(w, [](MainWindow *w) {
+	return QSharedPointer<MainWindow>(w,
+		[](MainWindow* w)
+		{
 			if (w) {
 				w->close();
 			}
-			});
+		});
 }
 
 QSharedPointer<MainWindow> CreateMainWindowWithRuntime() noexcept
@@ -85,11 +89,13 @@ QSharedPointer<MainWindow> CreateMainWindowWithRuntime() noexcept
 
 	ValidateNeovimConnection(w);
 
-	return QSharedPointer<MainWindow>(w, [](MainWindow *w) {
+	return QSharedPointer<MainWindow>(w,
+		[](MainWindow* w)
+		{
 			if (w) {
 				w->close();
 			}
-			});
+		});
 }
 
 } // namespace NeovimQt
