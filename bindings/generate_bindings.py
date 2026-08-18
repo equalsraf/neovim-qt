@@ -46,7 +46,7 @@ def generate_file(name, outfile, **kw):
     with open(outfile, 'w') as fp:
         fp.write(template.render(kw))
 
-ARRAY_OF = re.compile('ArrayOf\(\s*(\w+)\s*\)')
+ARRAY_OF = re.compile(r'ArrayOf\(\s*(\w+)\s*\)')
 class UnsupportedType(Exception): pass
 class NeovimTypeVal:
     """
@@ -71,7 +71,7 @@ class NeovimTypeVal:
         }
     PAIRTYPE = 'ArrayOf(Integer, 2)'
     # Unbound Array types
-    UNBOUND_ARRAY = re.compile('ArrayOf\(\s*(\w+)\s*\)')
+    UNBOUND_ARRAY = re.compile(r'ArrayOf\(\s*(\w+)\s*\)')
 
     def __init__(self, typename, name=''):
         self.name = name
