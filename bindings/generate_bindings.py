@@ -33,6 +33,12 @@ def get_api_info(nvim):
     info = subprocess.check_output(args)
     return decutf8(msgpack.unpackb(info))
 
+def read_api_info(path):
+    with open(path, 'rb') as f:
+        info = f.read()
+        return decutf8(msgpack.unpackb(info))
+
+
 def generate_file(name, outfile, **kw):
     from jinja2 import Environment, FileSystemLoader
     env=Environment(loader=FileSystemLoader('bindings'), trim_blocks=True)
@@ -210,8 +216,15 @@ if __name__ == '__main__':
 
     nvim = sys.argv[1]
     outpath = None if len(sys.argv) < 3 else sys.argv[2]
+
+    is_mpack = nvim.endswith('.mpack')
+
     try:
-        api = get_api_info(sys.argv[1])
+        if is_mpack:
+            print('Treating input as .mpack file')
+            api = read_api_info(sys.argv[1])
+        else:
+            api = get_api_info(sys.argv[1])
     except subprocess.CalledProcessError as ex:
         print(ex)
         sys.exit(-1)
