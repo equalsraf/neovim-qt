@@ -9,15 +9,32 @@ on:
   workflow_dispatch:
     inputs:
       nightly:
+        description: 'Generate a nightly release'
         type: boolean
         required: true
         default: false
-    outputs:
-      workflow_run_id:
-        description: 'The ID of this workflow run'
-        value: ${{ jobs.ExportId.outputs.run_id }}
 
 jobs:
+  CreateNightlyRelease:
+    name: Nightly Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # needed to get git tag/notes
+      - uses: actions/checkout@v7
+      - name: Create Release
+        if: ${{ inputs.nightly }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NAME="nightly-${{ github.sha }}"
+          if ! gh release view "$NAME" >/dev/null 2>&1; then
+            gh release create $NAME --draft --title "$NAME" --verify-tag --notes-from-tag --prerelease
+          else
+            echo "Release already exists. Skipping."
+          fi
+
   CreateRelease:
     name: Draft Release
     runs-on: ubuntu-latest
@@ -41,7 +58,7 @@ jobs:
 
   BuildTest:
     name: ${{ matrix.name }}
-    needs: [CreateRelease]
+    needs: [CreateRelease, CreateNightlyRelease]
     strategy:
       fail-fast: false
       matrix:
@@ -220,14 +237,6 @@ jobs:
           name: neovim-qt.dmg
           path: neovim-qt.dmg
 
-  ExportId:
-    runs-on: ubuntu-latest
-    outputs:
-      run_id: ${{ steps.set_id.outputs.current_run_id }}
-    steps:
-      - id: set_id
-        run: echo "current_run_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
-
   UploadReleaseAssets:
     name: Upload Release Assets
     # Depending on the create job is not enough - because the job always runs
@@ -255,4 +264,31 @@ jobs:
           TAG_NAME="${{ github.ref_name }}"
           ls -lh
           gh release upload --clobber "$TAG_NAME" neovim-qt-installer.msi neovim-qt.zip neovim-qt.dmg
+  ReleaseNightly:
+    name: Release Nightly
+    # Depending on the create job is not enough - because the job always runs
+    # we must check for a tag here too
+    needs: [CreateNightlyRelease, BuildTest]
+    if: ${{ inputs.nightly }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # required for gh release step
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: 'neovim-qt*'
+          skip-decompress: true
+          merge-multiple: true
+
+      - name: Upload release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Add artifact file names here
+        run: |
+          NAME="nightly-${{ github.sha }}"
+          gh release upload --clobber "$NAME" neovim-qt-installer.msi neovim-qt.zip neovim-qt.dmg
+          gh release edit "$NAME" --draft=false
 
