@@ -30,7 +30,7 @@ jobs:
         run: |
           NAME="nightly-${{ github.sha }}"
           if ! gh release view "$NAME" >/dev/null 2>&1; then
-            gh release create $NAME --draft --title "$NAME" --verify-tag --notes-from-tag --prerelease
+            gh release create $NAME --draft --title "$NAME" --notes "$NAME auto-generated" --prerelease
           else
             echo "Release already exists. Skipping."
           fi
