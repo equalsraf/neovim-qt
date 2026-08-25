@@ -6,6 +6,16 @@ on:
     tags: [ '*' ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      nightly:
+        type: boolean
+        required: true
+        default: false
+    outputs:
+      workflow_run_id:
+        description: 'The ID of this workflow run'
+        value: ${{ jobs.ExportId.outputs.run_id }}
 
 jobs:
   CreateRelease:
@@ -209,6 +219,14 @@ jobs:
           archive: false
           name: neovim-qt.dmg
           path: neovim-qt.dmg
+
+  ExportId:
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.set_id.outputs.current_run_id }}
+    steps:
+      - id: set_id
+        run: echo "current_run_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
 
   UploadReleaseAssets:
     name: Upload Release Assets
