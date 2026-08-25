@@ -13,10 +13,9 @@ on:
         type: boolean
         required: true
         default: false
-  on:
-    schedule:
-      # 22:45 UTC on the 25th of every month
-      - cron: '45 22 25 * *'
+  schedule:
+    # 22:45 UTC on the 25th of every month
+    - cron: '45 22 25 * *'
 
 jobs:
   CreateNightlyRelease:
