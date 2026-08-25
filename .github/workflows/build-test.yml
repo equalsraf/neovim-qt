@@ -13,6 +13,10 @@ on:
         type: boolean
         required: true
         default: false
+  on:
+    schedule:
+      # 22:45 UTC on the 25th of every month
+      - cron: '45 22 25 * *'
 
 jobs:
   CreateNightlyRelease:
@@ -24,7 +28,7 @@ jobs:
       # needed to get git tag/notes
       - uses: actions/checkout@v7
       - name: Create Release
-        if: ${{ inputs.nightly }}
+        if: github.event_name == 'schedule' || inputs.nightly == true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -269,7 +273,7 @@ jobs:
     # Depending on the create job is not enough - because the job always runs
     # we must check for a tag here too
     needs: [CreateNightlyRelease, BuildTest]
-    if: ${{ inputs.nightly }}
+    if: github.event_name == 'schedule' || inputs.nightly == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
