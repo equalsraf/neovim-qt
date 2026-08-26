@@ -151,10 +151,14 @@ endif()
 # msgpack
 option(USE_SYSTEM_MSGPACK "Use system msgpack libraries " OFF)
 if(USE_SYSTEM_MSGPACK)
-	find_package(msgpack-c 6...<8 REQUIRED)
+	find_package(msgpack-c 6)
+	if(NOT msgpack-c_FOUND)
+		find_package(msgpack-c 7 REQUIRED)
+	endif()
 else()
 	add_subdirectory(third-party)
 endif()
+
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	add_definitions(-DQT_NO_DEBUG_OUTPUT)
