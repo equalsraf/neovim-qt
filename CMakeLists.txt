@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.11.0)
 # Neovim-Qt Version, used by --version update before release
 # 9999 = Development Pre-Release
-project(neovim-qt VERSION 0.2.20.0)
+project(neovim-qt VERSION 0.2.20.9999)
 
 if(NOT EXISTS ${NEOVIM_EXEC})
 	set(NEOVIM_EXEC nvim)
