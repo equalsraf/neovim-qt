@@ -151,7 +151,7 @@ endif()
 # msgpack
 option(USE_SYSTEM_MSGPACK "Use system msgpack libraries " OFF)
 if(USE_SYSTEM_MSGPACK)
-	find_package(msgpack-c 6.0.0 REQUIRED)
+	find_package(msgpack-c 6...<8 REQUIRED)
 else()
 	add_subdirectory(third-party)
 endif()
