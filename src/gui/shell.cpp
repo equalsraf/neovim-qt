@@ -701,8 +701,6 @@ void Shell::handleRedraw(const QByteArray& name, const QVariantList& opargs)
 	} else if (name == "popupmenu_hide") {
 		m_pum.hide();
 	} else if (name == "mode_info_set") {
-		qDebug() << "mode_info_set";
-		qDebug() << "  " << opargs;
 		handleModeInfoSet(opargs);
 	} else if (name == "flush") {
 		// Do Nothing, a notification that nvim is done redrawing.
@@ -801,7 +799,6 @@ void Shell::handleModeChange(const QVariantList& opargs)
 		return;
 	}
 
-	//const QString mode{ m_nvim->decode(opargs.at(0).toByteArray()) };
 	const uint64_t modeIndex{ opargs.at(1).toULongLong() };
 
 	if (!m_cursor.IsStyleEnabled()) {
@@ -885,8 +882,6 @@ void Shell::handleModeInfoSet(const QVariantList& opargs)
 
 	const bool cursor_style_enabled{ opargs.at(0).toBool() };
 	const QVariantList mode_info = opargs.at(1).toList();
-
-	qDebug() << "  cursor_style_enabled:" << cursor_style_enabled;
 
 	m_cursor.SetIsStyleEnabled(cursor_style_enabled);
 	m_modeInfo = mode_info;
