@@ -15,7 +15,6 @@ ScrollBar::ScrollBar(NeovimConnector* nvim, QWidget* parent) noexcept
 	}
 
 	connect(m_nvim, &NeovimConnector::ready, this, &ScrollBar::neovimConnectorReady);
-	connect(this, &QScrollBar::valueChanged, this, &ScrollBar::handleValueChanged);
 
 	QSettings settings;
 	setVisible(settings.value("Gui/ScrollBar", false).toBool());
@@ -25,10 +24,16 @@ ScrollBar::ScrollBar(NeovimConnector* nvim, QWidget* parent) noexcept
 
 void ScrollBar::neovimConnectorReady() noexcept
 {
-	connect(m_nvim->api0(), &NeovimApi0::neovimNotification,
-		this, &ScrollBar::handleNeovimNotification);
+	if (!m_nvim->api2()) {
+		qWarning() << "Scrollbar NeovimConnector api version 2 is not available";
+		return;
+	}
 
-	m_nvim->api0()->vim_subscribe("Gui");
+	connect(m_nvim->api2(), &NeovimApi2::neovimNotification,
+		this, &ScrollBar::handleNeovimNotification);
+	connect(this, &QScrollBar::valueChanged, this, &ScrollBar::handleValueChanged);
+
+	m_nvim->api2()->vim_subscribe("Gui");
 }
 
 bool ScrollBar::IsWinViewportSupported() const noexcept
@@ -217,14 +222,14 @@ void ScrollBar::handleValueChanged(int value)
 	// Scroll Up: normal! {Control + Y}
 	// MSVC cannot parse the un-escaped sequence below `^Y`.
 	if (delta > 0) {
-		m_nvim->api0()->vim_command(
+		m_nvim->api2()->vim_command(
 			QStringLiteral("normal! %1\031").arg(delta).toLatin1());
 	}
 
 	// Scroll Down normal! {Control + E}
 	// MSVC cannot parse the un-escaped sequence below `^E`.
 	if (delta < 0) {
-		m_nvim->api0()->vim_command(
+		m_nvim->api2()->vim_command(
 			QStringLiteral("normal! %1\005").arg(delta).toLatin1());
 	}
 }

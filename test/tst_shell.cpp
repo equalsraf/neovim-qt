@@ -110,7 +110,7 @@ void TestShell::gviminit() noexcept
 	auto s = CreateShellWidget();
 	NeovimConnector* c = s->nvim();
 
-	MsgpackRequest* req{ c->api0()->vim_command_output(c->encode("echo g:test_gviminit")) };
+	MsgpackRequest* req{ c->api2()->vim_command_output(c->encode("echo g:test_gviminit")) };
 	QSignalSpy cmd{ req, &MsgpackRequest::finished };
 	QVERIFY(cmd.isValid());
 	QVERIFY(SPYWAIT(cmd));
@@ -275,7 +275,7 @@ void TestShell::CloseEvent() noexcept
 	QSignalSpy onWindowClosing(w.get(), &MainWindow::closing);
 	QVERIFY(onWindowClosing.isValid());
 
-	c->api0()->vim_command(c->encode(command));
+	c->api2()->vim_command(c->encode(command));
 
 	QVERIFY(SPYWAIT(onClose));
 	QCOMPARE(onClose.takeFirst().at(0).toInt(), msgpack_status);
@@ -329,7 +329,7 @@ void TestShell::GetClipboard() noexcept
 	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
 
 	// provided by the GUI shim
-	c->api0()->vim_command(c->encode("call GuiClipboard()"));
+	c->api2()->vim_command(c->encode("call GuiClipboard()"));
 
 	QGuiApplication::clipboard()->setText(register_data, GetClipboardMode(reg));
 
@@ -367,7 +367,7 @@ void TestShell::SetClipboard() noexcept
 	QObject::connect(c->neovimObject(), &NeovimApi1::err_vim_command_output, SignalPrintError);
 
 	// provided by the GUI shim
-	c->api0()->vim_command(c->encode("call GuiClipboard()"));
+	c->api2()->vim_command(c->encode("call GuiClipboard()"));
 
 	QString setreg_cmd =
 		QStringLiteral("setreg('%1', '%2')\n").arg(reg).arg(QString::fromUtf8(register_data));

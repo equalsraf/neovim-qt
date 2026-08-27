@@ -44,7 +44,7 @@ private:
 
 	void updateTabControl(
 		QTabBar& tabControl,
-		NeovimApi0* nvimApi0,
+		NeovimApi2* nvimApi2,
 		const std::vector<Tab> tabList,
 		uint64_t curtab,
 		bool drawTabIcons) noexcept;
