@@ -205,6 +205,23 @@ void ScrollBar::handleSetScrollBarVisible(const QVariantList& args) noexcept
 	settings.setValue("Gui/ScrollBar", isVisible);
 }
 
+QByteArray ScrollBar::scrollCommand(int delta)
+{
+	if (delta > 0) {
+		// Scroll Up: normal! {Control + Y}
+		// MSVC cannot parse the un-escaped sequence below `^Y`.
+		return QStringLiteral("normal! %1\031").arg(delta).toLatin1();
+	}
+	else if (delta < 0) {
+		// Scroll Down normal! {Control + E}
+		// MSVC cannot parse the un-escaped sequence below `^E`.
+		return QStringLiteral("normal! %1\005").arg(-delta).toLatin1();
+	}
+	else {
+		return QByteArray();
+	}
+}
+
 void ScrollBar::handleValueChanged(int value)
 {
 	const int delta{ m_lastKnownPosition - value};
@@ -214,18 +231,9 @@ void ScrollBar::handleValueChanged(int value)
 
 	m_lineScrollLockout += delta;
 
-	// Scroll Up: normal! {Control + Y}
-	// MSVC cannot parse the un-escaped sequence below `^Y`.
-	if (delta > 0) {
-		m_nvim->api0()->vim_command(
-			QStringLiteral("normal! %1\031").arg(delta).toLatin1());
-	}
-
-	// Scroll Down normal! {Control + E}
-	// MSVC cannot parse the un-escaped sequence below `^E`.
-	if (delta < 0) {
-		m_nvim->api0()->vim_command(
-			QStringLiteral("normal! %1\005").arg(delta).toLatin1());
+	auto cmd = scrollCommand(delta);
+	if (!cmd.isEmpty()) {
+		m_nvim->api0()->vim_command(cmd);
 	}
 }
 
