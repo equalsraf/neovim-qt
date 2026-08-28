@@ -6,6 +6,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QFontDialog>
 #include <QKeyEvent>
 #include <QMimeData>
@@ -24,6 +25,16 @@
 #include "version.h"
 
 namespace NeovimQt {
+
+static QByteArray ReadResourceFile(const QString& path) noexcept
+{
+	QFile f(path);
+	if (!f.open(QIODevice::ReadOnly)) {
+		qWarning() << "Failed to read embedded resource:" << path;
+		return {};
+	}
+	return f.readAll();
+}
 
 static ShellOptions GetShellOptionsFromQSettings() noexcept
 {
@@ -425,6 +436,21 @@ void Shell::init()
 		options.insert("ext_linegrid", true);
 	}
 	options.insert("rgb", true);
+
+	if (auto api3 = m_nvim->api3()) {
+		const QByteArray bootstrap{ ReadResourceFile(":/bootstrap.lua") };
+		const QByteArray shimScript{ ReadResourceFile(":/nvim_gui_shim.vim") };
+		const QByteArray helpText{ ReadResourceFile(":/nvim_gui_shim.txt") };
+
+		if (!bootstrap.isEmpty() && !shimScript.isEmpty()) {
+			QVariantList args;
+			args.append(QString::fromUtf8(shimScript));
+			args.append(QString::fromUtf8(helpText));
+
+			MsgpackRequest* req_shim{ api3->nvim_execute_lua(bootstrap, args) };
+			connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
+		}
+	}
 
 	MsgpackRequest* req{ nullptr };
 	if (m_nvim->api2()) {
