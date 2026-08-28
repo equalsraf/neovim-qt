@@ -39,7 +39,6 @@ endif()
 add_subdirectory(shellwidget)
 
 include(GNUInstallDirs)
-set(RUNTIME_PATH )
 
 add_library(neovim-qt-gui
 	app.cpp
@@ -66,10 +65,6 @@ add_executable(nvim-qt WIN32 MACOSX_BUNDLE main.cpp
 target_link_libraries(nvim-qt ${QTLIBS} ${MSGPACK_LIBRARIES} neovim-qt-gui)
 
 if(APPLE)
-	add_custom_command(TARGET nvim-qt COMMAND ${CMAKE_COMMAND} -E copy_directory
-		${CMAKE_CURRENT_SOURCE_DIR}/runtime/
-		${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nvim-qt.app/Contents/Resources/runtime
-		COMMENT "Copying runtime into bundle")
 #	TODO: Bundle Qt, currently conflicts with brew Qt
 #	add_custom_command(TARGET nvim-qt COMMAND macdeployqt
 #		ARGS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nvim-qt.app
@@ -91,9 +86,6 @@ endif()
 
 install(TARGETS nvim-qt DESTINATION ${CMAKE_INSTALL_BINDIR})
 if(NOT APPLE)
-	install(DIRECTORY runtime
-		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt
-		PATTERN "README.md" EXCLUDE)
 	install(FILES ${PROJECT_SOURCE_DIR}/LICENSE
 		DESTINATION ${CMAKE_INSTALL_DATADIR}/nvim-qt)
 	install(FILES nvim-qt.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)

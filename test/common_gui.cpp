@@ -76,12 +76,8 @@ QSharedPointer<MainWindow> CreateMainWindow() noexcept
 
 QSharedPointer<MainWindow> CreateMainWindowWithRuntime() noexcept
 {
-	static const QStringList cs_argsNoneRuntime{
-		"-u", "NONE", "--cmd", "set rtp+=" + GetRuntimeAbsolutePath()
-	};
-
 	DisableLocalGInitVim();
-	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNoneRuntime) };
+	NeovimConnector* c{ NeovimConnector::spawn(cs_argsNone) };
 	MainWindow* w{ new MainWindow{ c } };
 	w->setAttribute(Qt::WA_DeleteOnClose, true);
 

@@ -289,9 +289,6 @@ void TestShell::CloseEvent() noexcept
 	// and finally a call to nvim-qt
 	QProcess p;
 	p.setProgram(NVIM_QT_BINARY);
-	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-	env.insert("NVIM_QT_RUNTIME_PATH", GetRuntimeAbsolutePath());
-	p.setProcessEnvironment(env);
 	p.setArguments(BinaryAndArgumentsNoForkWithCommand(command));
 	p.start();
 	p.waitForFinished(-1);

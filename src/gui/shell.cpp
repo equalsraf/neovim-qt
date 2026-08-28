@@ -366,19 +366,6 @@ void Shell::setAttached(bool attached)
 
 		updateClientInfo();
 
-		if (m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
-			// Re-add runtime to rtp: plugin managers (e.g. lazy.nvim) may have reset it.
-			// but only if nvim is spawned
-			auto runtimeDir = App::getRuntimePath();
-			if (!runtimeDir.isEmpty()) {
-				const QString rtpCmd{ QString{ "let &rtp.=',%1'" }.arg(runtimeDir) };
-				m_nvim->api0()->vim_command(rtpCmd.toUtf8());
-			}
-		}
-
-		MsgpackRequest* req_shim{ m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim") };
-		connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
-
 		MsgpackRequest* req_ginit{ m_nvim->api0()->vim_command(GetGVimInitCommand()) };
 		connect(req_ginit, &MsgpackRequest::error, this, &Shell::handleGinitError);
 
