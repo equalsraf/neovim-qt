@@ -85,7 +85,7 @@ public:
 	NeovimApi4 * api4();
 	NeovimApi5 * api5();
 	NeovimApi6 * api6();
-	NeovimApi7 * api7();
+	NeovimApi7* api7();
 	uint64_t channel();
 
 	// Decode a byte array as a string according to Neovim string encoding
@@ -137,7 +137,7 @@ private:
 	NeovimApi4 *m_api4{ nullptr };
 	NeovimApi5 *m_api5{ nullptr };
 	NeovimApi6 *m_api6{ nullptr };
-	NeovimApi7 *m_api7{ nullptr };
+	NeovimApi7* m_api7{ nullptr };
 	quint64 m_channel{ 0 };
 	quint64 m_api_compat{ 0 };
 	quint64 m_api_supported{ 0 };

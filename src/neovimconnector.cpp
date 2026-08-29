@@ -260,10 +260,11 @@ NeovimApi6* NeovimConnector::api6()
  */
 NeovimApi7* NeovimConnector::api7()
 {
-	if ( !m_api7 ) {
+	if (!m_api7) {
 		if (m_api_compat <= 6 && 6 <= m_api_supported) {
 			m_api7 = new NeovimApi7(this);
-		} else {
+		}
+		else {
 			qWarning() << "This instance of neovim not support api level 7";
 		}
 	}
