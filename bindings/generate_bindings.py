@@ -203,6 +203,8 @@ def print_api(api):
             pass
         elif key == 'version':
             print('Version {major}.{minor}.{patch} API {api_level} supports API {api_compatible}'.format(**api[key]))
+        elif key == 'ui_options':
+            print('UI options: {}'.format(api[key]))
         else:
             print('Unknown API info attribute: %s' % key)
 
