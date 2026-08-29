@@ -366,18 +366,18 @@ void Shell::setAttached(bool attached)
 
 		updateClientInfo();
 
-		if (m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
-			// Re-add runtime to rtp: plugin managers (e.g. lazy.nvim) may have reset it.
-			// but only if nvim is spawned
-			auto runtimeDir = App::getRuntimePath();
-			if (!runtimeDir.isEmpty()) {
-				const QString rtpCmd{ QString{ "let &rtp.=',%1'" }.arg(runtimeDir) };
-				m_nvim->api0()->vim_command(rtpCmd.toUtf8());
-			}
-		}
+		//if (m_nvim->connectionType() == NeovimConnector::SpawnedConnection) {
+		//	// Re-add runtime to rtp: plugin managers (e.g. lazy.nvim) may have reset it.
+		//	// but only if nvim is spawned
+		//	auto runtimeDir = App::getRuntimePath();
+		//	if (!runtimeDir.isEmpty()) {
+		//		const QString rtpCmd{ QString{ "let &rtp.=',%1'" }.arg(runtimeDir) };
+		//		m_nvim->api0()->vim_command(rtpCmd.toUtf8());
+		//	}
+		//}
 
-		MsgpackRequest* req_shim{ m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim") };
-		connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
+		//MsgpackRequest* req_shim{ m_nvim->api0()->vim_command("runtime plugin/nvim_gui_shim.vim") };
+		//connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
 
 		MsgpackRequest* req_ginit{ m_nvim->api0()->vim_command(GetGVimInitCommand()) };
 		connect(req_ginit, &MsgpackRequest::error, this, &Shell::handleGinitError);
@@ -397,6 +397,26 @@ void Shell::setAttached(bool attached)
 	updateGuiFontRegisters();
 
 	update();
+}
+
+/// Take data (vimscript) and evaluate it in neovim via the vim.cmd.
+/// It is up to the caller to check if api3() is available.
+///
+/// Note: lua string assumes shim script does not have === string inside.
+void Shell::loadShimApi3(QString data)
+{
+	auto api = m_nvim->api3();
+	if (!api) {
+		m_nvim->api0()->vim_report_error("neovim-qt tried to luad script via vim.cmd but nvim does not support api3");
+		return;
+	}
+
+	auto wrapper = QStringLiteral("vim.cmd([===[%1]===])")
+		.arg(data)
+		.toLatin1();
+
+	MsgpackRequest* req_shim{ api->nvim_execute_lua(wrapper, QVariantList()) };
+	connect(req_shim, &MsgpackRequest::error, this, &Shell::handleShimError);
 }
 
 void Shell::init()
@@ -438,6 +458,32 @@ void Shell::init()
 		options.insert("ext_linegrid", true);
 	}
 	options.insert("rgb", true);
+
+	// FIXME - load shim, try different approaches depending on version - last resort is
+	// to blindly assume plugin is in rtp
+	auto shim = App::getRuntimeShim();
+	if (shim.isEmpty()) {
+		auto msg = QStringLiteral("Failed to find neovim-qt gui shim file")
+			.toLatin1();
+		m_nvim->api0()->vim_report_error(msg);
+		qDebug() << __func__ << msg;
+	} else {
+		auto f = QFile(shim);
+		if (f.open(QFile::ReadOnly | QFile::Text)) {
+			auto shimData = QTextStream(&f).readAll();
+
+			// FIXME check api3 and fallback
+			loadShimApi3(shimData);
+			qDebug() << __func__ << "shin loading" << shim;
+		} else {
+			auto msg = QStringLiteral("Failed to open GUI shim file: %1 - %2")
+				.arg(shim)
+				.arg(f.errorString())
+				.toLatin1();
+			m_nvim->api0()->vim_report_error(msg);
+			qDebug() << __func__ << msg << f.errorString();
+		}
+	}
 
 	MsgpackRequest* req{ nullptr };
 	if (m_nvim->api2()) {
@@ -2081,6 +2127,10 @@ void Shell::handleGinitError(quint32 msgid, quint64 fun, const QVariant& err)
 
 void Shell::handleShimError(quint32 msgid, quint64 fun, const QVariant& err)
 {
+	// FIXME
+	auto msg = QStringLiteral("Error loading neovim-qt shim")
+		.toLatin1();
+	m_nvim->api0()->vim_report_error(msg);
 	qDebug() << "GUI shim error " << err;
 }
 

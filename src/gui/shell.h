@@ -230,6 +230,8 @@ private:
 	bool m_mouseHide{ true };
 	quint64 m_font_timestamp{ 0 };
 
+	void loadShimApi3(QString data);
+
 	// highlight fg/bg - from redraw:highlightset - by default we
 	// use the values from above
 	QColor m_hg_foreground{ Qt::black };
