@@ -41,6 +41,8 @@ private:
 
 	NeovimConnector *m_nvim{ nullptr };
 
+	QByteArray scrollCommand(int value);
+
 	/// Locks out GUI triggered scrolling for a number of lines. Prevent double registration.
 	int m_lineScrollLockout{ 0 };
 
