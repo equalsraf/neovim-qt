@@ -34,22 +34,22 @@ ContextMenu::ContextMenu(NeovimConnector* nvim, QWidget* parent) noexcept
 
 void ContextMenu::neovimSendCut() noexcept
 {
-	m_nvim->api0()->vim_command_output(R"(normal! "+x)");
+	m_nvim->api2()->vim_command_output(R"(normal! "+x)");
 }
 
 void ContextMenu::neovimSendCopy() noexcept
 {
-	m_nvim->api0()->vim_command(R"(normal! "+y)");
+	m_nvim->api2()->vim_command(R"(normal! "+y)");
 }
 
 void ContextMenu::neovimSendPaste() noexcept
 {
-	m_nvim->api0()->vim_command(R"(normal! "+gP)");
+	m_nvim->api2()->vim_command(R"(normal! "+gP)");
 }
 
 void ContextMenu::neovimSendSelectAll() noexcept
 {
-	m_nvim->api0()->vim_command("normal! ggVG");
+	m_nvim->api2()->vim_command("normal! ggVG");
 }
 
 void ContextMenu::showContextMenu() noexcept

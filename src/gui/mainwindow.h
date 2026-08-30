@@ -53,7 +53,7 @@ private slots:
 	void neovimError(NeovimConnector::NeovimError);
 	void reconnectNeovim();
 	void handleNeovimAttachment(bool);
-	void neovimIsUnsupported();
+	void neovimIsUnsupported(bool error, quint64 required);
 	void saveWindowGeometry();
 	void handleClosing();
 

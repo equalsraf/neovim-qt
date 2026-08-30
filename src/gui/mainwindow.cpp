@@ -175,12 +175,20 @@ void MainWindow::neovimError(NeovimConnector::NeovimError err)
 	m_errorWidget->showReconnect(m_nvim->canReconnect());
 	m_stack.setCurrentIndex(0);
 }
-void MainWindow::neovimIsUnsupported()
+void MainWindow::neovimIsUnsupported(bool error, quint64 required)
 {
-	m_errorWidget->setText(
-		QStringLiteral("Cannot connect to this Neovim, required API version 1, found [%1-%2]")
-			.arg(m_nvim->apiCompatibility())
-			.arg(m_nvim->apiLevel()));
+	if (error) {
+		m_errorWidget->setText(
+			QStringLiteral("Cannot connect to this Neovim, failed to check API version [%1-%2]")
+				.arg(m_nvim->apiCompatibility())
+				.arg(m_nvim->apiLevel()));
+	} else {
+		m_errorWidget->setText(
+			QStringLiteral("Cannot connect to this Neovim, required API%1, found [%1-%2]")
+				.arg(required)
+				.arg(m_nvim->apiCompatibility())
+				.arg(m_nvim->apiLevel()));
+	}
 	m_errorWidget->showReconnect(m_nvim->canReconnect());
 	m_stack.setCurrentIndex(0);
 }
@@ -229,7 +237,7 @@ void MainWindow::neovimFrameless(bool isFrameless)
 	// Details: https://doc.qt.io/qt-5/qwidget.html#windowFlags-prop
 	show();
 
-	m_nvim->api0()->vim_set_var("GuiWindowFrameless", isFrameless ? 1 : 0);
+	m_nvim->api2()->vim_set_var("GuiWindowFrameless", isFrameless ? 1 : 0);
 
 }
 
@@ -391,7 +399,7 @@ void MainWindow::showGuiAdaptiveStyleList()
 {
 	const QString styleKeys{ QStyleFactory::keys().join("\n") };
 	QString echoCommand{ R"(echo "%1")" };
-	m_nvim->api0()->vim_command(echoCommand.arg(styleKeys).toLatin1());
+	m_nvim->api2()->vim_command(echoCommand.arg(styleKeys).toLatin1());
 }
 
 void MainWindow::updateAdaptiveFont() noexcept

@@ -38,17 +38,17 @@ void TreeView::neovimConnectorReady() noexcept
 	connect(this, &TreeView::doubleClicked, this, &TreeView::open);
 
 	connect(
-		m_nvim->api0(), &NeovimApi0::neovimNotification, this, &TreeView::handleNeovimNotification);
+		m_nvim->api2(), &NeovimApi2::neovimNotification, this, &TreeView::handleNeovimNotification);
 
-	m_nvim->api0()->vim_subscribe("Dir");
-	m_nvim->api0()->vim_subscribe("Gui");
+	m_nvim->api2()->vim_subscribe("Dir");
+	m_nvim->api2()->vim_subscribe("Gui");
 }
 
 void TreeView::open(const QModelIndex& index) noexcept
 {
 	const QFileInfo fileInfo{ m_model.fileInfo(index) };
 	if (fileInfo.isFile() && fileInfo.isReadable()) {
-		m_nvim->api0()->vim_call_function("GuiDrop", { fileInfo.filePath() });
+		m_nvim->api2()->vim_call_function("GuiDrop", { fileInfo.filePath() });
 	}
 	focusNextChild();
 }

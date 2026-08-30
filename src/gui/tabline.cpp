@@ -66,8 +66,8 @@ Tabline::Tabline(NeovimConnector& nvim, QWidget* parent) noexcept
 void Tabline::neovimConnectorReady() noexcept
 {
 	connect(
-		m_nvim.api0(), &NeovimApi0::neovimNotification, this, &Tabline::handleNeovimNotification);
-	m_nvim.api0()->vim_subscribe("Gui");
+		m_nvim.api2(), &NeovimApi2::neovimNotification, this, &Tabline::handleNeovimNotification);
+	m_nvim.api2()->vim_subscribe("Gui");
 }
 
 void Tabline::handleNeovimNotification(const QByteArray& name, const QVariantList& args) noexcept
@@ -133,8 +133,8 @@ void Tabline::handleGuiTabline(const QVariantList& args) noexcept
 	QSettings settings;
 	settings.setValue(cs_showTablineOptionName, isEnabled);
 
-	if (m_nvim.api1()) {
-		m_nvim.api1()->nvim_ui_set_option(cs_showTablineOptionName, isEnabled);
+	if (m_nvim.api2()) {
+		m_nvim.api2()->nvim_ui_set_option(cs_showTablineOptionName, isEnabled);
 	}
 
 	updateTablineVisibility();
@@ -323,14 +323,14 @@ void Tabline::drawTablineUpdates(
 	const std::vector<Tab>& bufferList,
 	uint64_t curbuf) noexcept
 {
-	updateTabControl(m_tabline, m_nvim.api0(), tabList, curtab, false /*drawTabIcons*/);
-	updateTabControl(m_bufferline, m_nvim.api0(), bufferList, curbuf, true /*drawTabIcons*/);
+	updateTabControl(m_tabline, m_nvim.api2(), tabList, curtab, false /*drawTabIcons*/);
+	updateTabControl(m_bufferline, m_nvim.api2(), bufferList, curbuf, true /*drawTabIcons*/);
 	updateTablineVisibility();
 }
 
 void Tabline::updateTabControl(
 	QTabBar& tabControl,
-	NeovimApi0* nvimApi0,
+	NeovimApi2* nvimApi2,
 	const std::vector<Tab> tabList,
 	uint64_t curtab,
 	bool drawTabIcons) noexcept
@@ -365,8 +365,8 @@ void Tabline::updateTabControl(
 		}
 
 		// Optional: Add filetype icons
-		if (drawTabIcons && nvimApi0) {
-			auto reqBufferPath{ nvimApi0->vim_eval(
+		if (drawTabIcons && nvimApi2) {
+			auto reqBufferPath{ nvimApi2->vim_eval(
 				QStringLiteral("expand('#%1:p')").arg(tab.GetHandle()).toLatin1()) };
 
 			QPointer<QTabBar> spTabControl{ &tabControl };
@@ -430,33 +430,33 @@ void Tabline::updateTablineVisibility() noexcept
 
 void Tabline::currentChangedTabline(int index) noexcept
 {
-	if (!m_nvim.api0()) {
+	if (!m_nvim.api2()) {
 		return;
 	}
 
 	const uint64_t handle{ m_tabline.tabData(index).toULongLong() };
 
-	m_nvim.api0()->vim_set_current_tabpage(handle);
+	m_nvim.api2()->vim_set_current_tabpage(handle);
 }
 
 void Tabline::closeRequestedTabline(int index) noexcept
 {
-	if (!m_nvim.api0()) {
+	if (!m_nvim.api2()) {
 		return;
 	}
 
 	const uint64_t handle{ m_bufferline.tabData(index).toULongLong() };
-	m_nvim.api0()->vim_command(QStringLiteral("tabclose %1").arg(handle).toLatin1());
+	m_nvim.api2()->vim_command(QStringLiteral("tabclose %1").arg(handle).toLatin1());
 }
 
 void Tabline::currentChangedBufline(int index) noexcept
 {
-	if (!m_nvim.api0()) {
+	if (!m_nvim.api2()) {
 		return;
 	}
 
 	const uint64_t handle{ m_bufferline.tabData(index).toULongLong() };
-	m_nvim.api0()->vim_command(QStringLiteral("buffer! %1").arg(handle).toLatin1());
+	m_nvim.api2()->vim_command(QStringLiteral("buffer! %1").arg(handle).toLatin1());
 }
 
 static QString GetSanitizedErrorString(const QVariant& err) noexcept
@@ -499,13 +499,13 @@ void Tabline::handleCloseBufferError(quint32 msgid, quint64 fun, const QVariant&
 
 void Tabline::closeRequestedBufline(int index) noexcept
 {
-	if (!m_nvim.api0()) {
+	if (!m_nvim.api2()) {
 		return;
 	}
 
 	const uint64_t handle{ m_bufferline.tabData(index).toULongLong() };
 
-	auto reqCloseBuffer{ m_nvim.api0()->vim_command(
+	auto reqCloseBuffer{ m_nvim.api2()->vim_command(
 		QStringLiteral("bdel %1").arg(handle).toLatin1()) };
 	connect(reqCloseBuffer, &MsgpackRequest::error, this, &Tabline::handleCloseBufferError);
 }

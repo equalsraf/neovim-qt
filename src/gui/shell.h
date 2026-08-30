@@ -95,7 +95,7 @@ signals:
 	void neovimFrameless(bool);
 	void neovimGuiCloseRequest(int status = 0);
 	/// This signal is emmited if the running neovim version is unsupported by the GUI
-	void neovimIsUnsupported();
+	void neovimIsUnsupported(bool error, quint64 required);
 	void neovimShowContextMenu();
 	void colorsChanged();
 
