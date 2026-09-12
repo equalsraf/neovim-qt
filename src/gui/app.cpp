@@ -187,7 +187,7 @@ bool getLoginEnvironment(const QString& path)
 	QProcess proc;
 	proc.start(path, {"-l", "-c", "env", "-i"});
 	if (!proc.waitForFinished()) {
-		qDebug() << "Failed to execute shell to get environemnt" << path;
+		qDebug() << "Failed to execute shell to get environment" << path;
 		return false;
 	}
 

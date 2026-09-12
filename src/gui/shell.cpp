@@ -171,7 +171,7 @@ QString Shell::escapeFontListEntry(QString value) noexcept
 ///
 /// @param fdesc Neovim font description string, "Fira Code:h11".
 /// @param opts used to pass options to ShellWidget
-/// @param reset we reseting the font, ignore optimizations
+/// @param reset we resetting the font, ignore optimizations
 /// @returns `true` if the font was successfully set.
 bool Shell::setGuiFont(
 	const QString& fdesc, ShellWidget::FontOptions opts, FontChangeSource src, bool reset) noexcept
@@ -2011,7 +2011,7 @@ void ShellRequestHandler::handleRequest(MsgpackIODevice* dev, quint32 msgid, con
 			}
 
 			// Check nvim, ops.c/get_clipboard() - Expected to return a list with two items
-			// [register data, selection type]. The type can be ommited.
+			// [register data, selection type]. The type can be omitted.
 			QVariantList result;
 
 			auto clipboard_data = QGuiApplication::clipboard()->mimeData(mode);

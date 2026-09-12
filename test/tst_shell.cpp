@@ -307,7 +307,7 @@ void TestShell::GetClipboard_data() noexcept
 	// * or +
 	QTest::addColumn<char>("reg");
 	// data set in the register when starting test, this is set
-	// externaly (i.e. without going through the provider)
+	// externally (i.e. without going through the provider)
 	QTest::addColumn<QByteArray>("register_data");
 
 	QTest::newRow("empty *") << '*' << QByteArray();
@@ -345,7 +345,7 @@ void TestShell::SetClipboard_data() noexcept
 	// * or +
 	QTest::addColumn<char>("reg");
 	// data set in the register when starting test, this is set
-	// externaly (i.e. without going through the provider)
+	// externally (i.e. without going through the provider)
 	QTest::addColumn<QByteArray>("register_data");
 
 	QTest::newRow("empty *") << '*' << QByteArray();

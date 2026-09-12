@@ -114,7 +114,7 @@ int MsgpackIODevice::msgpack_write_to_dev(void* data, const char* buf, unsigned 
 void MsgpackIODevice::dataAvailableStdin(const QByteArray& data)
 {
 	if ( (quint64)data.length() > msgpack_unpacker_buffer_capacity(&m_uk)) {
-		setError(InvalidDevice, tr("Error when reading from stdin, BUG(buffered data exceeds capaciy)"));
+		setError(InvalidDevice, tr("Error when reading from stdin, BUG(buffered data exceeds capacity)"));
 		return;
 	} else if ( data.length() > 0 ) {
 		memcpy(msgpack_unpacker_buffer(&m_uk), data.constData(), data.length());
