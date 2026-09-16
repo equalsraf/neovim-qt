@@ -346,10 +346,9 @@ void MainWindow::restoreWindowGeometry()
 		return;
 	}
 	const QVariant geometry{ settings.value("window_geometry") };
-	if (geometry.isValid()) {
-		restoreGeometry(geometry.toByteArray());
-	}
-	else {
+	// QWidget::restoreGeometry() can fail, for example when Qt rejects the saved
+	// geometry after a large display resolution change. Fall back to the default size.
+	if (!geometry.isValid() || !restoreGeometry(geometry.toByteArray())) {
 		SetDefaultWindowSize(*this);
 	}
 	const QVariant state{ settings.value("window_state") };
