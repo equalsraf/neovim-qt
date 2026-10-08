@@ -1,9 +1,8 @@
-#ifndef NEOVIM_QT_ERRORWIDGET
-#define NEOVIM_QT_ERRORWIDGET
+#pragma once
 
 #include <QLabel>
 #include <QPushButton>
-#include <QSvgWidget>
+#include <QTimer>
 #include <QWidget>
 
 namespace NeovimQt {
@@ -11,19 +10,26 @@ namespace NeovimQt {
 class ErrorWidget: public QWidget {
 	Q_OBJECT
 public:
-	ErrorWidget(QWidget *parent = nullptr);
+	ErrorWidget(QWidget* parent = nullptr) noexcept;
+
 public slots:
-	void setText(const QString& text);
-	void showReconnect(bool);
+	void setText(const QString& text) noexcept;
+	void showReconnect(bool isVisible) noexcept;
+
 signals:
 	void reconnectNeovim();
 
 private:
-	QLabel *m_errorLabel;
-	QSvgWidget *m_image;
-	QPushButton *m_closeButton;
+	void reconnectTimeout() noexcept;
+	QString getRetryMessageText() noexcept;
+
+	QLabel* m_errorMessage{ nullptr };
+	QLabel* m_retryMessage{ nullptr };
+	QPushButton* m_retryButton{ nullptr };
+	QTimer* m_reconnectTimer{ nullptr };
+
+	uint32_t m_retryIndex{ 0 };
+	uint32_t m_timerCount{ 0 };
 };
 
-} // Namespace
-
-#endif
+} // Namespace NeovimQt
