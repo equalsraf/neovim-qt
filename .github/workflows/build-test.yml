@@ -59,6 +59,18 @@ jobs:
             echo "Release already exists. Skipping."
           fi
 
+  BuildGuix:
+    name: Guix builds
+    needs: [CreateRelease, CreateNightlyRelease]
+    runs-on: ubuntu-latest
+    container:
+      image: metacall/guix:v20260910
+    steps:
+      - name: Build pack
+        run: guix pack  --no-offload -f appimage --relocatable  --file=contrib/neovim-qt.scm  --entry-point=bin/nvim-qt
+
+
+
   BuildTest:
     name: ${{ matrix.name }}
     needs: [CreateRelease, CreateNightlyRelease]
@@ -202,7 +214,6 @@ jobs:
         with:
           working-directory: ${{ github.workspace }}/build
           run: ctest -VV --timeout 120 --output-on-failure -C ${{ matrix.flavor }}
-
 
       #
       # Deploy Release Binaries
