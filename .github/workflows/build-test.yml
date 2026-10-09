@@ -63,11 +63,14 @@ jobs:
     name: Guix builds
     needs: [CreateRelease, CreateNightlyRelease]
     runs-on: ubuntu-latest
-    container:
-      image: metacall/guix:v20260910
+    #container:
+    #  image: metacall/guix:v20260910
     steps:
+      - name: Pull docker image
+        run: docker pull metacall/guix:v20260910
       - name: Build pack
-        run: guix pack  --no-offload -f appimage --relocatable  --file=contrib/neovim-qt.scm  --entry-point=bin/nvim-qt
+        run: |
+          docker run --rm metacall/guix:v20260910 guix pack  --no-offload -f appimage --relocatable  --file=contrib/neovim-qt.scm  --entry-point=bin/nvim-qt
 
 
 
