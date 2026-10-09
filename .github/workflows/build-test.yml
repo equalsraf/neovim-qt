@@ -59,6 +59,22 @@ jobs:
             echo "Release already exists. Skipping."
           fi
 
+  BuildGuix:
+    name: Guix builds
+    needs: [CreateRelease, CreateNightlyRelease]
+    runs-on: ubuntu-latest
+    #container:
+    #  image: metacall/guix:v20260910
+    steps:
+      - name: Pull docker image
+        run: docker pull metacall/guix:v20260910
+      - uses: actions/checkout@v7
+      - name: Build pack
+        run: |
+          docker run -v ${{ github.workspace }}:/workdir -w /workdir --rm metacall/guix:v20260910 guix pack  --no-offload -f appimage --relocatable  --file=contrib/neovim-qt.scm  --entry-point=bin/nvim-qt
+
+
+
   BuildTest:
     name: ${{ matrix.name }}
     needs: [CreateRelease, CreateNightlyRelease]
@@ -79,6 +95,14 @@ jobs:
             generator: Ninja
             cc: clang
             cxx: clang++
+
+          - name: Linux_Release_GCC
+            flavor: Release
+            runner: ubuntu-latest
+            generator: Ninja
+            cc: gcc
+            cxx: g++
+            publish: yes
 
           - name: Windows_Debug
             flavor: Debug
@@ -195,10 +219,15 @@ jobs:
           working-directory: ${{ github.workspace }}/build
           run: ctest -VV --timeout 120 --output-on-failure -C ${{ matrix.flavor }}
 
-
       #
       # Deploy Release Binaries
       #
+      - name: Linux - Publish
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'ubuntu') }}
+        run: |
+          cmake --build ./build --target install
+          tar czvf neovim-qt-linux.tar.gz install --transform s/install/neovim-qt/
+
       - name: Windows - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
         run: |
@@ -209,6 +238,17 @@ jobs:
           Compress-Archive -Path ./install/* -DestinationPath neovim-qt.zip
           Move-Item -Path ./build/neovim-qt-installer.msi -Destination neovim-qt-installer.msi
         shell: pwsh
+
+      - name: Artifact neovim-qt-linux.tar.gz
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'ubuntu') }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: neovim-qt-linux.tar.gz
+          path: neovim-qt-linux.tar.gz
+          if-no-files-found: error
+          archive: false
+
+
       - name: Artifact neovim-qt-installer.msi
         if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
         uses: actions/upload-artifact@v7
