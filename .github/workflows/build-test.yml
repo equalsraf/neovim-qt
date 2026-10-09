@@ -68,6 +68,7 @@ jobs:
     steps:
       - name: Pull docker image
         run: docker pull metacall/guix:v20260910
+      - uses: actions/checkout@v7
       - name: Build pack
         run: |
           docker run -v ${{ github.workspace }}:/workdir -w /workdir --rm metacall/guix:v20260910 guix pack  --no-offload -f appimage --relocatable  --file=contrib/neovim-qt.scm  --entry-point=bin/nvim-qt
