@@ -211,7 +211,7 @@ jobs:
         if: ${{ matrix.publish && startsWith(matrix.runner, 'ubuntu') }}
         run: |
           cmake --build ./build --target install
-          tar czvf neovim-qt-linux.tar.gz install
+          tar czvf neovim-qt-linux.tar.gz install --transform s/install/neovim-qt/
 
       - name: Windows - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
