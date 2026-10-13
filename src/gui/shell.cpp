@@ -82,7 +82,7 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 
 	// Font
 	QVariant useGuiSavedFontVal{ settings.value("use_gui_saved_font") };
-	bool useGuiSavedFont = true;
+	bool useGuiSavedFont = false; // default fallback
 	if (useGuiSavedFontVal.canConvert<bool>()) {
 		useGuiSavedFont = useGuiSavedFontVal.toBool();
 	}
