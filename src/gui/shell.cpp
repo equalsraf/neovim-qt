@@ -81,9 +81,14 @@ Shell::Shell(NeovimConnector *nvim, QWidget *parent)
 	QSettings settings;
 
 	// Font
+	QVariant useGuiSavedFontVal{ settings.value("use_gui_saved_font") };
+	bool useGuiSavedFont = true;
+	if (useGuiSavedFontVal.canConvert<bool>()) {
+		useGuiSavedFont = useGuiSavedFontVal.toBool();
+	}
+
 	QVariant guiFont{ settings.value("Gui/Font") };
-	if (guiFont.canConvert<QString>())
-	{
+	if (useGuiSavedFont && guiFont.canConvert<QString>()) {
 		QString fontDescription{ guiFont.toString() };
 		setGuiFont(
 			fontDescription, FontOption::Force, FontChangeSource::SettingsFile, true /*reset*/);
