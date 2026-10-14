@@ -417,15 +417,39 @@ void App::checkArgumentsMayTerminate(QCommandLineParser& parser) noexcept
 	return {};
 }
 
-/*static*/ QStringList App::getNeovimArgs() noexcept
+/*static*/ QString App::getRuntimeShim() noexcept
 {
-	QString runtimePath{ getRuntimePath() };
-	if (runtimePath.isEmpty()) {
-		return { "--cmd","set termguicolors" };
+	QString rtp{ QString::fromLocal8Bit(qgetenv("NVIM_QT_RUNTIME_PATH")) };
+	const auto filepath = "plugin/nvim_gui_shim.vim";
+
+	if (QFileInfo(rtp).isDir()) {
+		const QFileInfo fi{ QDir{ rtp }.filePath(filepath) };
+		if (fi.isFile()) {
+			qDebug() << __func__ << fi;
+			return fi.absoluteFilePath();
+		}
 	}
 
-	return { "--cmd", QString{ "let &rtp.=',%1'" }.arg(runtimePath),
-		"--cmd","set termguicolors" };
+	// Look for the runtime relative to the nvim-qt binary.
+	// Probe both known layouts: macOS bundle and standard install.
+	const QString appDir{ applicationDirPath() };
+	for (const char* relPath : { "../Resources/runtime", "../share/nvim-qt/runtime" }) {
+		const QDir d{ QDir{ appDir }.filePath(relPath) };
+		if (d.exists()) {
+			const QFileInfo fi{ d.filePath(filepath) };
+			if (fi.isFile()) {
+				qDebug() << __func__ << fi;
+				return fi.absoluteFilePath();
+			}
+		}
+	}
+
+	return {};
+}
+
+/*static*/ QStringList App::getNeovimArgs() noexcept
+{
+	return { "--cmd","set termguicolors" };
 }
 
 static QString GetNeovimVersionInfo(const QString& nvim) noexcept

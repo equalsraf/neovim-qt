@@ -25,6 +25,7 @@ public:
 	static void processCommandlineOptions(QCommandLineParser&, QStringList) noexcept;
 	static void openNewWindow(const QVariantList& args) noexcept;
 	static QString getRuntimePath() noexcept;
+	static QString getRuntimeShim() noexcept;
 
 private:
 	static QStringList getNeovimArgs() noexcept;

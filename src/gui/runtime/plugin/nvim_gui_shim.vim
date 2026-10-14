@@ -1,8 +1,7 @@
 " A Neovim plugin that implements GUI helper commands
-if !has('nvim') || exists('g:GuiLoaded')
+if !has('nvim')
   finish
 endif
-let g:GuiLoaded = 1
 
 " Get the channel to the last UI in the uis_list
 function! s:get_last_ui_chan()
