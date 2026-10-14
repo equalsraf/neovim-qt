@@ -211,7 +211,7 @@ jobs:
         if: ${{ matrix.publish && startsWith(matrix.runner, 'ubuntu') }}
         run: |
           cmake --build ./build --target install
-          tar czvf neovim-qt-linux.tar.gz install --transform s/install/neovim-qt/
+          tar czvf neovim-qt-linux-ci.tar.gz install --transform s/install/neovim-qt/
 
       - name: Windows - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
@@ -224,12 +224,14 @@ jobs:
           Move-Item -Path ./build/neovim-qt-installer.msi -Destination neovim-qt-installer.msi
         shell: pwsh
 
-      - name: Artifact neovim-qt-linux.tar.gz
+      # Despite being a "Release" build this artifact is not suitable
+      # for release - built off ubuntu and not relocatable/portable
+      - name: Artifact neovim-qt-linux-ci.tar.gz
         if: ${{ matrix.publish && startsWith(matrix.runner, 'ubuntu') }}
         uses: actions/upload-artifact@v7
         with:
-          name: neovim-qt-linux.tar.gz
-          path: neovim-qt-linux.tar.gz
+          name: neovim-qt-linux-ci.tar.gz
+          path: neovim-qt-linux-ci.tar.gz
           if-no-files-found: error
           archive: false
 
