@@ -9,6 +9,32 @@
 
 namespace NeovimQt {
 
+static QDir::Filters getTreeviewFilters(const QSettings& settings) noexcept
+{
+	QDir::Filters filters{ QDir::Filter::NoDotAndDotDot };
+
+	if (settings.value("Treeview/ShowDirs", true).toBool()) {
+		filters |= QDir::Filter::Dirs;
+		filters |= QDir::Filter::AllDirs;
+	}
+	if (settings.value("Treeview/ShowFiles", true).toBool()) {
+		filters |= QDir::Filter::Files;
+	}
+	if (settings.value("Treeview/ShowDrives", true).toBool()) {
+		filters |= QDir::Filter::Drives;
+	}
+	if (settings.value("Treeview/NoSymLinks", false).toBool()) {
+		filters |= QDir::Filter::NoSymLinks;
+	}
+	if (settings.value("Treeview/ShowHiddenFiles", false).toBool()) {
+		filters |= QDir::Filter::Hidden;
+	}
+	if (settings.value("Treeview/ShowSystemFiles", false).toBool()) {
+		filters |= QDir::Filter::System;
+	}
+
+	return filters;
+}
 TreeView::TreeView(NeovimConnector* nvim, QWidget* parent) noexcept
 	: QTreeView(parent)
 	, m_model{ parent }
@@ -18,7 +44,10 @@ TreeView::TreeView(NeovimConnector* nvim, QWidget* parent) noexcept
 		qFatal("Fatal Error: TreeView must have a valid NeovimConnector!");
 	}
 
+	QSettings settings;
+
 	setModel(&m_model);
+	m_model.setFilter(getTreeviewFilters(settings));
 
 	header()->hide();
 
@@ -27,7 +56,6 @@ TreeView::TreeView(NeovimConnector* nvim, QWidget* parent) noexcept
 		hideColumn(i);
 	}
 
-	QSettings settings;
 	setVisible(settings.value("Gui/TreeView", false).toBool());
 
 	connect(m_nvim, &NeovimConnector::ready, this, &TreeView::neovimConnectorReady);
