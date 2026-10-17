@@ -1,5 +1,8 @@
 <!DOCTYPE RCC><RCC VERSION="1.0">
 <qresource>
   <file alias="neovim.svg">../third-party/neovim.svg</file>
+  <file alias="bootstrap.lua">../src/gui/runtime/bootstrap.lua</file>
+  <file alias="nvim_gui_shim.vim">../src/gui/runtime/plugin/nvim_gui_shim.vim</file>
+  <file alias="nvim_gui_shim.txt">../src/gui/runtime/doc/nvim_gui_shim.txt</file>
 </qresource>
 </RCC>

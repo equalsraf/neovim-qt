@@ -1,8 +1,6 @@
 #include "app.h"
 
 #include <algorithm>
-#include <QDir>
-#include <QFileInfo>
 #include <QFileOpenEvent>
 #include <QSettings>
 #include <QTextStream>
@@ -396,36 +394,9 @@ void App::checkArgumentsMayTerminate(QCommandLineParser& parser) noexcept
 	}
 }
 
-/*static*/ QString App::getRuntimePath() noexcept
-{
-	QString path{ QString::fromLocal8Bit(qgetenv("NVIM_QT_RUNTIME_PATH")) };
-
-	if (QFileInfo(path).isDir()) {
-		return path;
-	}
-
-	// Look for the runtime relative to the nvim-qt binary.
-	// Probe both known layouts: macOS bundle and standard install.
-	const QString appDir{ applicationDirPath() };
-	for (const char* relPath : { "../Resources/runtime", "../share/nvim-qt/runtime" }) {
-		const QDir d{ QDir{ appDir }.filePath(relPath) };
-		if (d.exists()) {
-			return d.path();
-		}
-	}
-
-	return {};
-}
-
 /*static*/ QStringList App::getNeovimArgs() noexcept
 {
-	QString runtimePath{ getRuntimePath() };
-	if (runtimePath.isEmpty()) {
-		return { "--cmd","set termguicolors" };
-	}
-
-	return { "--cmd", QString{ "let &rtp.=',%1'" }.arg(runtimePath),
-		"--cmd","set termguicolors" };
+	return { "--cmd", "set termguicolors" };
 }
 
 static QString GetNeovimVersionInfo(const QString& nvim) noexcept
@@ -456,7 +427,6 @@ void App::showVersionInfo(QCommandLineParser& parser) noexcept
 	out << "Environment: " << Qt::endl;
 	out << "  nvim: " << nvimExecutable << Qt::endl;
 	out << "  args: " << getNeovimArgs().join(" ") << Qt::endl;
-	out << "  runtime: " << getRuntimePath() << Qt::endl;
 
 	out << Qt::endl;
 
