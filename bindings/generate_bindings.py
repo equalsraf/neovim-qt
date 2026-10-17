@@ -47,7 +47,11 @@ def generate_file(name, outfile, **kw):
         fp.write(template.render(kw))
 
 ARRAY_OF = re.compile(r'ArrayOf\(\s*(\w+)\s*\)')
-class UnsupportedType(Exception): pass
+class UnsupportedType(Exception):
+   def __init__(self, ty):
+        super().__init__(ty)
+        self.ty = ty
+
 class NeovimTypeVal:
     """
     Representation for Neovim Parameter/Return
@@ -130,8 +134,11 @@ class Function:
             for param in self.fun['parameters']:
                 self.parameters.append(NeovimTypeVal(*param))
         except UnsupportedType as ex:
-            print('Found unsupported type(%s) when adding function %s(), skipping' % (ex,self.name))
-            return
+            if ex.ty == 'LuaRef':
+                print('Skipping function %s(), due to type %s, not being supported for RPC' % (self.name, ex))
+            else:
+                print('Found unsupported type(%s) when adding function %s(), skipping' % (ex, self.name))
+                return
 
         u_attrs = self.unknown_attributes()
         if u_attrs:
@@ -203,6 +210,8 @@ def print_api(api):
             pass
         elif key == 'version':
             print('Version {major}.{minor}.{patch} API {api_level} supports API {api_compatible}'.format(**api[key]))
+        elif key == 'ui_options':
+            print('UI options: {}'.format(api[key]))
         else:
             print('Unknown API info attribute: %s' % key)
 

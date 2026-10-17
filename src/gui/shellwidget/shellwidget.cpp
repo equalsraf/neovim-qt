@@ -827,7 +827,7 @@ const ShellContents& ShellWidget::contents() const
 	return m_contents;
 }
 
-/// Put text in position, returns the amount of colums used
+/// Put text in position, returns the amount of columns used
 int ShellWidget::put(
 	const QString& text,
 	int row,

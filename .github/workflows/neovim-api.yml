@@ -23,6 +23,8 @@ jobs:
             nvim: 0.3.8
           - version: 6
             nvim: 0.4.4
+          - version: 7
+            nvim: 0.5.0
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4

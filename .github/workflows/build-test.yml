@@ -80,6 +80,14 @@ jobs:
             cc: clang
             cxx: clang++
 
+          - name: Linux_Release_GCC
+            flavor: Release
+            runner: ubuntu-latest
+            generator: Ninja
+            cc: gcc
+            cxx: g++
+            publish: yes
+
           - name: Windows_Debug
             flavor: Debug
             generator: Ninja
@@ -199,6 +207,12 @@ jobs:
       #
       # Deploy Release Binaries
       #
+      - name: Linux - Publish
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'ubuntu') }}
+        run: |
+          cmake --build ./build --target install
+          tar czvf neovim-qt-linux-ci.tar.gz install --transform s/install/neovim-qt/
+
       - name: Windows - Publish
         if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
         run: |
@@ -209,6 +223,19 @@ jobs:
           Compress-Archive -Path ./install/* -DestinationPath neovim-qt.zip
           Move-Item -Path ./build/neovim-qt-installer.msi -Destination neovim-qt-installer.msi
         shell: pwsh
+
+      # Despite being a "Release" build this artifact is not suitable
+      # for release - built off ubuntu and not relocatable/portable
+      - name: Artifact neovim-qt-linux-ci.tar.gz
+        if: ${{ matrix.publish && startsWith(matrix.runner, 'ubuntu') }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: neovim-qt-linux-ci.tar.gz
+          path: neovim-qt-linux-ci.tar.gz
+          if-no-files-found: error
+          archive: false
+
+
       - name: Artifact neovim-qt-installer.msi
         if: ${{ matrix.publish && startsWith(matrix.runner, 'windows') }}
         uses: actions/upload-artifact@v7

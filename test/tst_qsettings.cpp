@@ -40,7 +40,7 @@ static void SendNeovimCommand(NeovimConnector* connector, const QString& command
 	// 2. msg from nvim to gui
 	// The later are usually asynchronous notifications
 	//
-	// Attempt to ensure the previous command had the inteded effect
+	// Attempt to ensure the previous command had the intended effect
 	QTest::qSleep(1000);
 }
 
@@ -107,7 +107,7 @@ void TestQSettings::GuiFont() noexcept
 	auto w = CreateMainWindowWithRuntime();
 	NeovimConnector* connector = w->shell()->nvim();
 
-	// Await for inital font to settle - avoid racing with nvim &guifont
+	// Await for initial font to settle - avoid racing with nvim &guifont
 	// The assumption here is that there are 2 fonts being set
 	// 1. from qsettings
 	// 2. from nvim &guifont

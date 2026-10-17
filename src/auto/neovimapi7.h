@@ -1,0 +1,1478 @@
+// Auto generated 2026-08-29 16:04:49.712743 from nvim API level:7
+#pragma once
+
+#include <QObject>
+#include <QPoint>
+#include <QVariant>
+
+#include "function.h"
+#include "msgpack.h"
+
+namespace NeovimQt {
+
+class NeovimConnector;
+class MsgpackRequest;
+
+class NeovimApi7: public QObject
+{
+	Q_OBJECT
+
+public:
+
+	enum FunctionId {
+		NEOVIM_FN_NULL=0,
+				NEOVIM_FN_NVIM_BUF_LINE_COUNT,
+				NEOVIM_FN_NVIM_BUF_ATTACH,
+				NEOVIM_FN_NVIM_BUF_DETACH,
+				NEOVIM_FN_NVIM_BUF_GET_LINES,
+				NEOVIM_FN_NVIM_BUF_SET_LINES,
+				NEOVIM_FN_NVIM_BUF_SET_TEXT,
+				NEOVIM_FN_NVIM_BUF_GET_OFFSET,
+				NEOVIM_FN_NVIM_BUF_GET_VAR,
+				NEOVIM_FN_NVIM_BUF_GET_CHANGEDTICK,
+				NEOVIM_FN_NVIM_BUF_GET_KEYMAP,
+				NEOVIM_FN_NVIM_BUF_SET_KEYMAP,
+				NEOVIM_FN_NVIM_BUF_DEL_KEYMAP,
+				NEOVIM_FN_NVIM_BUF_GET_COMMANDS,
+				NEOVIM_FN_NVIM_BUF_SET_VAR,
+				NEOVIM_FN_NVIM_BUF_DEL_VAR,
+				NEOVIM_FN_NVIM_BUF_GET_OPTION,
+				NEOVIM_FN_NVIM_BUF_SET_OPTION,
+				NEOVIM_FN_NVIM_BUF_GET_NAME,
+				NEOVIM_FN_NVIM_BUF_SET_NAME,
+				NEOVIM_FN_NVIM_BUF_IS_LOADED,
+				NEOVIM_FN_NVIM_BUF_DELETE,
+				NEOVIM_FN_NVIM_BUF_IS_VALID,
+				NEOVIM_FN_NVIM_BUF_GET_MARK,
+				NEOVIM_FN_NVIM_BUF_GET_EXTMARK_BY_ID,
+				NEOVIM_FN_NVIM_BUF_GET_EXTMARKS,
+				NEOVIM_FN_NVIM_BUF_SET_EXTMARK,
+				NEOVIM_FN_NVIM_BUF_DEL_EXTMARK,
+				NEOVIM_FN_NVIM_BUF_ADD_HIGHLIGHT,
+				NEOVIM_FN_NVIM_BUF_CLEAR_NAMESPACE,
+				NEOVIM_FN_NVIM_BUF_SET_VIRTUAL_TEXT,
+				NEOVIM_FN_NVIM_BUF_CALL,
+				NEOVIM_FN_NVIM_COMMAND_OUTPUT,
+				NEOVIM_FN_NVIM_EXECUTE_LUA,
+				NEOVIM_FN_NVIM_BUF_GET_NUMBER,
+				NEOVIM_FN_NVIM_BUF_CLEAR_HIGHLIGHT,
+				NEOVIM_FN_BUFFER_INSERT,
+				NEOVIM_FN_BUFFER_GET_LINE,
+				NEOVIM_FN_BUFFER_SET_LINE,
+				NEOVIM_FN_BUFFER_DEL_LINE,
+				NEOVIM_FN_BUFFER_GET_LINE_SLICE,
+				NEOVIM_FN_BUFFER_SET_LINE_SLICE,
+				NEOVIM_FN_BUFFER_SET_VAR,
+				NEOVIM_FN_BUFFER_DEL_VAR,
+				NEOVIM_FN_WINDOW_SET_VAR,
+				NEOVIM_FN_WINDOW_DEL_VAR,
+				NEOVIM_FN_TABPAGE_SET_VAR,
+				NEOVIM_FN_TABPAGE_DEL_VAR,
+				NEOVIM_FN_VIM_SET_VAR,
+				NEOVIM_FN_VIM_DEL_VAR,
+				NEOVIM_FN_NVIM_TABPAGE_LIST_WINS,
+				NEOVIM_FN_NVIM_TABPAGE_GET_VAR,
+				NEOVIM_FN_NVIM_TABPAGE_SET_VAR,
+				NEOVIM_FN_NVIM_TABPAGE_DEL_VAR,
+				NEOVIM_FN_NVIM_TABPAGE_GET_WIN,
+				NEOVIM_FN_NVIM_TABPAGE_GET_NUMBER,
+				NEOVIM_FN_NVIM_TABPAGE_IS_VALID,
+				NEOVIM_FN_NVIM_UI_ATTACH,
+				NEOVIM_FN_UI_ATTACH,
+				NEOVIM_FN_NVIM_UI_DETACH,
+				NEOVIM_FN_NVIM_UI_TRY_RESIZE,
+				NEOVIM_FN_NVIM_UI_SET_OPTION,
+				NEOVIM_FN_NVIM_UI_TRY_RESIZE_GRID,
+				NEOVIM_FN_NVIM_UI_PUM_SET_HEIGHT,
+				NEOVIM_FN_NVIM_UI_PUM_SET_BOUNDS,
+				NEOVIM_FN_NVIM_EXEC,
+				NEOVIM_FN_NVIM_COMMAND,
+				NEOVIM_FN_NVIM_GET_HL_BY_NAME,
+				NEOVIM_FN_NVIM_GET_HL_BY_ID,
+				NEOVIM_FN_NVIM_GET_HL_ID_BY_NAME,
+				NEOVIM_FN_NVIM_SET_HL,
+				NEOVIM_FN_NVIM_FEEDKEYS,
+				NEOVIM_FN_NVIM_INPUT,
+				NEOVIM_FN_NVIM_INPUT_MOUSE,
+				NEOVIM_FN_NVIM_REPLACE_TERMCODES,
+				NEOVIM_FN_NVIM_EVAL,
+				NEOVIM_FN_NVIM_EXEC_LUA,
+				NEOVIM_FN_NVIM_NOTIFY,
+				NEOVIM_FN_NVIM_CALL_FUNCTION,
+				NEOVIM_FN_NVIM_CALL_DICT_FUNCTION,
+				NEOVIM_FN_NVIM_STRWIDTH,
+				NEOVIM_FN_NVIM_LIST_RUNTIME_PATHS,
+				NEOVIM_FN_NVIM_GET_RUNTIME_FILE,
+				NEOVIM_FN_NVIM_SET_CURRENT_DIR,
+				NEOVIM_FN_NVIM_GET_CURRENT_LINE,
+				NEOVIM_FN_NVIM_SET_CURRENT_LINE,
+				NEOVIM_FN_NVIM_DEL_CURRENT_LINE,
+				NEOVIM_FN_NVIM_GET_VAR,
+				NEOVIM_FN_NVIM_SET_VAR,
+				NEOVIM_FN_NVIM_DEL_VAR,
+				NEOVIM_FN_NVIM_GET_VVAR,
+				NEOVIM_FN_NVIM_SET_VVAR,
+				NEOVIM_FN_NVIM_GET_OPTION,
+				NEOVIM_FN_NVIM_GET_ALL_OPTIONS_INFO,
+				NEOVIM_FN_NVIM_GET_OPTION_INFO,
+				NEOVIM_FN_NVIM_SET_OPTION,
+				NEOVIM_FN_NVIM_ECHO,
+				NEOVIM_FN_NVIM_OUT_WRITE,
+				NEOVIM_FN_NVIM_ERR_WRITE,
+				NEOVIM_FN_NVIM_ERR_WRITELN,
+				NEOVIM_FN_NVIM_LIST_BUFS,
+				NEOVIM_FN_NVIM_GET_CURRENT_BUF,
+				NEOVIM_FN_NVIM_SET_CURRENT_BUF,
+				NEOVIM_FN_NVIM_LIST_WINS,
+				NEOVIM_FN_NVIM_GET_CURRENT_WIN,
+				NEOVIM_FN_NVIM_SET_CURRENT_WIN,
+				NEOVIM_FN_NVIM_CREATE_BUF,
+				NEOVIM_FN_NVIM_OPEN_TERM,
+				NEOVIM_FN_NVIM_CHAN_SEND,
+				NEOVIM_FN_NVIM_OPEN_WIN,
+				NEOVIM_FN_NVIM_LIST_TABPAGES,
+				NEOVIM_FN_NVIM_GET_CURRENT_TABPAGE,
+				NEOVIM_FN_NVIM_SET_CURRENT_TABPAGE,
+				NEOVIM_FN_NVIM_CREATE_NAMESPACE,
+				NEOVIM_FN_NVIM_GET_NAMESPACES,
+				NEOVIM_FN_NVIM_PASTE,
+				NEOVIM_FN_NVIM_PUT,
+				NEOVIM_FN_NVIM_SUBSCRIBE,
+				NEOVIM_FN_NVIM_UNSUBSCRIBE,
+				NEOVIM_FN_NVIM_GET_COLOR_BY_NAME,
+				NEOVIM_FN_NVIM_GET_COLOR_MAP,
+				NEOVIM_FN_NVIM_GET_CONTEXT,
+				NEOVIM_FN_NVIM_LOAD_CONTEXT,
+				NEOVIM_FN_NVIM_GET_MODE,
+				NEOVIM_FN_NVIM_GET_KEYMAP,
+				NEOVIM_FN_NVIM_SET_KEYMAP,
+				NEOVIM_FN_NVIM_DEL_KEYMAP,
+				NEOVIM_FN_NVIM_GET_COMMANDS,
+				NEOVIM_FN_NVIM_GET_API_INFO,
+				NEOVIM_FN_NVIM_SET_CLIENT_INFO,
+				NEOVIM_FN_NVIM_GET_CHAN_INFO,
+				NEOVIM_FN_NVIM_LIST_CHANS,
+				NEOVIM_FN_NVIM_CALL_ATOMIC,
+				NEOVIM_FN_NVIM_PARSE_EXPRESSION,
+				NEOVIM_FN_NVIM_LIST_UIS,
+				NEOVIM_FN_NVIM_GET_PROC_CHILDREN,
+				NEOVIM_FN_NVIM_GET_PROC,
+				NEOVIM_FN_NVIM_SELECT_POPUPMENU_ITEM,
+				NEOVIM_FN_NVIM_SET_DECORATION_PROVIDER,
+				NEOVIM_FN_NVIM_WIN_GET_BUF,
+				NEOVIM_FN_NVIM_WIN_SET_BUF,
+				NEOVIM_FN_NVIM_WIN_GET_CURSOR,
+				NEOVIM_FN_NVIM_WIN_SET_CURSOR,
+				NEOVIM_FN_NVIM_WIN_GET_HEIGHT,
+				NEOVIM_FN_NVIM_WIN_SET_HEIGHT,
+				NEOVIM_FN_NVIM_WIN_GET_WIDTH,
+				NEOVIM_FN_NVIM_WIN_SET_WIDTH,
+				NEOVIM_FN_NVIM_WIN_GET_VAR,
+				NEOVIM_FN_NVIM_WIN_SET_VAR,
+				NEOVIM_FN_NVIM_WIN_DEL_VAR,
+				NEOVIM_FN_NVIM_WIN_GET_OPTION,
+				NEOVIM_FN_NVIM_WIN_SET_OPTION,
+				NEOVIM_FN_NVIM_WIN_GET_POSITION,
+				NEOVIM_FN_NVIM_WIN_GET_TABPAGE,
+				NEOVIM_FN_NVIM_WIN_GET_NUMBER,
+				NEOVIM_FN_NVIM_WIN_IS_VALID,
+				NEOVIM_FN_NVIM_WIN_SET_CONFIG,
+				NEOVIM_FN_NVIM_WIN_GET_CONFIG,
+				NEOVIM_FN_NVIM_WIN_HIDE,
+				NEOVIM_FN_NVIM_WIN_CLOSE,
+				NEOVIM_FN_NVIM_WIN_CALL,
+				NEOVIM_FN_BUFFER_LINE_COUNT,
+				NEOVIM_FN_BUFFER_GET_LINES,
+				NEOVIM_FN_BUFFER_SET_LINES,
+				NEOVIM_FN_BUFFER_GET_VAR,
+				NEOVIM_FN_BUFFER_GET_OPTION,
+				NEOVIM_FN_BUFFER_SET_OPTION,
+				NEOVIM_FN_BUFFER_GET_NAME,
+				NEOVIM_FN_BUFFER_SET_NAME,
+				NEOVIM_FN_BUFFER_IS_VALID,
+				NEOVIM_FN_BUFFER_GET_MARK,
+				NEOVIM_FN_BUFFER_ADD_HIGHLIGHT,
+				NEOVIM_FN_VIM_COMMAND_OUTPUT,
+				NEOVIM_FN_BUFFER_GET_NUMBER,
+				NEOVIM_FN_BUFFER_CLEAR_HIGHLIGHT,
+				NEOVIM_FN_TABPAGE_GET_WINDOWS,
+				NEOVIM_FN_TABPAGE_GET_VAR,
+				NEOVIM_FN_TABPAGE_GET_WINDOW,
+				NEOVIM_FN_TABPAGE_IS_VALID,
+				NEOVIM_FN_UI_DETACH,
+				NEOVIM_FN_UI_TRY_RESIZE,
+				NEOVIM_FN_VIM_COMMAND,
+				NEOVIM_FN_VIM_FEEDKEYS,
+				NEOVIM_FN_VIM_INPUT,
+				NEOVIM_FN_VIM_REPLACE_TERMCODES,
+				NEOVIM_FN_VIM_EVAL,
+				NEOVIM_FN_VIM_CALL_FUNCTION,
+				NEOVIM_FN_VIM_STRWIDTH,
+				NEOVIM_FN_VIM_LIST_RUNTIME_PATHS,
+				NEOVIM_FN_VIM_CHANGE_DIRECTORY,
+				NEOVIM_FN_VIM_GET_CURRENT_LINE,
+				NEOVIM_FN_VIM_SET_CURRENT_LINE,
+				NEOVIM_FN_VIM_DEL_CURRENT_LINE,
+				NEOVIM_FN_VIM_GET_VAR,
+				NEOVIM_FN_VIM_GET_VVAR,
+				NEOVIM_FN_VIM_GET_OPTION,
+				NEOVIM_FN_VIM_SET_OPTION,
+				NEOVIM_FN_VIM_OUT_WRITE,
+				NEOVIM_FN_VIM_ERR_WRITE,
+				NEOVIM_FN_VIM_REPORT_ERROR,
+				NEOVIM_FN_VIM_GET_BUFFERS,
+				NEOVIM_FN_VIM_GET_CURRENT_BUFFER,
+				NEOVIM_FN_VIM_SET_CURRENT_BUFFER,
+				NEOVIM_FN_VIM_GET_WINDOWS,
+				NEOVIM_FN_VIM_GET_CURRENT_WINDOW,
+				NEOVIM_FN_VIM_SET_CURRENT_WINDOW,
+				NEOVIM_FN_VIM_GET_TABPAGES,
+				NEOVIM_FN_VIM_GET_CURRENT_TABPAGE,
+				NEOVIM_FN_VIM_SET_CURRENT_TABPAGE,
+				NEOVIM_FN_VIM_SUBSCRIBE,
+				NEOVIM_FN_VIM_UNSUBSCRIBE,
+				NEOVIM_FN_VIM_NAME_TO_COLOR,
+				NEOVIM_FN_VIM_GET_COLOR_MAP,
+				NEOVIM_FN_WINDOW_GET_BUFFER,
+				NEOVIM_FN_WINDOW_GET_CURSOR,
+				NEOVIM_FN_WINDOW_SET_CURSOR,
+				NEOVIM_FN_WINDOW_GET_HEIGHT,
+				NEOVIM_FN_WINDOW_SET_HEIGHT,
+				NEOVIM_FN_WINDOW_GET_WIDTH,
+				NEOVIM_FN_WINDOW_SET_WIDTH,
+				NEOVIM_FN_WINDOW_GET_VAR,
+				NEOVIM_FN_WINDOW_GET_OPTION,
+				NEOVIM_FN_WINDOW_SET_OPTION,
+				NEOVIM_FN_WINDOW_GET_POSITION,
+				NEOVIM_FN_WINDOW_GET_TABPAGE,
+				NEOVIM_FN_WINDOW_IS_VALID,
+			};
+	Q_ENUM(FunctionId)
+
+	static bool checkFunctions(const QVariantList& ftable);
+	static FunctionId functionId(const Function& f);
+
+	NeovimApi7(NeovimConnector *);
+protected slots:
+	void handleResponse(quint32 id, quint64 fun, const QVariant&);
+	void handleResponseError(quint32 id, quint64 fun, const QVariant&);
+signals:
+	void error(const QString& errmsg, const QVariant& errObj);
+	void neovimNotification(const QByteArray &name, const QVariantList& args);
+private:
+	NeovimConnector *m_c;
+public slots:
+	// Integer nvim_buf_line_count(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_line_count(int64_t buffer);
+	// Boolean nvim_buf_attach(Buffer buffer, Boolean send_buffer, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_attach(int64_t buffer, bool send_buffer, QVariantMap opts);
+	// Boolean nvim_buf_detach(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_detach(int64_t buffer);
+	// ArrayOf(String) nvim_buf_get_lines(Buffer buffer, Integer start, Integer end, Boolean strict_indexing, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_lines(int64_t buffer, int64_t start, int64_t end, bool strict_indexing);
+	// void nvim_buf_set_lines(Buffer buffer, Integer start, Integer end, Boolean strict_indexing, ArrayOf(String) replacement, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_set_lines(int64_t buffer, int64_t start, int64_t end, bool strict_indexing, QList<QByteArray> replacement);
+	// void nvim_buf_set_text(Buffer buffer, Integer start_row, Integer start_col, Integer end_row, Integer end_col, ArrayOf(String) replacement, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_set_text(int64_t buffer, int64_t start_row, int64_t start_col, int64_t end_row, int64_t end_col, QList<QByteArray> replacement);
+	// Integer nvim_buf_get_offset(Buffer buffer, Integer index, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_offset(int64_t buffer, int64_t index);
+	// Object nvim_buf_get_var(Buffer buffer, String name, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_var(int64_t buffer, QByteArray name);
+	// Integer nvim_buf_get_changedtick(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_changedtick(int64_t buffer);
+	// ArrayOf(Dictionary) nvim_buf_get_keymap(Buffer buffer, String mode, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_keymap(int64_t buffer, QByteArray mode);
+	// void nvim_buf_set_keymap(Buffer buffer, String mode, String lhs, String rhs, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_set_keymap(int64_t buffer, QByteArray mode, QByteArray lhs, QByteArray rhs, QVariantMap opts);
+	// void nvim_buf_del_keymap(Buffer buffer, String mode, String lhs, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_del_keymap(int64_t buffer, QByteArray mode, QByteArray lhs);
+	// Dictionary nvim_buf_get_commands(Buffer buffer, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_commands(int64_t buffer, QVariantMap opts);
+	// void nvim_buf_set_var(Buffer buffer, String name, Object value, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_set_var(int64_t buffer, QByteArray name, QVariant value);
+	// void nvim_buf_del_var(Buffer buffer, String name, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_del_var(int64_t buffer, QByteArray name);
+	// Object nvim_buf_get_option(Buffer buffer, String name, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_option(int64_t buffer, QByteArray name);
+	// void nvim_buf_set_option(Buffer buffer, String name, Object value, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_set_option(int64_t buffer, QByteArray name, QVariant value);
+	// String nvim_buf_get_name(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_name(int64_t buffer);
+	// void nvim_buf_set_name(Buffer buffer, String name, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_set_name(int64_t buffer, QByteArray name);
+	// Boolean nvim_buf_is_loaded(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_is_loaded(int64_t buffer);
+	// void nvim_buf_delete(Buffer buffer, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_delete(int64_t buffer, QVariantMap opts);
+	// Boolean nvim_buf_is_valid(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_is_valid(int64_t buffer);
+	// ArrayOf(Integer, 2) nvim_buf_get_mark(Buffer buffer, String name, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_mark(int64_t buffer, QByteArray name);
+	// ArrayOf(Integer) nvim_buf_get_extmark_by_id(Buffer buffer, Integer ns_id, Integer id, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_extmark_by_id(int64_t buffer, int64_t ns_id, int64_t id, QVariantMap opts);
+	// Array nvim_buf_get_extmarks(Buffer buffer, Integer ns_id, Object start, Object end, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_extmarks(int64_t buffer, int64_t ns_id, QVariant start, QVariant end, QVariantMap opts);
+	// Integer nvim_buf_set_extmark(Buffer buffer, Integer ns_id, Integer line, Integer col, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_set_extmark(int64_t buffer, int64_t ns_id, int64_t line, int64_t col, QVariantMap opts);
+	// Boolean nvim_buf_del_extmark(Buffer buffer, Integer ns_id, Integer id, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_del_extmark(int64_t buffer, int64_t ns_id, int64_t id);
+	// Integer nvim_buf_add_highlight(Buffer buffer, Integer ns_id, String hl_group, Integer line, Integer col_start, Integer col_end, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_add_highlight(int64_t buffer, int64_t ns_id, QByteArray hl_group, int64_t line, int64_t col_start, int64_t col_end);
+	// void nvim_buf_clear_namespace(Buffer buffer, Integer ns_id, Integer line_start, Integer line_end, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_clear_namespace(int64_t buffer, int64_t ns_id, int64_t line_start, int64_t line_end);
+	// Integer nvim_buf_set_virtual_text(Buffer buffer, Integer src_id, Integer line, Array chunks, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_set_virtual_text(int64_t buffer, int64_t src_id, int64_t line, QVariantList chunks, QVariantMap opts);
+	// Object nvim_buf_call(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_call(int64_t buffer);
+	// DEPRECATED
+	// String nvim_command_output(String command, ) 
+	NeovimQt::MsgpackRequest* nvim_command_output(QByteArray command);
+	// DEPRECATED
+	// Object nvim_execute_lua(String code, Array args, ) 
+	NeovimQt::MsgpackRequest* nvim_execute_lua(QByteArray code, QVariantList args);
+	// DEPRECATED
+	// Integer nvim_buf_get_number(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_get_number(int64_t buffer);
+	// DEPRECATED
+	// void nvim_buf_clear_highlight(Buffer buffer, Integer ns_id, Integer line_start, Integer line_end, ) 
+	NeovimQt::MsgpackRequest* nvim_buf_clear_highlight(int64_t buffer, int64_t ns_id, int64_t line_start, int64_t line_end);
+	// DEPRECATED
+	// void buffer_insert(Buffer buffer, Integer lnum, ArrayOf(String) lines, ) 
+	NeovimQt::MsgpackRequest* buffer_insert(int64_t buffer, int64_t lnum, QList<QByteArray> lines);
+	// DEPRECATED
+	// String buffer_get_line(Buffer buffer, Integer index, ) 
+	NeovimQt::MsgpackRequest* buffer_get_line(int64_t buffer, int64_t index);
+	// DEPRECATED
+	// void buffer_set_line(Buffer buffer, Integer index, String line, ) 
+	NeovimQt::MsgpackRequest* buffer_set_line(int64_t buffer, int64_t index, QByteArray line);
+	// DEPRECATED
+	// void buffer_del_line(Buffer buffer, Integer index, ) 
+	NeovimQt::MsgpackRequest* buffer_del_line(int64_t buffer, int64_t index);
+	// DEPRECATED
+	// ArrayOf(String) buffer_get_line_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end, ) 
+	NeovimQt::MsgpackRequest* buffer_get_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end);
+	// DEPRECATED
+	// void buffer_set_line_slice(Buffer buffer, Integer start, Integer end, Boolean include_start, Boolean include_end, ArrayOf(String) replacement, ) 
+	NeovimQt::MsgpackRequest* buffer_set_line_slice(int64_t buffer, int64_t start, int64_t end, bool include_start, bool include_end, QList<QByteArray> replacement);
+	// DEPRECATED
+	// Object buffer_set_var(Buffer buffer, String name, Object value, ) 
+	NeovimQt::MsgpackRequest* buffer_set_var(int64_t buffer, QByteArray name, QVariant value);
+	// DEPRECATED
+	// Object buffer_del_var(Buffer buffer, String name, ) 
+	NeovimQt::MsgpackRequest* buffer_del_var(int64_t buffer, QByteArray name);
+	// DEPRECATED
+	// Object window_set_var(Window window, String name, Object value, ) 
+	NeovimQt::MsgpackRequest* window_set_var(int64_t window, QByteArray name, QVariant value);
+	// DEPRECATED
+	// Object window_del_var(Window window, String name, ) 
+	NeovimQt::MsgpackRequest* window_del_var(int64_t window, QByteArray name);
+	// DEPRECATED
+	// Object tabpage_set_var(Tabpage tabpage, String name, Object value, ) 
+	NeovimQt::MsgpackRequest* tabpage_set_var(int64_t tabpage, QByteArray name, QVariant value);
+	// DEPRECATED
+	// Object tabpage_del_var(Tabpage tabpage, String name, ) 
+	NeovimQt::MsgpackRequest* tabpage_del_var(int64_t tabpage, QByteArray name);
+	// DEPRECATED
+	// Object vim_set_var(String name, Object value, ) 
+	NeovimQt::MsgpackRequest* vim_set_var(QByteArray name, QVariant value);
+	// DEPRECATED
+	// Object vim_del_var(String name, ) 
+	NeovimQt::MsgpackRequest* vim_del_var(QByteArray name);
+	// ArrayOf(Window) nvim_tabpage_list_wins(Tabpage tabpage, ) 
+	NeovimQt::MsgpackRequest* nvim_tabpage_list_wins(int64_t tabpage);
+	// Object nvim_tabpage_get_var(Tabpage tabpage, String name, ) 
+	NeovimQt::MsgpackRequest* nvim_tabpage_get_var(int64_t tabpage, QByteArray name);
+	// void nvim_tabpage_set_var(Tabpage tabpage, String name, Object value, ) 
+	NeovimQt::MsgpackRequest* nvim_tabpage_set_var(int64_t tabpage, QByteArray name, QVariant value);
+	// void nvim_tabpage_del_var(Tabpage tabpage, String name, ) 
+	NeovimQt::MsgpackRequest* nvim_tabpage_del_var(int64_t tabpage, QByteArray name);
+	// Window nvim_tabpage_get_win(Tabpage tabpage, ) 
+	NeovimQt::MsgpackRequest* nvim_tabpage_get_win(int64_t tabpage);
+	// Integer nvim_tabpage_get_number(Tabpage tabpage, ) 
+	NeovimQt::MsgpackRequest* nvim_tabpage_get_number(int64_t tabpage);
+	// Boolean nvim_tabpage_is_valid(Tabpage tabpage, ) 
+	NeovimQt::MsgpackRequest* nvim_tabpage_is_valid(int64_t tabpage);
+	// void nvim_ui_attach(Integer width, Integer height, Dictionary options, ) 
+	NeovimQt::MsgpackRequest* nvim_ui_attach(int64_t width, int64_t height, QVariantMap options);
+	// DEPRECATED
+	// void ui_attach(Integer width, Integer height, Boolean enable_rgb, ) 
+	NeovimQt::MsgpackRequest* ui_attach(int64_t width, int64_t height, bool enable_rgb);
+	// void nvim_ui_detach() 
+	NeovimQt::MsgpackRequest* nvim_ui_detach();
+	// void nvim_ui_try_resize(Integer width, Integer height, ) 
+	NeovimQt::MsgpackRequest* nvim_ui_try_resize(int64_t width, int64_t height);
+	// void nvim_ui_set_option(String name, Object value, ) 
+	NeovimQt::MsgpackRequest* nvim_ui_set_option(QByteArray name, QVariant value);
+	// void nvim_ui_try_resize_grid(Integer grid, Integer width, Integer height, ) 
+	NeovimQt::MsgpackRequest* nvim_ui_try_resize_grid(int64_t grid, int64_t width, int64_t height);
+	// void nvim_ui_pum_set_height(Integer height, ) 
+	NeovimQt::MsgpackRequest* nvim_ui_pum_set_height(int64_t height);
+	// void nvim_ui_pum_set_bounds(Float width, Float height, Float row, Float col, ) 
+	NeovimQt::MsgpackRequest* nvim_ui_pum_set_bounds(double width, double height, double row, double col);
+	// String nvim_exec(String src, Boolean output, ) 
+	NeovimQt::MsgpackRequest* nvim_exec(QByteArray src, bool output);
+	// void nvim_command(String command, ) 
+	NeovimQt::MsgpackRequest* nvim_command(QByteArray command);
+	// Dictionary nvim_get_hl_by_name(String name, Boolean rgb, ) 
+	NeovimQt::MsgpackRequest* nvim_get_hl_by_name(QByteArray name, bool rgb);
+	// Dictionary nvim_get_hl_by_id(Integer hl_id, Boolean rgb, ) 
+	NeovimQt::MsgpackRequest* nvim_get_hl_by_id(int64_t hl_id, bool rgb);
+	// Integer nvim_get_hl_id_by_name(String name, ) 
+	NeovimQt::MsgpackRequest* nvim_get_hl_id_by_name(QByteArray name);
+	// void nvim_set_hl(Integer ns_id, String name, Dictionary val, ) 
+	NeovimQt::MsgpackRequest* nvim_set_hl(int64_t ns_id, QByteArray name, QVariantMap val);
+	// void nvim_feedkeys(String keys, String mode, Boolean escape_csi, ) 
+	NeovimQt::MsgpackRequest* nvim_feedkeys(QByteArray keys, QByteArray mode, bool escape_csi);
+	// Integer nvim_input(String keys, ) 
+	NeovimQt::MsgpackRequest* nvim_input(QByteArray keys);
+	// void nvim_input_mouse(String button, String action, String modifier, Integer grid, Integer row, Integer col, ) 
+	NeovimQt::MsgpackRequest* nvim_input_mouse(QByteArray button, QByteArray action, QByteArray modifier, int64_t grid, int64_t row, int64_t col);
+	// String nvim_replace_termcodes(String str, Boolean from_part, Boolean do_lt, Boolean special, ) 
+	NeovimQt::MsgpackRequest* nvim_replace_termcodes(QByteArray str, bool from_part, bool do_lt, bool special);
+	// Object nvim_eval(String expr, ) 
+	NeovimQt::MsgpackRequest* nvim_eval(QByteArray expr);
+	// Object nvim_exec_lua(String code, Array args, ) 
+	NeovimQt::MsgpackRequest* nvim_exec_lua(QByteArray code, QVariantList args);
+	// Object nvim_notify(String msg, Integer log_level, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_notify(QByteArray msg, int64_t log_level, QVariantMap opts);
+	// Object nvim_call_function(String fn, Array args, ) 
+	NeovimQt::MsgpackRequest* nvim_call_function(QByteArray fn, QVariantList args);
+	// Object nvim_call_dict_function(Object dict, String fn, Array args, ) 
+	NeovimQt::MsgpackRequest* nvim_call_dict_function(QVariant dict, QByteArray fn, QVariantList args);
+	// Integer nvim_strwidth(String text, ) 
+	NeovimQt::MsgpackRequest* nvim_strwidth(QByteArray text);
+	// ArrayOf(String) nvim_list_runtime_paths() 
+	NeovimQt::MsgpackRequest* nvim_list_runtime_paths();
+	// ArrayOf(String) nvim_get_runtime_file(String name, Boolean all, ) 
+	NeovimQt::MsgpackRequest* nvim_get_runtime_file(QByteArray name, bool all);
+	// void nvim_set_current_dir(String dir, ) 
+	NeovimQt::MsgpackRequest* nvim_set_current_dir(QByteArray dir);
+	// String nvim_get_current_line() 
+	NeovimQt::MsgpackRequest* nvim_get_current_line();
+	// void nvim_set_current_line(String line, ) 
+	NeovimQt::MsgpackRequest* nvim_set_current_line(QByteArray line);
+	// void nvim_del_current_line() 
+	NeovimQt::MsgpackRequest* nvim_del_current_line();
+	// Object nvim_get_var(String name, ) 
+	NeovimQt::MsgpackRequest* nvim_get_var(QByteArray name);
+	// void nvim_set_var(String name, Object value, ) 
+	NeovimQt::MsgpackRequest* nvim_set_var(QByteArray name, QVariant value);
+	// void nvim_del_var(String name, ) 
+	NeovimQt::MsgpackRequest* nvim_del_var(QByteArray name);
+	// Object nvim_get_vvar(String name, ) 
+	NeovimQt::MsgpackRequest* nvim_get_vvar(QByteArray name);
+	// void nvim_set_vvar(String name, Object value, ) 
+	NeovimQt::MsgpackRequest* nvim_set_vvar(QByteArray name, QVariant value);
+	// Object nvim_get_option(String name, ) 
+	NeovimQt::MsgpackRequest* nvim_get_option(QByteArray name);
+	// Dictionary nvim_get_all_options_info() 
+	NeovimQt::MsgpackRequest* nvim_get_all_options_info();
+	// Dictionary nvim_get_option_info(String name, ) 
+	NeovimQt::MsgpackRequest* nvim_get_option_info(QByteArray name);
+	// void nvim_set_option(String name, Object value, ) 
+	NeovimQt::MsgpackRequest* nvim_set_option(QByteArray name, QVariant value);
+	// void nvim_echo(Array chunks, Boolean history, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_echo(QVariantList chunks, bool history, QVariantMap opts);
+	// void nvim_out_write(String str, ) 
+	NeovimQt::MsgpackRequest* nvim_out_write(QByteArray str);
+	// void nvim_err_write(String str, ) 
+	NeovimQt::MsgpackRequest* nvim_err_write(QByteArray str);
+	// void nvim_err_writeln(String str, ) 
+	NeovimQt::MsgpackRequest* nvim_err_writeln(QByteArray str);
+	// ArrayOf(Buffer) nvim_list_bufs() 
+	NeovimQt::MsgpackRequest* nvim_list_bufs();
+	// Buffer nvim_get_current_buf() 
+	NeovimQt::MsgpackRequest* nvim_get_current_buf();
+	// void nvim_set_current_buf(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* nvim_set_current_buf(int64_t buffer);
+	// ArrayOf(Window) nvim_list_wins() 
+	NeovimQt::MsgpackRequest* nvim_list_wins();
+	// Window nvim_get_current_win() 
+	NeovimQt::MsgpackRequest* nvim_get_current_win();
+	// void nvim_set_current_win(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_set_current_win(int64_t window);
+	// Buffer nvim_create_buf(Boolean listed, Boolean scratch, ) 
+	NeovimQt::MsgpackRequest* nvim_create_buf(bool listed, bool scratch);
+	// Integer nvim_open_term(Buffer buffer, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_open_term(int64_t buffer, QVariantMap opts);
+	// void nvim_chan_send(Integer chan, String data, ) 
+	NeovimQt::MsgpackRequest* nvim_chan_send(int64_t chan, QByteArray data);
+	// Window nvim_open_win(Buffer buffer, Boolean enter, Dictionary config, ) 
+	NeovimQt::MsgpackRequest* nvim_open_win(int64_t buffer, bool enter, QVariantMap config);
+	// ArrayOf(Tabpage) nvim_list_tabpages() 
+	NeovimQt::MsgpackRequest* nvim_list_tabpages();
+	// Tabpage nvim_get_current_tabpage() 
+	NeovimQt::MsgpackRequest* nvim_get_current_tabpage();
+	// void nvim_set_current_tabpage(Tabpage tabpage, ) 
+	NeovimQt::MsgpackRequest* nvim_set_current_tabpage(int64_t tabpage);
+	// Integer nvim_create_namespace(String name, ) 
+	NeovimQt::MsgpackRequest* nvim_create_namespace(QByteArray name);
+	// Dictionary nvim_get_namespaces() 
+	NeovimQt::MsgpackRequest* nvim_get_namespaces();
+	// Boolean nvim_paste(String data, Boolean crlf, Integer phase, ) 
+	NeovimQt::MsgpackRequest* nvim_paste(QByteArray data, bool crlf, int64_t phase);
+	// void nvim_put(ArrayOf(String) lines, String type, Boolean after, Boolean follow, ) 
+	NeovimQt::MsgpackRequest* nvim_put(QList<QByteArray> lines, QByteArray type, bool after, bool follow);
+	// void nvim_subscribe(String event, ) 
+	NeovimQt::MsgpackRequest* nvim_subscribe(QByteArray event);
+	// void nvim_unsubscribe(String event, ) 
+	NeovimQt::MsgpackRequest* nvim_unsubscribe(QByteArray event);
+	// Integer nvim_get_color_by_name(String name, ) 
+	NeovimQt::MsgpackRequest* nvim_get_color_by_name(QByteArray name);
+	// Dictionary nvim_get_color_map() 
+	NeovimQt::MsgpackRequest* nvim_get_color_map();
+	// Dictionary nvim_get_context(Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_get_context(QVariantMap opts);
+	// Object nvim_load_context(Dictionary dict, ) 
+	NeovimQt::MsgpackRequest* nvim_load_context(QVariantMap dict);
+	// Dictionary nvim_get_mode() 
+	NeovimQt::MsgpackRequest* nvim_get_mode();
+	// ArrayOf(Dictionary) nvim_get_keymap(String mode, ) 
+	NeovimQt::MsgpackRequest* nvim_get_keymap(QByteArray mode);
+	// void nvim_set_keymap(String mode, String lhs, String rhs, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_set_keymap(QByteArray mode, QByteArray lhs, QByteArray rhs, QVariantMap opts);
+	// void nvim_del_keymap(String mode, String lhs, ) 
+	NeovimQt::MsgpackRequest* nvim_del_keymap(QByteArray mode, QByteArray lhs);
+	// Dictionary nvim_get_commands(Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_get_commands(QVariantMap opts);
+	// Array nvim_get_api_info() 
+	NeovimQt::MsgpackRequest* nvim_get_api_info();
+	// void nvim_set_client_info(String name, Dictionary version, String type, Dictionary methods, Dictionary attributes, ) 
+	NeovimQt::MsgpackRequest* nvim_set_client_info(QByteArray name, QVariantMap version, QByteArray type, QVariantMap methods, QVariantMap attributes);
+	// Dictionary nvim_get_chan_info(Integer chan, ) 
+	NeovimQt::MsgpackRequest* nvim_get_chan_info(int64_t chan);
+	// Array nvim_list_chans() 
+	NeovimQt::MsgpackRequest* nvim_list_chans();
+	// Array nvim_call_atomic(Array calls, ) 
+	NeovimQt::MsgpackRequest* nvim_call_atomic(QVariantList calls);
+	// Dictionary nvim_parse_expression(String expr, String flags, Boolean highlight, ) 
+	NeovimQt::MsgpackRequest* nvim_parse_expression(QByteArray expr, QByteArray flags, bool highlight);
+	// Array nvim_list_uis() 
+	NeovimQt::MsgpackRequest* nvim_list_uis();
+	// Array nvim_get_proc_children(Integer pid, ) 
+	NeovimQt::MsgpackRequest* nvim_get_proc_children(int64_t pid);
+	// Object nvim_get_proc(Integer pid, ) 
+	NeovimQt::MsgpackRequest* nvim_get_proc(int64_t pid);
+	// void nvim_select_popupmenu_item(Integer item, Boolean insert, Boolean finish, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_select_popupmenu_item(int64_t item, bool insert, bool finish, QVariantMap opts);
+	// void nvim_set_decoration_provider(Integer ns_id, Dictionary opts, ) 
+	NeovimQt::MsgpackRequest* nvim_set_decoration_provider(int64_t ns_id, QVariantMap opts);
+	// Buffer nvim_win_get_buf(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_get_buf(int64_t window);
+	// void nvim_win_set_buf(Window window, Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* nvim_win_set_buf(int64_t window, int64_t buffer);
+	// ArrayOf(Integer, 2) nvim_win_get_cursor(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_get_cursor(int64_t window);
+	// void nvim_win_set_cursor(Window window, ArrayOf(Integer, 2) pos, ) 
+	NeovimQt::MsgpackRequest* nvim_win_set_cursor(int64_t window, QPoint pos);
+	// Integer nvim_win_get_height(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_get_height(int64_t window);
+	// void nvim_win_set_height(Window window, Integer height, ) 
+	NeovimQt::MsgpackRequest* nvim_win_set_height(int64_t window, int64_t height);
+	// Integer nvim_win_get_width(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_get_width(int64_t window);
+	// void nvim_win_set_width(Window window, Integer width, ) 
+	NeovimQt::MsgpackRequest* nvim_win_set_width(int64_t window, int64_t width);
+	// Object nvim_win_get_var(Window window, String name, ) 
+	NeovimQt::MsgpackRequest* nvim_win_get_var(int64_t window, QByteArray name);
+	// void nvim_win_set_var(Window window, String name, Object value, ) 
+	NeovimQt::MsgpackRequest* nvim_win_set_var(int64_t window, QByteArray name, QVariant value);
+	// void nvim_win_del_var(Window window, String name, ) 
+	NeovimQt::MsgpackRequest* nvim_win_del_var(int64_t window, QByteArray name);
+	// Object nvim_win_get_option(Window window, String name, ) 
+	NeovimQt::MsgpackRequest* nvim_win_get_option(int64_t window, QByteArray name);
+	// void nvim_win_set_option(Window window, String name, Object value, ) 
+	NeovimQt::MsgpackRequest* nvim_win_set_option(int64_t window, QByteArray name, QVariant value);
+	// ArrayOf(Integer, 2) nvim_win_get_position(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_get_position(int64_t window);
+	// Tabpage nvim_win_get_tabpage(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_get_tabpage(int64_t window);
+	// Integer nvim_win_get_number(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_get_number(int64_t window);
+	// Boolean nvim_win_is_valid(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_is_valid(int64_t window);
+	// void nvim_win_set_config(Window window, Dictionary config, ) 
+	NeovimQt::MsgpackRequest* nvim_win_set_config(int64_t window, QVariantMap config);
+	// Dictionary nvim_win_get_config(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_get_config(int64_t window);
+	// void nvim_win_hide(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_hide(int64_t window);
+	// void nvim_win_close(Window window, Boolean force, ) 
+	NeovimQt::MsgpackRequest* nvim_win_close(int64_t window, bool force);
+	// Object nvim_win_call(Window window, ) 
+	NeovimQt::MsgpackRequest* nvim_win_call(int64_t window);
+	// DEPRECATED
+	// Integer buffer_line_count(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* buffer_line_count(int64_t buffer);
+	// DEPRECATED
+	// ArrayOf(String) buffer_get_lines(Buffer buffer, Integer start, Integer end, Boolean strict_indexing, ) 
+	NeovimQt::MsgpackRequest* buffer_get_lines(int64_t buffer, int64_t start, int64_t end, bool strict_indexing);
+	// DEPRECATED
+	// void buffer_set_lines(Buffer buffer, Integer start, Integer end, Boolean strict_indexing, ArrayOf(String) replacement, ) 
+	NeovimQt::MsgpackRequest* buffer_set_lines(int64_t buffer, int64_t start, int64_t end, bool strict_indexing, QList<QByteArray> replacement);
+	// DEPRECATED
+	// Object buffer_get_var(Buffer buffer, String name, ) 
+	NeovimQt::MsgpackRequest* buffer_get_var(int64_t buffer, QByteArray name);
+	// DEPRECATED
+	// Object buffer_get_option(Buffer buffer, String name, ) 
+	NeovimQt::MsgpackRequest* buffer_get_option(int64_t buffer, QByteArray name);
+	// DEPRECATED
+	// void buffer_set_option(Buffer buffer, String name, Object value, ) 
+	NeovimQt::MsgpackRequest* buffer_set_option(int64_t buffer, QByteArray name, QVariant value);
+	// DEPRECATED
+	// String buffer_get_name(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* buffer_get_name(int64_t buffer);
+	// DEPRECATED
+	// void buffer_set_name(Buffer buffer, String name, ) 
+	NeovimQt::MsgpackRequest* buffer_set_name(int64_t buffer, QByteArray name);
+	// DEPRECATED
+	// Boolean buffer_is_valid(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* buffer_is_valid(int64_t buffer);
+	// DEPRECATED
+	// ArrayOf(Integer, 2) buffer_get_mark(Buffer buffer, String name, ) 
+	NeovimQt::MsgpackRequest* buffer_get_mark(int64_t buffer, QByteArray name);
+	// DEPRECATED
+	// Integer buffer_add_highlight(Buffer buffer, Integer ns_id, String hl_group, Integer line, Integer col_start, Integer col_end, ) 
+	NeovimQt::MsgpackRequest* buffer_add_highlight(int64_t buffer, int64_t ns_id, QByteArray hl_group, int64_t line, int64_t col_start, int64_t col_end);
+	// DEPRECATED
+	// String vim_command_output(String command, ) 
+	NeovimQt::MsgpackRequest* vim_command_output(QByteArray command);
+	// DEPRECATED
+	// Integer buffer_get_number(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* buffer_get_number(int64_t buffer);
+	// DEPRECATED
+	// void buffer_clear_highlight(Buffer buffer, Integer ns_id, Integer line_start, Integer line_end, ) 
+	NeovimQt::MsgpackRequest* buffer_clear_highlight(int64_t buffer, int64_t ns_id, int64_t line_start, int64_t line_end);
+	// DEPRECATED
+	// ArrayOf(Window) tabpage_get_windows(Tabpage tabpage, ) 
+	NeovimQt::MsgpackRequest* tabpage_get_windows(int64_t tabpage);
+	// DEPRECATED
+	// Object tabpage_get_var(Tabpage tabpage, String name, ) 
+	NeovimQt::MsgpackRequest* tabpage_get_var(int64_t tabpage, QByteArray name);
+	// DEPRECATED
+	// Window tabpage_get_window(Tabpage tabpage, ) 
+	NeovimQt::MsgpackRequest* tabpage_get_window(int64_t tabpage);
+	// DEPRECATED
+	// Boolean tabpage_is_valid(Tabpage tabpage, ) 
+	NeovimQt::MsgpackRequest* tabpage_is_valid(int64_t tabpage);
+	// DEPRECATED
+	// void ui_detach() 
+	NeovimQt::MsgpackRequest* ui_detach();
+	// DEPRECATED
+	// Object ui_try_resize(Integer width, Integer height, ) 
+	NeovimQt::MsgpackRequest* ui_try_resize(int64_t width, int64_t height);
+	// DEPRECATED
+	// void vim_command(String command, ) 
+	NeovimQt::MsgpackRequest* vim_command(QByteArray command);
+	// DEPRECATED
+	// void vim_feedkeys(String keys, String mode, Boolean escape_csi, ) 
+	NeovimQt::MsgpackRequest* vim_feedkeys(QByteArray keys, QByteArray mode, bool escape_csi);
+	// DEPRECATED
+	// Integer vim_input(String keys, ) 
+	NeovimQt::MsgpackRequest* vim_input(QByteArray keys);
+	// DEPRECATED
+	// String vim_replace_termcodes(String str, Boolean from_part, Boolean do_lt, Boolean special, ) 
+	NeovimQt::MsgpackRequest* vim_replace_termcodes(QByteArray str, bool from_part, bool do_lt, bool special);
+	// DEPRECATED
+	// Object vim_eval(String expr, ) 
+	NeovimQt::MsgpackRequest* vim_eval(QByteArray expr);
+	// DEPRECATED
+	// Object vim_call_function(String fn, Array args, ) 
+	NeovimQt::MsgpackRequest* vim_call_function(QByteArray fn, QVariantList args);
+	// DEPRECATED
+	// Integer vim_strwidth(String text, ) 
+	NeovimQt::MsgpackRequest* vim_strwidth(QByteArray text);
+	// DEPRECATED
+	// ArrayOf(String) vim_list_runtime_paths() 
+	NeovimQt::MsgpackRequest* vim_list_runtime_paths();
+	// DEPRECATED
+	// void vim_change_directory(String dir, ) 
+	NeovimQt::MsgpackRequest* vim_change_directory(QByteArray dir);
+	// DEPRECATED
+	// String vim_get_current_line() 
+	NeovimQt::MsgpackRequest* vim_get_current_line();
+	// DEPRECATED
+	// void vim_set_current_line(String line, ) 
+	NeovimQt::MsgpackRequest* vim_set_current_line(QByteArray line);
+	// DEPRECATED
+	// void vim_del_current_line() 
+	NeovimQt::MsgpackRequest* vim_del_current_line();
+	// DEPRECATED
+	// Object vim_get_var(String name, ) 
+	NeovimQt::MsgpackRequest* vim_get_var(QByteArray name);
+	// DEPRECATED
+	// Object vim_get_vvar(String name, ) 
+	NeovimQt::MsgpackRequest* vim_get_vvar(QByteArray name);
+	// DEPRECATED
+	// Object vim_get_option(String name, ) 
+	NeovimQt::MsgpackRequest* vim_get_option(QByteArray name);
+	// DEPRECATED
+	// void vim_set_option(String name, Object value, ) 
+	NeovimQt::MsgpackRequest* vim_set_option(QByteArray name, QVariant value);
+	// DEPRECATED
+	// void vim_out_write(String str, ) 
+	NeovimQt::MsgpackRequest* vim_out_write(QByteArray str);
+	// DEPRECATED
+	// void vim_err_write(String str, ) 
+	NeovimQt::MsgpackRequest* vim_err_write(QByteArray str);
+	// DEPRECATED
+	// void vim_report_error(String str, ) 
+	NeovimQt::MsgpackRequest* vim_report_error(QByteArray str);
+	// DEPRECATED
+	// ArrayOf(Buffer) vim_get_buffers() 
+	NeovimQt::MsgpackRequest* vim_get_buffers();
+	// DEPRECATED
+	// Buffer vim_get_current_buffer() 
+	NeovimQt::MsgpackRequest* vim_get_current_buffer();
+	// DEPRECATED
+	// void vim_set_current_buffer(Buffer buffer, ) 
+	NeovimQt::MsgpackRequest* vim_set_current_buffer(int64_t buffer);
+	// DEPRECATED
+	// ArrayOf(Window) vim_get_windows() 
+	NeovimQt::MsgpackRequest* vim_get_windows();
+	// DEPRECATED
+	// Window vim_get_current_window() 
+	NeovimQt::MsgpackRequest* vim_get_current_window();
+	// DEPRECATED
+	// void vim_set_current_window(Window window, ) 
+	NeovimQt::MsgpackRequest* vim_set_current_window(int64_t window);
+	// DEPRECATED
+	// ArrayOf(Tabpage) vim_get_tabpages() 
+	NeovimQt::MsgpackRequest* vim_get_tabpages();
+	// DEPRECATED
+	// Tabpage vim_get_current_tabpage() 
+	NeovimQt::MsgpackRequest* vim_get_current_tabpage();
+	// DEPRECATED
+	// void vim_set_current_tabpage(Tabpage tabpage, ) 
+	NeovimQt::MsgpackRequest* vim_set_current_tabpage(int64_t tabpage);
+	// DEPRECATED
+	// void vim_subscribe(String event, ) 
+	NeovimQt::MsgpackRequest* vim_subscribe(QByteArray event);
+	// DEPRECATED
+	// void vim_unsubscribe(String event, ) 
+	NeovimQt::MsgpackRequest* vim_unsubscribe(QByteArray event);
+	// DEPRECATED
+	// Integer vim_name_to_color(String name, ) 
+	NeovimQt::MsgpackRequest* vim_name_to_color(QByteArray name);
+	// DEPRECATED
+	// Dictionary vim_get_color_map() 
+	NeovimQt::MsgpackRequest* vim_get_color_map();
+	// DEPRECATED
+	// Buffer window_get_buffer(Window window, ) 
+	NeovimQt::MsgpackRequest* window_get_buffer(int64_t window);
+	// DEPRECATED
+	// ArrayOf(Integer, 2) window_get_cursor(Window window, ) 
+	NeovimQt::MsgpackRequest* window_get_cursor(int64_t window);
+	// DEPRECATED
+	// void window_set_cursor(Window window, ArrayOf(Integer, 2) pos, ) 
+	NeovimQt::MsgpackRequest* window_set_cursor(int64_t window, QPoint pos);
+	// DEPRECATED
+	// Integer window_get_height(Window window, ) 
+	NeovimQt::MsgpackRequest* window_get_height(int64_t window);
+	// DEPRECATED
+	// void window_set_height(Window window, Integer height, ) 
+	NeovimQt::MsgpackRequest* window_set_height(int64_t window, int64_t height);
+	// DEPRECATED
+	// Integer window_get_width(Window window, ) 
+	NeovimQt::MsgpackRequest* window_get_width(int64_t window);
+	// DEPRECATED
+	// void window_set_width(Window window, Integer width, ) 
+	NeovimQt::MsgpackRequest* window_set_width(int64_t window, int64_t width);
+	// DEPRECATED
+	// Object window_get_var(Window window, String name, ) 
+	NeovimQt::MsgpackRequest* window_get_var(int64_t window, QByteArray name);
+	// DEPRECATED
+	// Object window_get_option(Window window, String name, ) 
+	NeovimQt::MsgpackRequest* window_get_option(int64_t window, QByteArray name);
+	// DEPRECATED
+	// void window_set_option(Window window, String name, Object value, ) 
+	NeovimQt::MsgpackRequest* window_set_option(int64_t window, QByteArray name, QVariant value);
+	// DEPRECATED
+	// ArrayOf(Integer, 2) window_get_position(Window window, ) 
+	NeovimQt::MsgpackRequest* window_get_position(int64_t window);
+	// DEPRECATED
+	// Tabpage window_get_tabpage(Window window, ) 
+	NeovimQt::MsgpackRequest* window_get_tabpage(int64_t window);
+	// DEPRECATED
+	// Boolean window_is_valid(Window window, ) 
+	NeovimQt::MsgpackRequest* window_is_valid(int64_t window);
+
+signals:
+	void on_nvim_buf_line_count(int64_t);
+	void err_nvim_buf_line_count(const QString&, const QVariant&);
+
+	void on_nvim_buf_attach(bool);
+	void err_nvim_buf_attach(const QString&, const QVariant&);
+
+	void on_nvim_buf_detach(bool);
+	void err_nvim_buf_detach(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_lines(QList<QByteArray>);
+	void err_nvim_buf_get_lines(const QString&, const QVariant&);
+
+	void on_nvim_buf_set_lines(void);
+	void err_nvim_buf_set_lines(const QString&, const QVariant&);
+
+	void on_nvim_buf_set_text(void);
+	void err_nvim_buf_set_text(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_offset(int64_t);
+	void err_nvim_buf_get_offset(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_var(QVariant);
+	void err_nvim_buf_get_var(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_changedtick(int64_t);
+	void err_nvim_buf_get_changedtick(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_keymap(QList<QVariantMap>);
+	void err_nvim_buf_get_keymap(const QString&, const QVariant&);
+
+	void on_nvim_buf_set_keymap(void);
+	void err_nvim_buf_set_keymap(const QString&, const QVariant&);
+
+	void on_nvim_buf_del_keymap(void);
+	void err_nvim_buf_del_keymap(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_commands(QVariantMap);
+	void err_nvim_buf_get_commands(const QString&, const QVariant&);
+
+	void on_nvim_buf_set_var(void);
+	void err_nvim_buf_set_var(const QString&, const QVariant&);
+
+	void on_nvim_buf_del_var(void);
+	void err_nvim_buf_del_var(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_option(QVariant);
+	void err_nvim_buf_get_option(const QString&, const QVariant&);
+
+	void on_nvim_buf_set_option(void);
+	void err_nvim_buf_set_option(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_name(QByteArray);
+	void err_nvim_buf_get_name(const QString&, const QVariant&);
+
+	void on_nvim_buf_set_name(void);
+	void err_nvim_buf_set_name(const QString&, const QVariant&);
+
+	void on_nvim_buf_is_loaded(bool);
+	void err_nvim_buf_is_loaded(const QString&, const QVariant&);
+
+	void on_nvim_buf_delete(void);
+	void err_nvim_buf_delete(const QString&, const QVariant&);
+
+	void on_nvim_buf_is_valid(bool);
+	void err_nvim_buf_is_valid(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_mark(QPoint);
+	void err_nvim_buf_get_mark(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_extmark_by_id(QList<int64_t>);
+	void err_nvim_buf_get_extmark_by_id(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_extmarks(QVariantList);
+	void err_nvim_buf_get_extmarks(const QString&, const QVariant&);
+
+	void on_nvim_buf_set_extmark(int64_t);
+	void err_nvim_buf_set_extmark(const QString&, const QVariant&);
+
+	void on_nvim_buf_del_extmark(bool);
+	void err_nvim_buf_del_extmark(const QString&, const QVariant&);
+
+	void on_nvim_buf_add_highlight(int64_t);
+	void err_nvim_buf_add_highlight(const QString&, const QVariant&);
+
+	void on_nvim_buf_clear_namespace(void);
+	void err_nvim_buf_clear_namespace(const QString&, const QVariant&);
+
+	void on_nvim_buf_set_virtual_text(int64_t);
+	void err_nvim_buf_set_virtual_text(const QString&, const QVariant&);
+
+	void on_nvim_buf_call(QVariant);
+	void err_nvim_buf_call(const QString&, const QVariant&);
+
+	void on_nvim_command_output(QByteArray);
+	void err_nvim_command_output(const QString&, const QVariant&);
+
+	void on_nvim_execute_lua(QVariant);
+	void err_nvim_execute_lua(const QString&, const QVariant&);
+
+	void on_nvim_buf_get_number(int64_t);
+	void err_nvim_buf_get_number(const QString&, const QVariant&);
+
+	void on_nvim_buf_clear_highlight(void);
+	void err_nvim_buf_clear_highlight(const QString&, const QVariant&);
+
+	void on_buffer_insert(void);
+	void err_buffer_insert(const QString&, const QVariant&);
+
+	void on_buffer_get_line(QByteArray);
+	void err_buffer_get_line(const QString&, const QVariant&);
+
+	void on_buffer_set_line(void);
+	void err_buffer_set_line(const QString&, const QVariant&);
+
+	void on_buffer_del_line(void);
+	void err_buffer_del_line(const QString&, const QVariant&);
+
+	void on_buffer_get_line_slice(QList<QByteArray>);
+	void err_buffer_get_line_slice(const QString&, const QVariant&);
+
+	void on_buffer_set_line_slice(void);
+	void err_buffer_set_line_slice(const QString&, const QVariant&);
+
+	void on_buffer_set_var(QVariant);
+	void err_buffer_set_var(const QString&, const QVariant&);
+
+	void on_buffer_del_var(QVariant);
+	void err_buffer_del_var(const QString&, const QVariant&);
+
+	void on_window_set_var(QVariant);
+	void err_window_set_var(const QString&, const QVariant&);
+
+	void on_window_del_var(QVariant);
+	void err_window_del_var(const QString&, const QVariant&);
+
+	void on_tabpage_set_var(QVariant);
+	void err_tabpage_set_var(const QString&, const QVariant&);
+
+	void on_tabpage_del_var(QVariant);
+	void err_tabpage_del_var(const QString&, const QVariant&);
+
+	void on_vim_set_var(QVariant);
+	void err_vim_set_var(const QString&, const QVariant&);
+
+	void on_vim_del_var(QVariant);
+	void err_vim_del_var(const QString&, const QVariant&);
+
+	void on_nvim_tabpage_list_wins(QList<int64_t>);
+	void err_nvim_tabpage_list_wins(const QString&, const QVariant&);
+
+	void on_nvim_tabpage_get_var(QVariant);
+	void err_nvim_tabpage_get_var(const QString&, const QVariant&);
+
+	void on_nvim_tabpage_set_var(void);
+	void err_nvim_tabpage_set_var(const QString&, const QVariant&);
+
+	void on_nvim_tabpage_del_var(void);
+	void err_nvim_tabpage_del_var(const QString&, const QVariant&);
+
+	void on_nvim_tabpage_get_win(int64_t);
+	void err_nvim_tabpage_get_win(const QString&, const QVariant&);
+
+	void on_nvim_tabpage_get_number(int64_t);
+	void err_nvim_tabpage_get_number(const QString&, const QVariant&);
+
+	void on_nvim_tabpage_is_valid(bool);
+	void err_nvim_tabpage_is_valid(const QString&, const QVariant&);
+
+	void on_nvim_ui_attach(void);
+	void err_nvim_ui_attach(const QString&, const QVariant&);
+
+	void on_ui_attach(void);
+	void err_ui_attach(const QString&, const QVariant&);
+
+	void on_nvim_ui_detach(void);
+	void err_nvim_ui_detach(const QString&, const QVariant&);
+
+	void on_nvim_ui_try_resize(void);
+	void err_nvim_ui_try_resize(const QString&, const QVariant&);
+
+	void on_nvim_ui_set_option(void);
+	void err_nvim_ui_set_option(const QString&, const QVariant&);
+
+	void on_nvim_ui_try_resize_grid(void);
+	void err_nvim_ui_try_resize_grid(const QString&, const QVariant&);
+
+	void on_nvim_ui_pum_set_height(void);
+	void err_nvim_ui_pum_set_height(const QString&, const QVariant&);
+
+	void on_nvim_ui_pum_set_bounds(void);
+	void err_nvim_ui_pum_set_bounds(const QString&, const QVariant&);
+
+	void on_nvim_exec(QByteArray);
+	void err_nvim_exec(const QString&, const QVariant&);
+
+	void on_nvim_command(void);
+	void err_nvim_command(const QString&, const QVariant&);
+
+	void on_nvim_get_hl_by_name(QVariantMap);
+	void err_nvim_get_hl_by_name(const QString&, const QVariant&);
+
+	void on_nvim_get_hl_by_id(QVariantMap);
+	void err_nvim_get_hl_by_id(const QString&, const QVariant&);
+
+	void on_nvim_get_hl_id_by_name(int64_t);
+	void err_nvim_get_hl_id_by_name(const QString&, const QVariant&);
+
+	void on_nvim_set_hl(void);
+	void err_nvim_set_hl(const QString&, const QVariant&);
+
+	void on_nvim_feedkeys(void);
+	void err_nvim_feedkeys(const QString&, const QVariant&);
+
+	void on_nvim_input(int64_t);
+	void err_nvim_input(const QString&, const QVariant&);
+
+	void on_nvim_input_mouse(void);
+	void err_nvim_input_mouse(const QString&, const QVariant&);
+
+	void on_nvim_replace_termcodes(QByteArray);
+	void err_nvim_replace_termcodes(const QString&, const QVariant&);
+
+	void on_nvim_eval(QVariant);
+	void err_nvim_eval(const QString&, const QVariant&);
+
+	void on_nvim_exec_lua(QVariant);
+	void err_nvim_exec_lua(const QString&, const QVariant&);
+
+	void on_nvim_notify(QVariant);
+	void err_nvim_notify(const QString&, const QVariant&);
+
+	void on_nvim_call_function(QVariant);
+	void err_nvim_call_function(const QString&, const QVariant&);
+
+	void on_nvim_call_dict_function(QVariant);
+	void err_nvim_call_dict_function(const QString&, const QVariant&);
+
+	void on_nvim_strwidth(int64_t);
+	void err_nvim_strwidth(const QString&, const QVariant&);
+
+	void on_nvim_list_runtime_paths(QList<QByteArray>);
+	void err_nvim_list_runtime_paths(const QString&, const QVariant&);
+
+	void on_nvim_get_runtime_file(QList<QByteArray>);
+	void err_nvim_get_runtime_file(const QString&, const QVariant&);
+
+	void on_nvim_set_current_dir(void);
+	void err_nvim_set_current_dir(const QString&, const QVariant&);
+
+	void on_nvim_get_current_line(QByteArray);
+	void err_nvim_get_current_line(const QString&, const QVariant&);
+
+	void on_nvim_set_current_line(void);
+	void err_nvim_set_current_line(const QString&, const QVariant&);
+
+	void on_nvim_del_current_line(void);
+	void err_nvim_del_current_line(const QString&, const QVariant&);
+
+	void on_nvim_get_var(QVariant);
+	void err_nvim_get_var(const QString&, const QVariant&);
+
+	void on_nvim_set_var(void);
+	void err_nvim_set_var(const QString&, const QVariant&);
+
+	void on_nvim_del_var(void);
+	void err_nvim_del_var(const QString&, const QVariant&);
+
+	void on_nvim_get_vvar(QVariant);
+	void err_nvim_get_vvar(const QString&, const QVariant&);
+
+	void on_nvim_set_vvar(void);
+	void err_nvim_set_vvar(const QString&, const QVariant&);
+
+	void on_nvim_get_option(QVariant);
+	void err_nvim_get_option(const QString&, const QVariant&);
+
+	void on_nvim_get_all_options_info(QVariantMap);
+	void err_nvim_get_all_options_info(const QString&, const QVariant&);
+
+	void on_nvim_get_option_info(QVariantMap);
+	void err_nvim_get_option_info(const QString&, const QVariant&);
+
+	void on_nvim_set_option(void);
+	void err_nvim_set_option(const QString&, const QVariant&);
+
+	void on_nvim_echo(void);
+	void err_nvim_echo(const QString&, const QVariant&);
+
+	void on_nvim_out_write(void);
+	void err_nvim_out_write(const QString&, const QVariant&);
+
+	void on_nvim_err_write(void);
+	void err_nvim_err_write(const QString&, const QVariant&);
+
+	void on_nvim_err_writeln(void);
+	void err_nvim_err_writeln(const QString&, const QVariant&);
+
+	void on_nvim_list_bufs(QList<int64_t>);
+	void err_nvim_list_bufs(const QString&, const QVariant&);
+
+	void on_nvim_get_current_buf(int64_t);
+	void err_nvim_get_current_buf(const QString&, const QVariant&);
+
+	void on_nvim_set_current_buf(void);
+	void err_nvim_set_current_buf(const QString&, const QVariant&);
+
+	void on_nvim_list_wins(QList<int64_t>);
+	void err_nvim_list_wins(const QString&, const QVariant&);
+
+	void on_nvim_get_current_win(int64_t);
+	void err_nvim_get_current_win(const QString&, const QVariant&);
+
+	void on_nvim_set_current_win(void);
+	void err_nvim_set_current_win(const QString&, const QVariant&);
+
+	void on_nvim_create_buf(int64_t);
+	void err_nvim_create_buf(const QString&, const QVariant&);
+
+	void on_nvim_open_term(int64_t);
+	void err_nvim_open_term(const QString&, const QVariant&);
+
+	void on_nvim_chan_send(void);
+	void err_nvim_chan_send(const QString&, const QVariant&);
+
+	void on_nvim_open_win(int64_t);
+	void err_nvim_open_win(const QString&, const QVariant&);
+
+	void on_nvim_list_tabpages(QList<int64_t>);
+	void err_nvim_list_tabpages(const QString&, const QVariant&);
+
+	void on_nvim_get_current_tabpage(int64_t);
+	void err_nvim_get_current_tabpage(const QString&, const QVariant&);
+
+	void on_nvim_set_current_tabpage(void);
+	void err_nvim_set_current_tabpage(const QString&, const QVariant&);
+
+	void on_nvim_create_namespace(int64_t);
+	void err_nvim_create_namespace(const QString&, const QVariant&);
+
+	void on_nvim_get_namespaces(QVariantMap);
+	void err_nvim_get_namespaces(const QString&, const QVariant&);
+
+	void on_nvim_paste(bool);
+	void err_nvim_paste(const QString&, const QVariant&);
+
+	void on_nvim_put(void);
+	void err_nvim_put(const QString&, const QVariant&);
+
+	void on_nvim_subscribe(void);
+	void err_nvim_subscribe(const QString&, const QVariant&);
+
+	void on_nvim_unsubscribe(void);
+	void err_nvim_unsubscribe(const QString&, const QVariant&);
+
+	void on_nvim_get_color_by_name(int64_t);
+	void err_nvim_get_color_by_name(const QString&, const QVariant&);
+
+	void on_nvim_get_color_map(QVariantMap);
+	void err_nvim_get_color_map(const QString&, const QVariant&);
+
+	void on_nvim_get_context(QVariantMap);
+	void err_nvim_get_context(const QString&, const QVariant&);
+
+	void on_nvim_load_context(QVariant);
+	void err_nvim_load_context(const QString&, const QVariant&);
+
+	void on_nvim_get_mode(QVariantMap);
+	void err_nvim_get_mode(const QString&, const QVariant&);
+
+	void on_nvim_get_keymap(QList<QVariantMap>);
+	void err_nvim_get_keymap(const QString&, const QVariant&);
+
+	void on_nvim_set_keymap(void);
+	void err_nvim_set_keymap(const QString&, const QVariant&);
+
+	void on_nvim_del_keymap(void);
+	void err_nvim_del_keymap(const QString&, const QVariant&);
+
+	void on_nvim_get_commands(QVariantMap);
+	void err_nvim_get_commands(const QString&, const QVariant&);
+
+	void on_nvim_get_api_info(QVariantList);
+	void err_nvim_get_api_info(const QString&, const QVariant&);
+
+	void on_nvim_set_client_info(void);
+	void err_nvim_set_client_info(const QString&, const QVariant&);
+
+	void on_nvim_get_chan_info(QVariantMap);
+	void err_nvim_get_chan_info(const QString&, const QVariant&);
+
+	void on_nvim_list_chans(QVariantList);
+	void err_nvim_list_chans(const QString&, const QVariant&);
+
+	void on_nvim_call_atomic(QVariantList);
+	void err_nvim_call_atomic(const QString&, const QVariant&);
+
+	void on_nvim_parse_expression(QVariantMap);
+	void err_nvim_parse_expression(const QString&, const QVariant&);
+
+	void on_nvim_list_uis(QVariantList);
+	void err_nvim_list_uis(const QString&, const QVariant&);
+
+	void on_nvim_get_proc_children(QVariantList);
+	void err_nvim_get_proc_children(const QString&, const QVariant&);
+
+	void on_nvim_get_proc(QVariant);
+	void err_nvim_get_proc(const QString&, const QVariant&);
+
+	void on_nvim_select_popupmenu_item(void);
+	void err_nvim_select_popupmenu_item(const QString&, const QVariant&);
+
+	void on_nvim_set_decoration_provider(void);
+	void err_nvim_set_decoration_provider(const QString&, const QVariant&);
+
+	void on_nvim_win_get_buf(int64_t);
+	void err_nvim_win_get_buf(const QString&, const QVariant&);
+
+	void on_nvim_win_set_buf(void);
+	void err_nvim_win_set_buf(const QString&, const QVariant&);
+
+	void on_nvim_win_get_cursor(QPoint);
+	void err_nvim_win_get_cursor(const QString&, const QVariant&);
+
+	void on_nvim_win_set_cursor(void);
+	void err_nvim_win_set_cursor(const QString&, const QVariant&);
+
+	void on_nvim_win_get_height(int64_t);
+	void err_nvim_win_get_height(const QString&, const QVariant&);
+
+	void on_nvim_win_set_height(void);
+	void err_nvim_win_set_height(const QString&, const QVariant&);
+
+	void on_nvim_win_get_width(int64_t);
+	void err_nvim_win_get_width(const QString&, const QVariant&);
+
+	void on_nvim_win_set_width(void);
+	void err_nvim_win_set_width(const QString&, const QVariant&);
+
+	void on_nvim_win_get_var(QVariant);
+	void err_nvim_win_get_var(const QString&, const QVariant&);
+
+	void on_nvim_win_set_var(void);
+	void err_nvim_win_set_var(const QString&, const QVariant&);
+
+	void on_nvim_win_del_var(void);
+	void err_nvim_win_del_var(const QString&, const QVariant&);
+
+	void on_nvim_win_get_option(QVariant);
+	void err_nvim_win_get_option(const QString&, const QVariant&);
+
+	void on_nvim_win_set_option(void);
+	void err_nvim_win_set_option(const QString&, const QVariant&);
+
+	void on_nvim_win_get_position(QPoint);
+	void err_nvim_win_get_position(const QString&, const QVariant&);
+
+	void on_nvim_win_get_tabpage(int64_t);
+	void err_nvim_win_get_tabpage(const QString&, const QVariant&);
+
+	void on_nvim_win_get_number(int64_t);
+	void err_nvim_win_get_number(const QString&, const QVariant&);
+
+	void on_nvim_win_is_valid(bool);
+	void err_nvim_win_is_valid(const QString&, const QVariant&);
+
+	void on_nvim_win_set_config(void);
+	void err_nvim_win_set_config(const QString&, const QVariant&);
+
+	void on_nvim_win_get_config(QVariantMap);
+	void err_nvim_win_get_config(const QString&, const QVariant&);
+
+	void on_nvim_win_hide(void);
+	void err_nvim_win_hide(const QString&, const QVariant&);
+
+	void on_nvim_win_close(void);
+	void err_nvim_win_close(const QString&, const QVariant&);
+
+	void on_nvim_win_call(QVariant);
+	void err_nvim_win_call(const QString&, const QVariant&);
+
+	void on_buffer_line_count(int64_t);
+	void err_buffer_line_count(const QString&, const QVariant&);
+
+	void on_buffer_get_lines(QList<QByteArray>);
+	void err_buffer_get_lines(const QString&, const QVariant&);
+
+	void on_buffer_set_lines(void);
+	void err_buffer_set_lines(const QString&, const QVariant&);
+
+	void on_buffer_get_var(QVariant);
+	void err_buffer_get_var(const QString&, const QVariant&);
+
+	void on_buffer_get_option(QVariant);
+	void err_buffer_get_option(const QString&, const QVariant&);
+
+	void on_buffer_set_option(void);
+	void err_buffer_set_option(const QString&, const QVariant&);
+
+	void on_buffer_get_name(QByteArray);
+	void err_buffer_get_name(const QString&, const QVariant&);
+
+	void on_buffer_set_name(void);
+	void err_buffer_set_name(const QString&, const QVariant&);
+
+	void on_buffer_is_valid(bool);
+	void err_buffer_is_valid(const QString&, const QVariant&);
+
+	void on_buffer_get_mark(QPoint);
+	void err_buffer_get_mark(const QString&, const QVariant&);
+
+	void on_buffer_add_highlight(int64_t);
+	void err_buffer_add_highlight(const QString&, const QVariant&);
+
+	void on_vim_command_output(QByteArray);
+	void err_vim_command_output(const QString&, const QVariant&);
+
+	void on_buffer_get_number(int64_t);
+	void err_buffer_get_number(const QString&, const QVariant&);
+
+	void on_buffer_clear_highlight(void);
+	void err_buffer_clear_highlight(const QString&, const QVariant&);
+
+	void on_tabpage_get_windows(QList<int64_t>);
+	void err_tabpage_get_windows(const QString&, const QVariant&);
+
+	void on_tabpage_get_var(QVariant);
+	void err_tabpage_get_var(const QString&, const QVariant&);
+
+	void on_tabpage_get_window(int64_t);
+	void err_tabpage_get_window(const QString&, const QVariant&);
+
+	void on_tabpage_is_valid(bool);
+	void err_tabpage_is_valid(const QString&, const QVariant&);
+
+	void on_ui_detach(void);
+	void err_ui_detach(const QString&, const QVariant&);
+
+	void on_ui_try_resize(QVariant);
+	void err_ui_try_resize(const QString&, const QVariant&);
+
+	void on_vim_command(void);
+	void err_vim_command(const QString&, const QVariant&);
+
+	void on_vim_feedkeys(void);
+	void err_vim_feedkeys(const QString&, const QVariant&);
+
+	void on_vim_input(int64_t);
+	void err_vim_input(const QString&, const QVariant&);
+
+	void on_vim_replace_termcodes(QByteArray);
+	void err_vim_replace_termcodes(const QString&, const QVariant&);
+
+	void on_vim_eval(QVariant);
+	void err_vim_eval(const QString&, const QVariant&);
+
+	void on_vim_call_function(QVariant);
+	void err_vim_call_function(const QString&, const QVariant&);
+
+	void on_vim_strwidth(int64_t);
+	void err_vim_strwidth(const QString&, const QVariant&);
+
+	void on_vim_list_runtime_paths(QList<QByteArray>);
+	void err_vim_list_runtime_paths(const QString&, const QVariant&);
+
+	void on_vim_change_directory(void);
+	void err_vim_change_directory(const QString&, const QVariant&);
+
+	void on_vim_get_current_line(QByteArray);
+	void err_vim_get_current_line(const QString&, const QVariant&);
+
+	void on_vim_set_current_line(void);
+	void err_vim_set_current_line(const QString&, const QVariant&);
+
+	void on_vim_del_current_line(void);
+	void err_vim_del_current_line(const QString&, const QVariant&);
+
+	void on_vim_get_var(QVariant);
+	void err_vim_get_var(const QString&, const QVariant&);
+
+	void on_vim_get_vvar(QVariant);
+	void err_vim_get_vvar(const QString&, const QVariant&);
+
+	void on_vim_get_option(QVariant);
+	void err_vim_get_option(const QString&, const QVariant&);
+
+	void on_vim_set_option(void);
+	void err_vim_set_option(const QString&, const QVariant&);
+
+	void on_vim_out_write(void);
+	void err_vim_out_write(const QString&, const QVariant&);
+
+	void on_vim_err_write(void);
+	void err_vim_err_write(const QString&, const QVariant&);
+
+	void on_vim_report_error(void);
+	void err_vim_report_error(const QString&, const QVariant&);
+
+	void on_vim_get_buffers(QList<int64_t>);
+	void err_vim_get_buffers(const QString&, const QVariant&);
+
+	void on_vim_get_current_buffer(int64_t);
+	void err_vim_get_current_buffer(const QString&, const QVariant&);
+
+	void on_vim_set_current_buffer(void);
+	void err_vim_set_current_buffer(const QString&, const QVariant&);
+
+	void on_vim_get_windows(QList<int64_t>);
+	void err_vim_get_windows(const QString&, const QVariant&);
+
+	void on_vim_get_current_window(int64_t);
+	void err_vim_get_current_window(const QString&, const QVariant&);
+
+	void on_vim_set_current_window(void);
+	void err_vim_set_current_window(const QString&, const QVariant&);
+
+	void on_vim_get_tabpages(QList<int64_t>);
+	void err_vim_get_tabpages(const QString&, const QVariant&);
+
+	void on_vim_get_current_tabpage(int64_t);
+	void err_vim_get_current_tabpage(const QString&, const QVariant&);
+
+	void on_vim_set_current_tabpage(void);
+	void err_vim_set_current_tabpage(const QString&, const QVariant&);
+
+	void on_vim_subscribe(void);
+	void err_vim_subscribe(const QString&, const QVariant&);
+
+	void on_vim_unsubscribe(void);
+	void err_vim_unsubscribe(const QString&, const QVariant&);
+
+	void on_vim_name_to_color(int64_t);
+	void err_vim_name_to_color(const QString&, const QVariant&);
+
+	void on_vim_get_color_map(QVariantMap);
+	void err_vim_get_color_map(const QString&, const QVariant&);
+
+	void on_window_get_buffer(int64_t);
+	void err_window_get_buffer(const QString&, const QVariant&);
+
+	void on_window_get_cursor(QPoint);
+	void err_window_get_cursor(const QString&, const QVariant&);
+
+	void on_window_set_cursor(void);
+	void err_window_set_cursor(const QString&, const QVariant&);
+
+	void on_window_get_height(int64_t);
+	void err_window_get_height(const QString&, const QVariant&);
+
+	void on_window_set_height(void);
+	void err_window_set_height(const QString&, const QVariant&);
+
+	void on_window_get_width(int64_t);
+	void err_window_get_width(const QString&, const QVariant&);
+
+	void on_window_set_width(void);
+	void err_window_set_width(const QString&, const QVariant&);
+
+	void on_window_get_var(QVariant);
+	void err_window_get_var(const QString&, const QVariant&);
+
+	void on_window_get_option(QVariant);
+	void err_window_get_option(const QString&, const QVariant&);
+
+	void on_window_set_option(void);
+	void err_window_set_option(const QString&, const QVariant&);
+
+	void on_window_get_position(QPoint);
+	void err_window_get_position(const QString&, const QVariant&);
+
+	void on_window_get_tabpage(int64_t);
+	void err_window_get_tabpage(const QString&, const QVariant&);
+
+	void on_window_is_valid(bool);
+	void err_window_is_valid(const QString&, const QVariant&);
+
+};
+
+} // namespace NeovimQt

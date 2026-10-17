@@ -82,6 +82,7 @@ void TestCallAllMethods::callAll()
 	call_metaobject_slots(m_c->api4());
 	call_metaobject_slots(m_c->api5());
 	call_metaobject_slots(m_c->api6());
+	call_metaobject_slots(m_c->api7());
 }
 
 void TestCallAllMethods::call_metaobject_slots(QObject *obj)
@@ -129,14 +130,15 @@ void TestCallAllMethods::vim_call_function()
 }
 
 #define call_test_all_api(NAME) \
-	NAME(m_c->neovimObject());	\
-	NAME(m_c->api0());			\
-	NAME(m_c->api1());			\
-	NAME(m_c->api2());			\
-	NAME(m_c->api3());			\
-	NAME(m_c->api4());			\
-	NAME(m_c->api5());			\
-	NAME(m_c->api6());			\
+	NAME(m_c->neovimObject()); \
+	NAME(m_c->api0()); \
+	NAME(m_c->api1()); \
+	NAME(m_c->api2()); \
+	NAME(m_c->api3()); \
+	NAME(m_c->api4()); \
+	NAME(m_c->api5()); \
+	NAME(m_c->api6()); \
+	NAME(m_c->api7());
 
 void TestCallAllMethods::buffer_line_count()
 {
