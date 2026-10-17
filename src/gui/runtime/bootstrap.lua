@@ -1,12 +1,15 @@
 local shim_script, help_text = ...
 
+shim_script = shim_script:gsub("\r\n", "\n")
+help_text = help_text:gsub("\r\n", "\n")
+
 local function prepare_docs()
 	local plugin_dir = vim.fn.stdpath("data") .. "/nvim-qt/plugin"
 	local doc_dir = plugin_dir .. "/doc"
 	vim.fn.mkdir(doc_dir, "p")
 
 	local help_path = doc_dir .. "/nvim_gui_shim.txt"
-	local f = io.open(help_path, "w")
+	local f = io.open(help_path, "wb")
 	if f then
 		f:write(help_text)
 		f:close()
