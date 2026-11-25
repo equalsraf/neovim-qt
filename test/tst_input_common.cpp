@@ -23,6 +23,7 @@ private slots:
 	void MouseMiddleClick() noexcept;
 	void MouseX1Click() noexcept;
 	void MouseX2Click() noexcept;
+	void MouseMove() noexcept;
 };
 
 void TestInputCommon::LessThanKey() noexcept
@@ -293,6 +294,20 @@ void TestInputCommon::MouseX2Click() noexcept
 
 	QCOMPARE(x2Press, QString{ "<X2Mouse><1,2>" });
 	QCOMPARE(x2Release, QString{ "<X2Release><1,2>" });
+}
+
+void TestInputCommon::MouseMove() noexcept
+{
+	QString move{ NeovimQt::Input::convertMouse(
+		Qt::NoButton, QEvent::MouseMove, Qt::NoModifier, { 1, 2 }, 0 /*clickCount*/) };
+	QString moveShift{ NeovimQt::Input::convertMouse(
+		Qt::NoButton, QEvent::MouseMove, Qt::ShiftModifier, { 3, 4 }, 0 /*clickCount*/) };
+	QString leftDrag{ NeovimQt::Input::convertMouse(
+		Qt::LeftButton, QEvent::MouseMove, Qt::NoModifier, { 5, 6 }, 0 /*clickCount*/) };
+
+	QCOMPARE(move, QString{ "<MouseMove><1,2>" });
+	QCOMPARE(moveShift, QString{ "<S-MouseMove><3,4>" });
+	QCOMPARE(leftDrag, QString{ "<LeftDrag><5,6>" });
 }
 
 #include "tst_input_common.moc"

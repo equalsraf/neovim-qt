@@ -263,6 +263,8 @@ private:
 	ShellOptions m_options;
 	PopupMenu m_pum{ this };
 	bool m_mouseEnabled{ true };
+	// 'mousemoveevent' option: Neovim wants to receive mouse moves without a button pressed.
+	bool m_mouseMoveEvent{ false };
 
 	QWindow *m_window_handle{ nullptr };
 };
