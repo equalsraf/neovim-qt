@@ -127,6 +127,10 @@ QString convertMouse(
 	QString yPos;
 	yPos.setNum(pos.y());
 
+	if (bt == Qt::NoButton && type == QEvent::MouseMove) {
+		return QStringLiteral("<%1MouseMove><%2,%3>").arg(GetModifierPrefix(mod), xPos, yPos);
+	}
+
 	return QStringLiteral("<%1%2%3><%4,%5>").arg(GetModifierPrefix(mod), varButtonName.toString(),
 		GetEventString(type), xPos, yPos);
 }

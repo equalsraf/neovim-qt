@@ -1069,6 +1069,8 @@ void Shell::handleSetOption(const QVariantList& opargs)
 		handleGuiFontWide(value);
 	} else if (name == "linespace") {
 		handleLineSpace(value);
+	} else if (name == "mousemoveevent") {
+		m_mouseMoveEvent = variant_not_zero(value);
 	} else {
 		// Uncomment for writing new event handling code.
 		// qDebug() << "Received unknown option" << name << value;
@@ -1540,6 +1542,9 @@ void Shell::neovimMouseEvent(QMouseEvent* ev)
 		}
 		else if (ev->buttons() & Qt::MiddleButton) {
 			bt = Qt::MiddleButton;
+		}
+		else if (m_mouseMoveEvent && ev->buttons() == Qt::NoButton) {
+			bt = Qt::NoButton; // <MouseMove>
 		}
 		else {
 			return;
