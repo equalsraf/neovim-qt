@@ -63,6 +63,7 @@ void MainWindow::init(NeovimConnector *c)
 
 	m_shell = new Shell(c);
 	m_shell->setParent(this);
+	m_shell->installEventFilter(this);
 
 	addToolBar(&m_tabline);
 
@@ -139,6 +140,7 @@ void MainWindow::init(NeovimConnector *c)
 			this, &MainWindow::showGuiAdaptiveStyleList);
 	connect(m_shell, &Shell::colorsChanged,
 			this, &MainWindow::updateAdaptiveColor);
+	connect(m_shell, &Shell::shellFontChanged, this, &MainWindow::updateSizeHints);
 
 	m_shell->setFocus(Qt::OtherFocusReason);
 
@@ -306,6 +308,39 @@ void MainWindow::changeEvent(QEvent* ev)
 		emit activeChanged(*this);
 	}
 	QWidget::changeEvent(ev);
+}
+
+bool MainWindow::eventFilter(QObject* watched, QEvent* ev)
+{
+	if (watched == m_shell && ev->type() == QEvent::Resize) {
+		updateSizeHints();
+	}
+	return QMainWindow::eventFilter(watched, ev);
+}
+
+/// Let the window manager resize the window in whole grid cells:
+/// window size = base + n * cell, where base is everything but the shell.
+/// Only X11 (and XWayland) supports this; Wayland has no size increments.
+void MainWindow::updateSizeHints() noexcept
+{
+	if (!m_shell) {
+		return;
+	}
+	const QSize cell{ m_shell->cellSize() };
+	QSize base{ size() - m_shell->size() };
+	if (base.width() < 0 || base.height() < 0) {
+		return; // not laid out yet
+	}
+	// Qt 6 bug: a 0x0 base size isn't sent, so WMs would use the window's
+	// minimum size as the base instead, likely not cell-aligned.
+	// Work around it with a one-cell base: it allows cell-aligned sizes,
+	// at the cost of the grid sizes shown to the user by WM being off by 1.
+	// https://github.com/qt/qtbase/commit/25720f5a6365125d77400a26f11dbcfc950e5c5f
+	if (base.isNull()) {
+		base = cell;
+	}
+	setSizeIncrement(cell);
+	setBaseSize(base);
 }
 
 void MainWindow::handleNeovimAttachment(bool attached)

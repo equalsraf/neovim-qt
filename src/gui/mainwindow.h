@@ -40,6 +40,7 @@ signals:
 protected:
 	virtual void closeEvent(QCloseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void changeEvent(QEvent *ev) Q_DECL_OVERRIDE;
+	bool eventFilter(QObject* watched, QEvent* ev) Q_DECL_OVERRIDE;
 private slots:
 	void neovimSetTitle(const QString &title);
 	void neovimWidgetResized();
@@ -89,6 +90,7 @@ private:
 
 	void updateAdaptiveColor() noexcept;
 	void updateAdaptiveFont() noexcept;
+	void updateSizeHints() noexcept;
 };
 
 } // namespace NeovimQt
