@@ -308,6 +308,11 @@ void Shell::updateGuiFontRegisters() noexcept
 			}
 
 			const QString oldFont{ val.toString() };
+			// Newer than the last option_set we received (e.g. ginit.vim's, sourced
+			// on attach): its option_set is still on the way, don't undo it with ours.
+			if (oldFont != m_last_set_guifont) {
+				return;
+			}
 			const QString newFont{ escapeFontListEntry(fontDesc()) };
 			if (newFont.compare(oldFont, Qt::CaseInsensitive) == 0) {
 				return;
@@ -1051,6 +1056,7 @@ void Shell::handleSetOption(const QVariantList& opargs)
 	const QVariant& value{ opargs.at(1) };
 
 	if (name == "guifont") {
+		m_last_set_guifont = value.toString();
 		const QStringList values{ splitFontList(value.toString()) };
 		for (qsizetype i = 0; i < values.size(); i++) {
 			auto opts = FontOptions{ FontOption::Force };
